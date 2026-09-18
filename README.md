@@ -29,9 +29,24 @@ PATH as `godot`.
 godot --path game
 ```
 
+Controls: click a passenger to inspect it. Space starts or pauses, 1/2/4/8
+set speed, R restarts, F3 opens the debug panel.
+
+On Linux the editor and game need the usual X11 client libraries. If Godot
+reports it cannot load `libXcursor`, install `libxcursor1`.
+
 ## Run the tests
 
 ```sh
 ./run_tests.sh            # full suite, including 1000 deadlock scenarios
 ./run_tests.sh --quick    # 50 deadlock scenarios
+```
+
+## Screenshots for review
+
+`game/tests/screenshot.gd` drives the main screen through planning, boarding,
+results and the editor and saves PNGs. Under a virtual framebuffer:
+
+```sh
+xvfb-run -a -s "-screen 0 1280x800x24" godot --path game --script tests/screenshot.gd -- /abs/output/dir
 ```

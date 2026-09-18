@@ -5,5 +5,5 @@
   "passenger_count": 60,
   "seed": 101001,
   "config_overrides": {},
-  "target_time_seconds": 300
+  "target_time_seconds": 150
 }

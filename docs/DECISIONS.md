@@ -168,3 +168,32 @@ installed, pin the exact version in the repo (a `.godot-version` file and the
 same build.
 
 **Why:** Determinism guarantees only hold across identical engine builds.
+
+---
+
+## D-010 — Window/Middle/Aisle preset orders randomly within groups
+
+**Date:** 2026-09-18
+**Status:** Accepted
+
+The Window / Middle / Aisle preset boards the window group, then middle,
+then aisle, with random order inside each group. Strict back-to-front
+ordering inside the groups is available in the custom editor but is not the
+preset default.
+
+Measured on Full Flight across five seeds (sim 0.1.0):
+
+| In-group order | Avg time (ticks) |
+| --- | --- |
+| Random | 12,667 |
+| Back to front | 18,153 |
+| Front to back | 26,158 |
+| (Random boarding, for reference) | 17,056 |
+
+**Why:** Strict back-to-front inside a group sends consecutive passengers to
+adjacent rows, so each one stops directly behind the previous one's stowing
+and the whole group serialises. Random spreads stops along the aisle. This
+matches the boarding literature, where interleaved orders beat contiguous
+ones. With back-to-front inside groups the preset was slower than random
+boarding, which would have hidden the strategy signal the prototype exists
+to test.

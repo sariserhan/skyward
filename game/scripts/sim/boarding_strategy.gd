@@ -87,22 +87,22 @@ var unassigned_count: int = 0
 static func preset(id: String, aircraft: AircraftDef) -> BoardingStrategy:
 	match id:
 		"random":
-			return make_random()
+			return make_random(aircraft.rows)
 		"back_to_front":
 			return make_back_to_front(aircraft.rows)
 		"front_to_back":
 			return make_front_to_back(aircraft.rows)
 		"window_middle_aisle":
-			return make_window_middle_aisle()
+			return make_window_middle_aisle(aircraft.rows)
 	push_error("Unknown preset: %s" % id)
 	return make_random()
 
 
-static func make_random() -> BoardingStrategy:
+static func make_random(rows: int = 999) -> BoardingStrategy:
 	var s := BoardingStrategy.new()
 	s.preset_id = "random"
 	s.name = PRESET_NAMES["random"]
-	s.groups = [_group("All passengers", 1, 999, [], Order.RANDOM)]
+	s.groups = [_group("All passengers", 1, rows, [], Order.RANDOM)]
 	return s
 
 
@@ -130,14 +130,14 @@ static func make_front_to_back(rows: int, chunks: int = 3) -> BoardingStrategy:
 	return s
 
 
-static func make_window_middle_aisle() -> BoardingStrategy:
+static func make_window_middle_aisle(rows: int = 999) -> BoardingStrategy:
 	var s := BoardingStrategy.new()
 	s.preset_id = "window_middle_aisle"
 	s.name = PRESET_NAMES["window_middle_aisle"]
 	s.groups = [
-		_group("Window", 1, 999, [Passenger.SeatType.WINDOW], Order.RANDOM),
-		_group("Middle", 1, 999, [Passenger.SeatType.MIDDLE], Order.RANDOM),
-		_group("Aisle", 1, 999, [Passenger.SeatType.AISLE], Order.RANDOM),
+		_group("Window", 1, rows, [Passenger.SeatType.WINDOW], Order.RANDOM),
+		_group("Middle", 1, rows, [Passenger.SeatType.MIDDLE], Order.RANDOM),
+		_group("Aisle", 1, rows, [Passenger.SeatType.AISLE], Order.RANDOM),
 	]
 	return s
 
