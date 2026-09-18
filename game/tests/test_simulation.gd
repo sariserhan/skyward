@@ -234,6 +234,12 @@ func test_result_totals_consistent() -> void:
 	assert_true(r["blocked_ticks"] > 0, "some blocking happened")
 	assert_true(r["stow_ticks"] > 0, "some stowing happened")
 	assert_true(r["seat_wait_ticks"] > 0, "some seat interference happened")
+	var caused := 0
+	for p in sim.passengers:
+		caused += p.caused_blocked_time
+	assert_eq(caused, r["blocked_ticks"], "every blocked tick is attributed to exactly one blocker")
+	assert_true(r["top_blockers"].size() > 0, "top blockers reported")
+	assert_true(r["top_blockers"][0]["caused_blocked_ticks"] >= r["top_blockers"][-1]["caused_blocked_ticks"], "sorted desc")
 
 
 func test_records_versioning() -> void:

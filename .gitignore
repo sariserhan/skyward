@@ -10,3 +10,6 @@ game/export/
 .DS_Store
 # Scratch
 /tmp/
+
+# Exported builds
+/dist/

@@ -27,7 +27,9 @@
 ## Next: playtest gate (spec §33)
 
 Give the build to 10–20 people and track voluntary retries, attempts per
-session, strategy edits.
+session, strategy edits. Everything needed is in place: exported builds,
+a local event log, `tools/playtest_report.py`, and [PLAYTEST.md](PLAYTEST.md).
+What remains is the author playing it first and a balance pass from that.
 
 ## Balancing levers worth revisiting after playtest
 

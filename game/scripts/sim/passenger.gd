@@ -73,6 +73,9 @@ var total_blocked_time: int = 0
 var total_walk_time: int = 0
 var total_stow_time: int = 0
 var total_seat_wait_time: int = 0
+## Ticks other passengers spent BLOCKED with this passenger as the nearest
+## non-blocked passenger ahead of them (the head of the jam).
+var caused_blocked_time: int = 0
 
 
 func seat_key() -> String:

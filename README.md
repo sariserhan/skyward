@@ -42,6 +42,13 @@ reports it cannot load `libXcursor`, install `libxcursor1`.
 ./run_tests.sh --quick    # 50 deadlock scenarios
 ```
 
+## Playtest builds
+
+Export presets for Linux, Windows and macOS are in `game/export_presets.cfg`.
+Builds land in `dist/` (ignored by git). See [docs/PLAYTEST.md](docs/PLAYTEST.md)
+for what to send testers and how to read the results. The game writes a local
+event log that `tools/playtest_report.py` turns into the spec's metrics.
+
 ## Screenshots for review
 
 `game/tests/screenshot.gd` drives the main screen through planning, boarding,

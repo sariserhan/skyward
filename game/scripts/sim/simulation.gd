@@ -83,6 +83,7 @@ func _reset_passenger(p: Passenger) -> void:
 	p.total_walk_time = 0
 	p.total_stow_time = 0
 	p.total_seat_wait_time = 0
+	p.caused_blocked_time = 0
 	p.boarding_group = -1
 	p.boarding_group_name = ""
 	p.queue_position = -1
@@ -143,11 +144,24 @@ func step() -> void:
 				if p.timer <= 0:
 					_seat(p)
 
+	_attribute_blocking()
 	_step_entry()
 
 	if seated_count >= passengers.size() and not completed:
 		completed = true
 		boarding_completed.emit(tick)
+
+
+## Charge every BLOCKED tick to the nearest non-blocked passenger ahead, so
+## the results screen can name who caused the biggest jam.
+func _attribute_blocking() -> void:
+	var head: Passenger = null
+	for p in active:
+		if p.state == Passenger.State.BLOCKED:
+			if head != null:
+				head.caused_blocked_time += 1
+		else:
+			head = p
 
 
 func _step_walking(p: Passenger) -> void:
@@ -277,6 +291,25 @@ func result() -> Dictionary:
 		walk += p.total_walk_time
 		stow += p.total_stow_time
 		seat_wait += p.total_seat_wait_time
+	var blockers: Array = []
+	for p in passengers:
+		if p.caused_blocked_time > 0:
+			blockers.append(p)
+	blockers.sort_custom(func(a, b):
+		if a.caused_blocked_time != b.caused_blocked_time:
+			return a.caused_blocked_time > b.caused_blocked_time
+		return a.id < b.id
+	)
+	var top: Array = []
+	for i in mini(3, blockers.size()):
+		var p: Passenger = blockers[i]
+		top.append({
+			"id": p.id,
+			"seat": p.seat_key(),
+			"carry_on_count": p.carry_on_count,
+			"obstruction_count": p.obstruction_count,
+			"caused_blocked_ticks": p.caused_blocked_time,
+		})
 	return {
 		"sim_version": SIM_VERSION,
 		"config_version": config.config_version,
@@ -290,6 +323,7 @@ func result() -> Dictionary:
 		"walk_ticks": walk,
 		"stow_ticks": stow,
 		"seat_wait_ticks": seat_wait,
+		"top_blockers": top,
 		"strategy": strategy.to_dict(),
 		"warnings": warnings.duplicate(),
 	}

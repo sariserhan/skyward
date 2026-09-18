@@ -14,7 +14,10 @@ var aircraft: AircraftDef
 var config: SimConfig
 var strategy: BoardingStrategy
 var records: Records
+var playtest: PlaytestLog
 var phase: int = Phase.PLANNING
+## Completed runs on the current scenario+seed during this session.
+var runs_this_seed: int = 0
 var seed_override: int = -1
 var selected_passenger: Passenger
 
@@ -44,6 +47,9 @@ var _suppress_strategy_signal := false
 
 func _ready() -> void:
 	records = Records.load_records()
+	playtest = PlaytestLog.new()
+	playtest.log_event("session_start", {"os": OS.get_name(), "godot": Engine.get_version_info()["string"]})
+	get_tree().root.close_requested.connect(func(): playtest.log_event("session_end"))
 	scenarios = Scenario.load_all()
 	_build_ui()
 	var default_index := 0
@@ -201,7 +207,10 @@ func _build_ui() -> void:
 	restart_button = Button.new()
 	restart_button.text = "Restart"
 	restart_button.custom_minimum_size.x = 100
-	restart_button.pressed.connect(_rebuild_sim)
+	restart_button.pressed.connect(func():
+		_log_abandon_if_running("restart")
+		_rebuild_sim()
+	)
 	bottom.add_child(restart_button)
 
 	# Runner
@@ -305,8 +314,12 @@ func _build_debug_panel() -> void:
 # --- scenario / strategy --------------------------------------------------
 
 func _select_scenario(index: int) -> void:
+	_log_abandon_if_running("scenario_changed")
 	scenario = scenarios[index]
 	seed_override = -1
+	runs_this_seed = 0
+	if playtest != null:
+		playtest.log_event("scenario_selected", {"scenario": scenario.scenario_id, "passengers": scenario.passenger_count})
 	aircraft = scenario.load_aircraft()
 	config = scenario.build_config()
 	if strategy == null:
@@ -321,7 +334,9 @@ func _on_strategy_selected(index: int) -> void:
 	if _suppress_strategy_signal:
 		return
 	if index < BoardingStrategy.PRESET_IDS.size():
+		_log_abandon_if_running("strategy_changed")
 		strategy = BoardingStrategy.preset(BoardingStrategy.PRESET_IDS[index], aircraft)
+		playtest.log_event("strategy_changed", _strategy_fields())
 		_rebuild_sim()
 	else:
 		_open_editor()
@@ -335,13 +350,38 @@ func _sync_strategy_select() -> void:
 
 
 func _open_editor() -> void:
+	playtest.log_event("editor_opened", _strategy_fields())
 	editor.open(strategy, aircraft)
 
 
 func _on_custom_applied(s: BoardingStrategy) -> void:
+	_log_abandon_if_running("strategy_changed")
 	strategy = s
 	_sync_strategy_select()
+	playtest.log_event("custom_strategy_created", _strategy_fields())
+	playtest.log_event("strategy_changed", _strategy_fields())
 	_rebuild_sim()
+
+
+func _strategy_fields() -> Dictionary:
+	return {
+		"scenario": scenario.scenario_id,
+		"seed": scenario.seed_value if seed_override < 0 else seed_override,
+		"preset": strategy.preset_id,
+		"strategy_name": strategy.name,
+		"groups": strategy.group_count(),
+	}
+
+
+func _log_abandon_if_running(reason: String) -> void:
+	if playtest == null or runner.sim == null:
+		return
+	if phase == Phase.RUNNING and runner.sim.tick > 0:
+		var f := _strategy_fields()
+		f["reason"] = reason
+		f["tick"] = runner.sim.tick
+		f["seated"] = runner.sim.seated_count
+		playtest.log_event("scenario_abandoned", f)
 
 
 func _new_passengers() -> void:
@@ -349,6 +389,8 @@ func _new_passengers() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
 	seed_override = rng.randi_range(1, 2_000_000_000)
+	runs_this_seed = 0
+	playtest.log_event("new_passengers", {"scenario": scenario.scenario_id, "seed": seed_override})
 	_rebuild_sim()
 
 
@@ -378,6 +420,11 @@ func _on_start() -> void:
 	phase = Phase.RUNNING
 	start_button.disabled = true
 	start_button.text = "BOARDING…"
+	var f := _strategy_fields()
+	f["attempt"] = runs_this_seed + 1
+	playtest.log_event("simulation_started", f)
+	if runs_this_seed > 0:
+		playtest.log_event("simulation_retried", f)
 	if runner.speed <= 0.0:
 		runner.speed = 1.0
 	runner.start()
@@ -385,6 +432,8 @@ func _on_start() -> void:
 
 
 func _set_speed(speed: float) -> void:
+	if playtest != null and not is_equal_approx(speed, runner.speed):
+		playtest.log_event("speed_changed", {"speed": speed})
 	runner.speed = speed
 	if phase == Phase.RUNNING:
 		runner.running = speed > 0.0
@@ -403,6 +452,20 @@ func _on_completed(result: Dictionary) -> void:
 	var prev_best := records.best_ticks(scenario, config)
 	var prev_last := int(prev_entry.get("last_ticks", -1)) if records.is_current(prev_entry, config) else -1
 	var is_best := records.record_attempt(scenario, config, result)
+	runs_this_seed += 1
+	var f := _strategy_fields()
+	f["attempt"] = runs_this_seed
+	f["total_ticks"] = result["total_ticks"]
+	f["total_seconds"] = result["total_seconds"]
+	f["blocked_ticks"] = result["blocked_ticks"]
+	f["stow_ticks"] = result["stow_ticks"]
+	f["seat_wait_ticks"] = result["seat_wait_ticks"]
+	f["is_best"] = is_best
+	f["prev_best_ticks"] = prev_best
+	f["target_seconds"] = scenario.target_time_seconds
+	playtest.log_event("simulation_completed", f)
+	if is_best and prev_best >= 0:
+		playtest.log_event("personal_best", {"scenario": scenario.scenario_id, "total_ticks": result["total_ticks"], "prev_best_ticks": prev_best})
 	_show_results(result, prev_best, prev_last, is_best)
 	_update_best_label()
 
@@ -430,6 +493,13 @@ func _show_results(result: Dictionary, prev_best: int, prev_last: int, is_best: 
 	_result_row("Total Blocked Time", Simulation.format_ticks(result["blocked_ticks"], tr))
 	_result_row("Luggage Delay", Simulation.format_ticks(result["stow_ticks"], tr))
 	_result_row("Seat Interference", Simulation.format_ticks(result["seat_wait_ticks"], tr))
+	var top: Array = result.get("top_blockers", [])
+	if top.size() > 0:
+		var b: Dictionary = top[0]
+		var why := "%d bag%s" % [b["carry_on_count"], "" if int(b["carry_on_count"]) == 1 else "s"]
+		if int(b["obstruction_count"]) > 0:
+			why += ", %d seated in the way" % int(b["obstruction_count"])
+		_result_row("Worst Blockage", "#%d at %s (%s) held others %s" % [b["id"], b["seat"], why, Simulation.format_ticks(b["caused_blocked_ticks"], tr)])
 	results_title.text = "BOARDING COMPLETE" + ("  ·  NEW BEST" if is_best else "")
 	results_panel.visible = true
 
@@ -509,6 +579,8 @@ func _update_passenger_info() -> void:
 	lines.append("Carry-ons: %d" % p.carry_on_count)
 	lines.append("State: %s" % p.state_name())
 	lines.append("Blocked time: %.1f s" % (float(p.total_blocked_time) / tr))
+	if p.caused_blocked_time > 0:
+		lines.append("Delay caused: %.1f s" % (float(p.caused_blocked_time) / tr))
 	if p.state == Passenger.State.WAITING_FOR_SEAT:
 		lines.append("Waiting for %d seated passenger%s" % [p.obstruction_count, "" if p.obstruction_count == 1 else "s"])
 	if p.is_in_aisle() and p.state != Passenger.State.WALKING and p.state != Passenger.State.ENTERING:
@@ -538,6 +610,8 @@ func _update_debug() -> void:
 	lines.append("aisle occ   %d / %d" % [sim.aisle_occupancy(), sim.aisle.size()])
 	lines.append("queue       %d" % sim.queue_remaining())
 	lines.append("boarded     %d / %d" % [sim.seated_count, sim.total_passengers()])
+	lines.append("")
+	lines.append("playtest log: %s" % PlaytestLog.absolute_log_path())
 	lines.append("")
 	for s in Passenger.State.values():
 		lines.append("%-18s %d" % [Passenger.STATE_NAMES[s], counts[s]])

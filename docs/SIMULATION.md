@@ -67,6 +67,14 @@ WAITING ─► QUEUED ─► ENTERING ─► WALKING ⇄ BLOCKED
 * **SEATING**: lasts `seat_access_duration` ticks, still holding the cell.
 * **SEATED**: cell released, seat marked occupied.
 
+## Blame accounting
+
+After the movement pass each tick, every BLOCKED passenger charges one tick
+to the nearest non-blocked passenger ahead of them (the head of the jam).
+This is `caused_blocked_time`. The sum over all passengers equals total
+blocked time exactly, and `result()["top_blockers"]` lists the three worst.
+It does not affect outcomes; it only explains them.
+
 ## Door
 
 A passenger enters from the queue when both hold: at least
