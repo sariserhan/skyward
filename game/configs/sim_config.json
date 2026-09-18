@@ -1,0 +1,16 @@
+{
+  "config_version": 1,
+  "tick_rate": 30,
+  "walk_ticks_per_cell": 20,
+  "speed_min_permille": 900,
+  "speed_max_permille": 1150,
+  "entry_interval_ticks": 45,
+  "bag_weights": [15, 65, 20],
+  "stow_base_ticks": 60,
+  "stow_per_bag_ticks": 90,
+  "stow_variation_ticks": 30,
+  "seat_base_ticks": 30,
+  "seat_variation_ticks": 15,
+  "seat_per_obstructer_ticks": 150,
+  "bin_capacity_per_row": 0
+}

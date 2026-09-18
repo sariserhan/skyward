@@ -1,0 +1,12 @@
+# Godot
+game/.godot/
+game/export/
+*.import
+!game/assets/**/*.import
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+# Scratch
+/tmp/

@@ -1,0 +1,12 @@
+{
+  "scenario_id": "carry_on_chaos_001",
+  "display_name": "Carry-On Chaos",
+  "aircraft_id": "narrowbody_30",
+  "passenger_count": 180,
+  "seed": 774411,
+  "config_overrides": {
+    "bag_weights": [2, 38, 60],
+    "stow_per_bag_ticks": 110
+  },
+  "target_time_seconds": 900
+}

@@ -1,0 +1,46 @@
+class_name SimRng
+extends RefCounted
+## Thin wrapper around Godot's seeded RandomNumberGenerator that only exposes
+## integer operations, so the simulation never touches float randomness or
+## the global RNG. Derived streams keep generation, strategy ordering and
+## test fuzzing independent of one another.
+
+const STREAM_PASSENGERS := 0x1001
+const STREAM_STRATEGY := 0x2002
+const STREAM_SCENARIO := 0x3003
+
+var _rng := RandomNumberGenerator.new()
+
+
+func _init(seed_value: int, stream: int = 0) -> void:
+	# Mix the stream into the seed so streams with the same base seed differ.
+	_rng.seed = hash(str(seed_value) + ":" + str(stream))
+
+
+func randi_range(lo: int, hi: int) -> int:
+	return _rng.randi_range(lo, hi)
+
+
+## In-place Fisher-Yates shuffle. Array.shuffle() uses the global RNG, so it
+## must never be used inside the simulation.
+func shuffle(arr: Array) -> void:
+	for i in range(arr.size() - 1, 0, -1):
+		var j := _rng.randi_range(0, i)
+		var tmp = arr[i]
+		arr[i] = arr[j]
+		arr[j] = tmp
+
+
+## Pick an index according to integer weights.
+func weighted_index(weights: Array[int]) -> int:
+	var total := 0
+	for w in weights:
+		total += w
+	assert(total > 0, "weights must sum to a positive number")
+	var r := _rng.randi_range(0, total - 1)
+	var acc := 0
+	for i in weights.size():
+		acc += weights[i]
+		if r < acc:
+			return i
+	return weights.size() - 1

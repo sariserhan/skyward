@@ -1,0 +1,9 @@
+{
+  "scenario_id": "medium_120",
+  "display_name": "Medium",
+  "aircraft_id": "narrowbody_30",
+  "passenger_count": 120,
+  "seed": 202002,
+  "config_overrides": {},
+  "target_time_seconds": 540
+}

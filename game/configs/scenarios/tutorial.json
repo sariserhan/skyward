@@ -1,0 +1,9 @@
+{
+  "scenario_id": "tutorial_060",
+  "display_name": "Tutorial",
+  "aircraft_id": "narrowbody_30",
+  "passenger_count": 60,
+  "seed": 101001,
+  "config_overrides": {},
+  "target_time_seconds": 300
+}

@@ -1,0 +1,9 @@
+{
+  "id": "narrowbody_30",
+  "display_name": "NB-30",
+  "rows": 30,
+  "seats_per_row": 6,
+  "aisle_count": 1,
+  "boarding_doors": ["front"],
+  "seat_layout": "ABC|DEF"
+}
