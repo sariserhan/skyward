@@ -12,6 +12,12 @@ const COLOR_SEAT_EMPTY := Color("#2f3742")
 const COLOR_SEAT_OUTLINE := Color("#3d4652")
 const COLOR_SEAT_TAKEN := Color("#3e6b58")
 const COLOR_AISLE := Color("#1d222a")
+const COLOR_FUSELAGE := Color("#20262f")
+const COLOR_FUSELAGE_EDGE := Color("#3a4350")
+const COLOR_WING := Color("#1b2027")
+const COLOR_WING_EDGE := Color("#2f3742")
+const NOSE_LEN := 70.0
+const TAIL_LEN := 110.0
 const COLOR_TEXT := Color("#aab4c0")
 const COLOR_TEXT_DIM := Color("#6b7684")
 const COLOR_SELECT := Color("#ffffff")
@@ -104,7 +110,7 @@ func _draw() -> void:
 	var queue_h := 48.0
 	var legend_h := 28.0
 	var label_w := 26.0
-	var avail_w := size.x - margin * 2.0 - label_w
+	var avail_w := size.x - margin * 2.0 - label_w - NOSE_LEN - TAIL_LEN
 	var cell_w: float = clampf(floorf(avail_w / float(cells)), 12.0, 34.0)
 	var seat := cell_w - 4.0
 	var gap := 2.0
@@ -120,6 +126,8 @@ func _draw() -> void:
 	var aisle_y := seats_top + left_count * (seat + gap)
 	var aisle_cy := aisle_y + aisle_h / 2.0
 	var cells_left := cabin_left + label_w
+
+	_draw_airframe(cabin_left, cabin_top, cabin_w, cabin_h, cells_left, cell_w, aircraft.rows)
 
 	# Cabin body and aisle
 	draw_rect(Rect2(cabin_left, cabin_top, cabin_w, cabin_h), COLOR_CABIN)
@@ -161,31 +169,66 @@ func _draw() -> void:
 				if selected != null and selected.seat_key() == key:
 					draw_rect(r.grow(1.5), COLOR_SELECT, false, 2.0)
 
-	# Passengers in the aisle
+	# Passengers in the aisle. Positions are interpolated from simulation
+	# progress so movement glides; nothing here feeds back into the sim.
 	var radius := seat * 0.42
+	var t := float(sim.tick)
 	for cell in range(0, cells):
 		var pid: int = sim.aisle[cell]
 		if pid == -1:
 			continue
 		var p: Passenger = sim.passenger_by_id(pid)
-		var center := Vector2(cells_left + cell * cell_w + cell_w / 2.0, aisle_cy)
-		_passenger_pos[pid] = center
+		var cell_cx := cells_left + cell * cell_w + cell_w / 2.0
+		var center := Vector2(cell_cx, aisle_cy)
 		var col := state_color(p.state)
+		match p.state:
+			Passenger.State.ENTERING, Passenger.State.WALKING, Passenger.State.BLOCKED:
+				var frac := 0.0
+				if p.walk_ticks_per_cell > 0:
+					frac = clampf(float(p.progress) / float(p.walk_ticks_per_cell), 0.0, 1.0)
+				# Never draw on top of the passenger ahead.
+				var next_cell := cell + 1
+				if next_cell < cells and sim.aisle[next_cell] != -1:
+					frac = minf(frac, 0.55)
+				center.x += frac * cell_w
+				# Slight stride bob while actually moving.
+				if p.state != Passenger.State.BLOCKED:
+					center.y += sin(t * 0.9 + float(p.id)) * 0.8
+			Passenger.State.STOWING:
+				center.y += sin(t * 0.5 + float(p.id)) * 1.2
+			Passenger.State.WAITING_FOR_SEAT:
+				center.x += sin(t * 0.35 + float(p.id)) * 1.5
+			Passenger.State.SEATING:
+				# Slide from the aisle into the seat.
+				var dur := maxi(1, p.seat_access_duration)
+				var frac := 1.0 - clampf(float(p.timer) / float(dur), 0.0, 1.0)
+				var li: int = letters.find(p.seat_letter)
+				var sy := _seat_y(li, left_count, seats_top, seat, gap, aisle_h)
+				var seat_center := Vector2(cells_left + p.seat_row * cell_w + 2.0 + seat * 0.5, sy + seat * 0.5)
+				center = center.lerp(seat_center, frac * frac)
+		_passenger_pos[pid] = center
 		draw_circle(center, radius, col)
 		draw_circle(center, radius, group_color(p.boarding_group).darkened(0.3), false, 1.0)
 		match p.state:
 			Passenger.State.STOWING:
-				# Bag glyph inside the body
-				var bw := radius * 0.9
-				draw_rect(Rect2(center.x - bw / 2.0, center.y - bw * 0.35, bw, bw * 0.7), Color("#3b2a08"))
-				draw_rect(Rect2(center.x - bw * 0.2, center.y - bw * 0.55, bw * 0.4, bw * 0.2), Color("#3b2a08"))
-			Passenger.State.WAITING_FOR_SEAT:
-				# Chevron toward the seat side (side 0 is drawn above the aisle)
+				# Bag travels from the body up into the bin on the seat side.
+				var dur := maxi(1, p.luggage_stow_duration)
+				var frac := 1.0 - clampf(float(p.timer) / float(dur), 0.0, 1.0)
 				var dir := -1.0 if p.side == 0 else 1.0
-				var tip := Vector2(center.x, center.y + dir * radius * 0.75)
-				var base_y := center.y - dir * radius * 0.15
-				draw_line(Vector2(center.x - radius * 0.5, base_y), tip, Color("#ffffff"), 1.5)
-				draw_line(Vector2(center.x + radius * 0.5, base_y), tip, Color("#ffffff"), 1.5)
+				var bw := radius * 0.9
+				var by := center.y + dir * (radius * 0.2 + frac * (radius + 8.0))
+				var bag_col := Color("#3b2a08").lerp(Color("#3b2a08", 0.2), frac)
+				draw_rect(Rect2(center.x - bw / 2.0, by - bw * 0.35, bw, bw * 0.7), bag_col)
+				draw_rect(Rect2(center.x - bw * 0.2, by - bw * 0.55, bw * 0.4, bw * 0.2), bag_col)
+			Passenger.State.WAITING_FOR_SEAT:
+				# Pulsing chevron toward the seat side (side 0 is drawn above the aisle)
+				var dir := -1.0 if p.side == 0 else 1.0
+				var pulse := 0.6 + 0.4 * (0.5 + 0.5 * sin(t * 0.4))
+				var tip := Vector2(center.x, center.y + dir * radius * 0.8)
+				var base_y := center.y - dir * radius * 0.1
+				var white := Color(1, 1, 1, pulse)
+				draw_line(Vector2(center.x - radius * 0.5, base_y), tip, white, 1.5)
+				draw_line(Vector2(center.x + radius * 0.5, base_y), tip, white, 1.5)
 			Passenger.State.BLOCKED:
 				draw_circle(center, radius * 0.3, Color("#ffffff", 0.75))
 		if pid == selected_id:
@@ -233,3 +276,71 @@ func _seat_y(i: int, left_count: int, seats_top: float, seat: float, gap: float,
 	if i >= left_count:
 		y += aisle_h
 	return y
+
+
+## Nose, tail, wings and stabilisers drawn around the cabin rectangle. Pure
+## decoration so the cabin reads as an aircraft; nothing else depends on it.
+func _draw_airframe(cabin_left: float, cabin_top: float, cabin_w: float, cabin_h: float,
+		cells_left: float, cell_w: float, rows: int) -> void:
+	var cy := cabin_top + cabin_h / 2.0
+	var half_h := cabin_h / 2.0 + 6.0
+	var body_left := cabin_left - 4.0
+	var body_right := cabin_left + cabin_w + 4.0
+
+	# Wings: swept trapezoids either side of the cabin around the middle rows.
+	var wing_root_from := cells_left + (rows * 0.36) * cell_w
+	var wing_root_to := cells_left + (rows * 0.56) * cell_w
+	var wing_span := clampf(size.y * 0.16, 50.0, 120.0)
+	var sweep := cell_w * 4.0
+	for dir: float in [-1.0, 1.0]:
+		var base_y := cy + dir * half_h
+		var tip_y := base_y + dir * wing_span
+		var wing := PackedVector2Array([
+			Vector2(wing_root_from, base_y),
+			Vector2(wing_root_to, base_y),
+			Vector2(wing_root_to + sweep * 0.9, tip_y),
+			Vector2(wing_root_from + sweep * 1.3, tip_y),
+		])
+		draw_colored_polygon(wing, COLOR_WING)
+		draw_polyline(_closed(wing), COLOR_WING_EDGE, 1.0, true)
+		# Horizontal stabiliser near the tail.
+		var st_from := body_right + TAIL_LEN * 0.45
+		var st_to := body_right + TAIL_LEN * 0.8
+		var st_span := wing_span * 0.4
+		var stab := PackedVector2Array([
+			Vector2(st_from, cy + dir * (half_h * 0.35)),
+			Vector2(st_to, cy + dir * (half_h * 0.2)),
+			Vector2(st_to + cell_w * 1.2, cy + dir * (half_h * 0.2 + st_span)),
+			Vector2(st_from + cell_w * 1.6, cy + dir * (half_h * 0.35 + st_span)),
+		])
+		draw_colored_polygon(stab, COLOR_WING)
+		draw_polyline(_closed(stab), COLOR_WING_EDGE, 1.0, true)
+
+	# Fuselage outline: half-ellipse nose on the left, tapered cone on the right.
+	var pts := PackedVector2Array()
+	var steps := 14
+	for i in range(steps + 1):
+		var a := -PI / 2.0 + PI * float(i) / float(steps)
+		pts.append(Vector2(body_left - NOSE_LEN * cos(a), cy + half_h * sin(a)))
+	# pts now runs from top of nose round to bottom; continue along the bottom edge to the tail.
+	pts.append(Vector2(body_right, cy + half_h))
+	pts.append(Vector2(body_right + TAIL_LEN, cy + half_h * 0.25))
+	pts.append(Vector2(body_right + TAIL_LEN, cy - half_h * 0.25))
+	pts.append(Vector2(body_right, cy - half_h))
+	draw_colored_polygon(pts, COLOR_FUSELAGE)
+	draw_polyline(_closed(pts), COLOR_FUSELAGE_EDGE, 1.5, true)
+
+	# Vertical fin, drawn as a small dark wedge on the tail cone.
+	var fin := PackedVector2Array([
+		Vector2(body_right + TAIL_LEN * 0.55, cy - half_h * 0.6),
+		Vector2(body_right + TAIL_LEN * 0.95, cy - half_h * 1.05),
+		Vector2(body_right + TAIL_LEN, cy - half_h * 0.25),
+	])
+	draw_colored_polygon(fin, COLOR_WING)
+	draw_polyline(_closed(fin), COLOR_WING_EDGE, 1.0, true)
+
+
+static func _closed(poly: PackedVector2Array) -> PackedVector2Array:
+	var out := PackedVector2Array(poly)
+	out.append(poly[0])
+	return out

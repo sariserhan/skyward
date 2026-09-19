@@ -300,6 +300,8 @@ func _build_debug_panel() -> void:
 	debug_panel.add_child(vbox)
 	debug_label = Label.new()
 	debug_label.add_theme_font_size_override("font_size", 12)
+	debug_label.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY
+	debug_label.custom_minimum_size.x = 300
 	vbox.add_child(debug_label)
 	var run := Button.new()
 	run.text = "RUN TO COMPLETION"
