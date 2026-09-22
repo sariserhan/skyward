@@ -110,3 +110,53 @@ func to_dict() -> Dictionary:
 		"boarding_group": boarding_group,
 		"queue_position": queue_position,
 	}
+
+
+# Airport identity lives on this same passenger. `state` above remains the
+# boarding substate; airport_state describes the enclosing journey phase.
+var current_flight_id: String = ""
+var itinerary_id: String = ""
+var origin: String = ""
+var destination: String = ""
+var checked_bag_ids: Array = []
+var carry_on_size_class: String = "standard"
+var mobility_profile: String = "standard"
+var travel_party_id: String = ""
+var connection_flight_id: String = ""
+var arrival_time_at_airport: int = -1
+var gate_arrival_time: int = -1
+var current_location: String = ""
+var airport_state: String = "not_arrived"
+var satisfaction: int = 100
+var risk_flags: Array = []
+
+
+# Terminal journey timing uses AirportClock ticks; boarding timing above retains
+# its original configuration. Both belong to this one passenger identity.
+var security_checkpoint_id: String = ""
+var security_queue_enter_tick: int = -1
+var security_wait_ticks: int = 0
+var security_lane: int = -1
+var security_cleared: bool = false
+var gate_target_tick: int = -1
+var terminal_route: Array = []
+var route_goal: String = ""
+var walk_from: String = ""
+var walk_to: String = ""
+var walk_started_tick: int = -1
+var flow_due_tick: int = -1
+
+## Full live state for airport saves; preserve to_dict()'s boarding record API.
+func snapshot() -> Dictionary:
+	var result := {}
+	for property in get_property_list():
+		if int(property.usage) & PROPERTY_USAGE_SCRIPT_VARIABLE:
+			result[property.name] = get(property.name)
+	return result.duplicate(true)
+
+func restore_snapshot(data: Dictionary) -> void:
+	for property in get_property_list():
+		if int(property.usage) & PROPERTY_USAGE_SCRIPT_VARIABLE and data.has(property.name):
+			var value = data[property.name]
+			if int(property.type) == TYPE_INT: value = int(value)
+			set(property.name, value)

@@ -1,0 +1,554 @@
+{
+  "id": "riverdale_morning",
+  "name": "Riverdale International",
+  "seed": 8492014,
+  "start_tick": 216000,
+  "landing_ticks": 700,
+  "takeoff_ticks": 550,
+  "separation_ticks": 400,
+  "taxi_in_ticks": 1800,
+  "taxi_out_ticks": 1800,
+  "approach_ticks": 1200,
+  "gate_buffer_ticks": 1200,
+  "turnaround_variation_ticks": 1200,
+  "aircraft_types": {
+    "A220": {
+      "class": "narrow",
+      "seats": 130,
+      "turnaround_ticks": 15000
+    },
+    "737": {
+      "class": "narrow",
+      "seats": 180,
+      "turnaround_ticks": 21000
+    },
+    "A321": {
+      "class": "narrow",
+      "seats": 220,
+      "turnaround_ticks": 24000
+    },
+    "787": {
+      "class": "wide",
+      "seats": 276,
+      "turnaround_ticks": 33000
+    }
+  },
+  "airlines": {
+    "NS": "Northstar Air",
+    "AW": "Atlantic Wings",
+    "SJ": "SunJet",
+    "GA": "Global Airways"
+  },
+  "gates": [
+    {
+      "id": "A1",
+      "type": "narrow",
+      "supported_aircraft_classes": [
+        "narrow"
+      ]
+    },
+    {
+      "id": "A2",
+      "type": "narrow",
+      "supported_aircraft_classes": [
+        "narrow"
+      ]
+    },
+    {
+      "id": "A3",
+      "type": "narrow",
+      "supported_aircraft_classes": [
+        "narrow"
+      ]
+    },
+    {
+      "id": "A4",
+      "type": "narrow",
+      "supported_aircraft_classes": [
+        "narrow"
+      ]
+    },
+    {
+      "id": "A5",
+      "type": "narrow",
+      "supported_aircraft_classes": [
+        "narrow"
+      ]
+    },
+    {
+      "id": "A6",
+      "type": "narrow",
+      "supported_aircraft_classes": [
+        "narrow"
+      ]
+    },
+    {
+      "id": "A7",
+      "type": "wide",
+      "supported_aircraft_classes": [
+        "narrow",
+        "wide"
+      ]
+    },
+    {
+      "id": "A8",
+      "type": "wide",
+      "supported_aircraft_classes": [
+        "narrow",
+        "wide"
+      ]
+    }
+  ],
+  "flights": [
+    {
+      "id": "F001",
+      "airline_id": "NS",
+      "flight_number": "NS 221",
+      "origin": "Pinehaven",
+      "destination": "Ashford",
+      "aircraft_type": "A220",
+      "scheduled_arrival": 217800,
+      "scheduled_departure": 238150,
+      "assigned_gate_id": "A1"
+    },
+    {
+      "id": "F002",
+      "airline_id": "AW",
+      "flight_number": "AW 228",
+      "origin": "Lakeport",
+      "destination": "Clearwater",
+      "aircraft_type": "737",
+      "scheduled_arrival": 219600,
+      "scheduled_departure": 245950,
+      "assigned_gate_id": "A2"
+    },
+    {
+      "id": "F003",
+      "airline_id": "SJ",
+      "flight_number": "SJ 235",
+      "origin": "Westbridge",
+      "destination": "Fairview",
+      "aircraft_type": "A321",
+      "scheduled_arrival": 221400,
+      "scheduled_departure": 250750,
+      "assigned_gate_id": "A3"
+    },
+    {
+      "id": "F004",
+      "airline_id": "GA",
+      "flight_number": "GA 242",
+      "origin": "Seabrook",
+      "destination": "Eastmere",
+      "aircraft_type": "A220",
+      "scheduled_arrival": 223200,
+      "scheduled_departure": 243550,
+      "assigned_gate_id": "A4"
+    },
+    {
+      "id": "F005",
+      "airline_id": "NS",
+      "flight_number": "NS 249",
+      "origin": "Pinehaven",
+      "destination": "Ashford",
+      "aircraft_type": "737",
+      "scheduled_arrival": 225000,
+      "scheduled_departure": 251350,
+      "assigned_gate_id": "A5"
+    },
+    {
+      "id": "F006",
+      "airline_id": "AW",
+      "flight_number": "AW 256",
+      "origin": "Lakeport",
+      "destination": "Clearwater",
+      "aircraft_type": "A321",
+      "scheduled_arrival": 226800,
+      "scheduled_departure": 256150,
+      "assigned_gate_id": "A6"
+    },
+    {
+      "id": "F007",
+      "airline_id": "SJ",
+      "flight_number": "SJ 263",
+      "origin": "Westbridge",
+      "destination": "Fairview",
+      "aircraft_type": "787",
+      "scheduled_arrival": 228600,
+      "scheduled_departure": 266950,
+      "assigned_gate_id": "A7"
+    },
+    {
+      "id": "F008",
+      "airline_id": "GA",
+      "flight_number": "GA 270",
+      "origin": "Seabrook",
+      "destination": "Eastmere",
+      "aircraft_type": "787",
+      "scheduled_arrival": 230400,
+      "scheduled_departure": 268750,
+      "assigned_gate_id": "A8"
+    },
+    {
+      "id": "F009",
+      "airline_id": "NS",
+      "flight_number": "NS 277",
+      "origin": "Pinehaven",
+      "destination": "Ashford",
+      "aircraft_type": "A220",
+      "scheduled_arrival": 235800,
+      "scheduled_departure": 256150,
+      "assigned_gate_id": "A1"
+    },
+    {
+      "id": "F010",
+      "airline_id": "AW",
+      "flight_number": "AW 284",
+      "origin": "Lakeport",
+      "destination": "Clearwater",
+      "aircraft_type": "737",
+      "scheduled_arrival": 237600,
+      "scheduled_departure": 263950,
+      "assigned_gate_id": "A2"
+    },
+    {
+      "id": "F011",
+      "airline_id": "SJ",
+      "flight_number": "SJ 291",
+      "origin": "Westbridge",
+      "destination": "Fairview",
+      "aircraft_type": "A321",
+      "scheduled_arrival": 239400,
+      "scheduled_departure": 268750,
+      "assigned_gate_id": "A3"
+    },
+    {
+      "id": "F012",
+      "airline_id": "GA",
+      "flight_number": "GA 298",
+      "origin": "Seabrook",
+      "destination": "Eastmere",
+      "aircraft_type": "A220",
+      "scheduled_arrival": 241200,
+      "scheduled_departure": 261550,
+      "assigned_gate_id": "A4"
+    },
+    {
+      "id": "F013",
+      "airline_id": "NS",
+      "flight_number": "NS 305",
+      "origin": "Pinehaven",
+      "destination": "Ashford",
+      "aircraft_type": "737",
+      "scheduled_arrival": 243000,
+      "scheduled_departure": 269350,
+      "assigned_gate_id": "A5"
+    },
+    {
+      "id": "F014",
+      "airline_id": "AW",
+      "flight_number": "AW 312",
+      "origin": "Lakeport",
+      "destination": "Clearwater",
+      "aircraft_type": "A321",
+      "scheduled_arrival": 244800,
+      "scheduled_departure": 274150,
+      "assigned_gate_id": "A6"
+    },
+    {
+      "id": "F015",
+      "airline_id": "SJ",
+      "flight_number": "SJ 319",
+      "origin": "Westbridge",
+      "destination": "Fairview",
+      "aircraft_type": "787",
+      "scheduled_arrival": 246600,
+      "scheduled_departure": 284950,
+      "assigned_gate_id": "A7"
+    },
+    {
+      "id": "F016",
+      "airline_id": "GA",
+      "flight_number": "GA 326",
+      "origin": "Seabrook",
+      "destination": "Eastmere",
+      "aircraft_type": "787",
+      "scheduled_arrival": 248400,
+      "scheduled_departure": 286750,
+      "assigned_gate_id": "A8"
+    },
+    {
+      "id": "F017",
+      "airline_id": "NS",
+      "flight_number": "NS 333",
+      "origin": "Pinehaven",
+      "destination": "Ashford",
+      "aircraft_type": "A220",
+      "scheduled_arrival": 253800,
+      "scheduled_departure": 274150,
+      "assigned_gate_id": "A1"
+    },
+    {
+      "id": "F018",
+      "airline_id": "AW",
+      "flight_number": "AW 340",
+      "origin": "Lakeport",
+      "destination": "Clearwater",
+      "aircraft_type": "737",
+      "scheduled_arrival": 255600,
+      "scheduled_departure": 281950,
+      "assigned_gate_id": "A2"
+    },
+    {
+      "id": "F019",
+      "airline_id": "SJ",
+      "flight_number": "SJ 347",
+      "origin": "Westbridge",
+      "destination": "Fairview",
+      "aircraft_type": "A321",
+      "scheduled_arrival": 257400,
+      "scheduled_departure": 286750,
+      "assigned_gate_id": "A3"
+    },
+    {
+      "id": "F020",
+      "airline_id": "GA",
+      "flight_number": "GA 354",
+      "origin": "Seabrook",
+      "destination": "Eastmere",
+      "aircraft_type": "A220",
+      "scheduled_arrival": 259200,
+      "scheduled_departure": 279550,
+      "assigned_gate_id": "A4"
+    },
+    {
+      "id": "F021",
+      "airline_id": "NS",
+      "flight_number": "NS 361",
+      "origin": "Pinehaven",
+      "destination": "Ashford",
+      "aircraft_type": "737",
+      "scheduled_arrival": 261000,
+      "scheduled_departure": 287350,
+      "assigned_gate_id": "A5"
+    },
+    {
+      "id": "F022",
+      "airline_id": "AW",
+      "flight_number": "AW 368",
+      "origin": "Lakeport",
+      "destination": "Clearwater",
+      "aircraft_type": "A321",
+      "scheduled_arrival": 262800,
+      "scheduled_departure": 292150,
+      "assigned_gate_id": "A6"
+    },
+    {
+      "id": "F023",
+      "airline_id": "SJ",
+      "flight_number": "SJ 375",
+      "origin": "Westbridge",
+      "destination": "Fairview",
+      "aircraft_type": "787",
+      "scheduled_arrival": 264600,
+      "scheduled_departure": 302950,
+      "assigned_gate_id": "A7"
+    },
+    {
+      "id": "F024",
+      "airline_id": "GA",
+      "flight_number": "GA 382",
+      "origin": "Seabrook",
+      "destination": "Eastmere",
+      "aircraft_type": "787",
+      "scheduled_arrival": 266400,
+      "scheduled_departure": 304750,
+      "assigned_gate_id": "A8"
+    }
+  ],
+  "passenger_flow": {
+    "load_permille": 450,
+    "arrival_lead_min_ticks": 9000,
+    "arrival_lead_max_ticks": 27000,
+    "gate_target_buffer_ticks": 6000,
+    "check_in_ticks": 200,
+    "staff_pool": 6,
+    "graph": {
+      "nodes": {
+        "entrance": {
+          "label": "ENTRANCE",
+          "x": 500,
+          "y": 920,
+          "airside": false
+        },
+        "check_in": {
+          "label": "CHECK-IN",
+          "x": 500,
+          "y": 740,
+          "airside": false
+        },
+        "security_west": {
+          "label": "WEST SECURITY",
+          "x": 270,
+          "y": 530,
+          "airside": true
+        },
+        "security_east": {
+          "label": "EAST SECURITY",
+          "x": 730,
+          "y": 530,
+          "airside": true
+        },
+        "west_hall": {
+          "label": "WEST CONCOURSE",
+          "x": 270,
+          "y": 310,
+          "airside": true
+        },
+        "east_hall": {
+          "label": "EAST CONCOURSE",
+          "x": 730,
+          "y": 310,
+          "airside": true
+        },
+        "A1": {
+          "label": "A1",
+          "x": 80,
+          "y": 100,
+          "airside": true
+        },
+        "A2": {
+          "label": "A2",
+          "x": 200,
+          "y": 100,
+          "airside": true
+        },
+        "A3": {
+          "label": "A3",
+          "x": 320,
+          "y": 100,
+          "airside": true
+        },
+        "A4": {
+          "label": "A4",
+          "x": 440,
+          "y": 100,
+          "airside": true
+        },
+        "A5": {
+          "label": "A5",
+          "x": 560,
+          "y": 100,
+          "airside": true
+        },
+        "A6": {
+          "label": "A6",
+          "x": 680,
+          "y": 100,
+          "airside": true
+        },
+        "A7": {
+          "label": "A7",
+          "x": 800,
+          "y": 100,
+          "airside": true
+        },
+        "A8": {
+          "label": "A8",
+          "x": 920,
+          "y": 100,
+          "airside": true
+        }
+      },
+      "edges": [
+        {
+          "from": "entrance",
+          "to": "check_in",
+          "walking_ticks": 300
+        },
+        {
+          "from": "check_in",
+          "to": "security_west",
+          "walking_ticks": 600
+        },
+        {
+          "from": "check_in",
+          "to": "security_east",
+          "walking_ticks": 600
+        },
+        {
+          "from": "security_west",
+          "to": "west_hall",
+          "walking_ticks": 300
+        },
+        {
+          "from": "security_east",
+          "to": "east_hall",
+          "walking_ticks": 300
+        },
+        {
+          "from": "west_hall",
+          "to": "east_hall",
+          "walking_ticks": 1800
+        },
+        {
+          "from": "west_hall",
+          "to": "A1",
+          "walking_ticks": 750
+        },
+        {
+          "from": "west_hall",
+          "to": "A2",
+          "walking_ticks": 600
+        },
+        {
+          "from": "west_hall",
+          "to": "A3",
+          "walking_ticks": 750
+        },
+        {
+          "from": "west_hall",
+          "to": "A4",
+          "walking_ticks": 900
+        },
+        {
+          "from": "east_hall",
+          "to": "A5",
+          "walking_ticks": 750
+        },
+        {
+          "from": "east_hall",
+          "to": "A6",
+          "walking_ticks": 600
+        },
+        {
+          "from": "east_hall",
+          "to": "A7",
+          "walking_ticks": 750
+        },
+        {
+          "from": "east_hall",
+          "to": "A8",
+          "walking_ticks": 900
+        }
+      ]
+    },
+    "checkpoints": [
+      {
+        "id": "west",
+        "node_id": "security_west",
+        "max_lanes": 4,
+        "open_lanes": 2,
+        "staff": 2,
+        "service_ticks": 120
+      },
+      {
+        "id": "east",
+        "node_id": "security_east",
+        "max_lanes": 4,
+        "open_lanes": 1,
+        "staff": 1,
+        "service_ticks": 120
+      }
+    ]
+  }
+}

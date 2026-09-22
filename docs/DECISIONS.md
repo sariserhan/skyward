@@ -197,3 +197,34 @@ matches the boarding literature, where interleaved orders beat contiguous
 ones. With back-to-front inside groups the preset was slower than random
 boarding, which would have hidden the strategy signal the prototype exists
 to test.
+
+
+## D-011 — Airport M0/M1 around the preserved boarding core
+
+**Date:** 2026-09-22
+**Status:** Accepted
+
+`docs/additional_spec.md` expands the product into airport operations. The default
+scene is now Riverdale; `scenes/main.tscn` remains the boarding prototype.
+Simulation/render separation, integer ticks, seeded streams and boarding behavior
+are retained. The canonical Passenger class gains enclosing airport journey
+fields; there is no second passenger class. M1 uses timed turnarounds and reserves
+passenger/bag registries. Integration into boarding is M3, after M2 terminal flow.
+See `architecture.md`, `simulation.md`, `roadmap.md` and `status.md` for the airport
+contract and current scope. Earlier boarding-specific decisions still apply to
+the boarding engine, not to the new aircraft/runway time scale.
+
+
+## D-012 — Event-scheduled terminal flow on canonical passengers
+
+**Date:** 2026-09-22
+**Status:** Accepted
+
+M2 reuses Passenger identity and adds full live-state snapshot/restore separately
+from its compact boarding-record serialization. A stable min-heap schedules
+terminal transitions on the airport clock. Weighted graph routing is independent
+of rendering, and gate changes preserve the current walking edge. Checkpoints
+use FIFO queues and non-interrupting lane closure, with a finite six-person staff
+pool. Schema v2 persists active journeys and rejects old/inconsistent snapshots.
+Gate-arrival targets measure security consequences; M3 will make boarding and
+departure readiness consume these same passengers.

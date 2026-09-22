@@ -44,3 +44,12 @@ func weighted_index(weights: Array[int]) -> int:
 		if r < acc:
 			return i
 	return weights.size() - 1
+
+
+## Decimal strings avoid loss of 64-bit RNG state through JSON numbers.
+func snapshot() -> Dictionary:
+	return {"seed": str(_rng.seed), "state": str(_rng.state)}
+
+func restore(data: Dictionary) -> void:
+	_rng.seed = int(data.seed)
+	_rng.state = int(data.state)
