@@ -192,6 +192,26 @@ has a slow baggage loader (`baggage_overrides`).
 - Baggage loading opens at D-35 (`opens_before_departure_ticks`).
 - Service priority reorders waiting tasks; it never adds units.
 
+**Airline evaluation (D-041 to D-043).** At each takeoff, a record of the
+flight's real outcome feeds its airline's view of the day, and the view of
+every airline whose connectors or transfer bags it carried.
+
+Five dimensions:
+
+- **Punctuality:** mean of the on-time rate (3-minute grace) and
+  100 − 8 × mean delay
+- **Connections:** 100 − 10 × missed %
+- **Baggage:** 100 − 10 × missed transfer-bag % − 5 × baggage delay per
+  flight − 2 × reclaim wait over 5 minutes
+- **Turnaround:** 100 − 10 × turnaround-caused delay per flight
+- **Gates:** % at preferred gates
+
+Weighted by airline, they give the day score. The relationship is
+`(start × 3 + day × flights) / (3 + flights)` plus contract and request
+adjustments. Contracts settle when the day's last flight departs. A request is
+offered when the relationship, flights operated, contract and a free
+compatible gate allow; accepted flights are committed to the next day.
+
 **Departure delay breakdown (D-026).** At takeoff, the lateness is split into:
 
 - runway queue

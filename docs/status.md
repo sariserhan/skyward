@@ -1,14 +1,13 @@
-# Current status — M0 through M8 implemented
+# Current status — M0 through M9 implemented
 
-M8 operational resources are complete. Cleaning and catering crews, fuel
-units, baggage crews and pushback tugs are limited. Turnaround tasks wait for
-them, flights compete, and the player's LOW / NORMAL / HIGH service priority
-decides who goes first, which redistributes delay rather than removing it.
-Resource waits appear in the departure-delay breakdown only when they are on
-the critical path. Save schema v8. See the [M8 completion report](m8-status.md).
-M9 airlines and contracts has not started.
+M9 airlines are complete. Northstar, Atlantic Wings, SunJet and Global Airways
+judge Riverdale from real flight outcomes, each with its own priorities. Every
+relationship score can be traced to its inputs. Contracts give operational
+goals, and strong performance earns requests for more flights. Priority, gate
+and hold decisions shift those results between airlines. Save schema v9. See
+the [M9 completion report](m9-status.md). M10 economy has not started.
 
-Earlier reports: [M7](m7-status.md), [M6](m6-status.md), [M5](m5-status.md), [M4](m4-status.md), [M3](m3-status.md), [M2](m2-status.md), and the M0/M1 report below. Their
+Earlier reports: [M8](m8-status.md), [M7](m7-status.md), [M6](m6-status.md), [M5](m5-status.md), [M4](m4-status.md), [M3](m3-status.md), [M2](m2-status.md), and the M0/M1 report below. Their
 limitations and timings are historical; M3 changed the timetable, scenario start,
 security defaults, loads, cabin timings and save schema (D-021, D-023, D-024).
 

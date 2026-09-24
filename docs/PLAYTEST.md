@@ -107,6 +107,33 @@ The scripted version asserts the same sequence and writes screenshots:
 tools/ui_tests.sh tests/m3_demo.gd
 ```
 
+### M9 walkthrough: airlines
+
+1. **Who cares about what.** Open **Airlines** during the default morning.
+   Select Global Airways: its details list each weighted part of the score
+   with the real numbers behind it. For example, *+ Connections 93 (weight
+   35%) · 289 made · 2 missed*, its Connection Hub terms, its worst flights
+   and why, and its request. Compare SunJet: connections barely matter to it
+   (5%), punctuality and turnaround do (45% / 40%).
+2. **Requests.** Once Global Airways and SunJet have operated four flights in
+   good standing, each asks for +2 daily flights (an alert). **ACCEPT**
+   commits them to tomorrow's schedule. **DECLINE** costs 3 points. Northstar
+   (80 needed) and Atlantic Wings (no request) don't ask.
+3. **Pick a winner.** Launch
+   `godot --path game -- --scenario=res://configs/airports/riverdale_airline_conflict.json`
+   (Global Airways and SunJet only, one fuel unit). Set every GA flight
+   **HIGH**: GA ends 65 ACCEPTABLE, SunJet 21 CRITICAL, with its Fast
+   Turnaround contract FAILED. Its problem flights read *Waiting for fuel
+   unit … served first: GA …*. Setting SunJet HIGH instead gives SunJet 76 GOOD
+   (contract PASSED) and GA 53 POOR.
+4. **The hold.** Launch `riverdale_ga_hold.json`. NS 305 lands 25 minutes
+   late with connectors for GA 298 (A4, closes 07:40).
+   - Without a hold, 7 of 8 miss, and GA 298 leaves +0.8 minutes.
+   - With **HOLD +5 MIN** at the alert, 6 make it, and it leaves +6.9 minutes.
+
+   Global Airways' day score rises (77.4 → 79.3), because its weights favor
+   connections. SunJet's weights would have scored the same hold as worse.
+
 ### M8 walkthrough: scarce resources
 
 Launch the shortage morning (2 fuel units, 4 baggage crews, 1 tug):

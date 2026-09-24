@@ -1014,3 +1014,119 @@ v7 is rejected. Validation checks:
 - running resource work holds a unit
 - units and pools match the scenario
 - queues are in deterministic order (after restore)
+
+
+## D-041 — Airlines judge the airport from real flight records
+
+**Date:** 2026-09-24
+**Status:** Accepted (M9)
+
+**Config.** A new `airline_relations` block holds:
+
+- scoring constants
+- contract templates
+- profiles per airline: starting relationship, weights, preferred gates,
+  contract, request
+
+`airlines` (id → name) is unchanged. Scoring code has no airline-specific
+paths; a test swaps two profiles and checks that the scores swap.
+
+**Records.** At each takeoff the simulation builds one record from the
+flight's actual outcome:
+
+- lateness
+- turnaround-caused delay (the critical-path breakdown minus runway, hold and
+  late inbound), resource-wait delay (`wait:*`), baggage delay, hold used
+- connections and transfer bags carried, credited to every airline on the
+  itinerary
+- bags checked and the inbound locals' reclaim waits
+- whether it used a preferred gate
+- its largest cause, and for a resource wait, who was served meanwhile and at
+  what priority (from `RESOURCE_ASSIGNED` events)
+
+Evaluation runs only at departures and request answers. There is no per-tick
+work and no randomness.
+
+**Evaluation window.** The current operating day. The day ends with its last
+departure, when every contract is settled together; settling earlier would
+miss connections and bags credited by later flights. Career history comes
+later.
+
+
+## D-042 — Weighted dimensions, credibility blend, contracts
+
+**Date:** 2026-09-24
+**Status:** Accepted (M9)
+
+Five dimensions, each scored 0–100:
+
+| Dimension | Score |
+| --- | --- |
+| Punctuality | mean of the on-time rate (3-minute grace) and 100 − 8 × mean delay (minutes) |
+| Connections | 100 − 10 × missed % |
+| Baggage | 100 − 10 × missed transfer-bag % − 5 × mean baggage delay (minutes per flight) − 2 × mean reclaim wait beyond 5 minutes |
+| Turnaround | 100 − 10 × mean turnaround-caused delay (minutes per flight) |
+| Gates | % of flights at a preferred gate |
+
+**Day score** is the weighted mean over the dimensions that have data.
+
+**Relationship** is `(start × 3 + day × n) / (3 + n)` for n flights operated,
+plus listed adjustments:
+
+- contract passed: +5
+- contract failed: −10
+- request declined: −3
+
+It is then clamped to 0–100.
+
+**Bands:** Excellent 90+, Good 75+, Acceptable 55+, Poor 35+, Critical below.
+
+**Riverdale weights** (the rest of the 100 goes to the gates dimension; SunJet
+gives it none):
+
+| Airline | Emphasis |
+| --- | --- |
+| Global Airways | connections 35, baggage 25, punctuality 20 |
+| SunJet | punctuality 45, turnaround 40 |
+| Atlantic Wings | balanced |
+| Northstar | punctuality 35, baggage 30 |
+
+**Contracts** are templates of `{metric, min|max, risk}` terms. Live status is
+FAILING if any term is breached, AT RISK within a term's risk band, and
+PASSING otherwise. At the day's end they become PASSED or FAILED.
+
+| Airline | Contract |
+| --- | --- |
+| Global Airways | Connection Hub |
+| SunJet | Fast Turnaround |
+| Atlantic Wings | Basic Service |
+| Northstar | Premium Reliability |
+
+Thresholds were tuned on the default morning: GA is excellent, AW and NS are
+at risk, and nobody fails without player mistakes.
+
+
+## D-043 — Flight requests are commitments for the next operating day; save schema v9
+
+**Date:** 2026-09-24
+**Status:** Accepted (M9)
+
+An airline with a request profile offers +N flights (defined in data) when all
+of these hold:
+
+- its relationship reaches the minimum
+- enough of its flights have operated
+- its contract is not failing
+- a compatible gate is free for each proposed slot in the schedule
+
+The player accepts or declines (a recorded decision). Declining costs −3.
+
+**Accepted flights are commitments for the next operating day,** not inserted
+into the running morning. Passengers, bags and connections come from one-shot
+generation on fixed streams; inserting flights mid-run would need passenger,
+bag and connection generation for them and would break determinism. Career
+mode or M10 will consume the commitments.
+
+**Save schema v9** adds records and per-airline state: contract status, the
+settled flag, adjustments and request state. Records may exist only for
+departed flights; states and airlines must be known. v8 is rejected.

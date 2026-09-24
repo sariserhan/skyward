@@ -23,6 +23,9 @@ var bag_metrics: Dictionary = {}
 ## M8: service priority buttons (low, normal, high) and the Resources tab.
 var priority_buttons: Dictionary = {}
 var resource_tree: Tree
+## M9: the Airlines tab and the airline shown in the details panel.
+var airline_tree: Tree
+var selected_airline := ""
 var bag_metrics_second: int = -1
 var pause_button: Button
 var debug_panel: VBoxContainer
@@ -48,6 +51,8 @@ func _ready() -> void:
 	for arg in OS.get_cmdline_user_args() + OS.get_cmdline_args():
 		if arg.begins_with("--scenario="): scenario_path = arg.trim_prefix("--scenario=")
 	sim.setup({} if scenario_path.is_empty() else AirportSimulation.load_config(scenario_path))
+	# Scenario variants may not include the default first flight.
+	if not sim.airport.flights.has(selected_id): selected_id = sim.flight_order[0].id
 	_build()
 	_refresh()
 
@@ -168,6 +173,22 @@ func _build() -> void:
 		var item := resource_tree.get_selected()
 		if item != null and item.get_metadata(0) is String and not str(item.get_metadata(0)).is_empty(): _select(item.get_metadata(0)))
 	operations_tabs.add_child(resource_tree)
+	airline_tree = Tree.new()
+	airline_tree.name = "Airlines"
+	airline_tree.columns = 4
+	airline_tree.hide_root = true
+	airline_tree.column_titles_visible = true
+	airline_tree.select_mode = Tree.SELECT_ROW
+	airline_tree.add_theme_font_size_override("font_size", 14)
+	airline_tree.add_theme_font_size_override("title_button_font_size", 13)
+	for i in 4:
+		airline_tree.set_column_title(i, ["Airline", "Relationship", "Contract", "Request"][i])
+		airline_tree.set_column_expand(i, i == 2)
+		airline_tree.set_column_custom_minimum_width(i, [160, 150, 280, 150][i])
+	airline_tree.item_selected.connect(func():
+		var item := airline_tree.get_selected()
+		if item != null: _select_airline(item.get_metadata(0)))
+	operations_tabs.add_child(airline_tree)
 	_rebuild_board()
 	var right := VBoxContainer.new()
 	right.custom_minimum_size.x = 320
@@ -176,6 +197,12 @@ func _build() -> void:
 	detail_heading = _label(right, "FLIGHT DETAILS", 16)
 	detail = RichTextLabel.new()
 	detail.bbcode_enabled = true
+	# Airline request answers are links in the airline details.
+	detail.meta_clicked.connect(func(meta):
+		var parts := str(meta).split(":")
+		if parts.size() == 2 and sim.answer_airline_request(parts[1], parts[0] == "accept"):
+			status_label.text = "%s request %s" % [sim.airport.airlines[parts[1]], "accepted: flights added to tomorrow's schedule" if parts[0] == "accept" else "declined"]
+		_refresh())
 	detail.custom_minimum_size.y = 214
 	detail.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	right.add_child(detail)
@@ -235,6 +262,7 @@ func _build() -> void:
 			view_tabs.current_tab = 1
 			operations_tabs.current_tab = 1
 		elif str(alert_ids[index]).begins_with("baggage:"): return
+		elif str(alert_ids[index]).begins_with("airline:"): _select_airline(str(alert_ids[index]).substr(8))
 		elif str(alert_ids[index]).begins_with("resources:"):
 			view_tabs.current_tab = 0
 			operations_tabs.current_tab = resource_tree.get_index()
@@ -281,6 +309,7 @@ func _process(delta: float) -> void:
 
 func _select(id: String) -> void:
 	selected_id = id
+	selected_airline = ""
 	selected_passenger_id = -1
 	terminal_view.selected_id = -1
 	map.selected_id = id
@@ -323,6 +352,7 @@ func _refresh() -> void:
 	detail.text = text
 	_refresh_turnaround_tree(flight)
 	_refresh_resources()
+	_refresh_airlines()
 	_refresh_terminal()
 	_refresh_warnings()
 	alerts.clear()
@@ -340,6 +370,15 @@ func _refresh() -> void:
 		if current.oldest_wait >= 6000 or (cp.capacity() == 0 and not cp.queue.is_empty()):
 			alerts.add_item("%s security · %d waiting" % [cp.id.capitalize(), cp.queue.size()])
 			alert_ids.append("security:" + cp.id)
+	for airline in sim.airlines.airline_ids:
+		var e: Dictionary = sim.airlines.evaluations[airline]
+		if e.contract.status in ["AT RISK", "FAILING"]:
+			alerts.add_item("%s · %s %s" % [airline, e.contract.label, e.contract.status])
+			alerts.set_item_tooltip(alerts.item_count - 1, "Select to see which terms are at risk and why.")
+			alert_ids.append("airline:" + airline)
+		if sim.airlines.state[airline].request == "offered":
+			alerts.add_item("%s requests +%d daily flights" % [sim.airport.airlines[airline], sim.airlines.profile(airline).request.flights.size()])
+			alert_ids.append("airline:" + airline)
 	for type in sim.resources.order:
 		var queue: Array = sim.resource_queue(type)
 		if queue.size() >= 2:
@@ -460,6 +499,7 @@ func _adjust_security(id: String, lane_delta: int, staff_delta: int) -> void:
 func _select_passenger(id: int) -> void:
 	var p: Passenger = sim.airport.passengers[str(id)]
 	_select(p.current_flight_id)
+	selected_airline = ""
 	selected_passenger_id = id
 	terminal_view.selected_id = id
 	view_tabs.current_tab = 1
@@ -511,6 +551,9 @@ func _refresh_terminal() -> void:
 		elif p.gate_arrival_time < 0 and sim.clock.tick > p.gate_target_tick: risk = "Past gate-arrival target"
 		detail.text = "[font_size=23][b]Passenger %04d[/b][/font_size]\n%s\n\nFlight %s  ·  Gate %s\nDestination %s\n\nLocation: %s\nSecurity: %s  ·  %s\nQueue wait: %.1f min\n\nTerminal arrival: %s\nGate target: %s\nGate arrival: %s\n%s\n\n[color=#70dec0]%s[/color]" % [p.id, state_text, flight.flight_number, flight.assigned_gate_id, p.destination, location, p.security_checkpoint_id.capitalize(), "cleared" if p.security_cleared else "not cleared", wait / 600.0, AirportClock.display(p.arrival_time_at_airport), AirportClock.display(p.gate_target_tick), gate_time, _cabin_text(p, flight) + _bag_lines(p), risk]
 	terminal_view.refresh_population()
+	if not selected_airline.is_empty():
+		detail_heading.text = "AIRLINE DETAILS"
+		detail.text = _airline_text(selected_airline)
 
 
 func _boarding_text(f: AirportFlight) -> String:
@@ -818,3 +861,115 @@ func _refresh_resources() -> void:
 			item.set_text(2, "in use")
 			item.set_text(3, "since %s%s" % [AirportClock.display(t.start_tick).left(5), " · waited %s" % _mmss(t.resource_wait_ticks) if t.resource_wait_ticks > 0 else ""])
 			item.set_metadata(0, f.id)
+
+
+# --- airlines (M9) ------------------------------------------------------------------
+
+func _select_airline(airline: String) -> void:
+	selected_airline = airline
+	selected_passenger_id = -1
+	view_tabs.current_tab = 0
+	operations_tabs.current_tab = airline_tree.get_index()
+	_refresh()
+
+const BAND_COLORS := {"EXCELLENT": "70dec0", "GOOD": "70dec0", "ACCEPTABLE": "ffc078", "POOR": "e5484d", "CRITICAL": "e5484d"}
+const STATUS_COLORS := {"PASSING": "70dec0", "PASSED": "70dec0", "AT RISK": "ffc078", "FAILING": "e5484d", "FAILED": "e5484d", "PENDING": "a7becd", "NONE": "a7becd", "NO DATA": "a7becd"}
+
+func _refresh_airlines() -> void:
+	if not sim.airlines.enabled() or operations_tabs.current_tab != airline_tree.get_index(): return
+	# Rebuilding re-selects the current row; that is not a new selection.
+	airline_tree.set_block_signals(true)
+	airline_tree.clear()
+	var root := airline_tree.create_item()
+	for airline in sim.airlines.airline_ids:
+		var e: Dictionary = sim.airlines.evaluations[airline]
+		var row := airline_tree.create_item(root)
+		row.set_text(0, str(sim.airport.airlines[airline]))
+		row.set_text(1, "%d  %s" % [e.relationship, e.band])
+		row.set_text(2, "%s · %s" % [e.contract.label, e.contract.status] if not e.contract.label.is_empty() else "—")
+		row.set_text(3, {"offered": "+%d flights?" % sim.airlines.profile(airline).get("request", {}).get("flights", []).size(), "accepted": "accepted", "declined": "declined"}.get(sim.airlines.state[airline].request, ""))
+		row.set_metadata(0, airline)
+		row.set_custom_color(1, Color(BAND_COLORS[e.band]))
+		row.set_custom_color(2, Color(STATUS_COLORS.get(e.contract.status, "a7becd")))
+		if airline == selected_airline: row.select(0)
+	airline_tree.set_block_signals(false)
+
+## Everything behind an airline's number: each weighted dimension with its
+## real inputs, the contract terms, the flights that hurt most and why, and any
+## request with the conditions for it.
+func _airline_text(airline: String) -> String:
+	var e: Dictionary = sim.airlines.evaluations[airline]
+	var m: Dictionary = e.metrics
+	var text := "[font_size=23][b]%s[/b][/font_size]  ·  [color=#%s]%d %s[/color]" % [sim.airport.airlines[airline], BAND_COLORS[e.band], e.relationship, e.band]
+	if e.day_score == null: text += "\nStarting relationship %d · no flights operated yet" % e.start
+	else: text += "\nStarting %d · today %.0f over %d of %d flights" % [e.start, e.day_score, m.flights, m.scheduled]
+	for item in sim.airlines.state[airline].adjustments: text += " · %s %+d" % [item[0], item[1]]
+	text += "\n\n[b]WHY[/b]"
+	var weights := 0.0
+	for dim in AirlineRelations.DIMENSIONS: weights += e.dimensions[dim].weight
+	for dim in AirlineRelations.DIMENSIONS:
+		var d: Dictionary = e.dimensions[dim]
+		if d.weight <= 0: continue
+		var share := roundi(100.0 * d.weight / maxf(1.0, weights))
+		if d.score == null:
+			text += "\n  · %s (%d%%): nothing to judge yet" % [dim.capitalize(), share]
+			continue
+		var good: bool = d.score >= 75.0
+		text += "\n[color=#%s]%s %s %d[/color] (weight %d%%) · %s" % ["70dec0" if good else "ffc078", "+" if good else "−", dim.capitalize(), roundi(d.score), share, _dimension_inputs(dim, m)]
+	var c: Dictionary = e.contract
+	if not c.label.is_empty():
+		text += "\n\n[b]CONTRACT[/b]  %s · [color=#%s]%s[/color]" % [c.label, STATUS_COLORS.get(c.status, "a7becd"), c.status]
+		for t in c.terms:
+			text += "\n  [color=#%s]%s[/color] %s %s: %s" % [STATUS_COLORS.get(t.status, "a7becd"), {"PASSING": "✓", "AT RISK": "!", "FAILING": "✗"}.get(t.status, "·"),
+				t.label, t.get("target", ""), "—" if t.value == null else AirlineRelations._fmt(t.metric, float(t.value))]
+	var problems := _problem_flights(airline)
+	if not problems.is_empty():
+		text += "\n\n[b]PROBLEM FLIGHTS[/b]"
+		for line in problems: text += "\n  " + line
+	text += _request_text(airline, e)
+	return text
+
+func _dimension_inputs(dim: String, m: Dictionary) -> String:
+	match dim:
+		"punctuality": return "%d of %d on time · mean delay %.1f min · %d over 5 min" % [m.on_time, m.flights, m.mean_delay_min, m.late_over_5]
+		"connections": return "%d made · %d missed (%.1f%%)" % [m.connections_made, m.connections_missed, 100.0 * m.connection_rate]
+		"baggage":
+			var bags := "transfer bags %d made · %d missed" % [m.transfer_bags_made, m.transfer_bags_missed]
+			return bags + " · baggage delay %.1f min/flight%s" % [m.baggage_delay_min, "" if m.mean_reclaim_min == null else " · reclaim wait %.1f min" % m.mean_reclaim_min]
+		"turnaround": return "turnaround-caused delay %.1f min/flight (resource waits %.1f)" % [m.turnaround_delay_min, m.resource_delay_min]
+		"gates": return "%d of %d at preferred gates" % [m.preferred_gate, m.flights]
+	return ""
+
+## The airline's worst departures, each with its largest cause; a resource wait
+## names who was served while it waited.
+func _problem_flights(airline: String) -> Array:
+	var ids: Array = sim.airlines.evaluations[airline].metrics.flight_ids.duplicate()
+	ids.sort_custom(func(a, b): return int(sim.airlines.records[a].late_ticks) > int(sim.airlines.records[b].late_ticks))
+	var out: Array = []
+	for id in ids:
+		var rec: Dictionary = sim.airlines.records[id]
+		if int(rec.late_ticks) <= 1800 or out.size() >= 3: continue
+		var f: AirportFlight = sim.airport.flights[id]
+		var line := "%s +%.1f min · %s +%.1f" % [f.flight_number, int(rec.late_ticks) / 600.0, _cause_label(f, rec.cause), int(rec.cause_ticks) / 600.0]
+		if not rec.served_first.is_empty(): line += " · served first: " + ", ".join(rec.served_first.slice(0, 3))
+		if f.service_priority != "normal": line += " · priority " + f.service_priority.to_upper()
+		if f.hold_ticks > 0: line += " · held %d min" % (f.hold_ticks / 600)
+		out.append(line)
+	return out
+
+func _request_text(airline: String, e: Dictionary) -> String:
+	var request: Dictionary = sim.airlines.profile(airline).get("request", {})
+	if request.is_empty(): return ""
+	var names: Array = []
+	for flight in request.flights: names.append(flight.flight_number)
+	var text := "\n\n[b]REQUEST[/b]  +%d daily flights (%s)" % [names.size(), ", ".join(names)]
+	match sim.airlines.state[airline].request:
+		"offered": return text + "\n  [url=accept:%s][color=#70dec0]ACCEPT[/color][/url]    [url=decline:%s][color=#ffc078]DECLINE[/color][/url]" % [airline, airline]
+		"accepted": return text + "\n  Accepted: committed to tomorrow's schedule"
+		"declined": return text + "\n  Declined"
+	var why: Array = []
+	if e.relationship < int(request.get("min_relationship", 0)): why.append("relationship %d, needs %d" % [e.relationship, request.min_relationship])
+	if e.metrics.flights < int(request.get("min_flights_operated", 0)): why.append("%d of %d flights operated so far" % [e.metrics.flights, request.min_flights_operated])
+	if e.contract.status in ["FAILING", "FAILED"]: why.append("contract " + e.contract.status.to_lower())
+	if sim.airlines.state[airline].final: why.append("the day is over")
+	return text + "\n  Not offered: " + ("; ".join(why) if not why.is_empty() else "no compatible gate free")

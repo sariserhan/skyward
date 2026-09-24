@@ -1,0 +1,10 @@
+{
+  "extends": "riverdale.json",
+  "id": "riverdale_airline_conflict",
+  "name": "Riverdale International (Global Airways vs SunJet)",
+  "include_flights": ["F003", "F004", "F007", "F008", "F011", "F012", "F015", "F016", "F019", "F020", "F023", "F024"],
+  "resources": {"fuel_unit": {"units": 1}},
+  "task_overrides": {"fueling": {"durations": {"A220": 4800, "737": 6720, "A321": 7680, "787": 8640}}},
+  "passenger_flow": {"connections": {"demo_bank": []}},
+  "baggage": {"demo_bags": []}
+}

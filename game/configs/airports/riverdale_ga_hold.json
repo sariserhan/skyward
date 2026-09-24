@@ -1,0 +1,7 @@
+{
+  "extends": "riverdale.json",
+  "id": "riverdale_ga_hold",
+  "name": "Riverdale International (late NS 305 feeding GA 298)",
+  "flight_overrides": {"F013": {"inbound_delay_ticks": 15000, "inbound_load_permille": 1000}},
+  "passenger_flow": {"connections": {"demo_bank": [{"from": "F013", "to": "F012", "seats": ["1A", "12C", "19D", "26E"]}]}}
+}

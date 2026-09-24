@@ -50,11 +50,17 @@ it is kept as historical context. The original boarding roadmap remains at
   breakdown; a Resources tab and shortage alerts; a shortage scenario; save
   schema v8. Plan [m8-plan.md](m8-plan.md), report
   [m8-status.md](m8-status.md). Decisions D-038–D-040.
-- **M9 next, not started:** airlines and contracts.
-- M10: economy.
+- **M9 implemented:** airlines as customers. Each airline judges the day from
+  real flight records with its own weights (punctuality, connections, baggage,
+  turnaround, gates); an explained 0–100 relationship with bands;
+  data-driven contracts (PASSING / AT RISK / FAILING, settled at day's end);
+  flight requests earned by performance, committed to the next day; Airlines
+  tab and detail; save schema v9. Plan [m9-plan.md](m9-plan.md), report
+  [m9-status.md](m9-status.md). Decisions D-041–D-043.
+- **M10 next, not started:** economy.
 - M11: construction and expansion.
 
 The order after M3 follows D-020: the turnaround task framework comes before any
 individual turnaround activity.
 
-M8 stopped here for review. Do not begin M9 until requested.
+M9 stopped here for review. Do not begin M10 until requested.

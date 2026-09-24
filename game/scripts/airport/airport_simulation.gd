@@ -3,7 +3,7 @@ extends RefCounted
 ## One world, one clock. Turnaround is a task graph (M4); cabin flights deboard
 ## (M5) and board (M3) through cabin engines as tasks of it; widebodies use the
 ## widebody deboarding and boarding abstractions (D-022, D-029).
-const SAVE_VERSION := 8
+const SAVE_VERSION := 9
 const CONFIG_PATH := "res://configs/airports/riverdale.json"
 const STATES := ["scheduled", "approaching", "landed", "taxiing_in", "at_gate",
 	"turnaround", "boarding", "ready_for_pushback", "taxiing_out", "departed"]
@@ -28,6 +28,7 @@ var passenger_flow := PassengerFlow.new()
 var turnaround := Turnaround.new()
 var baggage := BaggageSystem.new()
 var resources := AirportResources.new()
+var airlines := AirlineRelations.new()
 ## Built once: what the turnaround calls to release boarding and start driven work.
 var _release := Callable(self, "_release_boarding")
 var _starters := {"deboarding": Callable(self, "_start_deboarding"), "baggage_unload": Callable(self, "_start_baggage_unload"),
@@ -41,6 +42,8 @@ var last_tick_usec: int = 0
 var baggage_usec: int = 0
 ## Profiling: total time spent dispatching resources (not saved).
 var resource_usec: int = 0
+## Profiling: total time spent evaluating airlines at departures (not saved).
+var airline_usec: int = 0
 var flight_order: Array[AirportFlight] = []
 ## Active cabin boarding sessions by flight id (open until pushback).
 var boarding_sessions: Dictionary = {}
@@ -59,7 +62,22 @@ static func load_config(path: String) -> Dictionary:
 	if not data.has("extends"): return data
 	var base := load_config(path.get_base_dir().path_join(str(data.extends)))
 	data.erase("extends")
-	return _merged(base, data)
+	# Per-flight changes merge into the base schedule by flight id.
+	var overrides: Dictionary = data.get("flight_overrides", {})
+	data.erase("flight_overrides")
+	var only: Array = data.get("include_flights", [])
+	data.erase("include_flights")
+	var task_overrides: Dictionary = data.get("task_overrides", {})
+	data.erase("task_overrides")
+	var merged := _merged(base, data)
+	# A variant may keep just part of the schedule.
+	if not only.is_empty(): merged.flights = merged.flights.filter(func(flight): return flight.id in only)
+	for flight in merged.get("flights", []):
+		if overrides.has(flight.id): flight.merge(overrides[flight.id], true)
+	# Turnaround task specs merge by task type (for example, faster fueling).
+	for spec in merged.get("turnaround", {}).get("tasks", []):
+		if task_overrides.has(spec.type): spec.merge(task_overrides[spec.type], true)
+	return merged
 
 static func _merged(base: Dictionary, over: Dictionary) -> Dictionary:
 	var out := base.duplicate(true)
@@ -130,6 +148,9 @@ func setup(scenario: Dictionary = {}, seed_override: int = -1) -> void:
 	baggage.bind(airport, events, passenger_flow, config.get("baggage", {}))
 	passenger_flow.baggage = baggage
 	baggage.generate(seed_value)
+	# Airlines judge the day from real flight outcomes (M9).
+	airlines = AirlineRelations.new()
+	airlines.bind(airport, events, config.get("airline_relations", {}), flight_order)
 
 func _boarding(key: String) -> Variant:
 	return config.get("boarding", {}).get(key, BOARDING_DEFAULTS[key])
@@ -292,6 +313,10 @@ func _complete_runway() -> void:
 			if p.current_flight_id == f.id and p.airport_state == "on_aircraft": passenger_flow.set_journey_state(p, "departed")
 		events.record(clock.tick, "FLIGHT_DEPARTED", f.id, {"delay_ticks": maxi(0, clock.tick - f.scheduled_departure), "causes": f.delay_reasons,
 			"breakdown": f.departure_delay_breakdown, "boarded": f.boarded_count, "missed": f.missed_count})
+		if airlines.enabled():
+			var airline_started := Time.get_ticks_usec()
+			airlines.record(f, _airline_record(f), clock.tick, Callable(self, "_request_slot_free"))
+			airline_usec += Time.get_ticks_usec() - airline_started
 
 func _estimate_departure(f: AirportFlight) -> int:
 	var exit_time := int(config.taxi_out_ticks) + int(config.takeoff_ticks)
@@ -477,7 +502,8 @@ func snapshot() -> Dictionary:
 	return _integer_json({"version": SAVE_VERSION, "engine": Engine.get_version_info().string, "scenario": config.duplicate(true),
 		"seed": seed_value, "clock": clock.to_dict(), "rng": rng.snapshot(), "airport": airport.to_dict(),
 		"events": events.history.duplicate(true), "decisions": decisions.duplicate(true), "conflicts": conflicts.duplicate(true), "passenger_flow": passenger_flow.snapshot(),
-		"boarding": _boarding_snapshot(), "deboarding": _deboarding_snapshot(), "baggage": baggage.snapshot(), "resources": resources.snapshot()})
+		"boarding": _boarding_snapshot(), "deboarding": _deboarding_snapshot(), "baggage": baggage.snapshot(), "resources": resources.snapshot(),
+		"airline_relations": airlines.snapshot()})
 
 ## Active cabin sessions (D-021). Passenger cabin fields are already inside
 ## airport.passengers through Passenger.snapshot().
@@ -490,7 +516,7 @@ static func from_snapshot(data: Dictionary) -> AirportSimulation:
 	data = _integer_json(data)
 	if int(data.get("version", -1)) != SAVE_VERSION or data.get("engine", "") != Engine.get_version_info().string:
 		return null
-	for key in ["scenario", "clock", "rng", "airport", "conflicts", "passenger_flow", "boarding", "deboarding", "baggage", "resources"]:
+	for key in ["scenario", "clock", "rng", "airport", "conflicts", "passenger_flow", "boarding", "deboarding", "baggage", "resources", "airline_relations"]:
 		if not data.get(key) is Dictionary: return null
 	for key in ["events", "decisions"]:
 		if not data.get(key) is Array: return null
@@ -499,6 +525,7 @@ static func from_snapshot(data: Dictionary) -> AirportSimulation:
 	if not Turnaround.valid_snapshot(data): return null
 	if not BaggageSystem.valid_snapshot(data): return null
 	if not AirportResources.valid_snapshot(data): return null
+	if not AirlineRelations.valid_snapshot(data): return null
 	var sim := AirportSimulation.new()
 	sim.config = data.scenario.duplicate(true)
 	sim._load_cabins()
@@ -521,6 +548,8 @@ static func from_snapshot(data: Dictionary) -> AirportSimulation:
 	sim._bind_resources()
 	sim.resources.restore(data.resources)
 	if not sim.resources.queues_ordered(): return null
+	sim.airlines.bind(sim.airport, sim.events, sim.config.get("airline_relations", {}), sim.flight_order)
+	sim.airlines.restore(data.airline_relations)
 	for id in data.boarding:
 		var f: AirportFlight = sim.airport.flights[id]
 		sim.boarding_sessions[id] = FlightBoarding.from_snapshot(data.boarding[id], sim.cabins[data.boarding[id].cabin_id], sim._manifest(f))
@@ -1291,3 +1320,118 @@ func resource_holders(type: String) -> Array:
 	for unit in resources.pools[type].units:
 		out.append(null if unit.task_id.is_empty() else airport.turnaround_tasks[unit.task_id])
 	return out
+
+
+
+# --- airlines (M9) ----------------------------------------------------------------
+
+## What one departed flight contributes to airline evaluation: its real
+## outcome, and the connections and transfer bags it carried, credited to every
+## airline on those itineraries.
+func _airline_record(f: AirportFlight) -> Dictionary:
+	var late := maxi(0, f.actual_departure - f.scheduled_departure)
+	var turnaround_delay := 0
+	var resource_delay := 0
+	var baggage_delay := 0
+	var cause := ""
+	var cause_ticks := 0
+	for key in f.departure_delay_breakdown:
+		var ticks := int(f.departure_delay_breakdown[key])
+		if ticks > cause_ticks:
+			cause = key
+			cause_ticks = ticks
+		if key in ["runway_takeoff_queue", "passenger_hold", "late_inbound"]: continue
+		turnaround_delay += ticks
+		if str(key).begins_with("wait:"): resource_delay += ticks
+		if key in ["baggage_load", "baggage_unload", "wait:baggage_crew"]: baggage_delay += ticks
+	var resource_wait := 0
+	for t: TurnaroundTask in turnaround.tasks_of(f): resource_wait += t.resource_wait_ticks
+	var connections := {}
+	for id in f.passenger_ids:
+		var p: Passenger = airport.passengers[str(id)]
+		if p.journey_direction != "connecting" or p.itinerary_legs[-1] != f.id: continue
+		var made := 1 if p.connection_status == "made" else 0
+		for airline in _itinerary_airlines(p.itinerary_legs):
+			var c: Array = connections.get(airline, [0, 0])
+			connections[airline] = [c[0] + made, c[1] + 1 - made]
+	var transfer_bags := {}
+	var checked := 0
+	for bag in baggage.bags_for(f):
+		checked += 1
+		if bag.kind != "transfer" or not bag.state in ["departed", "missed_connection"]: continue
+		var made := 1 if bag.state == "departed" else 0
+		for airline in _itinerary_airlines(bag.legs):
+			var b: Array = transfer_bags.get(airline, [0, 0])
+			transfer_bags[airline] = [b[0] + made, b[1] + 1 - made]
+	var reclaim_ticks := 0
+	var reclaim_waits := 0
+	for id in f.inbound_passenger_ids:
+		var p: Passenger = airport.passengers[str(id)]
+		if p.bags_collected_tick >= 0 and p.reclaim_arrival_tick >= 0:
+			reclaim_ticks += p.bags_collected_tick - p.reclaim_arrival_tick
+			reclaim_waits += 1
+	var preferred: Array = airlines.profile(f.airline_id).get("preferred_gates", [])
+	return {"airline": f.airline_id, "late_ticks": late, "turnaround_delay_ticks": turnaround_delay, "resource_delay_ticks": resource_delay,
+		"resource_wait_ticks": resource_wait, "baggage_delay_ticks": baggage_delay, "hold_ticks": f.hold_ticks, "bags_checked": checked,
+		"reclaim_wait_ticks": reclaim_ticks, "reclaim_waits": reclaim_waits, "preferred_gate": preferred.is_empty() or f.assigned_gate_id in preferred,
+		"connections": connections, "transfer_bags": transfer_bags, "cause": cause, "cause_ticks": cause_ticks,
+		"served_first": _served_while_waiting(f, cause)}
+
+func _itinerary_airlines(legs: Array) -> Array:
+	var out: Array = []
+	for leg in legs:
+		var airline: String = airport.flights[leg].airline_id
+		if not airline in out: out.append(airline)
+	return out
+
+## For a resource-wait cause: the flights handed that resource while this one
+## waited, with their service priority (from RESOURCE_ASSIGNED events).
+func _served_while_waiting(f: AirportFlight, cause: String) -> Array:
+	if not cause.begins_with("wait:"): return []
+	var type := cause.substr(5)
+	var waiting: TurnaroundTask = null
+	for t: TurnaroundTask in turnaround.tasks_of(f):
+		if t.resource == type and t.resource_wait_ticks > 0 and (waiting == null or t.resource_wait_ticks > waiting.resource_wait_ticks): waiting = t
+	if waiting == null: return []
+	var out: Array = []
+	var history := events.history
+	# Events are in tick order: find the first at the start of the wait.
+	var lo := 0
+	var hi := history.size()
+	while lo < hi:
+		var mid := (lo + hi) / 2
+		if int(history[mid].tick) < waiting.ready_tick: lo = mid + 1
+		else: hi = mid
+	for i in range(lo, history.size()):
+		var e: Dictionary = history[i]
+		if int(e.tick) > waiting.start_tick: break
+		if e.type != "RESOURCE_ASSIGNED" or e.details.get("resource") != type or e.flight_id == f.id: continue
+		var other: AirportFlight = airport.flights[e.flight_id]
+		out.append("%s (%s)" % [other.flight_number, other.service_priority.to_upper()])
+	return out
+
+## A requested flight fits the next day's schedule: some compatible gate has no
+## scheduled occupancy (with the gate buffer) overlapping its slot.
+func _request_slot_free(spec: Dictionary) -> bool:
+	var type: Dictionary = config.aircraft_types.get(spec.aircraft_type, {})
+	var start := int(spec.scheduled_arrival) + int(config.taxi_in_ticks)
+	var finish := int(spec.scheduled_departure)
+	var buffer := int(config.gate_buffer_ticks)
+	for gate: AirportGate in airport.gates.values():
+		if not str(type.get("class", "")) in gate.supported_aircraft_classes: continue
+		var clear := true
+		for f: AirportFlight in flight_order:
+			if f.assigned_gate_id != gate.id: continue
+			var busy_from := f.scheduled_arrival + int(config.taxi_in_ticks) - buffer
+			var busy_to := f.scheduled_departure + buffer
+			if start < busy_to and finish > busy_from:
+				clear = false
+				break
+		if clear: return true
+	return false
+
+## Player decision on an airline's request for more flights (M9).
+func answer_airline_request(airline: String, accept: bool) -> bool:
+	if not airlines.answer_request(airline, accept, clock.tick): return false
+	decisions.append({"tick": clock.tick, "type": "airline_request", "airline": airline, "accept": accept})
+	return true

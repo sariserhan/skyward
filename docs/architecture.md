@@ -1,4 +1,4 @@
-# Airport architecture — M0 to M8
+# Airport architecture — M0 to M9
 
 The airport is now the default Godot scene. The existing boarding scene remains
 available at `res://scenes/main.tscn`; its simulation algorithm is unchanged.
@@ -162,6 +162,42 @@ alongside the conflict check.
 - A compact turnaround summary sits under it.
 - A **Turnaround** tab holds the full task table.
 - After takeoff, the additive delay breakdown is shown.
+
+## M9 airlines
+
+**Ownership.** `airline_relations.gd` (`AirlineRelations`) owns:
+
+- per-flight outcome records
+- per-airline state: contract status, the settled flag, adjustments, request
+  state
+- the cached evaluations
+
+It never reads simulation internals: `AirportSimulation._airline_record()`
+builds each record at takeoff, from the breakdown, manifests, bags, tasks and
+events.
+
+**Evaluation** is a pure function of the records and the state (`evaluate()`,
+`metrics()`, `_dimension()`, `contract_status()`). It runs when a flight
+departs or a request is answered.
+
+**Commands and helpers.**
+
+- `answer_airline_request()` is a recorded decision.
+- `_request_slot_free()` checks the next day's slot against gate occupancy.
+- `_served_while_waiting()` binary-searches the event history for the
+  resource assignments made during a wait.
+
+**UI.**
+
+- The **Airlines** tab lists each airline.
+- An airline detail (`_airline_text()`) shows why the score is what it is, the
+  contract, problem flights and the request, with ACCEPT / DECLINE as
+  RichText links.
+- Alerts cover contracts at risk or failing, and offered requests.
+
+**Scenario overlays** gain `flight_overrides`, `include_flights` and
+`task_overrides` (used by `riverdale_airline_conflict.json` and
+`riverdale_ga_hold.json`).
 
 ## M8 operational resources
 
