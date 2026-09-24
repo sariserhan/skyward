@@ -2,12 +2,13 @@
 
 A Godot airport operations simulator with a preserved aircraft boarding engine.
 The default scene runs Riverdale International: manage gate conflicts while
-fictional flights land, taxi, turn around and depart. Airport M0–M5 are
-implemented. Arriving aircraft carry real passengers, who deboard row by row,
-walk through the terminal and leave the airport. Departing passengers clear
+fictional flights land, taxi, turn around and depart. Airport M0–M6 are
+implemented. Arriving aircraft carry real passengers, who deboard row by row and
+either leave the airport or connect: they walk to another gate and board
+another flight, as the same person. Departing passengers clear
 security and board through the preserved cabin simulation. Aircraft turnaround
 is a visible task graph (deboarding, cleaning, catering, fueling, baggage,
-boarding), and departures wait for it. Connecting passengers (M6) are next.
+boarding), and departures wait for it. Baggage (M7) is next.
 
 Product direction from M3 onward: [airport_tycoon.md](airport_tycoon.md). M3 report:
 [docs/m3-status.md](docs/m3-status.md).
@@ -48,8 +49,11 @@ intentional waiting; incompatible gates are rejected. Space pauses/resumes;
 F3 reveals +10 minutes, force arrival and +10 minute operational hold controls.
 
 While an aircraft deboards, **View deboarding** shows the cabin emptying. The
-**Passengers** tab lists arrivals (IN) and departures (OUT); select one to
-follow them from seat to exit.
+**Passengers** tab lists arrivals (IN), connectors (CX) and departures (OUT).
+Select one to follow them from seat to exit, or from one aircraft onto another.
+When connecting passengers are still on their way to a closing gate, the flight
+details say how many there are, where they come from, and when they will arrive:
+**HOLD +5 MIN** waits for them, at the cost of departure time.
 
 The **Turnaround** tab lists the selected aircraft's tasks: progress, times,
 and what each one is waiting for. The flight details say what is holding
@@ -102,12 +106,13 @@ Benchmarks (headless):
 godot --headless --path game --script tests/airport_benchmark.gd    # airside, 24 and 100 flights
 godot --headless --path game --script tests/passenger_benchmark.gd  # full morning baseline
 godot --headless --path game --script tests/strategy_benchmark.gd   # each strategy on every flight
+godot --headless --path game --script tests/connection_benchmark.gd # default and 40% connecting
 ```
 
 Rendered UI smoke tests and the M3 demonstration run under a virtual display:
 
 ```sh
-tools/ui_tests.sh                      # airport UI, terminal UI, M3, M4 and M5 demos
+tools/ui_tests.sh                      # airport UI, terminal UI, M3–M6 demos
 tools/ui_tests.sh tests/m3_demo.gd     # one script
 ```
 

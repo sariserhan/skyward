@@ -1,13 +1,12 @@
-# Current status — M0 through M5 implemented
+# Current status — M0 through M6 implemented
 
-M5 passenger deboarding is complete. Arriving aircraft carry real passengers,
-who deboard through a cabin engine (the 787 uses the widebody deboarding
-abstraction), enter the terminal at the gate and leave through the exit.
-Deboarding is a turnaround task gating cleaning and catering. Save schema v5.
-See the [M5 completion report](m5-status.md). M6 connecting passengers has not
-started.
+M6 connecting passengers are complete. The same passenger arrives on one flight,
+deboards, transfers airside, and boards another. Missed connections are
+stranded, with derived causes, and gate-close decisions show which connectors
+are still inbound. Save schema v6. See the [M6 completion report](m6-status.md),
+including an open question on connector loads. M7 baggage has not started.
 
-Earlier reports: [M4](m4-status.md), [M3](m3-status.md), [M2](m2-status.md), and the M0/M1 report below. Their
+Earlier reports: [M5](m5-status.md), [M4](m4-status.md), [M3](m3-status.md), [M2](m2-status.md), and the M0/M1 report below. Their
 limitations and timings are historical; M3 changed the timetable, scenario start,
 security defaults, loads, cabin timings and save schema (D-021, D-023, D-024).
 

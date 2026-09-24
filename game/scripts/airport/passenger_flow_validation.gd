@@ -37,17 +37,32 @@ static func valid(data: Dictionary) -> bool:
 		if not edge.get("walking_ticks") is int or edge.walking_ticks <= 0: return false
 	var graph := TerminalGraph.new()
 	graph.setup(graph_data)
-	var owned := {}
+	# Departing: one outbound manifest. Arriving: one inbound manifest.
+	# Connecting: the inbound manifest of legs[0] and the outbound one of legs[1].
+	var inbound_of := {}
+	var outbound_of := {}
 	for f in state.flights.values():
-		for list in ["passenger_ids", "inbound_passenger_ids"]:
-			for id in f[list]:
-				if not id is int or owned.has(str(id)) or not state.passengers.has(str(id)): return false
+		for pair in [["inbound_passenger_ids", inbound_of], ["passenger_ids", outbound_of]]:
+			for id in f[pair[0]]:
+				if not id is int or pair[1].has(str(id)) or not state.passengers.has(str(id)): return false
 				if not state.passengers[str(id)] is Dictionary: return false
-				if state.passengers[str(id)].get("current_flight_id") != f.id: return false
-				var direction := "arriving" if list == "inbound_passenger_ids" else "departing"
-				if state.passengers[str(id)].get("journey_direction") != direction: return false
-				owned[str(id)] = f.id
-	if owned.size() != state.passengers.size(): return false
+				pair[1][str(id)] = f.id
+	for key in state.passengers:
+		var p = state.passengers[key]
+		if not p is Dictionary: return false
+		match p.get("journey_direction"):
+			"departing":
+				if inbound_of.has(key) or outbound_of.get(key) != p.current_flight_id: return false
+			"arriving":
+				if outbound_of.has(key) or inbound_of.get(key) != p.current_flight_id: return false
+			"connecting":
+				var legs = p.get("itinerary_legs")
+				if not legs is Array or legs.size() != 2 or not p.get("leg_index") in [0, 1]: return false
+				if inbound_of.get(key) != legs[0] or outbound_of.get(key) != legs[1] or legs[0] == legs[1]: return false
+				if p.current_flight_id != legs[p.leg_index]: return false
+				if not p.connection_status in ["pending", "made", "missed"]: return false
+			_:
+				return false
 	var expected := Passenger.new().snapshot()
 	for key in state.passengers:
 		var p = state.passengers[key]
@@ -56,10 +71,18 @@ static func valid(data: Dictionary) -> bool:
 			if not p.has(field) or typeof(p[field]) != typeof(expected[field]): return false
 		if str(p.id) != key or p.walking_speed <= 0 or not p.airport_state in PassengerFlow.JOURNEY_STATES: return false
 		var arriving: bool = p.journey_direction == "arriving"
-		if arriving != (p.airport_state in PassengerFlow.ARRIVING_STATES) and p.airport_state != "on_aircraft": return false
-		if not arriving and not state.security_checkpoints.has(p.security_checkpoint_id): return false
-		var aboard: bool = arriving and p.airport_state in ["on_aircraft", "deboarding"]
-		if aboard != (arriving and p.current_location == ""): return false
+		var connecting: bool = p.journey_direction == "connecting"
+		match p.journey_direction:
+			"arriving":
+				if not p.airport_state in PassengerFlow.ARRIVING_STATES: return false
+			"connecting":
+				if not p.airport_state in PassengerFlow.CONNECTING_STATES[p.leg_index]: return false
+			_:
+				if p.airport_state in ["deboarding", "walking_to_exit", "left_airport", "missed_connection"]: return false
+				if not state.security_checkpoints.has(p.security_checkpoint_id): return false
+		# Still on the inbound aircraft: no terminal location yet.
+		var aboard: bool = (arriving or (connecting and p.leg_index == 0)) and p.airport_state in ["on_aircraft", "deboarding"]
+		if aboard != ((arriving or connecting) and p.current_location == ""): return false
 		if p.airport_state != "not_arrived" and not aboard and not graph.nodes.has(p.current_location): return false
 		if p.airport_state == "waiting_at_gate":
 			if not p.security_cleared or p.current_location != state.flights[p.current_flight_id].assigned_gate_id: return false

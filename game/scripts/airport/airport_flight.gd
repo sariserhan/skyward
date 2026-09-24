@@ -72,3 +72,10 @@ var deboarding_complete_tick: int = -1
 var deplaned_count: int = 0
 ## DeboardingSimulation.result() for cabin flights, in boarding ticks.
 var deboarding_result: Dictionary = {}
+
+# Connections (M6), kept for later airline measures (M9).
+var connections_made: int = 0
+var connections_missed: int = 0
+## Scenario aid (M6 demo): the aircraft is this late from its origin, so its
+## approach and landing start later than scheduled.
+var inbound_delay_ticks: int = 0

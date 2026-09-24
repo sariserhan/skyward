@@ -20,6 +20,8 @@ func fixture(overrides := {}, edit := Callable()) -> AirportSimulation:
 	f.turnaround_overrides = overrides
 	config.flights = [f]
 	var flow: Dictionary = config.passenger_flow
+	# Earlier-milestone fixtures: no connecting itineraries (M6 tests opt in).
+	flow.erase("connections")
 	flow.arrival_lead_min_ticks = 30000
 	flow.arrival_lead_max_ticks = 34000
 	flow.check_in_ticks = 1

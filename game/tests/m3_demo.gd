@@ -133,7 +133,8 @@ func _report(f: AirportFlight) -> void:
 	# Step 7: carry-ons and seat interference visibly affect boarding.
 	check(int(r.stow_ticks) > 0 and int(r.seat_wait_ticks) > 0 and int(r.blocked_ticks) > 0, "carry-ons and seat interference had an effect")
 	check(late.airport_state == "missed_flight" and late.boarding_admit_tick < 0, "late passenger never boarded")
-	check(f.missed_count == 1 and f.boarded_count == f.passenger_ids.size() - 1, "exactly the late passenger missed")
+	# Since M6 the same gate close also strands the demo bank's late connectors.
+	check(f.missed_count == 1 + f.connections_missed and f.boarded_count + f.missed_count == f.passenger_ids.size(), "the late passenger (and only missed connectors besides) missed")
 	print("  7  Carry-ons / seat interference: aisle blocked %.0f s, stowing %.0f s, seat-access waits %.0f s" % [int(r.blocked_ticks) / 30.0, int(r.stow_ticks) / 30.0, int(r.seat_wait_ticks) / 30.0])
 	for b in r.top_blockers:
 		print("     seat %s (%d bags, %d obstructing) held up the aisle %.0f s" % [b.seat, int(b.carry_on_count), int(b.obstruction_count), int(b.caused_blocked_ticks) / 30.0])

@@ -22,6 +22,8 @@ func fixture(aircraft := "737", overrides := {}, edit := Callable()) -> AirportS
 	f.deboarding_overrides = overrides
 	config.flights = [f]
 	var flow: Dictionary = config.passenger_flow
+	# Earlier-milestone fixtures: no connecting itineraries (M6 tests opt in).
+	flow.erase("connections")
 	flow.arrival_lead_min_ticks = 30000
 	flow.arrival_lead_max_ticks = 34000
 	flow.check_in_ticks = 1
@@ -308,7 +310,9 @@ func test_full_morning_every_arrival_leaves_the_airport() -> void:
 		assert_eq(sum(f.departure_delay_breakdown), maxi(0, f.actual_departure - f.scheduled_departure), f.id)
 		for p in sim._inbound(f):
 			arriving += 1
-			assert_eq(p.airport_state, "left_airport", "P%d" % p.id)
+			# Local arrivals leave the airport; connectors (M6) fly on or are stranded.
+			var endpoints: Array = ["left_airport"] if p.journey_direction == "arriving" else ["departed", "missed_connection"]
+			assert_true(p.airport_state in endpoints, "P%d ended %s" % [p.id, p.airport_state])
 	assert_true(arriving > 3000, "a full morning of arrivals: %d" % arriving)
 	# Demo flight SJ 235 has a slow jet bridge door: deboarding shows up in its explanation.
 	assert_true(int(sim.airport.flights.F003.departure_delay_breakdown.get("deboarding", 0)) > 0, str(sim.airport.flights.F003.departure_delay_breakdown))

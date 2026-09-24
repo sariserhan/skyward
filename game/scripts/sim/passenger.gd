@@ -173,6 +173,16 @@ var exited_tick: int = -1
 var deplaned_airport_tick: int = -1
 var left_airport_tick: int = -1
 
+# Connections (M6). A "connecting" passenger flies itinerary_legs[0] in and
+# itinerary_legs[1] out; current_flight_id is the leg they are on. One seat per
+# leg ([row, letter], or [] without a cabin model); the seat fields above are
+# switched to the next leg's seat when they leave the inbound aircraft.
+var itinerary_legs: Array = []
+var itinerary_seats: Array = []
+var leg_index: int = 0
+## "" (not connecting), "pending", "made" or "missed".
+var connection_status: String = ""
+
 ## Full live state for airport saves; preserve to_dict()'s boarding record API.
 func snapshot() -> Dictionary:
 	var result := {}

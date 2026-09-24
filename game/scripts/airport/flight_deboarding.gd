@@ -54,7 +54,7 @@ static func valid_snapshot(data: Variant, state: Dictionary, now: int, start: in
 		if not e.get(key) is int: return false
 	for key in ["aisle", "active", "exited", "seat_queues"]:
 		if not e.get(key) is Array: return false
-	for key in ["seat_occupied", "config"]:
+	for key in ["seat_occupied", "config", "exit_records"]:
 		if not e.get(key) is Dictionary: return false
 	if not e.get("completed") is bool: return false
 	var cabin: AircraftDef = cabins[data.cabin_id]
@@ -86,16 +86,20 @@ static func valid_snapshot(data: Variant, state: Dictionary, now: int, start: in
 		if where.get(id) != "aisle": return false
 	for id in e.exited:
 		if not id is int or not manifest.has(id) or where.has(id): return false
+		var record = e.exit_records.get(str(id))
+		if not record is Array or record.size() != 3 or not record[0] is String or not record[1] is int or not record[2] is int: return false
 		where[id] = "out"
+	if e.exit_records.size() != e.exited.size(): return false
 	if where.size() != manifest.size(): return false
 	for key in e.seat_occupied:
 		if where.get(e.seat_occupied[key]) != "seat": return false
 	if e.completed != (e.exited.size() == manifest.size()): return false
 	if not e.completed and e.tick != data.ratio * (now - start + 1): return false
-	# Journey layer agrees: in the cabin means deboarding; out means in the terminal.
+	# Journey layer agrees: in the cabin means deboarding on this leg; out means
+	# in the terminal (or, for a connector, on to the next leg).
 	for id in manifest:
 		var p: Dictionary = state.passengers[str(id)]
-		if where[id] == "out":
-			if not p.airport_state in ["walking_to_exit", "left_airport"] or p.exited_tick < 0: return false
-		elif p.airport_state != "deboarding" or p.exited_tick != -1: return false
+		var aboard: bool = p.current_flight_id == data.flight_id and p.airport_state == "deboarding"
+		if (where[id] == "out") == aboard: return false
+		if (where[id] == "out") != (p.exited_tick >= 0): return false
 	return true

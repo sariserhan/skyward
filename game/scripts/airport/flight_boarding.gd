@@ -113,6 +113,8 @@ static func valid_snapshot(data: Variant, state: Dictionary, now: int, cabins: D
 		if seated.has(id): expected = "on_aircraft"
 		elif queued.has(id): expected = "boarding"
 		if not expected.is_empty() and p.airport_state != expected: return false
-		if expected.is_empty() and p.airport_state in ["boarding", "on_aircraft", "departed", "waiting_at_gate"]: return false
+		# A connector not yet off their inbound aircraft is on another flight's leg.
+		if expected.is_empty() and p.current_flight_id == data.flight_id and p.airport_state in ["boarding", "on_aircraft", "departed", "waiting_at_gate"]: return false
+		if not expected.is_empty() and p.current_flight_id != data.flight_id: return false
 		if queued.has(id) and p.boarding_admit_tick < 0: return false
 	return true

@@ -28,8 +28,13 @@ it is kept as historical context. The original boarding roadmap remains at
   exit; follow a passenger from seat to exit. Save schema v5. Plan
   [m5-plan.md](m5-plan.md), report [m5-status.md](m5-status.md). Decisions
   D-028–D-030.
-- **M6 next, not started:** connecting passengers.
-- M7: baggage.
+- **M6 implemented:** two-leg itineraries on the same passenger, generated
+  deterministically and only when ideally reachable; deplane → airside transfer
+  → outbound boarding; missed connections stranded at the closed gate, with
+  derived causes; connection context at gate close (the M3 hold is unchanged);
+  connection metrics; save schema v6. Plan [m6-plan.md](m6-plan.md), report
+  [m6-status.md](m6-status.md). Decisions D-031–D-033.
+- **M7 next, not started:** baggage.
 - M8: operational resources.
 - M9: airlines and contracts.
 - M10: economy.
@@ -38,4 +43,4 @@ it is kept as historical context. The original boarding roadmap remains at
 The order after M3 follows D-020: the turnaround task framework comes before any
 individual turnaround activity.
 
-M5 stopped here for review. Do not begin M6 until requested.
+M6 stopped here for review. Do not begin M7 until requested.

@@ -30,6 +30,9 @@ var seat_queues: Array = []
 ## Passengers not yet in the aisle; seat processing stops at zero.
 var seated_count: int = 0
 var exited: Array[int] = []
+## Passenger id -> [seat key, blocked ticks, caused ticks] recorded at exit, so
+## results stay correct after a connecting passenger moves on to another cabin.
+var exit_records: Dictionary = {}
 var tick: int = 0
 var ticks_since_exit: int = 1_000_000
 var completed: bool = false
@@ -78,6 +81,7 @@ func setup(p_aircraft: AircraftDef, p_passengers: Array[Passenger], p_config: Di
 	for _i in (aircraft.rows + 1) * 2: seat_queues.append([])
 	seated_count = passengers.size()
 	exited.clear()
+	exit_records.clear()
 	tick = 0
 	ticks_since_exit = 1_000_000
 	completed = passengers.is_empty()
@@ -207,6 +211,7 @@ func _exit(p: Passenger) -> void:
 	p.exited_tick = tick
 	active.erase(p)
 	exited.append(p.id)
+	exit_records[p.id] = [p.seat_key(), p.total_blocked_time, p.caused_blocked_time]
 	ticks_since_exit = 0
 	passenger_exited.emit(p)
 
@@ -230,13 +235,15 @@ func result() -> Dictionary:
 	var blocked := 0
 	var blockers: Array = []
 	for p in passengers:
-		blocked += p.total_blocked_time
-		if p.caused_blocked_time > 0: blockers.append(p)
-	blockers.sort_custom(func(a, b): return a.caused_blocked_time > b.caused_blocked_time if a.caused_blocked_time != b.caused_blocked_time else a.id < b.id)
+		var record: Array = exit_records.get(p.id, [p.seat_key(), p.total_blocked_time, p.caused_blocked_time])
+		blocked += int(record[1])
+		if int(record[2]) > 0: blockers.append([p, record])
+	blockers.sort_custom(func(a, b): return int(a[1][2]) > int(b[1][2]) if int(a[1][2]) != int(b[1][2]) else a[0].id < b[0].id)
 	var top: Array = []
 	for i in mini(3, blockers.size()):
-		var p: Passenger = blockers[i]
-		top.append({"id": p.id, "seat": p.seat_key(), "carry_on_count": p.carry_on_count, "caused_blocked_ticks": p.caused_blocked_time})
+		var p: Passenger = blockers[i][0]
+		var record: Array = blockers[i][1]
+		top.append({"id": p.id, "seat": record[0], "carry_on_count": p.carry_on_count, "caused_blocked_ticks": int(record[2])})
 	return {"completed": completed, "total_ticks": tick, "passengers": passengers.size(), "exited": exited.size(),
 		"blocked_ticks": blocked, "top_blockers": top}
 
@@ -249,7 +256,7 @@ func snapshot() -> Dictionary:
 	for p in active: active_ids.append(p.id)
 	return {"config": config.duplicate(), "aisle": Array(aisle), "active": active_ids,
 		"seat_occupied": seat_occupied.duplicate(), "seat_queues": seat_queues.duplicate(true), "seated_count": seated_count,
-		"exited": Array(exited), "tick": tick, "ticks_since_exit": ticks_since_exit, "completed": completed}
+		"exited": Array(exited), "exit_records": exit_records.duplicate(true), "tick": tick, "ticks_since_exit": ticks_since_exit, "completed": completed}
 
 
 func restore(p_aircraft: AircraftDef, p_passengers: Array[Passenger], data: Dictionary) -> void:
@@ -271,6 +278,10 @@ func restore(p_aircraft: AircraftDef, p_passengers: Array[Passenger], data: Dict
 	seated_count = int(data.seated_count)
 	exited.clear()
 	for id in data.exited: exited.append(int(id))
+	exit_records.clear()
+	for key in data.exit_records:
+		var record: Array = data.exit_records[key]
+		exit_records[int(key)] = [str(record[0]), int(record[1]), int(record[2])]
 	tick = int(data.tick)
 	ticks_since_exit = int(data.ticks_since_exit)
 	completed = bool(data.completed)

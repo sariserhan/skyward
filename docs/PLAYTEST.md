@@ -107,10 +107,34 @@ The scripted version asserts the same sequence and writes screenshots:
 tools/ui_tests.sh tests/m3_demo.gd
 ```
 
+### M6 walkthrough: the connection bank
+
+NS 249 (gate A5) arrives 18 minutes late. Four of its passengers, in seats 1A,
+28C, 19D and 26E, connect to AW 228 at A2, whose gate closes at 06:47.
+
+1. Select **AW 228** → **Passengers**. The CX rows are its connectors. Select
+   the one from NS 249 seat 1A. The details read *CONNECTING NS 249 → AW 228*,
+   with the gate, the close countdown and an ETA.
+2. 06:36: NS 249 docks. **View deboarding** follows them off the aircraft. On
+   the Terminal tab they walk along the concourse from A5 to A2. Their seat has
+   already switched to their AW 228 seat.
+3. About 06:45 (the alert appears two minutes before close): *AW 228 · 4
+   missing (3 connecting)*. The details read *3 connecting inbound (NS 249) ·
+   next at gate 06:45 · last 06:51 after close*.
+   - **Do nothing:** 28C just makes it; 19D and 26E arrive at 06:49 and 06:51
+     to a closed gate, and stay there stranded. Selecting one shows *MISSED
+     CONNECTION: inbound flight arrived late (+18.0 min); gate closed without a
+     hold*.
+   - **HOLD +5 MIN:** all four board. AW 228 leaves 6.3 minutes late (hold 5.0,
+     plus 1.3 of runway queue from the lost slot).
+
+Scripted: `tools/ui_tests.sh tests/m6_demo.gd`.
+
 ### M5 walkthrough: arrivals
 
 1. Select **AW 228** and open **Passengers**. The IN rows are the people on the
-   arriving aircraft. Select one seated in a middle or rear row.
+   arriving aircraft who are staying in Riverdale. Select one seated in a middle
+   or rear row.
 2. 06:09: AW 228 docks, and deboarding starts about a minute later. Press
    **View deboarding**: the cabin empties from the front, and your passenger is
    circled. They wait for their row, step into the aisle, take their bags down,

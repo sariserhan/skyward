@@ -254,7 +254,8 @@ func _refresh() -> void:
 		var stats := sim.passenger_flow.checkpoint_metrics(cp, sim.clock.tick)
 		if stats.oldest_wait >= 6000 or (cp.capacity() == 0 and not cp.queue.is_empty()): security_alert_count += 1
 	var punctuality := "—" if metrics.departed == 0 else "%d%%" % (100 * (metrics.departed - metrics.late) / metrics.departed)
-	metrics_label.text = "MORNING RUSH    |    %d× %s    |    Gates %d / 8    |    Departed %d / %d    |    On time %s    |    Alerts %d" % [sim.clock.speed, "PAUSED" if sim.clock.paused else "LIVE", metrics.occupied, metrics.departed, sim.airport.flights.size(), punctuality, sim.conflicts.size() + security_alert_count]
+	var connections := sim.connection_metrics()
+	metrics_label.text = "MORNING RUSH    |    %d× %s    |    Gates %d / 8    |    Departed %d / %d    |    On time %s    |    Connections %d made · %d missed    |    Alerts %d" % [sim.clock.speed, "PAUSED" if sim.clock.paused else "LIVE", metrics.occupied, metrics.departed, sim.airport.flights.size(), punctuality, connections.made, connections.missed, sim.conflicts.size() + security_alert_count]
 	for f: AirportFlight in sim.airport.flights.values():
 		var values := [f.flight_number, f.origin + " → " + f.destination, f.assigned_gate_id,
 			AirportClock.display(f.scheduled_departure).left(5), AirportClock.display(f.estimated_departure).left(5), f.status.replace("_", " ").capitalize()]
@@ -286,7 +287,8 @@ func _refresh() -> void:
 			alert_ids.append("security:" + cp.id)
 	for alert in sim.boarding_alerts():
 		var held: AirportFlight = sim.airport.flights[alert.flight_id]
-		alerts.add_item("%s · %d missing · gate closes in %d min" % [held.flight_number, alert.missing, ceili(alert.closes_in / 600.0)])
+		var connecting := " (%d connecting)" % alert.connecting if alert.connecting > 0 else ""
+		alerts.add_item("%s · %d missing%s · gate closes in %d min" % [held.flight_number, alert.missing, connecting, ceili(alert.closes_in / 600.0)])
 		alerts.set_item_tooltip(alerts.item_count - 1, "Select to hold the flight or close the gate. It closes automatically if you do nothing.")
 		alert_ids.append(held.id)
 	if alert_ids.is_empty():
@@ -412,11 +414,13 @@ func _refresh_terminal() -> void:
 		for id in passenger_list_ids: passenger_list.add_item(str(id))
 	for i in passenger_list_ids.size():
 		var p: Passenger = sim.airport.passengers[str(passenger_list_ids[i])]
-		passenger_list.set_item_text(i, "P%04d  ·  %s %s  ·  %s  ·  Gate %s" % [p.id, "IN" if p.journey_direction == "arriving" else "OUT", flight.flight_number, p.airport_state.replace("_", " ").capitalize(), flight.assigned_gate_id])
+		passenger_list.set_item_text(i, "P%04d  ·  %s %s  ·  %s  ·  Gate %s" % [p.id, {"arriving": "IN", "connecting": "CX"}.get(p.journey_direction, "OUT"), flight.flight_number, p.airport_state.replace("_", " ").capitalize(), flight.assigned_gate_id])
 		if p.id == selected_passenger_id:
 			passenger_list.select(i)
 	detail_heading.text = "PASSENGER DETAILS" if selected_passenger_id >= 0 else "FLIGHT DETAILS"
-	if selected_passenger_id >= 0 and sim.airport.passengers[str(selected_passenger_id)].journey_direction == "arriving":
+	if selected_passenger_id >= 0 and sim.airport.passengers[str(selected_passenger_id)].journey_direction == "connecting":
+		detail.text = _connection_text(sim.airport.passengers[str(selected_passenger_id)])
+	elif selected_passenger_id >= 0 and sim.airport.passengers[str(selected_passenger_id)].journey_direction == "arriving":
 		detail.text = _arrival_text(sim.airport.passengers[str(selected_passenger_id)], flight)
 	elif selected_passenger_id >= 0:
 		var p: Passenger = sim.airport.passengers[str(selected_passenger_id)]
@@ -437,8 +441,12 @@ func _refresh_terminal() -> void:
 
 func _boarding_text(f: AirportFlight) -> String:
 	var mode := "Cabin simulation" if f.boarding_mode == "cabin" else "Widebody boarding abstraction"
-	var text := "\n\n[b]Boarding[/b]  %s · %s\nLoad %d%% · %d booked" % [mode, BoardingStrategy.PRESET_NAMES.get(f.boarding_strategy, f.boarding_strategy) if f.boarding_mode == "cabin" else "no cabin model yet",
-		f.load_permille / 10, f.passenger_ids.size()]
+	var connecting := 0
+	for p in sim._manifest(f):
+		if p.journey_direction == "connecting": connecting += 1
+	var text := "\n\n[b]Boarding[/b]  %s · %s\nBooked %d (%d connecting) · at gate %d" % [mode, BoardingStrategy.PRESET_NAMES.get(f.boarding_strategy, f.boarding_strategy) if f.boarding_mode == "cabin" else "no cabin model yet",
+		f.passenger_ids.size(), connecting, int(sim.passenger_flow.ready_by_flight.get(f.id, 0))]
+	text += _missing_connectors_text(f)
 	match f.boarding_phase:
 		"": return text + "\nOpens about 30 min before departure, once service is done"
 		"scheduled": text += "\nOpens %s · gate closes %s" % [AirportClock.display(f.boarding_open_tick), AirportClock.display(f.gate_close_tick)]
@@ -483,7 +491,24 @@ func _holding_text(f: AirportFlight) -> String:
 		return ""
 	# Before boarding starts the turnaround itself is being held up.
 	var what := "turnaround" if f.status == "turnaround" else "departure"
-	return "\n[color=#ffc078]Holding %s: %s · %s[/color]" % [what, t.label, _task_state(f, t, false)]
+	return "\n[color=#ffc078]Holding %s: %s · %s[/color]%s" % [what, t.label, _task_state(f, t, false), _connectors_headline(f)]
+
+## At the gate-close decision: who the flight would be holding for, in one line.
+func _connectors_headline(f: AirportFlight) -> String:
+	if f.boarding_phase != "open": return ""
+	var missing: Array[Passenger] = sim.missing_connectors(f)
+	if missing.is_empty(): return ""
+	var from := {}
+	var first := -1
+	var last := -1
+	for p in missing:
+		from[sim.airport.flights[p.itinerary_legs[0]].flight_number] = true
+		var eta := int(sim.connector_eta(p, f).eta)
+		first = eta if first < 0 else mini(first, eta)
+		last = maxi(last, eta)
+	var after := " [color=#e5484d]after close[/color]" if last > f.gate_close_tick else ""
+	return "\n[color=#ffc078]%d connecting inbound (%s) · next at gate %s · last %s%s[/color]" % [missing.size(), ", ".join(from.keys()),
+		AirportClock.display(first).left(5), AirportClock.display(last).left(5), after]
 
 ## Compact summary in the details; the full table is the Turnaround tab.
 func _turnaround_text(f: AirportFlight) -> String:
@@ -508,7 +533,7 @@ func _task_state(f: AirportFlight, t: TurnaroundTask, table: bool) -> String:
 				var total := f.inbound_passenger_ids.size()
 				if f.boarding_mode != "cabin": return "widebody deboarding abstraction · %d min left" % ceili((t.start_tick + t.duration_ticks - sim.clock.tick) / 600.0)
 				return "%d%% · %d / %d off" % [100 * f.deplaned_count / maxi(1, total), f.deplaned_count, total]
-			if f.boarding_phase == "open": return "boarding · gate closes %s" % AirportClock.display(f.gate_close_tick).left(5)
+			if f.boarding_phase == "open": return "gate closes %s" % AirportClock.display(f.gate_close_tick).left(5)
 			return "doors closing · seating"
 		TurnaroundTask.READY: return "opens %s" % AirportClock.display(f.boarding_open_tick).left(5)
 		TurnaroundTask.BLOCKED: return t.blocked_reason
@@ -554,3 +579,55 @@ func _arrival_text(p: Passenger, f: AirportFlight) -> String:
 	var cabin := "Seat %s (%s) · %d bags" % [p.seat_key(), p.seat_type_name(), p.carry_on_count] if f.boarding_mode == "cabin" else "Widebody: no seat model yet"
 	if p.caused_blocked_time > 0: cabin += " · held up others %.0f s" % (float(p.caused_blocked_time) / sim.cabin_config.tick_rate)
 	return "[font_size=23][b]Passenger %04d[/b][/font_size]\nArriving on %s from %s\n\n%s\n%s\n\n[color=#70dec0]%s[/color]" % [p.id, f.flight_number, p.origin, cabin, off, where]
+
+
+## Who a closing gate is waiting for: up to three connectors still on their way.
+func _missing_connectors_text(f: AirportFlight) -> String:
+	if f.boarding_phase in ["closed", "complete"]: return ""
+	var missing: Array[Passenger] = sim.missing_connectors(f)
+	if missing.is_empty(): return ""
+	var text := "\n[color=#ffc078]%d connecting still inbound[/color]" % missing.size()
+	for i in mini(3, missing.size()):
+		var p: Passenger = missing[i]
+		var eta: Dictionary = sim.connector_eta(p, f)
+		var late: bool = f.gate_close_tick >= 0 and int(eta.eta) > f.gate_close_tick
+		text += "\n  P%04d · %s · ETA %s%s" % [p.id, eta.status, AirportClock.display(int(eta.eta)).left(5), " [color=#ffc078]after close[/color]" if late else ""]
+	if missing.size() > 3: text += "\n  … and %d more" % (missing.size() - 3)
+	return text
+
+## Following a connecting passenger: where they are, and whether they will make it.
+func _connection_text(p: Passenger) -> String:
+	var a: AirportFlight = sim.airport.flights[p.itinerary_legs[0]]
+	var b: AirportFlight = sim.airport.flights[p.itinerary_legs[1]]
+	var r: Dictionary = sim.connection_report(p)
+	var where := ""
+	match p.airport_state:
+		"on_aircraft": where = ("Seated in %s on %s" % [p.seat_key(), a.flight_number]) if p.leg_index == 0 else ("Seated in %s on %s" % [p.seat_key(), b.flight_number])
+		"deboarding": where = "Leaving %s · %s" % [a.flight_number, p.state_name()]
+		"walking_to_gate": where = "Walking to gate %s · at %s" % [b.assigned_gate_id, p.current_location.replace("_", " ")]
+		"waiting_at_gate": where = "At gate %s" % b.assigned_gate_id
+		"boarding": where = "Boarding %s · %s" % [b.flight_number, p.state_name()]
+		"departed": where = "Departed on %s" % b.flight_number
+		"missed_connection": where = "Stranded at the closed gate %s" % b.assigned_gate_id
+		_: where = p.airport_state.replace("_", " ")
+	var status := ""
+	match p.connection_status:
+		"made": status = "[color=#70dec0]CONNECTION MADE[/color]"
+		"missed":
+			status = "[color=#e5484d]MISSED CONNECTION[/color]\n%s" % r.decisive
+			status += "\nInbound late %.1f min · off the aircraft after %.1f min · walk %s · reached gate %s · gate closed %s" % [
+				maxi(0, int(r.inbound_late)) / 600.0, maxi(0, int(r.deboarding)) / 600.0,
+				"%.1f min" % (int(r.walk) / 600.0) if int(r.walk) >= 0 else "—",
+				AirportClock.display(int(r.reached_gate)).left(5) if int(r.reached_gate) >= 0 else "not yet", AirportClock.display(int(r.gate_close)).left(5)]
+		_:
+			var close := b.gate_close_tick if b.gate_close_tick >= 0 else b.scheduled_departure - 6000
+			var eta: Dictionary = sim.connector_eta(p, b) if p.airport_state != "waiting_at_gate" else {"eta": sim.clock.tick}
+			var slack := close - int(eta.eta)
+			status = ("[color=#70dec0]ON TRACK[/color]" if slack > 1800 else "[color=#ffc078]CONNECTION AT RISK[/color]") + \
+				" · gate closes %s (in %s) · ETA %s" % [AirportClock.display(close).left(5), _mmss(close - sim.clock.tick), AirportClock.display(int(eta.eta)).left(5)]
+	return "[font_size=23][b]Passenger %04d[/b][/font_size]\nCONNECTING %s → %s\nFrom %s to %s · gate %s\n\n%s\n\n%s" % [
+		p.id, a.flight_number, b.flight_number, a.origin, b.destination, b.assigned_gate_id, where, status]
+
+static func _mmss(ticks: int) -> String:
+	var seconds := maxi(0, ticks) / 10
+	return "%d:%02d" % [seconds / 60, seconds % 60]

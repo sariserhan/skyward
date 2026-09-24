@@ -284,7 +284,8 @@
       "aircraft_type": "737",
       "scheduled_arrival": 225000,
       "scheduled_departure": 255750,
-      "assigned_gate_id": "A5"
+      "assigned_gate_id": "A5",
+      "inbound_delay_ticks": 10800
     },
     {
       "id": "F006",
@@ -733,6 +734,28 @@
         "service_ticks": 150
       }
     ],
-    "exit_node": "airport_exit"
+    "exit_node": "airport_exit",
+    "connections": {
+      "default_permille": 120,
+      "airline_permille": {
+        "GA": 220,
+        "NS": 150,
+        "AW": 120,
+        "SJ": 100
+      },
+      "max_connection_ticks": 90000,
+      "demo_bank": [
+        {
+          "from": "F005",
+          "to": "F002",
+          "seats": [
+            "1A",
+            "28C",
+            "19D",
+            "26E"
+          ]
+        }
+      ]
+    }
   }
 }

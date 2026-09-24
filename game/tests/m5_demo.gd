@@ -59,7 +59,7 @@ func _process(_delta: float) -> bool:
 			sim().clock.paused = true
 			# Follow a mid-cabin window passenger: they wait for their row, then the aisle.
 			for p in sim()._inbound(f):
-				if p.seat_row >= 14 and p.seat_type == Passenger.SeatType.WINDOW:
+				if p.journey_direction == "arriving" and p.seat_row >= 14 and p.seat_type == Passenger.SeatType.WINDOW:
 					follow = p
 					break
 			main._select_passenger(follow.id)

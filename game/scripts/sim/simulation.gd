@@ -82,34 +82,73 @@ func setup(p_aircraft: AircraftDef, p_passengers: Array[Passenger], p_strategy: 
 
 ## Airport mode: resolve the strategy over the whole manifest (same groups and
 ## seeded in-group order as setup()), but start with an empty door queue.
-## Passengers join through admit() once they are physically at the gate.
+## Passengers join through admit() once they are physically at the gate. Cabin
+## state is left alone until admission: a connecting passenger on this manifest
+## may still be in another aircraft's deboarding cabin.
 func setup_incremental(p_aircraft: AircraftDef, p_passengers: Array[Passenger], p_strategy: BoardingStrategy,
 		p_config: SimConfig, p_seed: int) -> void:
-	setup(p_aircraft, p_passengers, p_strategy, p_config, p_seed)
+	aircraft = p_aircraft
+	passengers = p_passengers
+	strategy = p_strategy
+	config = p_config
+	seed_value = p_seed
+	warnings.clear()
+	_by_id.clear()
+	var states := {}
+	for p in passengers:
+		_by_id[p.id] = p
+		states[p.id] = p.state
+	queue = strategy.resolve(passengers, seed_value)
+	if strategy.unassigned_count > 0:
+		warnings.append("%d passengers matched no group and were placed in %s." %
+			[strategy.unassigned_count, BoardingStrategy.UNASSIGNED_NAME])
+	_rank.clear()
 	for i in queue.size():
 		_rank[queue[i]] = i
 	for p in passengers:
-		p.state = Passenger.State.WAITING
+		p.state = states[p.id]
 	queue.clear()
+	aisle.clear()
+	for _i in range(aircraft.rows + 1):
+		aisle.append(-1)
+	active.clear()
+	seat_occupied.clear()
+	queue_index = 0
+	tick = 0
+	seated_count = 0
+	ticks_since_entry = 1_000_000
+	completed = false
 	closed = false
 
 
 ## Append passengers to the back of the door queue, in strategy order among
-## themselves. Unknown or already admitted ids are ignored. Returns the ids
-## actually admitted.
+## themselves. Unknown or already admitted ids are ignored. Admission resets the
+## passenger's cabin state for this cabin. Returns the ids actually admitted.
 func admit(ids: Array) -> Array[int]:
 	var fresh: Array[int] = []
 	if closed:
 		return fresh
 	for id in ids:
 		var p: Passenger = _by_id.get(int(id))
-		if p != null and p.state == Passenger.State.WAITING and not int(id) in fresh:
+		if p != null and not _admitted(p.id) and not int(id) in fresh:
 			fresh.append(int(id))
 	fresh.sort_custom(func(a, b): return _rank[a] < _rank[b])
 	for id in fresh:
+		var p: Passenger = _by_id[id]
+		var group := p.boarding_group
+		var group_name := p.boarding_group_name
+		var position := p.queue_position
+		_reset_passenger(p)
+		p.boarding_group = group
+		p.boarding_group_name = group_name
+		p.queue_position = position
 		queue.append(id)
-		_set_state(_by_id[id], Passenger.State.QUEUED)
+		_set_state(p, Passenger.State.QUEUED)
 	return fresh
+
+
+func _admitted(id: int) -> bool:
+	return id in queue
 
 
 ## No further admissions. Boarding completes once everyone admitted is seated,

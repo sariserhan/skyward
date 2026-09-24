@@ -14,6 +14,8 @@ const STREAM_CABIN := 0x4004
 const STREAM_LOAD := 0x5005
 ## Inbound (arriving) manifests: loads, seats and passenger attributes.
 const STREAM_INBOUND := 0x6006
+## Connecting itineraries (M6): who connects, onto which flight, which seat.
+const STREAM_CONNECTION := 0x7007
 
 var _rng := RandomNumberGenerator.new()
 

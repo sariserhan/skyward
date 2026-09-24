@@ -85,6 +85,20 @@ variation.
 - Widebodies (abstraction): after the configured duration, everyone enters the
   terminal together.
 
+**Connections (D-031, D-032).**
+
+- About 12% of arrivals connect. At generation, each connector is placed on an
+  outbound flight they could make under ideal conditions, and is on its
+  manifest from the start.
+- On leaving the inbound aircraft they switch to the outbound leg and seat,
+  then walk airside to the outbound gate. The normal boarding rules apply:
+  admitted once at the gate, D-10 close unless held, early close once everyone
+  is aboard.
+- If the gate closes first, they are marked missed, keep walking, and end
+  stranded at the closed gate as `missed_connection`.
+- Holds cost exactly what M3 holds cost: the departure target moves, the gate
+  is kept, and the runway slot is lost.
+
 **Turnaround tasks (D-025).**
 
 - Tasks start when the aircraft reaches the gate. Their order and durations

@@ -651,3 +651,112 @@ v4 is rejected. Validation checks:
 - journey states agree with the flight's deboarding progress
 
 A save made mid-deboarding resumes to the identical outcome.
+
+
+## D-031 — Connecting passengers: one passenger, two legs
+
+**Date:** 2026-09-24
+**Status:** Accepted
+
+A connector is an arriving `Passenger` with:
+
+- `journey_direction = "connecting"`
+- `itinerary_legs = [inbound, outbound]` and `leg_index`
+- `itinerary_seats` (one seat per leg)
+- `connection_status` (`pending`, `made` or `missed`)
+
+`current_flight_id` is always the current leg. The connector belongs to the
+inbound flight's `inbound_passenger_ids` and, **from generation onward**, the
+outbound flight's `passenger_ids`, so the outbound gate close knows they are
+missing.
+
+**Leg change.** On leaving the inbound aircraft
+(`PassengerFlow.transfer_to_connection`), the leg advances and the seat
+switches to the outbound seat. The passenger then walks airside, with no
+re-screening, to the outbound gate. From there M3 applies unchanged. There is
+no despawn and no copy. More legs later means longer arrays.
+
+**Generation.**
+
+- A dedicated stream, `SimRng.STREAM_CONNECTION`, runs after all manifests, so
+  nothing else reshuffles.
+- Rates are set per arriving airline: GA 22% (hub), NS 15%, AW 12%, SJ 10%.
+- A connection is valid only if:
+  - it isn't the same flight, and the outbound destination isn't the inbound
+    origin
+  - the outbound departs after the inbound arrives, within 150 minutes
+  - there is a free outbound seat
+  - it is ideally reachable: planned deboarding start + the passenger's row
+    share of the planned deboarding + the ideal gate-to-gate walk ≤ the
+    outbound's scheduled D-10 close
+- A scenario `demo_bank` names exact inbound seats.
+
+**Boarding-engine consequence.** `Simulation.setup_incremental()` no longer
+resets cabin state for the whole manifest; admission does. A connector may
+still be in the inbound deboarding cabin when outbound boarding opens.
+Standalone `setup()` is unchanged, and the golden baseline is identical.
+
+
+## D-032 — Missed connections, holds and causality
+
+**Date:** 2026-09-24
+**Status:** Accepted
+
+**Missed connections.**
+
+- At outbound gate close, a missing connector is marked `missed`, with the
+  reason (`inbound_on_aircraft`, `inbound_deboarding`, `walking_to_gate`, and
+  so on), and `CONNECTION_MISSED` is recorded.
+- They still leave the inbound aircraft, walk to the closed gate, and remain
+  there as `missed_connection`. This is a temporary endpoint; there is no
+  rebooking.
+- Holds are M3's unchanged: HOLD +5 MIN, a 15-minute maximum, and CLOSE GATE.
+
+**Causality.** `connection_report()` derives, from recorded ticks:
+
+- how late the inbound flight reached its gate
+- time from doors open to this passenger off
+- transfer walk
+- arrival at the gate vs gate close
+- hold used vs the limit
+
+The decisive factor is the largest overrun against plan (inbound lateness,
+deboarding beyond the passenger's row share, walk beyond ideal), plus what the
+gate did: closed without a hold, hold limit reached, or closed after a hold.
+
+**Metrics.** `connection_metrics()` returns:
+
+- connecting, made, missed, pending
+- success rate
+- mean transfer time
+- minimum margin, measured against the scheduled close, holds included
+
+Per-flight `connections_made` and `connections_missed` are kept for M9.
+
+**Scenario aid.** A flight's `inbound_delay_ticks` makes the aircraft late from
+its origin. The demo bank: NS 249 is 18 minutes late, and its seats 1A, 28C,
+19D and 26E connect to AW 228.
+
+
+## D-033 — Save schema v6
+
+**Date:** 2026-09-24
+**Status:** Accepted
+
+v6 adds:
+
+- passenger itinerary fields
+- flight connection counts and `inbound_delay_ticks`
+- deboarding-engine `exit_records` (seat and tallies at exit)
+
+v5 is rejected. Validation is direction- and leg-aware:
+
+- ownership: a connector is in exactly `legs[0]`'s inbound manifest and
+  `legs[1]`'s outbound one
+- per-leg journey states
+- terminal location only once off the inbound aircraft
+- boarding and deboarding sessions judged only for passengers on that flight's
+  leg
+
+A save while a connector is seated inbound, deboarding, walking, waiting or
+boarding resumes to the identical outcome.

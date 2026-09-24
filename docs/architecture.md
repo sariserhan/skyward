@@ -1,4 +1,4 @@
-# Airport architecture — M0 to M5
+# Airport architecture — M0 to M6
 
 The airport is now the default Godot scene. The existing boarding scene remains
 available at `res://scenes/main.tscn`; its simulation algorithm is unchanged.
@@ -162,6 +162,26 @@ alongside the conflict check.
 - A compact turnaround summary sits under it.
 - A **Turnaround** tab holds the full task table.
 - After takeoff, the additive delay breakdown is shown.
+
+## M6 connections
+
+**Legs.** A connector's `current_flight_id` follows `itinerary_legs[leg_index]`,
+so every existing system keys on the current leg:
+
+- gate routing
+- `gate_arrivals` admission
+- manifests
+- reroutes on a gate change
+
+Checks that mean "aboard *this* flight" (gate close, missing passengers, the
+departed transition, session validators) test `current_flight_id == f.id`
+(`_aboard()`).
+
+**Leaving the inbound aircraft.** `_deplane()` sends local arrivals to
+`arrive_from_aircraft()` and connectors to `transfer_to_connection()`.
+
+**Reporting.** `connection_report()`, `connection_metrics()`,
+`missing_connectors()` and `connector_eta()` feed the UI from recorded state.
 
 ## M5 arrivals
 

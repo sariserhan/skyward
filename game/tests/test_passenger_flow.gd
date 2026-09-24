@@ -10,6 +10,8 @@ func fixture(count: int = 12, lanes: int = 2) -> AirportSimulation:
 	config.flights[0].scheduled_departure = 40000
 	config.aircraft_types.A220.seats = count
 	var flow: Dictionary = config.passenger_flow
+	# Earlier-milestone fixtures: no connecting itineraries (M6 tests opt in).
+	flow.erase("connections")
 	flow.load_permille = 1000
 	flow.staff_pool = 6
 	# Exact manifest sizes: use the flat load, not the scenario's load ranges.

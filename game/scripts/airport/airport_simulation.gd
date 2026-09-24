@@ -3,7 +3,7 @@ extends RefCounted
 ## One world, one clock. Turnaround is a task graph (M4); cabin flights deboard
 ## (M5) and board (M3) through cabin engines as tasks of it; widebodies use the
 ## widebody deboarding and boarding abstractions (D-022, D-029).
-const SAVE_VERSION := 5
+const SAVE_VERSION := 6
 const CONFIG_PATH := "res://configs/airports/riverdale.json"
 const STATES := ["scheduled", "approaching", "landed", "taxiing_in", "at_gate",
 	"turnaround", "boarding", "ready_for_pushback", "taxiing_out", "departed"]
@@ -89,8 +89,14 @@ func setup(scenario: Dictionary = {}, seed_override: int = -1) -> void:
 	events.record(clock.tick, "SCENARIO_STARTED", "", {"seed": seed_value, "scenario": config.id})
 	passenger_flow = PassengerFlow.new()
 	passenger_flow.bind(airport, events, config.get("passenger_flow", {}))
+	# Planned deboarding windows let connection generation test ideal reachability.
+	var plans := {}
+	for f: AirportFlight in flight_order:
+		var deboarding := turnaround.task(f, Turnaround.DEBOARDING)
+		var cabin: AircraftDef = cabins_by_type.get(airport.aircraft[f.aircraft_id].aircraft_type_id)
+		if deboarding != null: plans[f.id] = [deboarding.planned_start_tick, deboarding.planned_finish_tick, 0 if cabin == null else cabin.rows]
 	passenger_flow.generate(seed_value, clock.tick, flight_order, cabins_by_type, cabin_config,
-		int(_boarding("gate_close_before_departure_ticks")), config.get("deboarding", {}))
+		int(_boarding("gate_close_before_departure_ticks")), config.get("deboarding", {}), plans)
 
 func _boarding(key: String) -> Variant:
 	return config.get("boarding", {}).get(key, BOARDING_DEFAULTS[key])
@@ -138,10 +144,11 @@ func _transition(flight: AirportFlight, status: String, duration: int = 0) -> vo
 func _update_flight(f: AirportFlight) -> void:
 	match f.status:
 		"scheduled":
-			if clock.tick >= f.scheduled_arrival - int(config.approach_ticks):
+			if clock.tick >= f.scheduled_arrival + f.inbound_delay_ticks - int(config.approach_ticks):
 				_transition(f, "approaching")
+				if f.inbound_delay_ticks > 0: _add_delay(f, "late_inbound", f.inbound_delay_ticks)
 		"approaching":
-			if clock.tick >= f.scheduled_arrival - int(config.landing_ticks):
+			if clock.tick >= f.scheduled_arrival + f.inbound_delay_ticks - int(config.landing_ticks):
 				_request_runway(f, "landing")
 		"landed":
 			_transition(f, "taxiing_in", int(config.taxi_in_ticks))
@@ -237,7 +244,7 @@ func _complete_runway() -> void:
 		_transition(f, "departed")
 		for id in f.passenger_ids:
 			var p: Passenger = airport.passengers[str(id)]
-			if p.airport_state == "on_aircraft": passenger_flow.set_journey_state(p, "departed")
+			if p.current_flight_id == f.id and p.airport_state == "on_aircraft": passenger_flow.set_journey_state(p, "departed")
 		events.record(clock.tick, "FLIGHT_DEPARTED", f.id, {"delay_ticks": maxi(0, clock.tick - f.scheduled_departure), "causes": f.delay_reasons,
 			"breakdown": f.departure_delay_breakdown, "boarded": f.boarded_count, "missed": f.missed_count})
 
@@ -246,8 +253,8 @@ func _estimate_departure(f: AirportFlight) -> int:
 	var dock := -1
 	var earliest := f.scheduled_departure
 	match f.status:
-		"scheduled": dock = f.scheduled_arrival + int(config.taxi_in_ticks) + 3
-		"approaching": dock = maxi(clock.tick, f.scheduled_arrival) + int(config.taxi_in_ticks) + 2
+		"scheduled": dock = f.scheduled_arrival + f.inbound_delay_ticks + int(config.taxi_in_ticks) + 3
+		"approaching": dock = maxi(clock.tick, f.scheduled_arrival + f.inbound_delay_ticks) + int(config.taxi_in_ticks) + 2
 		"landed": dock = clock.tick + int(config.taxi_in_ticks) + 2
 		"taxiing_in": dock = maxi(clock.tick, f.due_tick) + 2
 		"at_gate", "turnaround", "boarding": dock = clock.tick
@@ -474,7 +481,8 @@ func _valid_boarding(data: Dictionary) -> bool:
 		if not FlightBoarding.valid_snapshot(data.boarding[id], state, int(data.clock.tick), cabins): return false
 	for key in state.passengers:
 		var p: Dictionary = state.passengers[key]
-		if p.journey_direction == "arriving": continue
+		# Arrivals, and connectors still on their inbound leg, are checked by _valid_deboarding.
+		if p.journey_direction == "arriving" or (p.journey_direction == "connecting" and p.leg_index == 0): continue
 		var f: Dictionary = state.flights[p.current_flight_id]
 		match p.airport_state:
 			"boarding", "on_aircraft":
@@ -694,14 +702,20 @@ func _close_gate(f: AirportFlight, by: String) -> void:
 			f.last_seated_tick = clock.tick
 			passenger_flow.set_journey_state(p, "on_aircraft")
 			passenger_flow._emit(clock.tick, "PASSENGER_ON_AIRCRAFT", p, {"mode": "widebody_boarding_abstraction"})
-		if p.airport_state in ["boarding", "on_aircraft"]:
+			_connection_made(p, f)
+		if _aboard(p, f):
 			boarded += 1
 			continue
 		p.missed_flight_id = f.id
-		p.missed_reason = p.airport_state
+		# A connector may still be on (or leaving) their inbound aircraft.
+		p.missed_reason = ("inbound_" if p.current_flight_id != f.id else "") + p.airport_state
 		if p.airport_state == "waiting_at_gate": passenger_flow.set_journey_state(p, "missed_flight")
 		f.missed_count += 1
 		passenger_flow._emit(clock.tick, "PASSENGER_MISSED_FLIGHT", p, {"reason": p.missed_reason})
+		if p.journey_direction == "connecting":
+			p.connection_status = "missed"
+			f.connections_missed += 1
+			passenger_flow._emit(clock.tick, "CONNECTION_MISSED", p, {"from": p.itinerary_legs[0], "to": f.id, "reason": p.missed_reason})
 	f.boarded_count = boarded
 	if f.boarding_mode == "cabin":
 		var engine: Simulation = boarding_sessions[f.id].engine
@@ -730,6 +744,7 @@ func _step_boarding() -> void:
 			f.last_seated_tick = clock.tick
 			passenger_flow.set_journey_state(p, "on_aircraft")
 			passenger_flow._emit(clock.tick, "PASSENGER_ON_AIRCRAFT", p, {"seat": p.seat_key()})
+			_connection_made(p, f)
 		if session.engine.is_complete(): f.boarding_complete_tick = clock.tick
 		# Whole manifest aboard: no reason to keep the gate open until D-10.
 		if f.boarding_phase == "open" and session.engine.seated_count == f.passenger_ids.size():
@@ -790,8 +805,12 @@ func close_gate(flight_id: String) -> bool:
 func missing_passengers(f: AirportFlight) -> int:
 	var missing := 0
 	for p in _manifest(f):
-		if not p.airport_state in ["boarding", "on_aircraft", "departed", "waiting_at_gate"]: missing += 1
+		if not _aboard(p, f) and not (p.current_flight_id == f.id and p.airport_state in ["departed", "waiting_at_gate"]): missing += 1
 	return missing
+
+## Boarding or seated on this flight (not on a connector's inbound aircraft).
+func _aboard(p: Passenger, f: AirportFlight) -> bool:
+	return p.current_flight_id == f.id and p.airport_state in ["boarding", "on_aircraft"]
 
 ## Flights whose gate closes soon with passengers still missing.
 func boarding_alerts() -> Array:
@@ -799,7 +818,7 @@ func boarding_alerts() -> Array:
 	for f: AirportFlight in flight_order:
 		if f.boarding_phase != "open" or f.gate_close_tick - clock.tick > int(_boarding("close_warning_ticks")): continue
 		var missing := missing_passengers(f)
-		if missing > 0: out.append({"flight_id": f.id, "missing": missing, "closes_in": f.gate_close_tick - clock.tick})
+		if missing > 0: out.append({"flight_id": f.id, "missing": missing, "connecting": missing_connectors(f).size(), "closes_in": f.gate_close_tick - clock.tick})
 	return out
 
 
@@ -835,19 +854,36 @@ func _step_deboarding() -> void:
 	for f: AirportFlight in flight_order:
 		if not deboarding_sessions.has(f.id): continue
 		var session: FlightDeboarding = deboarding_sessions[f.id]
-		for p in session.step():
-			f.deplaned_count += 1
-			passenger_flow.arrive_from_aircraft(p, f.assigned_gate_id, clock.tick)
+		for p in session.step(): _deplane(f, p)
 		if session.engine.is_complete(): _finish_deboarding(f)
 
 func _update_abstract_deboarding(f: AirportFlight) -> void:
 	if f.boarding_mode == "cabin": return
 	var t := turnaround.task(f, Turnaround.DEBOARDING)
 	if t == null or t.status != TurnaroundTask.RUNNING or clock.tick < t.start_tick + t.duration_ticks: return
-	for p in _inbound(f):
-		f.deplaned_count += 1
-		passenger_flow.arrive_from_aircraft(p, f.assigned_gate_id, clock.tick)
+	for p in _inbound(f): _deplane(f, p)
 	_finish_deboarding(f)
+
+## Off the aircraft at the gate: local arrivals head for the exit, connectors
+## for their next flight's gate.
+func _deplane(f: AirportFlight, p: Passenger) -> void:
+	f.deplaned_count += 1
+	if p.journey_direction == "connecting": passenger_flow.transfer_to_connection(p, f.assigned_gate_id, clock.tick)
+	else: passenger_flow.arrive_from_aircraft(p, f.assigned_gate_id, clock.tick)
+
+func _connection_made(p: Passenger, f: AirportFlight) -> void:
+	if p.journey_direction != "connecting" or p.connection_status != "pending": return
+	p.connection_status = "made"
+	f.connections_made += 1
+	passenger_flow._emit(clock.tick, "CONNECTION_MADE", p, {"from": p.itinerary_legs[0], "to": f.id,
+		"margin_ticks": _connection_margin(p, f)})
+
+## Slack between reaching the gate and the gate's scheduled close (with any
+## late-aircraft shift and holds), unaffected by an early all-aboard close.
+func _connection_margin(p: Passenger, f: AirportFlight) -> int:
+	var close := f.departure_target_tick - int(_boarding("gate_close_before_departure_ticks"))
+	if f.departure_target_tick < 0: close = f.scheduled_departure - int(_boarding("gate_close_before_departure_ticks"))
+	return close - p.gate_arrival_time
 
 func _finish_deboarding(f: AirportFlight) -> void:
 	f.deboarding_complete_tick = clock.tick
@@ -876,11 +912,90 @@ func _valid_deboarding(data: Dictionary) -> bool:
 		var done: bool = task == null or task.status == TurnaroundTask.COMPLETE
 		for pid in f.inbound_passenger_ids:
 			var p: Dictionary = state.passengers[str(pid)]
-			match p.airport_state:
-				"on_aircraft":
-					if running or done: return false
-				"deboarding":
-					if not running: return false
-				_:
-					if not (done or (running and f.boarding_mode == "cabin")): return false
+			# Still on this aircraft: seated before doors open, deboarding while they
+			# are. Off it (terminal, or a connector's next leg): only once it began.
+			var on_leg: bool = p.current_flight_id == id and p.airport_state in ["on_aircraft", "deboarding"]
+			if on_leg and p.airport_state == "on_aircraft" and (running or done): return false
+			if on_leg and p.airport_state == "deboarding" and not running: return false
+			if not on_leg and not (done or (running and f.boarding_mode == "cabin")): return false
 	return true
+
+
+# --- connections (M6) --------------------------------------------------------
+
+## Why a connection was made or missed, from recorded ticks only (no guessing).
+## Times in airport ticks; -1 where a step has not happened yet.
+func connection_report(p: Passenger) -> Dictionary:
+	var a: AirportFlight = airport.flights[p.itinerary_legs[0]]
+	var b: AirportFlight = airport.flights[p.itinerary_legs[1]]
+	var deboarding := turnaround.task(a, Turnaround.DEBOARDING)
+	var graph := passenger_flow.graph
+	var ideal_walk := graph.route_ticks(graph.route(a.assigned_gate_id, b.assigned_gate_id, true))
+	var report := {
+		"from": a.id, "to": b.id, "status": p.connection_status,
+		"inbound_late": -1 if a.gate_arrival_tick < 0 else maxi(0, a.gate_arrival_tick - (a.scheduled_arrival + int(config.taxi_in_ticks))),
+		"deboarding": -1 if p.deplaned_airport_tick < 0 or deboarding == null else p.deplaned_airport_tick - deboarding.start_tick,
+		"walk": -1 if p.gate_arrival_time < 0 or p.deplaned_airport_tick < 0 else p.gate_arrival_time - p.deplaned_airport_tick,
+		"ideal_walk": ideal_walk, "reached_gate": p.gate_arrival_time,
+		"gate_close": b.gate_closed_tick if b.gate_closed_tick >= 0 else b.gate_close_tick,
+		"hold": b.hold_ticks, "hold_limit": int(_boarding("max_hold_ticks")), "decisive": "",
+	}
+	if p.connection_status != "missed": return report
+	# The biggest overrun against plan decides, then what the gate did about it.
+	var planned_off := 0
+	if deboarding != null:
+		if p.itinerary_seats[0].is_empty():
+			# Widebody deboarding abstraction: everyone leaves at its end.
+			planned_off = deboarding.nominal_ticks
+		else:
+			var rows: int = cabins[airport.aircraft[a.aircraft_id].seat_map].rows
+			planned_off = deboarding.nominal_ticks * (int(p.itinerary_seats[0][0]) - 1) / rows
+	var causes := {"inbound flight arrived late": maxi(0, int(report.inbound_late)),
+		"deboarding took long": maxi(0, int(report.deboarding) - planned_off),
+		"transfer walk took long": maxi(0, int(report.walk) - ideal_walk)}
+	var worst := ""
+	for cause in causes:
+		if worst.is_empty() or causes[cause] > causes[worst]: worst = cause
+	var gate := "gate closed without a hold" if b.hold_ticks == 0 else ("hold limit reached" if b.hold_ticks >= int(report.hold_limit) else "gate closed after a %d min hold" % (b.hold_ticks / 600))
+	report.decisive = "%s (+%.1f min); %s" % [worst, causes[worst] / 600.0, gate]
+	return report
+
+## Airport-wide connection summary (data for later airline measures, M9).
+func connection_metrics() -> Dictionary:
+	var out := {"connecting": 0, "made": 0, "missed": 0, "pending": 0, "transfer_ticks_total": 0, "transfers": 0, "min_margin_ticks": -1}
+	for p: Passenger in airport.passengers.values():
+		if p.journey_direction != "connecting": continue
+		out.connecting += 1
+		out[p.connection_status] += 1
+		if p.gate_arrival_time >= 0 and p.deplaned_airport_tick >= 0:
+			out.transfers += 1
+			out.transfer_ticks_total += p.gate_arrival_time - p.deplaned_airport_tick
+		if p.connection_status == "made":
+			var margin := _connection_margin(p, airport.flights[p.itinerary_legs[1]])
+			if out.min_margin_ticks < 0 or margin < out.min_margin_ticks: out.min_margin_ticks = margin
+	out["success_rate"] = 0.0 if out.made + out.missed == 0 else float(out.made) / (out.made + out.missed)
+	out["mean_transfer_ticks"] = 0 if out.transfers == 0 else out.transfer_ticks_total / out.transfers
+	return out
+
+## Connectors on flight f's manifest not yet at its gate or aboard it.
+func missing_connectors(f: AirportFlight) -> Array[Passenger]:
+	var out: Array[Passenger] = []
+	for p in _manifest(f):
+		if p.journey_direction == "connecting" and p.connection_status == "pending" and not _aboard(p, f) \
+				and not (p.current_flight_id == f.id and p.airport_state == "waiting_at_gate"):
+			out.append(p)
+	return out
+
+## When a missing connector should reach f's gate, and what they are doing now.
+func connector_eta(p: Passenger, f: AirportFlight) -> Dictionary:
+	var a: AirportFlight = airport.flights[p.itinerary_legs[0]]
+	var graph := passenger_flow.graph
+	var walk := graph.route_ticks(graph.route(a.assigned_gate_id, f.assigned_gate_id, true), p.walking_speed)
+	if p.leg_index == 1:
+		var remaining := graph.route_ticks(graph.route(p.walk_to if not p.walk_to.is_empty() else p.current_location, f.assigned_gate_id, true), p.walking_speed)
+		var leg_end := maxi(clock.tick, p.flow_due_tick) if not p.walk_to.is_empty() else clock.tick
+		return {"status": "walking to gate %s" % f.assigned_gate_id, "eta": leg_end + maxi(0, remaining)}
+	if p.airport_state == "deboarding":
+		return {"status": "deboarding %s at %s" % [a.flight_number, a.assigned_gate_id], "eta": clock.tick + walk}
+	var dock := a.gate_arrival_tick if a.gate_arrival_tick >= 0 else a.scheduled_arrival + a.inbound_delay_ticks + int(config.taxi_in_ticks)
+	return {"status": "on %s (%s)" % [a.flight_number, a.status.replace("_", " ")], "eta": maxi(dock, clock.tick) + walk}

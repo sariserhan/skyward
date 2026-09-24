@@ -4,12 +4,15 @@ extends RefCounted
 const JOURNEY_STATES := ["not_arrived", "walking_to_check_in", "check_in", "walking_to_security",
 	"security_queue", "security_processing", "walking_to_gate", "waiting_at_gate", "route_blocked",
 	"boarding", "on_aircraft", "departed", "missed_flight",
-	"deboarding", "walking_to_exit", "left_airport"]
+	"deboarding", "walking_to_exit", "left_airport", "missed_connection"]
 ## Journey states of arriving passengers (M5).
 const ARRIVING_STATES := ["on_aircraft", "deboarding", "walking_to_exit", "left_airport"]
+## Journey states of a connecting passenger on each leg (M6).
+const CONNECTING_STATES := [["on_aircraft", "deboarding"],
+	["walking_to_gate", "waiting_at_gate", "route_blocked", "boarding", "on_aircraft", "departed", "missed_connection"]]
 ## Journey states with no pending terminal event (the passenger is not moving).
 const RESTING_STATES := ["waiting_at_gate", "security_queue", "route_blocked",
-	"boarding", "on_aircraft", "departed", "missed_flight", "deboarding", "left_airport"]
+	"boarding", "on_aircraft", "departed", "missed_flight", "deboarding", "left_airport", "missed_connection"]
 var airport: AirportState
 var events: AirportEvents
 var graph := TerminalGraph.new()
@@ -32,7 +35,7 @@ func bind(state: AirportState, event_bus: AirportEvents, settings: Dictionary) -
 ## engine; their passengers get seats and boarding-tick durations from a
 ## separate RNG stream so terminal-flow draws are unchanged.
 func generate(seed_value: int, now: int, flights: Array[AirportFlight], cabins: Dictionary = {},
-		cabin_config: SimConfig = null, gate_close_offset: int = 0, deboarding: Dictionary = {}) -> void:
+		cabin_config: SimConfig = null, gate_close_offset: int = 0, deboarding: Dictionary = {}, deboard_plans: Dictionary = {}) -> void:
 	if config.is_empty(): return
 	rng = SimRng.new(seed_value, SimRng.STREAM_PASSENGERS)
 	var cabin_rng := SimRng.new(seed_value, SimRng.STREAM_CABIN)
@@ -85,6 +88,7 @@ func generate(seed_value: int, now: int, flights: Array[AirportFlight], cabins: 
 			counts["not_arrived"] = int(counts.get("not_arrived", 0)) + 1
 			_schedule(p, p.arrival_time_at_airport, "arrive")
 	_generate_inbound(seed_value, next_id, flights, cabins, deboarding)
+	_generate_connections(seed_value, flights, cabins, cabin_config, deboard_plans, gate_close_offset)
 
 ## Arriving passengers, after every outbound one so outbound ids and draws are
 ## unchanged. Own stream: load, seats, speed, bags and deboarding timings. All
@@ -125,6 +129,107 @@ func _generate_inbound(seed_value: int, next_id: int, flights: Array[AirportFlig
 			airport.passengers[str(p.id)] = p
 			f.inbound_passenger_ids.append(p.id)
 			counts["on_aircraft"] = int(counts.get("on_aircraft", 0)) + 1
+
+## Connecting itineraries (M6), after every manifest so nothing else reshuffles.
+## Each arriving passenger may connect, at the arriving airline's rate, onto a
+## flight they could make under ideal conditions: their share of the planned
+## deboarding plus the ideal gate-to-gate walk before its scheduled gate close.
+## The connector joins that flight's outbound manifest now; the airline expects
+## them. A scenario demo_bank names exact inbound seats to connect.
+func _generate_connections(seed_value: int, flights: Array[AirportFlight], cabins: Dictionary, cabin_config: SimConfig,
+		plans: Dictionary, close_offset: int) -> void:
+	var settings: Dictionary = config.get("connections", {})
+	if settings.is_empty(): return
+	var rng := SimRng.new(seed_value, SimRng.STREAM_CONNECTION)
+	var free := {}
+	for f in flights:
+		var aircraft: AirportAircraft = airport.aircraft[f.aircraft_id]
+		var cabin: AircraftDef = cabins.get(aircraft.aircraft_type_id)
+		var taken := {}
+		for id in f.passenger_ids: taken[airport.passengers[str(id)].seat_key()] = true
+		var seats: Array = []
+		if cabin != null:
+			for seat in cabin.all_seats():
+				if not taken.has(AircraftDef.seat_key(seat[0], seat[1])): seats.append(seat)
+		free[f.id] = {"seats": seats, "left": aircraft.seat_capacity - f.passenger_ids.size(), "cabin": cabin}
+	var banked := {}
+	for entry in settings.get("demo_bank", []):
+		if not airport.flights.has(entry.from) or not airport.flights.has(entry.to): continue
+		var a: AirportFlight = airport.flights[entry.from]
+		for seat in entry.seats:
+			for id in a.inbound_passenger_ids:
+				var p: Passenger = airport.passengers[str(id)]
+				if p.seat_key() == seat and free[entry.to].left > 0:
+					_connect(p, a, airport.flights[entry.to], free[entry.to], rng.randi_range(0, 1_000_000), cabin_config, rng)
+					banked[p.id] = true
+	var by_airline: Dictionary = settings.get("airline_permille", {})
+	for a in flights:
+		var permille := int(by_airline.get(a.airline_id, settings.get("default_permille", 0)))
+		for id in a.inbound_passenger_ids:
+			# Both draws always happen, so one passenger's outcome never shifts another's.
+			var roll := rng.randi_range(0, 999)
+			var pick := rng.randi_range(0, 1_000_000)
+			if banked.has(id) or roll >= permille: continue
+			var p: Passenger = airport.passengers[str(id)]
+			var candidates: Array = []
+			for b in flights:
+				if free[b.id].left > 0 and _reachable(p, a, b, plans, close_offset, int(settings.get("max_connection_ticks", 0))):
+					candidates.append(b)
+			if candidates.is_empty(): continue
+			var b: AirportFlight = candidates[pick % candidates.size()]
+			_connect(p, a, b, free[b.id], pick, cabin_config, rng)
+
+## Could this passenger make flight b under ideal conditions? `plans` holds each
+## flight's planned deboarding [start, finish] and cabin rows.
+func _reachable(p: Passenger, a: AirportFlight, b: AirportFlight, plans: Dictionary, close_offset: int, max_ticks: int) -> bool:
+	if b.id == a.id or b.destination == a.origin or b.scheduled_departure <= a.scheduled_arrival: return false
+	if max_ticks > 0 and b.scheduled_departure - a.scheduled_arrival > max_ticks: return false
+	var plan: Array = plans.get(a.id, [a.scheduled_arrival, a.scheduled_arrival, 0])
+	# Front rows are off first: their share of the planned deboarding.
+	var deplane: int = int(plan[1])
+	if p.seat_row > 0 and int(plan[2]) > 0:
+		deplane = int(plan[0]) + (int(plan[1]) - int(plan[0])) * (p.seat_row - 1) / int(plan[2])
+	var walk := graph.route_ticks(graph.route(a.assigned_gate_id, b.assigned_gate_id, true))
+	return walk >= 0 and deplane + walk <= b.scheduled_departure - close_offset
+
+func _connect(p: Passenger, a: AirportFlight, b: AirportFlight, seats: Dictionary, pick: int, cabin_config: SimConfig, rng: SimRng) -> void:
+	var inbound_seat: Array = [] if p.seat_row <= 0 else [p.seat_row, p.seat_letter, p.seat_type, p.side]
+	var outbound_seat: Array = []
+	var cabin: AircraftDef = seats.cabin
+	if cabin != null and not seats.seats.is_empty():
+		var seat: Array = seats.seats.pop_at(pick % seats.seats.size())
+		outbound_seat = [seat[0], seat[1], cabin.seat_type_of(seat[1]), cabin.side_of(seat[1])]
+		PassengerGenerator.apply_cabin_timing(p, cabin_config, rng)
+	seats.left -= 1
+	p.journey_direction = "connecting"
+	p.itinerary_legs = [a.id, b.id]
+	p.itinerary_seats = [inbound_seat, outbound_seat]
+	p.leg_index = 0
+	p.connection_status = "pending"
+	p.connection_flight_id = b.id
+	p.destination = b.destination
+	p.gate_target_tick = b.scheduled_departure - int(config.get("gate_target_buffer_ticks", 0))
+	# Airside from the moment they leave the aircraft: no re-screening.
+	p.security_cleared = true
+	b.passenger_ids.append(p.id)
+
+## A connector has left the inbound aircraft at `gate`: next leg, next seat,
+## walking airside to the connecting flight's gate. Same passenger throughout.
+func transfer_to_connection(p: Passenger, gate: String, now: int) -> void:
+	p.current_location = gate
+	p.deplaned_airport_tick = now
+	p.leg_index = 1
+	p.current_flight_id = p.itinerary_legs[1]
+	var seat: Array = p.itinerary_seats[1]
+	p.seat_row = 0 if seat.is_empty() else int(seat[0])
+	p.seat_letter = "" if seat.is_empty() else str(seat[1])
+	if not seat.is_empty():
+		p.seat_type = int(seat[2])
+		p.side = int(seat[3])
+	p.state = Passenger.State.WAITING
+	p.aisle_position = -1
+	_emit(now, "PASSENGER_DEPLANED", p, {"gate_id": gate, "connecting_to": p.current_flight_id})
+	_begin_walk(p, "walking_to_gate", airport.flights[p.current_flight_id].assigned_gate_id, now)
 
 ## A passenger has left the aircraft at `gate`: into the terminal, toward the exit.
 func arrive_from_aircraft(p: Passenger, gate: String, now: int) -> void:
@@ -224,7 +329,7 @@ func _continue_walk(p: Passenger, now: int) -> void:
 				p.gate_arrival_time = now
 				if not p.missed_flight_id.is_empty():
 					# The gate closed while they were on the way: they arrive, never board.
-					_set_state(p, "missed_flight")
+					_set_state(p, "missed_connection" if p.journey_direction == "connecting" else "missed_flight")
 					_emit(now, "PASSENGER_GATE_ARRIVE", p, {"gate_id": p.current_location, "missed_flight": true})
 					return
 				_set_state(p, "waiting_at_gate")
