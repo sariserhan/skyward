@@ -21,7 +21,7 @@ func _initialize() -> void:
 		var boarding_late := 0
 		var last_seated := []
 		for f: AirportFlight in sim.flight_order:
-			var b := int(f.delay_reasons.get("boarding", 0))
+			var b := int(f.departure_delay_breakdown.get("boarding", 0))
 			boarding_delay += b
 			if b > 0: boarding_late += 1
 			if f.boarding_mode == "cabin": last_seated.append((f.last_seated_tick - f.boarding_open_tick) / 600.0)

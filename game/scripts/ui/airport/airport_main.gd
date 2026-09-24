@@ -28,6 +28,7 @@ var hold_button: Button
 var close_gate_button: Button
 var view_boarding_button: Button
 var boarding_overlay: BoardingOverlay
+var turnaround_tree: Tree
 var selected_id: String = "F001"
 var refresh_timer: float = 0
 var rows: Dictionary = {}
@@ -120,6 +121,21 @@ func _build() -> void:
 		if item != null: _select(item.get_metadata(0)))
 	operations_tabs.add_child(board)
 	_build_security_panel()
+	turnaround_tree = Tree.new()
+	turnaround_tree.name = "Turnaround"
+	turnaround_tree.columns = 5
+	turnaround_tree.hide_root = true
+	turnaround_tree.column_titles_visible = true
+	turnaround_tree.select_mode = Tree.SELECT_ROW
+	# All seven tasks fit without scrolling.
+	turnaround_tree.add_theme_constant_override("v_separation", 0)
+	turnaround_tree.add_theme_font_size_override("font_size", 13)
+	turnaround_tree.add_theme_font_size_override("title_button_font_size", 13)
+	for i in 5:
+		turnaround_tree.set_column_title(i, ["Task", "Status", "Start", "Done", "Waiting for / progress"][i])
+		turnaround_tree.set_column_expand(i, i == 4)
+		turnaround_tree.set_column_custom_minimum_width(i, [170, 95, 60, 60, 220][i])
+	operations_tabs.add_child(turnaround_tree)
 	passenger_list = ItemList.new()
 	passenger_list.name = "Passengers"
 	passenger_list.item_selected.connect(func(index): _select_passenger(passenger_list_ids[index]))
@@ -246,17 +262,11 @@ func _refresh() -> void:
 		rows[f.id].set_custom_color(4, Color("ffc078") if f.estimated_departure > f.scheduled_departure else Color("70dec0"))
 	var flight: AirportFlight = sim.airport.flights[selected_id]
 	var aircraft: AirportAircraft = sim.airport.aircraft[flight.aircraft_id]
-	var turnaround := "Waiting for gate"
-	if flight.status == "turnaround":
-		turnaround = "In progress · %d min remaining" % ceili(maxi(0, flight.due_tick - sim.clock.tick) / 600.0)
-	elif flight.status in ["boarding", "ready_for_pushback", "taxiing_out", "departed"]: turnaround = "Complete"
-	var text := "[font_size=23][b]%s[/b][/font_size]  ·  %s\n%s\n%s → %s\n\nGate %s  ·  %s\nArrival  %s  /  %s\nDeparture  %s\nEstimated  %s\n\n[b]Service before boarding[/b]  %s" % [flight.flight_number, aircraft.aircraft_type_id, sim.airport.airlines[flight.airline_id], flight.origin, flight.destination, flight.assigned_gate_id, flight.status.replace("_", " "), AirportClock.display(flight.scheduled_arrival), "pending" if flight.actual_arrival < 0 else AirportClock.display(flight.actual_arrival), AirportClock.display(flight.scheduled_departure), AirportClock.display(flight.estimated_departure), turnaround]
-	text += _boarding_text(flight) + "\n"
-	for reason in flight.delay_reasons:
-		if int(flight.delay_reasons[reason]) > 0:
-			text += "\n[color=#ffc078]%s: %.1f min[/color]" % [reason.replace("_", " ").capitalize(), int(flight.delay_reasons[reason]) / 600.0]
+	var text := "[font_size=23][b]%s[/b][/font_size]  ·  %s\n%s\n%s → %s\n\nGate %s  ·  %s\nArrival  %s  /  %s\nDeparture  %s\nEstimated  %s" % [flight.flight_number, aircraft.aircraft_type_id, sim.airport.airlines[flight.airline_id], flight.origin, flight.destination, flight.assigned_gate_id, flight.status.replace("_", " "), AirportClock.display(flight.scheduled_arrival), "pending" if flight.actual_arrival < 0 else AirportClock.display(flight.actual_arrival), AirportClock.display(flight.scheduled_departure), AirportClock.display(flight.estimated_departure)]
+	text += _holding_text(flight) + _delay_text(flight) + _turnaround_text(flight) + _boarding_text(flight) + "\n"
 	text += "\n\n[b]Passengers at gate[/b]  %d / %d" % [int(sim.passenger_flow.ready_by_flight.get(flight.id, 0)), flight.passenger_ids.size()]
 	detail.text = text
+	_refresh_turnaround_tree(flight)
 	_refresh_terminal()
 	_refresh_warnings()
 	alerts.clear()
@@ -438,3 +448,70 @@ func _cabin_text(p: Passenger, f: AirportFlight) -> String:
 	if p.airport_state == "boarding": text += " · cabin: " + p.state_name()
 	if p.caused_blocked_time > 0: text += " · blocked others %.0f s" % (float(p.caused_blocked_time) / sim.cabin_config.tick_rate)
 	return text
+
+## Additive departure-delay split once the flight has left; live causes before.
+func _delay_text(f: AirportFlight) -> String:
+	if f.status == "departed":
+		var late := f.actual_departure - f.scheduled_departure
+		if late <= 0: return "\n[color=#70dec0]Departed on time[/color]"
+		var parts: Array = []
+		for cause in f.departure_delay_breakdown:
+			parts.append("%s %.1f" % [_cause_label(f, cause), int(f.departure_delay_breakdown[cause]) / 600.0])
+		return "\n[color=#ffc078]Departed +%.1f min: %s[/color]" % [late / 600.0, " · ".join(parts)]
+	var text := ""
+	for reason in f.delay_reasons:
+		if int(f.delay_reasons[reason]) > 0:
+			text += "\n[color=#ffc078]%s: %.1f min[/color]" % [reason.replace("_", " ").capitalize(), int(f.delay_reasons[reason]) / 600.0]
+	return text
+
+func _cause_label(f: AirportFlight, cause: String) -> String:
+	var t: TurnaroundTask = sim.turnaround.task(f, cause)
+	if t != null: return t.label
+	return {"late_inbound": "Late inbound", "passenger_hold": "Passenger hold", "runway_takeoff_queue": "Runway queue"}.get(cause, cause.capitalize())
+
+## One line near the top: what is holding departure now.
+func _holding_text(f: AirportFlight) -> String:
+	var t: TurnaroundTask = sim.turnaround.holding(f)
+	if t == null:
+		if f.status == "ready_for_pushback": return "\n[color=#70dec0]Ready · pushback %s[/color]" % AirportClock.display(sim._pushback_floor(f)).left(5)
+		return ""
+	return "\n[color=#ffc078]Holding departure: %s · %s[/color]" % [t.label, _task_state(f, t, false)]
+
+## Compact summary in the details; the full table is the Turnaround tab.
+func _turnaround_text(f: AirportFlight) -> String:
+	var tasks: Array = sim.turnaround.tasks_of(f)
+	if f.status in ["scheduled", "approaching", "landed", "taxiing_in"]:
+		return "\n\n[b]Turnaround[/b]  %d tasks start at the gate" % tasks.size()
+	var running: Array = []
+	for t: TurnaroundTask in tasks:
+		if t.status == TurnaroundTask.RUNNING and t.kind == "timed": running.append(t.label)
+	var text := "\n\n[b]Turnaround[/b]  %d / %d complete" % [sim.turnaround.completed_count(f), tasks.size()]
+	if not running.is_empty(): text += " · running: " + ", ".join(running)
+	return text
+
+func _task_state(f: AirportFlight, t: TurnaroundTask, table: bool) -> String:
+	match t.status:
+		TurnaroundTask.COMPLETE:
+			var overrun := (t.finish_tick - t.start_tick) - (t.planned_finish_tick - t.planned_start_tick)
+			return "+%d min over plan" % (overrun / 600) if t.kind == "timed" and overrun >= 600 else "done"
+		TurnaroundTask.RUNNING:
+			if t.kind == "timed": return "%d%% · %d min left" % [int(t.progress(sim.clock.tick) * 100), ceili((t.start_tick + t.duration_ticks - sim.clock.tick) / 600.0)]
+			if f.boarding_phase == "open": return "boarding · gate closes %s" % AirportClock.display(f.gate_close_tick).left(5)
+			return "doors closing · seating"
+		TurnaroundTask.READY: return "opens %s" % AirportClock.display(f.boarding_open_tick).left(5)
+		TurnaroundTask.BLOCKED: return t.blocked_reason
+	return "starts at the gate" if table else "not started"
+
+func _refresh_turnaround_tree(f: AirportFlight) -> void:
+	turnaround_tree.clear()
+	var root := turnaround_tree.create_item()
+	var colors := {TurnaroundTask.COMPLETE: Color("70dec0"), TurnaroundTask.RUNNING: Color("ffc078"), TurnaroundTask.READY: Color("a7becd"), TurnaroundTask.BLOCKED: Color("a7becd"), TurnaroundTask.PENDING: Color("6b7684")}
+	var holding: TurnaroundTask = sim.turnaround.holding(f)
+	for t: TurnaroundTask in sim.turnaround.tasks_of(f):
+		var row := turnaround_tree.create_item(root)
+		var values := [t.label + ("  ◀" if t == holding else ""), t.status.capitalize(),
+			"" if t.start_tick < 0 else AirportClock.display(t.start_tick).left(5),
+			"" if t.finish_tick < 0 else AirportClock.display(t.finish_tick).left(5), _task_state(f, t, true)]
+		for i in 5:
+			row.set_text(i, values[i])
+			row.set_custom_color(i, colors[t.status])

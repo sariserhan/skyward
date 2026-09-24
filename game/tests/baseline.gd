@@ -27,7 +27,7 @@ static func measure(sim: AirportSimulation) -> Dictionary:
 	for f: AirportFlight in sim.flight_order:
 		if f.missed_count > 0: flights_with_missed += 1
 		if f.actual_departure - f.scheduled_departure > 3000: late_over_5 += 1
-		if int(f.delay_reasons.get("boarding", 0)) > 0: boarding_delayed += 1
+		if int(f.departure_delay_breakdown.get("boarding", 0)) > 0: boarding_delayed += 1
 	return {"passengers": total, "at_gate_by_d30_pct": pct.call(by_d30), "at_gate_by_d10_pct": pct.call(by_d10),
 		"missed_pct": pct.call(missed), "flights_with_missed": flights_with_missed,
 		"security_wait_min": {"p50": quantile.call(0.5), "p90": quantile.call(0.9), "p99": quantile.call(0.99), "max": quantile.call(1.0)},

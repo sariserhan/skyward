@@ -41,6 +41,7 @@ at any moment, including while a flight is boarding.
 Then answer three questions in your reply:
 
 1. When a flight left late or a passenger missed a flight, could you tell why?
+   Could you tell what an aircraft at the gate was waiting for?
 2. Did you ever hold a flight or close a gate yourself? What made you decide?
 3. What was confusing?
 
@@ -105,6 +106,23 @@ The scripted version asserts the same sequence and writes screenshots:
 ```sh
 tools/ui_tests.sh tests/m3_demo.gd
 ```
+
+### M4 walkthrough: turnaround tasks
+
+Select **GA 242** (A220, gate A4) and open the **Turnaround** tab. Its scenario
+gives it a 25-minute deep clean.
+
+1. 06:15: it docks. Arrival secured runs, then cleaning, catering, fueling and
+   baggage start together at 06:16.
+2. Around 06:26, catering and fueling are done. The details say **Holding
+   departure: Cleaning**, and boarding reads *waiting for cleaning*.
+3. 06:51: cleaning finishes and boarding opens immediately (its window
+   shifted). Pushback readiness waits for boarding.
+4. It departs about 10 minutes late. The details read *Departed +10.3 min:
+   Runway queue 0.9 · Cleaning 9.4*.
+
+Compare **AW 228**: all its service tasks finish before D-30, and its only delay
+is 20 seconds of runway queue. Scripted: `tools/ui_tests.sh tests/m4_demo.gd`.
 
 ## Standalone boarding prototype (from source)
 

@@ -1,12 +1,12 @@
-# Current status — M0 through M3 implemented
+# Current status — M0 through M4 implemented
 
-M3 airport ↔ boarding integration is complete: terminal passengers board through
-the preserved cabin engine, departures depend on boarding, and saves (schema v3)
-include active boarding. See the [M3 completion report](m3-status.md) for
-validation, the measured scenario baseline, the §51 demonstration and
-limitations. M4 has not started.
+M4 aircraft turnaround is complete. Turnaround is a visible task graph
+(cleaning, catering, fueling, placeholder baggage, boarding, pushback
+readiness) with dependencies, exclusivity, blocking reasons, a Turnaround tab
+and an additive departure-delay breakdown. Save schema v4. See the
+[M4 completion report](m4-status.md). M5 deboarding has not started.
 
-Earlier reports: [M2](m2-status.md), and the M0/M1 report below. Their
+Earlier reports: [M3](m3-status.md), [M2](m2-status.md), and the M0/M1 report below. Their
 limitations and timings are historical; M3 changed the timetable, scenario start,
 security defaults, loads, cabin timings and save schema (D-021, D-023, D-024).
 

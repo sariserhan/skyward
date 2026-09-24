@@ -11,11 +11,11 @@ func fixture(count: int = 3) -> AirportSimulation:
 	config.taxi_out_ticks = 10
 	config.approach_ticks = 15
 	config.gate_buffer_ticks = 10
-	config.turnaround_variation_ticks = 3
 	config.flights = config.flights.slice(0, count)
-	for definition in config.aircraft_types.values():
-		definition.turnaround_ticks = 30
-		definition.service_before_boarding_ticks = 30
+	# Turnaround tasks scaled like every other duration here.
+	var durations := {"arrival_secured": 2, "cleaning": 20, "catering": 15, "fueling": 10, "placeholder_baggage_service": 28}
+	for spec in config.turnaround.tasks:
+		if durations.has(spec.type): spec.durations = {"*": durations[spec.type]}
 	# Boarding window scaled like every other duration here (no passengers).
 	config.boarding = {"open_before_departure_ticks": 20, "gate_close_before_departure_ticks": 16,
 		"close_warning_ticks": 5, "hold_increment_ticks": 10, "max_hold_ticks": 30}

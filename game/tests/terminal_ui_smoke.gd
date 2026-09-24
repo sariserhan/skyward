@@ -52,7 +52,7 @@ func _process(_delta: float) -> bool:
 			main._load_save()
 			check(JSON.stringify(main.sim.snapshot()) == saved, "populated UI save restores all state")
 			main._select("F009")
-			main.operations_tabs.current_tab = 2
+			main.operations_tabs.current_tab = main.passenger_list.get_index()
 			check(main.passenger_list.item_count > 0, "selected flight has manifest")
 			main.passenger_list.item_selected.emit(0)
 			check(main.selected_passenger_id == main.passenger_list_ids[0], "manifest opens canonical passenger")

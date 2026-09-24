@@ -15,12 +15,13 @@ var security_checkpoints: Dictionary = {}
 var airlines: Dictionary = {}
 var resources: Dictionary = {}
 var runway := AirportRunway.new()
+var turnaround_tasks: Dictionary = {}
 
 func to_dict() -> Dictionary:
 	var result := {"id": id, "name": name, "money": money, "reputation": reputation,
 		"airlines": airlines.duplicate(true), "resources": resources.duplicate(true),
 		"runway": runway.to_dict()}
-	for registry in ["gates", "aircraft", "flights", "passengers", "bags", "security_checkpoints"]:
+	for registry in ["gates", "aircraft", "flights", "passengers", "bags", "security_checkpoints", "turnaround_tasks"]:
 		result[registry] = {}
 		for key in get(registry):
 			result[registry][key] = get(registry)[key].snapshot() if registry == "passengers" else get(registry)[key].to_dict()
@@ -34,7 +35,7 @@ func restore(data: Dictionary) -> void:
 	airlines = data.airlines.duplicate(true)
 	resources = data.resources.duplicate(true)
 	runway.restore(data.runway)
-	for registry in ["gates", "aircraft", "flights", "bags", "security_checkpoints"]:
+	for registry in ["gates", "aircraft", "flights", "bags", "security_checkpoints", "turnaround_tasks"]:
 		get(registry).clear()
 		for key in data[registry]:
 			var entity: AirportEntity
@@ -44,6 +45,7 @@ func restore(data: Dictionary) -> void:
 				"flights": entity = AirportFlight.new()
 				"bags": entity = AirportBag.new()
 				"security_checkpoints": entity = SecurityCheckpoint.new()
+				"turnaround_tasks": entity = TurnaroundTask.new()
 			entity.restore(data[registry][key])
 			get(registry)[key] = entity
 

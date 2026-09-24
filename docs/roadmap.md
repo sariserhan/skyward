@@ -17,9 +17,12 @@ it is kept as historical context. The original boarding roadmap remains at
   flights, widebody boarding abstraction, active-boarding saves (schema v3).
   Plan [m3-plan.md](m3-plan.md), report [m3-status.md](m3-status.md). Decisions
   D-014–D-024.
-- **M4 next, not started:** turnaround task framework (replaces the placeholder
-  service-before-boarding timer).
-- M5: deboarding, plugged into the turnaround framework.
+- **M4 implemented:** turnaround task graph (cleaning, catering, fueling,
+  placeholder baggage, boarding, pushback readiness) with dependencies,
+  exclusivity, blocking reasons, a Turnaround tab and an additive delay
+  breakdown. Save schema v4. Plan [m4-plan.md](m4-plan.md), report
+  [m4-status.md](m4-status.md). Decisions D-025–D-027.
+- **M5 next, not started:** deboarding, plugged into the turnaround framework.
 - M6: connecting passengers.
 - M7: baggage.
 - M8: operational resources.
@@ -30,4 +33,4 @@ it is kept as historical context. The original boarding roadmap remains at
 The order after M3 follows D-020: the turnaround task framework comes before any
 individual turnaround activity.
 
-M3 stopped here for review. Do not begin M4 until requested.
+M4 stopped here for review. Do not begin M5 until requested.

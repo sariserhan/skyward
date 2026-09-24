@@ -1,4 +1,4 @@
-# Airport architecture — M0 / M1 / M2 / M3
+# Airport architecture — M0 to M4
 
 The airport is now the default Godot scene. The existing boarding scene remains
 available at `res://scenes/main.tscn`; its simulation algorithm is unchanged.
@@ -13,6 +13,10 @@ available at `res://scenes/main.tscn`; its simulation algorithm is unchanged.
   of rendered node positions.
 - `security_checkpoint.gd`: lane/staff limits, active screenings, queue and metrics.
 - `passenger_flow_validation.gd`: passenger/manifest/queue/scheduler save invariants.
+- `turnaround.gd` / `turnaround_task.gd`: the turnaround task graph (M4).
+  Rules: creation, per-tick status updates, blocking reasons, "holding
+  departure", and additive delay attribution. The tasks themselves are
+  canonical entities in `AirportState.turnaround_tasks`.
 - `flight_boarding.gd`: one flight's cabin boarding session. Adapter around the
   preserved `Simulation` engine; validates saved sessions (M3).
 - `airport_clock.gd`: absolute integer simulation ticks and presentation pacing.
@@ -130,10 +134,36 @@ and `AirportSimulation._valid_boarding` reject inconsistent sessions before
 anything is replaced. Engine state and passengers restore onto the same restored
 objects.
 
+## M4 turnaround
+
+`_update_flight()` calls `_update_turnaround()` for docked flights:
+
+1. The task pass runs first. Releasing the boarding task runs M3's
+   `_schedule_boarding()`.
+2. `_update_boarding()` runs next, unchanged.
+3. A second task pass lets boarding completion release `pushback_ready` on the
+   same tick.
+
+`Turnaround.update()` skips a flight until its next possible change: a running
+task's finish, or a wake when boarding opens, boarding completes or durations
+change. An update with nothing due is a no-op, so skipping keeps results
+identical.
+
+Departure estimates walk the graph for docked flights. Flights that haven't
+docked use two cached offsets. Estimates refresh once per simulated second,
+alongside the conflict check.
+
+**UI.**
+
+- The flight details get a "Holding departure" headline: the pushback
+  milestone's blocked chain, followed to the running work.
+- A compact turnaround summary sits under it.
+- A **Turnaround** tab holds the full task table.
+- After takeoff, the additive delay breakdown is shown.
+
 ## M3 boundary
 
-- **Service before boarding** is a placeholder timer
-  (`service_before_boarding_ticks`) until M4 turnaround tasks.
+- **Service before boarding** is the M4 task graph; see above.
 - **Cabin timings** in the airport come from `SimConfig` plus the scenario's
   `boarding.sim_config_overrides` (D-024). The standalone scenarios are
   untouched.

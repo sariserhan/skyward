@@ -456,3 +456,93 @@ punctuality, and strategy differences had no operational effect. With these
 settings, default play sees boarding delay an occasional flight. Window/Middle/
 Aisle removes that delay; Front-to-Back produces widespread lateness.
 Measurements are in `m3-status.md`.
+
+
+## D-025 — Turnaround is a small task graph, not a timer
+
+**Date:** 2026-09-24
+**Status:** Accepted
+
+The service-before-boarding timer (`turnaround_ticks`,
+`service_before_boarding_ticks`, `turnaround_variation_ticks`) is removed.
+
+**Model.**
+
+- Each flight owns `TurnaroundTask` entities built from the scenario's
+  `turnaround.tasks` list, which must be in topological order.
+- Statuses: `PENDING` (not at the gate) → `BLOCKED` (with a reason) → `READY`
+  (boarding only, waiting for its window) → `RUNNING` → `COMPLETE`. No failed or
+  cancelled states yet.
+- Three kinds:
+  - `timed`: a seeded duration, with 0–15% variation per task and optional
+    per-flight `turnaround_overrides`.
+  - `boarding`: the M3 window, unchanged, driven by `AirportSimulation`.
+  - `milestone`: `pushback_ready`.
+- Two relations: `after` (prerequisite) and `exclusive_with` (the two tasks
+  may not overlap; recorded on both). There is nothing else; this is not a
+  workflow engine.
+
+**Riverdale graph.**
+
+```
+arrival_secured → cleaning, catering, fueling, placeholder_baggage_service
+                  (concurrent)
+boarding: after cleaning + catering; exclusive with fueling
+pushback_ready: after boarding, fueling, placeholder_baggage_service
+```
+
+Task durations reproduce the M3 service timings on the boarding path.
+
+**Status meaning.** `turnaround` means the boarding task hasn't started;
+`boarding` means it has; `ready_for_pushback` means the milestone is complete.
+Pushback also still waits for scheduled pushback plus any hold used (D-024).
+
+**Why:** The player must be able to see what work is happening, what is
+waiting, and what is preventing departure. Deboarding, baggage and resources
+(M5–M8) plug in as tasks.
+
+
+## D-026 — Additive departure-delay breakdown along the critical path
+
+**Date:** 2026-09-24
+**Status:** Accepted
+
+At takeoff, `AirportFlight.departure_delay_breakdown` splits takeoff lateness
+into causes that sum exactly to it. It is built in order:
+
+1. Runway queue before the takeoff roll.
+2. The hold used.
+3. A walk back from `pushback_ready` along what released each task
+   (`started_after`). Each task is blamed first for its own overrun beyond its
+   planned duration; the rest, up to its own late start, passes to its releaser.
+   Lateness that reaches the gate is `late_inbound`.
+
+Off-critical-path overruns are never blamed. M1's `delay_reasons` stay as they
+were: overlapping causal durations that are not additive. They are not
+repurposed.
+
+
+## D-027 — Save schema v4
+
+**Date:** 2026-09-24
+**Status:** Accepted
+
+v4 adds `AirportState.turnaround_tasks` and flight fields:
+
+- `task_ids`
+- `turnaround_overrides`
+- `takeoff_wait_ticks`
+- `departure_delay_breakdown`
+
+It removes `AirportFlight.turnaround_ticks`. v3 saves are rejected explicitly.
+Loading validates:
+
+- task shape, ownership and graph order
+- statuses against flight state and boarding phase
+- timing (nothing finishes in the future; a running task is not overdue)
+- that prerequisites are complete before a dependent runs
+
+A save made mid-turnaround resumes to the identical outcome.
+
+Derived caches (per-flight task lists, pre-docking estimate offsets, next-wake
+ticks) are rebuilt after loading, not saved.

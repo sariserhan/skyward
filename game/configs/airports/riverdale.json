@@ -10,34 +10,25 @@
   "taxi_out_ticks": 1800,
   "approach_ticks": 1200,
   "gate_buffer_ticks": 1200,
-  "turnaround_variation_ticks": 1200,
   "aircraft_types": {
     "A220": {
       "class": "narrow",
       "seats": 130,
-      "turnaround_ticks": 15000,
-      "cabin": "a220_26",
-      "service_before_boarding_ticks": 7200
+      "cabin": "a220_26"
     },
     "737": {
       "class": "narrow",
       "seats": 180,
-      "turnaround_ticks": 21000,
-      "cabin": "narrowbody_30",
-      "service_before_boarding_ticks": 9000
+      "cabin": "narrowbody_30"
     },
     "A321": {
       "class": "narrow",
       "seats": 220,
-      "turnaround_ticks": 24000,
-      "cabin": "a321_37",
-      "service_before_boarding_ticks": 10200
+      "cabin": "a321_37"
     },
     "787": {
       "class": "wide",
-      "seats": 276,
-      "turnaround_ticks": 33000,
-      "service_before_boarding_ticks": 12000
+      "seats": 276
     }
   },
   "boarding": {
@@ -56,6 +47,92 @@
       "stow_variation_ticks": 90,
       "seat_per_obstructer_ticks": 330
     }
+  },
+  "turnaround": {
+    "variation_permille": 150,
+    "tasks": [
+      {
+        "type": "arrival_secured",
+        "label": "Arrival secured",
+        "durations": {
+          "*": 600
+        }
+      },
+      {
+        "type": "cleaning",
+        "label": "Cleaning",
+        "after": [
+          "arrival_secured"
+        ],
+        "durations": {
+          "A220": 6000,
+          "737": 7800,
+          "A321": 9000,
+          "787": 10800
+        }
+      },
+      {
+        "type": "catering",
+        "label": "Catering",
+        "after": [
+          "arrival_secured"
+        ],
+        "durations": {
+          "A220": 4800,
+          "737": 6600,
+          "A321": 7800,
+          "787": 10200
+        }
+      },
+      {
+        "type": "fueling",
+        "label": "Fueling",
+        "after": [
+          "arrival_secured"
+        ],
+        "exclusive_with": [
+          "boarding"
+        ],
+        "durations": {
+          "A220": 6000,
+          "737": 8400,
+          "A321": 9600,
+          "787": 10800
+        }
+      },
+      {
+        "type": "placeholder_baggage_service",
+        "label": "Baggage (placeholder)",
+        "after": [
+          "arrival_secured"
+        ],
+        "durations": {
+          "A220": 12000,
+          "737": 14400,
+          "A321": 15600,
+          "787": 21000
+        }
+      },
+      {
+        "type": "boarding",
+        "label": "Boarding",
+        "kind": "boarding",
+        "after": [
+          "cleaning",
+          "catering"
+        ]
+      },
+      {
+        "type": "pushback_ready",
+        "label": "Pushback readiness",
+        "kind": "milestone",
+        "after": [
+          "boarding",
+          "fueling",
+          "placeholder_baggage_service"
+        ]
+      }
+    ]
   },
   "airlines": {
     "NS": "Northstar Air",
@@ -168,7 +245,10 @@
       "aircraft_type": "A220",
       "scheduled_arrival": 223200,
       "scheduled_departure": 252150,
-      "assigned_gate_id": "A4"
+      "assigned_gate_id": "A4",
+      "turnaround_overrides": {
+        "cleaning": 15000
+      }
     },
     {
       "id": "F005",

@@ -21,7 +21,6 @@ var external_flight_reference: String = ""
 var terminal: String = "A"
 var state_since: int = 0
 var due_tick: int = 0
-var turnaround_ticks: int = 0
 var gate_arrival_tick: int = -1
 var gate_release_tick: int = -1
 var forced_delay_ticks: int = 0
@@ -53,3 +52,12 @@ var boarded_count: int = 0
 var missed_count: int = 0
 ## Simulation.result() of the cabin engine, in boarding ticks.
 var boarding_result: Dictionary = {}
+
+# Turnaround (M4). Task ids in AirportState.turnaround_tasks, in graph order.
+var task_ids: Array = []
+## Scenario override: extra airport ticks per task type (e.g. a deep clean).
+var turnaround_overrides: Dictionary = {}
+## Runway queue wait before the takeoff roll, airport ticks.
+var takeoff_wait_ticks: int = 0
+## Additive split of takeoff lateness by cause; sums exactly to the lateness.
+var departure_delay_breakdown: Dictionary = {}

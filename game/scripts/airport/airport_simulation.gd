@@ -1,8 +1,9 @@
 class_name AirportSimulation
 extends RefCounted
-## One world, one clock. Cabin flights board through the preserved boarding
-## engine (M3); widebodies use the widebody boarding abstraction (D-022).
-const SAVE_VERSION := 3
+## One world, one clock. Turnaround is a task graph (M4); cabin flights board
+## through the preserved boarding engine (M3) as one of its tasks; widebodies use
+## the widebody boarding abstraction (D-022).
+const SAVE_VERSION := 4
 const CONFIG_PATH := "res://configs/airports/riverdale.json"
 const STATES := ["scheduled", "approaching", "landed", "taxiing_in", "at_gate",
 	"turnaround", "boarding", "ready_for_pushback", "taxiing_out", "departed"]
@@ -24,6 +25,7 @@ var clock := AirportClock.new()
 var events := AirportEvents.new()
 var rng := SimRng.new(0)
 var passenger_flow := PassengerFlow.new()
+var turnaround := Turnaround.new()
 var config: Dictionary = {}
 var seed_value: int = 0
 var decisions: Array = []
@@ -49,6 +51,8 @@ func setup(scenario: Dictionary = {}, seed_override: int = -1) -> void:
 	flight_order = []
 	boarding_sessions = {}
 	_load_cabins()
+	turnaround = Turnaround.new()
+	turnaround.bind(airport, events, config.get("turnaround", {}))
 	clock.tick = int(config.start_tick)
 	airport.name = config.name
 	airport.airlines = config.airlines.duplicate(true)
@@ -73,15 +77,12 @@ func setup(scenario: Dictionary = {}, seed_override: int = -1) -> void:
 			aircraft.seat_map = definition.cabin
 		if flight.boarding_strategy.is_empty():
 			flight.boarding_strategy = str(_boarding("default_strategy"))
-		# M3: the timer covers service before boarding only; boarding itself is
-		# simulated (cabin) or abstracted (widebody). M4 replaces it with tasks.
-		var service := int(definition.get("service_before_boarding_ticks", definition.turnaround_ticks))
-		flight.turnaround_ticks = service + rng.randi_range(0, int(config.turnaround_variation_ticks))
 		airport.aircraft[aircraft.id] = aircraft
 		airport.flights[flight.id] = flight
 		flight_order.append(flight)
-		var variation := flight.turnaround_ticks - service
-		if variation > 0: _add_delay(flight, "turnaround_variation", variation)
+		# Turnaround tasks with seeded durations and a planned schedule (M4).
+		turnaround.create(flight, data.aircraft_type, rng, flight.scheduled_arrival + int(config.taxi_in_ticks),
+			flight.scheduled_departure - int(_boarding("open_before_departure_ticks")), _scheduled_pushback(flight))
 	events.record(clock.tick, "SCENARIO_STARTED", "", {"seed": seed_value, "scenario": config.id})
 	passenger_flow = PassengerFlow.new()
 	passenger_flow.bind(airport, events, config.get("passenger_flow", {}))
@@ -151,22 +152,38 @@ func _update_flight(f: AirportFlight) -> void:
 				else:
 					_add_delay(f, "gate_wait", 1)
 		"at_gate":
-			_transition(f, "turnaround", f.turnaround_ticks + f.forced_delay_ticks)
-		"turnaround":
-			if clock.tick >= f.due_tick:
-				_schedule_boarding(f)
-				_transition(f, "boarding")
-				# A late aircraft opens boarding on this same tick.
-				_update_boarding(f)
-		"boarding":
-			_update_boarding(f)
+			_transition(f, "turnaround")
+			_update_turnaround(f)
+		"turnaround", "boarding":
+			_update_turnaround(f)
 		"ready_for_pushback":
 			_try_pushback(f)
 		"taxiing_out":
 			if clock.tick >= f.due_tick:
 				_request_runway(f, "takeoff")
-	if f.status != "departed":
+	# Estimates refresh once per simulated second, with the conflict check that
+	# reads them; commands refresh immediately. Timing never depends on frames.
+	if f.status != "departed" and clock.tick % AirportClock.TICKS_PER_SECOND == 0:
 		f.estimated_departure = _estimate_departure(f)
+
+## Tasks advance first; releasing boarding schedules its window, which a late
+## aircraft opens on this same tick. A second pass lets boarding completion
+## release the pushback milestone (and anything exclusive with boarding).
+func _update_turnaround(f: AirportFlight) -> void:
+	var release := Callable(self, "_release_boarding")
+	turnaround.update(f, clock.tick, release)
+	if f.status == "boarding": _update_boarding(f)
+	turnaround.update(f, clock.tick, release)
+	if turnaround.pushback_ready(f) and f.status in ["turnaround", "boarding"]:
+		_transition(f, "ready_for_pushback")
+		_try_pushback(f)
+
+func _release_boarding(f: AirportFlight) -> void:
+	_schedule_boarding(f)
+	_transition(f, "boarding")
+
+func _scheduled_pushback(f: AirportFlight) -> int:
+	return f.scheduled_departure - int(config.taxi_out_ticks) - int(config.takeoff_ticks)
 
 func _add_delay(f: AirportFlight, reason: String, ticks: int) -> void:
 	f.delay_reasons[reason] = int(f.delay_reasons.get(reason, 0)) + ticks
@@ -192,6 +209,7 @@ func _start_runway() -> void:
 	runway.busy_ticks += duration
 	var flight: AirportFlight = airport.flights[operation.flight_id]
 	_add_delay(flight, "runway_" + operation.operation + "_queue", clock.tick - int(operation.requested_at))
+	if operation.operation == "takeoff": flight.takeoff_wait_ticks = clock.tick - int(operation.requested_at)
 	events.record(clock.tick, "RUNWAY_STARTED", flight.id, operation)
 
 func _complete_runway() -> void:
@@ -209,36 +227,62 @@ func _complete_runway() -> void:
 	else:
 		f.actual_departure = clock.tick
 		f.estimated_departure = clock.tick
+		f.departure_delay_breakdown = turnaround.attribute(f, _scheduled_pushback(f), f.takeoff_wait_ticks)
 		_transition(f, "departed")
 		for id in f.passenger_ids:
 			var p: Passenger = airport.passengers[str(id)]
 			if p.airport_state == "on_aircraft": passenger_flow.set_journey_state(p, "departed")
 		events.record(clock.tick, "FLIGHT_DEPARTED", f.id, {"delay_ticks": maxi(0, clock.tick - f.scheduled_departure), "causes": f.delay_reasons,
-			"boarded": f.boarded_count, "missed": f.missed_count})
+			"breakdown": f.departure_delay_breakdown, "boarded": f.boarded_count, "missed": f.missed_count})
 
 func _estimate_departure(f: AirportFlight) -> int:
 	var exit_time := int(config.taxi_out_ticks) + int(config.takeoff_ticks)
-	# After service, boarding needs its window before the departure target.
-	var after_service := int(_boarding("open_before_departure_ticks"))
-	var earliest := f.scheduled_arrival + int(config.taxi_in_ticks) + f.turnaround_ticks + f.forced_delay_ticks + after_service + 3
+	var dock := -1
+	var earliest := f.scheduled_departure
 	match f.status:
-		"approaching": earliest = maxi(clock.tick + int(config.taxi_in_ticks) + f.turnaround_ticks + f.forced_delay_ticks + after_service, earliest)
-		"landed": earliest = clock.tick + int(config.taxi_in_ticks) + f.turnaround_ticks + f.forced_delay_ticks + after_service + 2
-		"taxiing_in": earliest = maxi(clock.tick, f.due_tick) + f.turnaround_ticks + f.forced_delay_ticks + after_service + 2
-		"at_gate": earliest = clock.tick + f.turnaround_ticks + f.forced_delay_ticks + after_service + 2
-		"turnaround": earliest = f.due_tick + after_service + 1
-		"boarding":
-			# Ready at gate close (earlier if everyone boards), never before schedule + holds.
-			var ready := clock.tick if f.boarding_phase in ["closed", "complete"] else maxi(clock.tick, f.gate_close_tick)
-			if f.boarding_phase == "scheduled": ready = maxi(ready, f.boarding_open_tick)
-			earliest = maxi(f.scheduled_departure + f.hold_ticks, ready + exit_time + 1)
-		"ready_for_pushback": earliest = maxi(f.scheduled_departure + f.hold_ticks, clock.tick + exit_time)
+		"scheduled": dock = f.scheduled_arrival + int(config.taxi_in_ticks) + 3
+		"approaching": dock = maxi(clock.tick, f.scheduled_arrival) + int(config.taxi_in_ticks) + 2
+		"landed": dock = clock.tick + int(config.taxi_in_ticks) + 2
+		"taxiing_in": dock = maxi(clock.tick, f.due_tick) + 2
+		"at_gate", "turnaround", "boarding": dock = clock.tick
+		"ready_for_pushback": earliest = maxi(_pushback_floor(f), clock.tick) + exit_time
 		"taxiing_out":
 			earliest = maxi(clock.tick, f.due_tick) + int(config.takeoff_ticks)
 			var operation := airport.runway.active_operation
 			if operation.get("flight_id", "") == f.id:
 				earliest = int(operation.end_tick)
+	if dock >= 0: earliest = _estimate_pushback(f, dock) + exit_time
 	return maxi(f.scheduled_departure, earliest)
+
+## Walk the task graph: finished tasks keep their times, running ones finish on
+## their duration, the rest start after their prerequisites (or docking) take
+## their full duration. Boarding follows the M3 window: it ends by gate close.
+func _estimate_pushback(f: AirportFlight, dock: int) -> int:
+	var finish := {}
+	var open_offset := int(_boarding("open_before_departure_ticks"))
+	var close_offset := int(_boarding("gate_close_before_departure_ticks"))
+	var pushback := _pushback_floor(f)
+	if not f.status in ["turnaround", "boarding"]:
+		var offsets := turnaround.dock_offsets(f)
+		var boarding_end := maxi(f.scheduled_departure, dock + int(offsets[0]) + open_offset) - close_offset
+		return maxi(pushback, maxi(boarding_end, dock + int(offsets[1])))
+	for t: TurnaroundTask in turnaround.tasks_of(f):
+		var ready := dock
+		for dependency in t.after: ready = maxi(ready, int(finish[dependency]))
+		match t.status:
+			TurnaroundTask.COMPLETE: finish[t.type] = t.finish_tick
+			_:
+				match t.kind:
+					"timed":
+						var started := t.start_tick if t.status == TurnaroundTask.RUNNING else ready
+						finish[t.type] = maxi(clock.tick, started + t.duration_ticks)
+					"boarding":
+						if f.boarding_phase in ["closed", "complete"]: finish[t.type] = clock.tick
+						elif f.boarding_phase in ["scheduled", "open"]: finish[t.type] = maxi(clock.tick, f.gate_close_tick)
+						else: finish[t.type] = maxi(f.scheduled_departure, ready + open_offset) - close_offset
+					_: finish[t.type] = ready
+		if t.type == Turnaround.PUSHBACK: pushback = maxi(pushback, int(finish[t.type]))
+	return pushback
 
 func _release_estimate(f: AirportFlight) -> int:
 	return f.estimated_departure - int(config.taxi_out_ticks) - int(config.takeoff_ticks)
@@ -255,7 +299,7 @@ func assignment_warnings(flight_id: String, gate_id: String) -> Array:
 	if f.terminal != gate.terminal:
 		warnings.append("Terminal constraint")
 	var arrival := maxi(clock.tick, f.scheduled_arrival + int(config.taxi_in_ticks))
-	var release := maxi(arrival + f.turnaround_ticks, _release_estimate(f))
+	var release := maxi(arrival + turnaround.planned_gate_ticks(f, f.scheduled_arrival + int(config.taxi_in_ticks)), _release_estimate(f))
 	if arrival < gate.available_from or release > gate.available_until:
 		warnings.append("Gate outside availability window")
 	for other: AirportFlight in flight_order:
@@ -312,9 +356,17 @@ func force_delay(flight_id: String, ticks: int = 6000) -> bool:
 	var f: AirportFlight = airport.flights[flight_id]
 	if not f.status in ["scheduled", "approaching", "landed", "taxiing_in", "at_gate", "turnaround"]:
 		return false
+	# A ramp hold: the first task if it has not finished, else all running work.
+	var held: Array = []
+	var first: TurnaroundTask = turnaround.tasks_of(f)[0]
+	if first.status != TurnaroundTask.COMPLETE: held = [first]
+	else:
+		for t: TurnaroundTask in turnaround.tasks_of(f):
+			if t.status == TurnaroundTask.RUNNING and t.kind == "timed": held.append(t)
+	if held.is_empty(): return false
+	for t in held: t.duration_ticks += ticks
+	turnaround.durations_changed(f)
 	f.forced_delay_ticks += ticks
-	if f.status == "turnaround":
-		f.due_tick += ticks
 	_add_delay(f, "operational_hold", ticks)
 	f.estimated_departure = _estimate_departure(f)
 	decisions.append({"tick": clock.tick, "type": "force_delay", "flight_id": flight_id, "ticks": ticks})
@@ -372,6 +424,7 @@ static func from_snapshot(data: Dictionary) -> AirportSimulation:
 		if not data.get(key) is Array: return null
 	if not _valid_snapshot(data): return null
 	if not PassengerFlowValidation.valid(data): return null
+	if not Turnaround.valid_snapshot(data): return null
 	var sim := AirportSimulation.new()
 	sim.config = data.scenario.duplicate(true)
 	sim._load_cabins()
@@ -387,6 +440,7 @@ static func from_snapshot(data: Dictionary) -> AirportSimulation:
 	sim.conflicts = data.conflicts.duplicate(true)
 	sim.passenger_flow.bind(sim.airport, sim.events, sim.config.get("passenger_flow", {}))
 	sim.passenger_flow.restore(data.passenger_flow)
+	sim.turnaround.bind(sim.airport, sim.events, sim.config.get("turnaround", {}))
 	for id in data.boarding:
 		var f: AirportFlight = sim.airport.flights[id]
 		sim.boarding_sessions[id] = FlightBoarding.from_snapshot(data.boarding[id], sim.cabins[data.boarding[id].cabin_id], sim._manifest(f))
@@ -469,7 +523,7 @@ static func _valid_snapshot(data: Dictionary) -> bool:
 		if not data.airport.get(key) is String: return false
 	for key in ["money", "reputation"]:
 		if not data.airport.get(key) is int: return false
-	for key in ["airlines", "resources", "flights", "gates", "aircraft", "passengers", "bags", "security_checkpoints"]:
+	for key in ["airlines", "resources", "flights", "gates", "aircraft", "passengers", "bags", "security_checkpoints", "turnaround_tasks"]:
 		if not data.airport.get(key) is Dictionary: return false
 	var state: Dictionary = data.airport
 	if state.flights.is_empty() or state.gates.is_empty(): return false
@@ -566,14 +620,13 @@ func _update_boarding(f: AirportFlight) -> void:
 		f.boarding_phase = "complete"
 		events.record(clock.tick, "BOARDING_COMPLETE", f.id, {"boarded": f.boarded_count, "missed": f.missed_count,
 			"duration_ticks": f.boarding_complete_tick - f.boarding_open_tick})
-		_transition(f, "ready_for_pushback")
-		_try_pushback(f)
+		turnaround.boarding_complete(f, f.boarding_complete_tick)
 
 ## Pushback once boarding is complete, never before the scheduled pushback plus
 ## any hold actually used. A late aircraft that boards quickly recovers time: it
 ## does not wait for its shifted boarding window.
 func _try_pushback(f: AirportFlight) -> void:
-	if clock.tick < _pushback_floor(f): return
+	if clock.tick < _pushback_floor(f) or not turnaround.pushback_ready(f): return
 	var gate: AirportGate = airport.gates[f.assigned_gate_id]
 	gate.occupied_by_flight_id = ""
 	f.gate_release_tick = clock.tick
@@ -588,6 +641,7 @@ func _pushback_floor(f: AirportFlight) -> int:
 func _open_boarding(f: AirportFlight) -> void:
 	f.boarding_phase = "open"
 	f.boarding_open_tick = clock.tick
+	turnaround.boarding_running(f, clock.tick)
 	var present: Array = []
 	for p in _manifest(f):
 		if p.airport_state == "waiting_at_gate": present.append(p.id)

@@ -30,8 +30,9 @@ A caller can reproduce them at the recorded tick; a replay player UI is deferred
 `scheduled → approaching → landed → taxiing_in → at_gate → turnaround →
 boarding → ready_for_pushback → taxiing_out → departed`
 
-Since M3, `turnaround` is only the service before boarding (placeholder until M4
-tasks). `boarding` runs its own phases, `scheduled → open → closed → complete`:
+Since M4, `turnaround` means the task graph is running and the boarding task
+has not started. See **Turnaround tasks** below. `boarding` runs its own phases,
+`scheduled → open → closed → complete`:
 
 - When service finishes at tick *s*, the departure target becomes
   `max(D, s + 30 min)`, where D is the scheduled takeoff.
@@ -67,6 +68,45 @@ pushback `D − exit` is split additively:
 A gate kept open for missing passengers in a late aircraft's shifted window is
 explained by the upstream causes: gate wait, landing queue and turnaround
 variation.
+
+**Turnaround tasks (D-025).**
+
+- Tasks start when the aircraft reaches the gate. Their order and durations
+  come from `turnaround.tasks` (per aircraft type), plus 0–15% seeded
+  variation drawn at setup, plus optional per-flight `turnaround_overrides`.
+- A task starts on the first tick its prerequisites are complete and no
+  exclusive partner is active. A task finishing on a tick releases its
+  dependents on that same tick.
+- The boarding task is released when cleaning and catering are done and
+  fueling isn't running. On that tick the M3 window is scheduled: target
+  `max(D, release + 30 min)`.
+- `pushback_ready` completes when boarding, fueling and baggage are complete.
+  Pushback follows once the scheduled pushback plus hold used has passed.
+- A debug ramp hold extends the first task if it's unfinished, else every
+  running timed task.
+
+Riverdale placeholder durations (minutes):
+
+| Task | A220 | 737 | A321 | 787 |
+| --- | --- | --- | --- | --- |
+| Arrival secured | 1 | 1 | 1 | 1 |
+| Cleaning | 10 | 13 | 15 | 18 |
+| Catering | 8 | 11 | 13 | 17 |
+| Fueling | 10 | 14 | 16 | 18 |
+| Baggage (placeholder) | 20 | 24 | 26 | 35 |
+
+Demo flight F004 (GA 242) has a 25-minute deep-clean override.
+
+**Departure delay breakdown (D-026).** At takeoff, the lateness is split into:
+
+- runway queue
+- hold used
+- a critical-path walk from `pushback_ready`: each task takes its own overrun
+  first, and passes the rest (up to its own late start) to the task that
+  released it
+- `late_inbound` for whatever reaches the gate
+
+The parts sum exactly to the lateness.
 
 **Loads and cabin calibration (D-024).** Each flight's load is an explicit
 `load_permille`, or else drawn once from `SimRng.STREAM_LOAD` within its

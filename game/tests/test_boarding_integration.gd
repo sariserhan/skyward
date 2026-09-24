@@ -10,7 +10,7 @@ const D := 40000
 func fixture(aircraft := "737", load := 900, late := 0, strategy := "random", edit := Callable()) -> AirportSimulation:
 	var config := JsonUtil.load_file(AirportSimulation.CONFIG_PATH)
 	config.start_tick = 0
-	config.turnaround_variation_ticks = 0
+	config.turnaround.variation_permille = 0
 	var f: Dictionary = config.flights[1].duplicate(true)
 	f.aircraft_type = aircraft
 	f.scheduled_arrival = 3000
