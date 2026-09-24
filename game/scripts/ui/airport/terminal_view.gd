@@ -23,7 +23,7 @@ func refresh_population() -> void:
 	var samples := {}
 	var moving := 0
 	for p: Passenger in sim.airport.passengers.values():
-		if p.airport_state in ["not_arrived", "boarding", "on_aircraft", "departed"]: continue
+		if p.airport_state in ["not_arrived", "boarding", "on_aircraft", "departed", "deboarding", "left_airport"]: continue
 		var walking := not p.walk_to.is_empty()
 		var bucket := p.current_location + ":" + p.airport_state
 		var limit := 8 if p.airport_state == "waiting_at_gate" else 18
@@ -81,6 +81,7 @@ func _draw() -> void:
 			pos += Vector2(-23 + (slot % 8) * 6, 32 + (slot / 8) * 7)
 		var color := AMBER if p.airport_state == "security_queue" else MINT
 		if p.airport_state == "missed_flight": color = Color("e5484d")
+		elif p.journey_direction == "arriving": color = Color("7aa2f7")
 		draw_circle(pos, 2.5, color)
 		if p.id == selected_id: draw_arc(pos, 7, 0, TAU, 16, Color.WHITE, 1.5)
 		hits[p.id] = pos

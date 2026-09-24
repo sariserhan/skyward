@@ -1,9 +1,9 @@
 class_name AirportSimulation
 extends RefCounted
-## One world, one clock. Turnaround is a task graph (M4); cabin flights board
-## through the preserved boarding engine (M3) as one of its tasks; widebodies use
-## the widebody boarding abstraction (D-022).
-const SAVE_VERSION := 4
+## One world, one clock. Turnaround is a task graph (M4); cabin flights deboard
+## (M5) and board (M3) through cabin engines as tasks of it; widebodies use the
+## widebody deboarding and boarding abstractions (D-022, D-029).
+const SAVE_VERSION := 5
 const CONFIG_PATH := "res://configs/airports/riverdale.json"
 const STATES := ["scheduled", "approaching", "landed", "taxiing_in", "at_gate",
 	"turnaround", "boarding", "ready_for_pushback", "taxiing_out", "departed"]
@@ -34,6 +34,8 @@ var last_tick_usec: int = 0
 var flight_order: Array[AirportFlight] = []
 ## Active cabin boarding sessions by flight id (open until pushback).
 var boarding_sessions: Dictionary = {}
+## Active cabin deboarding sessions by flight id (until the last passenger is off).
+var deboarding_sessions: Dictionary = {}
 ## Cabin layouts by cabin config id, and by aircraft type for cabin-boarding types.
 var cabins: Dictionary = {}
 var cabins_by_type: Dictionary = {}
@@ -50,6 +52,7 @@ func setup(scenario: Dictionary = {}, seed_override: int = -1) -> void:
 	conflicts = {}
 	flight_order = []
 	boarding_sessions = {}
+	deboarding_sessions = {}
 	_load_cabins()
 	turnaround = Turnaround.new()
 	turnaround.bind(airport, events, config.get("turnaround", {}))
@@ -87,7 +90,7 @@ func setup(scenario: Dictionary = {}, seed_override: int = -1) -> void:
 	passenger_flow = PassengerFlow.new()
 	passenger_flow.bind(airport, events, config.get("passenger_flow", {}))
 	passenger_flow.generate(seed_value, clock.tick, flight_order, cabins_by_type, cabin_config,
-		int(_boarding("gate_close_before_departure_ticks")))
+		int(_boarding("gate_close_before_departure_ticks")), config.get("deboarding", {}))
 
 func _boarding(key: String) -> Variant:
 	return config.get("boarding", {}).get(key, BOARDING_DEFAULTS[key])
@@ -116,6 +119,7 @@ func step() -> void:
 	_start_runway()
 	passenger_flow.step(clock.tick)
 	_step_boarding()
+	_step_deboarding()
 	if clock.tick % AirportClock.TICKS_PER_SECOND == 0:
 		_update_conflicts()
 	last_tick_usec = Time.get_ticks_usec() - started
@@ -171,9 +175,11 @@ func _update_flight(f: AirportFlight) -> void:
 ## release the pushback milestone (and anything exclusive with boarding).
 func _update_turnaround(f: AirportFlight) -> void:
 	var release := Callable(self, "_release_boarding")
-	turnaround.update(f, clock.tick, release)
+	var deboard := Callable(self, "_start_deboarding")
+	_update_abstract_deboarding(f)
+	turnaround.update(f, clock.tick, release, deboard)
 	if f.status == "boarding": _update_boarding(f)
-	turnaround.update(f, clock.tick, release)
+	turnaround.update(f, clock.tick, release, deboard)
 	if turnaround.pushback_ready(f) and f.status in ["turnaround", "boarding"]:
 		_transition(f, "ready_for_pushback")
 		_try_pushback(f)
@@ -273,7 +279,7 @@ func _estimate_pushback(f: AirportFlight, dock: int) -> int:
 			TurnaroundTask.COMPLETE: finish[t.type] = t.finish_tick
 			_:
 				match t.kind:
-					"timed":
+					"timed", "deboarding":
 						var started := t.start_tick if t.status == TurnaroundTask.RUNNING else ready
 						finish[t.type] = maxi(clock.tick, started + t.duration_ticks)
 					"boarding":
@@ -405,7 +411,7 @@ func snapshot() -> Dictionary:
 	return _integer_json({"version": SAVE_VERSION, "engine": Engine.get_version_info().string, "scenario": config.duplicate(true),
 		"seed": seed_value, "clock": clock.to_dict(), "rng": rng.snapshot(), "airport": airport.to_dict(),
 		"events": events.history.duplicate(true), "decisions": decisions.duplicate(true), "conflicts": conflicts.duplicate(true), "passenger_flow": passenger_flow.snapshot(),
-		"boarding": _boarding_snapshot()})
+		"boarding": _boarding_snapshot(), "deboarding": _deboarding_snapshot()})
 
 ## Active cabin sessions (D-021). Passenger cabin fields are already inside
 ## airport.passengers through Passenger.snapshot().
@@ -418,7 +424,7 @@ static func from_snapshot(data: Dictionary) -> AirportSimulation:
 	data = _integer_json(data)
 	if int(data.get("version", -1)) != SAVE_VERSION or data.get("engine", "") != Engine.get_version_info().string:
 		return null
-	for key in ["scenario", "clock", "rng", "airport", "conflicts", "passenger_flow", "boarding"]:
+	for key in ["scenario", "clock", "rng", "airport", "conflicts", "passenger_flow", "boarding", "deboarding"]:
 		if not data.get(key) is Dictionary: return null
 	for key in ["events", "decisions"]:
 		if not data.get(key) is Array: return null
@@ -428,7 +434,7 @@ static func from_snapshot(data: Dictionary) -> AirportSimulation:
 	var sim := AirportSimulation.new()
 	sim.config = data.scenario.duplicate(true)
 	sim._load_cabins()
-	if not sim._valid_boarding(data): return null
+	if not sim._valid_boarding(data) or not sim._valid_deboarding(data): return null
 	sim.seed_value = int(data.seed)
 	sim.clock.restore(data.clock)
 	sim.rng.restore(data.rng)
@@ -444,6 +450,9 @@ static func from_snapshot(data: Dictionary) -> AirportSimulation:
 	for id in data.boarding:
 		var f: AirportFlight = sim.airport.flights[id]
 		sim.boarding_sessions[id] = FlightBoarding.from_snapshot(data.boarding[id], sim.cabins[data.boarding[id].cabin_id], sim._manifest(f))
+	for id in data.deboarding:
+		var f: AirportFlight = sim.airport.flights[id]
+		sim.deboarding_sessions[id] = FlightDeboarding.from_snapshot(data.deboarding[id], sim.cabins[data.deboarding[id].cabin_id], sim._inbound(f))
 	return sim
 
 ## Every open/closed/complete cabin flight still at the gate has exactly one
@@ -465,6 +474,7 @@ func _valid_boarding(data: Dictionary) -> bool:
 		if not FlightBoarding.valid_snapshot(data.boarding[id], state, int(data.clock.tick), cabins): return false
 	for key in state.passengers:
 		var p: Dictionary = state.passengers[key]
+		if p.journey_direction == "arriving": continue
 		var f: Dictionary = state.flights[p.current_flight_id]
 		match p.airport_state:
 			"boarding", "on_aircraft":
@@ -791,3 +801,86 @@ func boarding_alerts() -> Array:
 		var missing := missing_passengers(f)
 		if missing > 0: out.append({"flight_id": f.id, "missing": missing, "closes_in": f.gate_close_tick - clock.tick})
 	return out
+
+
+
+# --- deboarding (M5) ---------------------------------------------------------
+# Doors open when the deboarding task is released. Cabin flights run the
+# deboarding engine; widebodies use the widebody deboarding abstraction: the
+# task's configured duration, then every inbound passenger enters the terminal.
+
+func _inbound(f: AirportFlight) -> Array[Passenger]:
+	var out: Array[Passenger] = []
+	for id in f.inbound_passenger_ids: out.append(airport.passengers[str(id)])
+	return out
+
+func _deboarding_settings(f: AirportFlight) -> Dictionary:
+	var settings: Dictionary = config.get("deboarding", {}).duplicate()
+	settings.merge(f.deboarding_overrides, true)
+	return settings
+
+func _start_deboarding(f: AirportFlight) -> void:
+	for p in _inbound(f): passenger_flow.set_journey_state(p, "deboarding")
+	events.record(clock.tick, "DEBOARDING_STARTED", f.id, {"mode": "cabin" if f.boarding_mode == "cabin" else "widebody_deboarding_abstraction",
+		"passengers": f.inbound_passenger_ids.size()})
+	if f.boarding_mode != "cabin": return
+	var session := FlightDeboarding.new()
+	session.open(f, cabins[airport.aircraft[f.aircraft_id].seat_map], _inbound(f), _deboarding_settings(f),
+		int(_boarding("boarding_ticks_per_airport_tick")))
+	deboarding_sessions[f.id] = session
+
+## Advance every deboarding cabin; passengers who reach the door enter the
+## terminal at the gate on the same tick.
+func _step_deboarding() -> void:
+	for f: AirportFlight in flight_order:
+		if not deboarding_sessions.has(f.id): continue
+		var session: FlightDeboarding = deboarding_sessions[f.id]
+		for p in session.step():
+			f.deplaned_count += 1
+			passenger_flow.arrive_from_aircraft(p, f.assigned_gate_id, clock.tick)
+		if session.engine.is_complete(): _finish_deboarding(f)
+
+func _update_abstract_deboarding(f: AirportFlight) -> void:
+	if f.boarding_mode == "cabin": return
+	var t := turnaround.task(f, Turnaround.DEBOARDING)
+	if t == null or t.status != TurnaroundTask.RUNNING or clock.tick < t.start_tick + t.duration_ticks: return
+	for p in _inbound(f):
+		f.deplaned_count += 1
+		passenger_flow.arrive_from_aircraft(p, f.assigned_gate_id, clock.tick)
+	_finish_deboarding(f)
+
+func _finish_deboarding(f: AirportFlight) -> void:
+	f.deboarding_complete_tick = clock.tick
+	if deboarding_sessions.has(f.id):
+		f.deboarding_result = deboarding_sessions[f.id].engine.result()
+		deboarding_sessions.erase(f.id)
+	events.record(clock.tick, "DEBOARDING_COMPLETE", f.id, {"passengers": f.deplaned_count})
+	turnaround.deboarding_complete(f, clock.tick)
+
+func _deboarding_snapshot() -> Dictionary:
+	var out := {}
+	for id in deboarding_sessions: out[id] = deboarding_sessions[id].snapshot()
+	return out
+
+## A cabin session exists exactly while a cabin flight's deboarding task runs.
+## Arriving passengers agree with their flight's deboarding progress.
+func _valid_deboarding(data: Dictionary) -> bool:
+	var state: Dictionary = data.airport
+	var now := int(data.clock.tick)
+	for id in state.flights:
+		var f: Dictionary = state.flights[id]
+		var task = state.turnaround_tasks.get(id + ":" + Turnaround.DEBOARDING)
+		var running: bool = task != null and task.status == TurnaroundTask.RUNNING
+		if (running and f.boarding_mode == "cabin") != data.deboarding.has(id): return false
+		if data.deboarding.has(id) and not FlightDeboarding.valid_snapshot(data.deboarding[id], state, now, int(task.start_tick), cabins): return false
+		var done: bool = task == null or task.status == TurnaroundTask.COMPLETE
+		for pid in f.inbound_passenger_ids:
+			var p: Dictionary = state.passengers[str(pid)]
+			match p.airport_state:
+				"on_aircraft":
+					if running or done: return false
+				"deboarding":
+					if not running: return false
+				_:
+					if not (done or (running and f.boarding_mode == "cabin")): return false
+	return true

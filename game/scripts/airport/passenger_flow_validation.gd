@@ -39,11 +39,14 @@ static func valid(data: Dictionary) -> bool:
 	graph.setup(graph_data)
 	var owned := {}
 	for f in state.flights.values():
-		for id in f.passenger_ids:
-			if not id is int or owned.has(str(id)) or not state.passengers.has(str(id)): return false
-			if not state.passengers[str(id)] is Dictionary: return false
-			if state.passengers[str(id)].get("current_flight_id") != f.id: return false
-			owned[str(id)] = f.id
+		for list in ["passenger_ids", "inbound_passenger_ids"]:
+			for id in f[list]:
+				if not id is int or owned.has(str(id)) or not state.passengers.has(str(id)): return false
+				if not state.passengers[str(id)] is Dictionary: return false
+				if state.passengers[str(id)].get("current_flight_id") != f.id: return false
+				var direction := "arriving" if list == "inbound_passenger_ids" else "departing"
+				if state.passengers[str(id)].get("journey_direction") != direction: return false
+				owned[str(id)] = f.id
 	if owned.size() != state.passengers.size(): return false
 	var expected := Passenger.new().snapshot()
 	for key in state.passengers:
@@ -52,8 +55,12 @@ static func valid(data: Dictionary) -> bool:
 		for field in expected:
 			if not p.has(field) or typeof(p[field]) != typeof(expected[field]): return false
 		if str(p.id) != key or p.walking_speed <= 0 or not p.airport_state in PassengerFlow.JOURNEY_STATES: return false
-		if not state.security_checkpoints.has(p.security_checkpoint_id): return false
-		if p.airport_state != "not_arrived" and not graph.nodes.has(p.current_location): return false
+		var arriving: bool = p.journey_direction == "arriving"
+		if arriving != (p.airport_state in PassengerFlow.ARRIVING_STATES) and p.airport_state != "on_aircraft": return false
+		if not arriving and not state.security_checkpoints.has(p.security_checkpoint_id): return false
+		var aboard: bool = arriving and p.airport_state in ["on_aircraft", "deboarding"]
+		if aboard != (arriving and p.current_location == ""): return false
+		if p.airport_state != "not_arrived" and not aboard and not graph.nodes.has(p.current_location): return false
 		if p.airport_state == "waiting_at_gate":
 			if not p.security_cleared or p.current_location != state.flights[p.current_flight_id].assigned_gate_id: return false
 			if p.gate_arrival_time < 0 or p.gate_arrival_time > data.clock.tick: return false
@@ -96,7 +103,7 @@ static func valid(data: Dictionary) -> bool:
 			"not_arrived": kind = "arrive"
 			"check_in": kind = "check_in"
 			"security_processing": kind = "security"
-			"walking_to_check_in", "walking_to_security", "walking_to_gate": kind = "walk"
+			"walking_to_check_in", "walking_to_security", "walking_to_gate", "walking_to_exit": kind = "walk"
 		if kind.is_empty() or event.get("kind") != kind: return false
 		scheduled[key] = true
 		if i > 0:

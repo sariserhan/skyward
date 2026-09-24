@@ -1,4 +1,4 @@
-# Airport architecture — M0 to M4
+# Airport architecture — M0 to M5
 
 The airport is now the default Godot scene. The existing boarding scene remains
 available at `res://scenes/main.tscn`; its simulation algorithm is unchanged.
@@ -17,6 +17,8 @@ available at `res://scenes/main.tscn`; its simulation algorithm is unchanged.
   Rules: creation, per-tick status updates, blocking reasons, "holding
   departure", and additive delay attribution. The tasks themselves are
   canonical entities in `AirportState.turnaround_tasks`.
+- `flight_deboarding.gd`: one arriving flight's cabin deboarding session (M5).
+  Adapter around `scripts/sim/deboarding_simulation.gd`, the deboarding engine.
 - `flight_boarding.gd`: one flight's cabin boarding session. Adapter around the
   preserved `Simulation` engine; validates saved sessions (M3).
 - `airport_clock.gd`: absolute integer simulation ticks and presentation pacing.
@@ -160,6 +162,31 @@ alongside the conflict check.
 - A compact turnaround summary sits under it.
 - A **Turnaround** tab holds the full task table.
 - After takeoff, the additive delay breakdown is shown.
+
+## M5 arrivals
+
+**Inbound manifests.** Each flight carries inbound passengers
+(`inbound_passenger_ids`), generated after all outbound ones from
+`STREAM_INBOUND`.
+
+**Doors open.** When the deboarding task is released, `_start_deboarding()`
+runs:
+
+- For cabin flights, a `FlightDeboarding` session starts.
+  `_step_deboarding()` runs after `_step_boarding()` each tick, at three engine
+  steps per airport tick. Every passenger who reaches the door enters the
+  terminal at the gate on that same tick, through
+  `PassengerFlow.arrive_from_aircraft()`.
+- Widebodies use the widebody deboarding abstraction:
+  `_update_abstract_deboarding()` moves everyone into the terminal at the
+  task's end.
+
+**Completion.** Completion reports to
+`Turnaround.deboarding_complete()`, which releases cleaning and catering.
+
+**Cabin view.** `AircraftView` is duck-typed over both engines and draws either
+direction using `aisle_direction`. The overlay has boarding and deboarding
+modes.
 
 ## M3 boundary
 

@@ -1,12 +1,13 @@
-# Current status — M0 through M4 implemented
+# Current status — M0 through M5 implemented
 
-M4 aircraft turnaround is complete. Turnaround is a visible task graph
-(cleaning, catering, fueling, placeholder baggage, boarding, pushback
-readiness) with dependencies, exclusivity, blocking reasons, a Turnaround tab
-and an additive departure-delay breakdown. Save schema v4. See the
-[M4 completion report](m4-status.md). M5 deboarding has not started.
+M5 passenger deboarding is complete. Arriving aircraft carry real passengers,
+who deboard through a cabin engine (the 787 uses the widebody deboarding
+abstraction), enter the terminal at the gate and leave through the exit.
+Deboarding is a turnaround task gating cleaning and catering. Save schema v5.
+See the [M5 completion report](m5-status.md). M6 connecting passengers has not
+started.
 
-Earlier reports: [M3](m3-status.md), [M2](m2-status.md), and the M0/M1 report below. Their
+Earlier reports: [M4](m4-status.md), [M3](m3-status.md), [M2](m2-status.md), and the M0/M1 report below. Their
 limitations and timings are historical; M3 changed the timetable, scenario start,
 security defaults, loads, cabin timings and save schema (D-021, D-023, D-024).
 

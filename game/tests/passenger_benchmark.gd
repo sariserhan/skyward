@@ -17,15 +17,24 @@ func _initialize() -> void:
 		var started := Time.get_ticks_usec()
 		var worst := 0
 		var sessions := 0
+		var deboarding := 0
+		var peak_active := 0
 		for _i in ticks:
 			sim.step()
 			worst = maxi(worst, sim.last_tick_usec)
 			sessions = maxi(sessions, sim.boarding_sessions.size())
+			deboarding = maxi(deboarding, sim.deboarding_sessions.size())
+			if sim.clock.tick % 600 == 0:
+				# In the terminal or in a cabin at the gate (airborne and gone excluded).
+				var active := 0
+				for state in sim.passenger_flow.counts:
+					if not state in ["not_arrived", "departed", "left_airport", "on_aircraft"]: active += int(sim.passenger_flow.counts[state])
+				peak_active = maxi(peak_active, active)
 		var elapsed := Time.get_ticks_usec() - started
 		print("%s: %s" % ["all %d staff on lanes" % pool if upgraded else "default staffing", JSON.stringify(Baseline.measure(sim))])
-		print("    %d ticks in %.3f s (%.2f us/tick mean, worst tick %d us), up to %d concurrent cabin engines, %d events" % [ticks, elapsed / 1000000.0, float(elapsed) / ticks, worst, sessions, sim.events.history.size()])
+		print("    %d ticks in %.3f s (%.2f us/tick mean, worst tick %d us), up to %d boarding + %d deboarding cabins, peak %d passengers active, %d total, %d events" % [ticks, elapsed / 1000000.0, float(elapsed) / ticks, worst, sessions, deboarding, peak_active, sim.airport.passengers.size(), sim.events.history.size()])
 		for p: Passenger in sim.airport.passengers.values():
-			if not p.airport_state in ["departed", "missed_flight"] and p.missed_flight_id.is_empty():
+			if not p.airport_state in ["departed", "missed_flight", "left_airport"] and p.missed_flight_id.is_empty():
 				push_error("Passenger %d ended in %s" % [p.id, p.airport_state])
 				quit(1)
 				return

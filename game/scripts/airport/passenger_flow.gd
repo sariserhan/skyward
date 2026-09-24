@@ -3,10 +3,13 @@ extends RefCounted
 ## Events are scheduled on the airport's integer clock, not a second clock.
 const JOURNEY_STATES := ["not_arrived", "walking_to_check_in", "check_in", "walking_to_security",
 	"security_queue", "security_processing", "walking_to_gate", "waiting_at_gate", "route_blocked",
-	"boarding", "on_aircraft", "departed", "missed_flight"]
+	"boarding", "on_aircraft", "departed", "missed_flight",
+	"deboarding", "walking_to_exit", "left_airport"]
+## Journey states of arriving passengers (M5).
+const ARRIVING_STATES := ["on_aircraft", "deboarding", "walking_to_exit", "left_airport"]
 ## Journey states with no pending terminal event (the passenger is not moving).
 const RESTING_STATES := ["waiting_at_gate", "security_queue", "route_blocked",
-	"boarding", "on_aircraft", "departed", "missed_flight"]
+	"boarding", "on_aircraft", "departed", "missed_flight", "deboarding", "left_airport"]
 var airport: AirportState
 var events: AirportEvents
 var graph := TerminalGraph.new()
@@ -29,7 +32,7 @@ func bind(state: AirportState, event_bus: AirportEvents, settings: Dictionary) -
 ## engine; their passengers get seats and boarding-tick durations from a
 ## separate RNG stream so terminal-flow draws are unchanged.
 func generate(seed_value: int, now: int, flights: Array[AirportFlight], cabins: Dictionary = {},
-		cabin_config: SimConfig = null, gate_close_offset: int = 0) -> void:
+		cabin_config: SimConfig = null, gate_close_offset: int = 0, deboarding: Dictionary = {}) -> void:
 	if config.is_empty(): return
 	rng = SimRng.new(seed_value, SimRng.STREAM_PASSENGERS)
 	var cabin_rng := SimRng.new(seed_value, SimRng.STREAM_CABIN)
@@ -81,6 +84,54 @@ func generate(seed_value: int, now: int, flights: Array[AirportFlight], cabins: 
 			f.passenger_ids.append(p.id)
 			counts["not_arrived"] = int(counts.get("not_arrived", 0)) + 1
 			_schedule(p, p.arrival_time_at_airport, "arrive")
+	_generate_inbound(seed_value, next_id, flights, cabins, deboarding)
+
+## Arriving passengers, after every outbound one so outbound ids and draws are
+## unchanged. Own stream: load, seats, speed, bags and deboarding timings. All
+## are local arrivals in M5; connection_flight_id stays empty until M6.
+func _generate_inbound(seed_value: int, next_id: int, flights: Array[AirportFlight], cabins: Dictionary, deboarding: Dictionary) -> void:
+	var inbound_rng := SimRng.new(seed_value, SimRng.STREAM_INBOUND)
+	for f in flights:
+		var aircraft: AirportAircraft = airport.aircraft[f.aircraft_id]
+		var drawn := _draw_load(f, inbound_rng)
+		if f.inbound_load_permille < 0: f.inbound_load_permille = drawn
+		var count := int(aircraft.seat_capacity * f.inbound_load_permille / 1000)
+		var seats: Array = []
+		var cabin: AircraftDef = cabins.get(aircraft.aircraft_type_id)
+		if cabin != null:
+			seats = cabin.all_seats()
+			inbound_rng.shuffle(seats)
+			count = mini(count, seats.size())
+		var timings: Dictionary = deboarding.duplicate()
+		timings.merge(f.deboarding_overrides, true)
+		for i in count:
+			var p := Passenger.new()
+			p.id = next_id
+			next_id += 1
+			p.journey_direction = "arriving"
+			p.current_flight_id = f.id
+			p.itinerary_id = "IT_%d" % p.id
+			p.origin = f.origin
+			p.destination = airport.id
+			p.walking_speed = inbound_rng.randi_range(800, 1200)
+			p.carry_on_count = inbound_rng.randi_range(0, 2)
+			p.airport_state = "on_aircraft"
+			if cabin != null:
+				p.seat_row = seats[i][0]
+				p.seat_letter = seats[i][1]
+				p.seat_type = cabin.seat_type_of(p.seat_letter)
+				p.side = cabin.side_of(p.seat_letter)
+				DeboardingSimulation.apply_timing(p, timings, inbound_rng)
+			airport.passengers[str(p.id)] = p
+			f.inbound_passenger_ids.append(p.id)
+			counts["on_aircraft"] = int(counts.get("on_aircraft", 0)) + 1
+
+## A passenger has left the aircraft at `gate`: into the terminal, toward the exit.
+func arrive_from_aircraft(p: Passenger, gate: String, now: int) -> void:
+	p.current_location = gate
+	p.deplaned_airport_tick = now
+	_emit(now, "PASSENGER_DEPLANED", p, {"gate_id": gate})
+	_begin_walk(p, "walking_to_exit", str(config.get("exit_node", "airport_exit")), now)
 
 ## Load factor in permille: the airline's range, else the scenario range, else
 ## the flat scenario default.
@@ -165,6 +216,10 @@ func _continue_walk(p: Passenger, now: int) -> void:
 				cp.queue.append(p.id)
 				_emit(now, "PASSENGER_SECURITY_ENTER", p, {"checkpoint": cp.id})
 				_dispatch(cp, now)
+			"walking_to_exit":
+				_set_state(p, "left_airport")
+				p.left_airport_tick = now
+				_emit(now, "PASSENGER_LEFT_AIRPORT", p)
 			"walking_to_gate":
 				p.gate_arrival_time = now
 				if not p.missed_flight_id.is_empty():

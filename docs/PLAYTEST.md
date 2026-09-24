@@ -107,19 +107,40 @@ The scripted version asserts the same sequence and writes screenshots:
 tools/ui_tests.sh tests/m3_demo.gd
 ```
 
+### M5 walkthrough: arrivals
+
+1. Select **AW 228** and open **Passengers**. The IN rows are the people on the
+   arriving aircraft. Select one seated in a middle or rear row.
+2. 06:09: AW 228 docks, and deboarding starts about a minute later. Press
+   **View deboarding**: the cabin empties from the front, and your passenger is
+   circled. They wait for their row, step into the aisle, take their bags down,
+   then walk to the door.
+3. When they are off, open **Terminal**. The details say *In the terminal,
+   walking to the exit*, and their route along the concourse to Arrivals and
+   the exit is highlighted.
+4. The **Turnaround** tab shows cleaning and catering waiting for deboarding,
+   then starting the moment the last passenger is off.
+
+**Slow deboarding (SJ 235, gate A3).** Its jet-bridge door is restricted.
+Deboarding takes about 20 minutes instead of 9.5, and the details read
+*Holding turnaround: Deboarding*. Cleaning, catering and boarding all start
+late. The departure explanation starts with *Deboarding*. Scripted:
+`tools/ui_tests.sh tests/m5_demo.gd`.
+
 ### M4 walkthrough: turnaround tasks
 
 Select **GA 242** (A220, gate A4) and open the **Turnaround** tab. Its scenario
 gives it a 25-minute deep clean.
 
-1. 06:15: it docks. Arrival secured runs, then cleaning, catering, fueling and
-   baggage start together at 06:16.
-2. Around 06:26, catering and fueling are done. The details say **Holding
-   departure: Cleaning**, and boarding reads *waiting for cleaning*.
-3. 06:51: cleaning finishes and boarding opens immediately (its window
+1. 06:15: it docks. Arrival secured runs, then deboarding, fueling and baggage
+   start together; cleaning and catering follow deboarding.
+2. Deboarding finishes around 06:22, and the deep clean starts. By 06:26,
+   catering and fueling are done. The details say **Holding turnaround:
+   Cleaning**, and boarding reads *waiting for cleaning*.
+3. 06:52: cleaning finishes and boarding opens immediately (its window
    shifted). Pushback readiness waits for boarding.
-4. It departs about 10 minutes late. The details read *Departed +10.3 min:
-   Runway queue 0.9 · Cleaning 9.4*.
+4. It departs about 12 minutes late. The details read *Departed +12.3 min:
+   Runway queue 1.7 · Cleaning 10.6*.
 
 Compare **AW 228**: all its service tasks finish before D-30, and its only delay
 is 20 seconds of runway queue. Scripted: `tools/ui_tests.sh tests/m4_demo.gd`.

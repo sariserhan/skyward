@@ -12,6 +12,8 @@ const STREAM_SCENARIO := 0x3003
 const STREAM_CABIN := 0x4004
 ## Per-flight airport load factors, one draw per flight in scenario order.
 const STREAM_LOAD := 0x5005
+## Inbound (arriving) manifests: loads, seats and passenger attributes.
+const STREAM_INBOUND := 0x6006
 
 var _rng := RandomNumberGenerator.new()
 

@@ -170,7 +170,7 @@ func _build() -> void:
 		status_label.text = "Boarding strategy set" if ok else "Strategy locked once boarding opens"
 		_refresh())
 	boarding_row.add_child(strategy_choice)
-	view_boarding_button = _button(boarding_row, "View boarding", func(): boarding_overlay.show_flight(sim, selected_id))
+	view_boarding_button = _button(boarding_row, "View boarding", _open_cabin)
 	var gate_actions := HBoxContainer.new()
 	right.add_child(gate_actions)
 	hold_button = _button(gate_actions, "HOLD +5 MIN", func():
@@ -306,7 +306,9 @@ func _refresh_warnings() -> void:
 	strategy_choice.disabled = f.boarding_mode != "cabin" or not f.boarding_phase in ["", "scheduled"]
 	hold_button.disabled = not sim.can_hold(selected_id)
 	close_gate_button.disabled = f.boarding_phase != "open"
-	view_boarding_button.disabled = f.boarding_mode != "cabin" or f.boarding_phase == "" or f.boarding_phase == "scheduled"
+	var deboarding := _deboarding_running(f)
+	view_boarding_button.text = "View deboarding" if deboarding else "View boarding"
+	view_boarding_button.disabled = not deboarding and (f.boarding_mode != "cabin" or f.boarding_phase == "" or f.boarding_phase == "scheduled")
 
 func _assign() -> void:
 	var result := sim.assign_gate(selected_id, gate_choice.get_item_text(gate_choice.selected))
@@ -402,17 +404,21 @@ func _refresh_terminal() -> void:
 		buttons[2].disabled = cp.staff <= 0
 		buttons[3].disabled = cp.staff >= cp.max_lanes or assigned >= int(sim.passenger_flow.config.staff_pool)
 	var flight: AirportFlight = sim.airport.flights[selected_id]
-	if passenger_list_ids != flight.passenger_ids:
-		passenger_list_ids = flight.passenger_ids.duplicate()
+	# Arriving passengers first (they are on the aircraft now), then departing.
+	var ids: Array = flight.inbound_passenger_ids + flight.passenger_ids
+	if passenger_list_ids != ids:
+		passenger_list_ids = ids
 		passenger_list.clear()
 		for id in passenger_list_ids: passenger_list.add_item(str(id))
 	for i in passenger_list_ids.size():
 		var p: Passenger = sim.airport.passengers[str(passenger_list_ids[i])]
-		passenger_list.set_item_text(i, "P%04d  ·  %s  ·  %s  ·  Gate %s" % [p.id, flight.flight_number, p.airport_state.replace("_", " ").capitalize(), flight.assigned_gate_id])
+		passenger_list.set_item_text(i, "P%04d  ·  %s %s  ·  %s  ·  Gate %s" % [p.id, "IN" if p.journey_direction == "arriving" else "OUT", flight.flight_number, p.airport_state.replace("_", " ").capitalize(), flight.assigned_gate_id])
 		if p.id == selected_passenger_id:
 			passenger_list.select(i)
 	detail_heading.text = "PASSENGER DETAILS" if selected_passenger_id >= 0 else "FLIGHT DETAILS"
-	if selected_passenger_id >= 0:
+	if selected_passenger_id >= 0 and sim.airport.passengers[str(selected_passenger_id)].journey_direction == "arriving":
+		detail.text = _arrival_text(sim.airport.passengers[str(selected_passenger_id)], flight)
+	elif selected_passenger_id >= 0:
 		var p: Passenger = sim.airport.passengers[str(selected_passenger_id)]
 		var state_text := p.airport_state.replace("_", " ").capitalize()
 		var location := p.current_location if not p.current_location.is_empty() else "Outside airport"
@@ -475,7 +481,9 @@ func _holding_text(f: AirportFlight) -> String:
 	if t == null:
 		if f.status == "ready_for_pushback": return "\n[color=#70dec0]Ready · pushback %s[/color]" % AirportClock.display(sim._pushback_floor(f)).left(5)
 		return ""
-	return "\n[color=#ffc078]Holding departure: %s · %s[/color]" % [t.label, _task_state(f, t, false)]
+	# Before boarding starts the turnaround itself is being held up.
+	var what := "turnaround" if f.status == "turnaround" else "departure"
+	return "\n[color=#ffc078]Holding %s: %s · %s[/color]" % [what, t.label, _task_state(f, t, false)]
 
 ## Compact summary in the details; the full table is the Turnaround tab.
 func _turnaround_text(f: AirportFlight) -> String:
@@ -484,7 +492,7 @@ func _turnaround_text(f: AirportFlight) -> String:
 		return "\n\n[b]Turnaround[/b]  %d tasks start at the gate" % tasks.size()
 	var running: Array = []
 	for t: TurnaroundTask in tasks:
-		if t.status == TurnaroundTask.RUNNING and t.kind == "timed": running.append(t.label)
+		if t.status == TurnaroundTask.RUNNING and t.kind in ["timed", "deboarding"]: running.append(t.label)
 	var text := "\n\n[b]Turnaround[/b]  %d / %d complete" % [sim.turnaround.completed_count(f), tasks.size()]
 	if not running.is_empty(): text += " · running: " + ", ".join(running)
 	return text
@@ -496,6 +504,10 @@ func _task_state(f: AirportFlight, t: TurnaroundTask, table: bool) -> String:
 			return "+%d min over plan" % (overrun / 600) if t.kind == "timed" and overrun >= 600 else "done"
 		TurnaroundTask.RUNNING:
 			if t.kind == "timed": return "%d%% · %d min left" % [int(t.progress(sim.clock.tick) * 100), ceili((t.start_tick + t.duration_ticks - sim.clock.tick) / 600.0)]
+			if t.kind == "deboarding":
+				var total := f.inbound_passenger_ids.size()
+				if f.boarding_mode != "cabin": return "widebody deboarding abstraction · %d min left" % ceili((t.start_tick + t.duration_ticks - sim.clock.tick) / 600.0)
+				return "%d%% · %d / %d off" % [100 * f.deplaned_count / maxi(1, total), f.deplaned_count, total]
 			if f.boarding_phase == "open": return "boarding · gate closes %s" % AirportClock.display(f.gate_close_tick).left(5)
 			return "doors closing · seating"
 		TurnaroundTask.READY: return "opens %s" % AirportClock.display(f.boarding_open_tick).left(5)
@@ -515,3 +527,30 @@ func _refresh_turnaround_tree(f: AirportFlight) -> void:
 		for i in 5:
 			row.set_text(i, values[i])
 			row.set_custom_color(i, colors[t.status])
+
+
+func _deboarding_running(f: AirportFlight) -> bool:
+	var t: TurnaroundTask = sim.turnaround.task(f, Turnaround.DEBOARDING)
+	return t != null and t.status == TurnaroundTask.RUNNING
+
+## Deboarding while the doors are open, boarding otherwise. Follows the selected
+## passenger into the cabin when they are in it.
+func _open_cabin() -> void:
+	var f: AirportFlight = sim.airport.flights[selected_id]
+	boarding_overlay.show_flight(sim, selected_id, "deboarding" if _deboarding_running(f) else "boarding", selected_passenger_id)
+
+## Follow an arriving passenger: seat → aisle → door → terminal → exit.
+func _arrival_text(p: Passenger, f: AirportFlight) -> String:
+	var where := ""
+	match p.airport_state:
+		"on_aircraft": where = "Seated in %s on the arriving aircraft" % p.seat_key() if f.boarding_mode == "cabin" else "On the arriving aircraft"
+		"deboarding":
+			if f.boarding_mode != "cabin": where = "Deboarding (widebody deboarding abstraction)"
+			elif p.aisle_position >= 0: where = "In the aisle at row %d · %s" % [p.aisle_position, p.state_name()]
+			else: where = "Seat %s · %s" % [p.seat_key(), p.state_name()]
+		"walking_to_exit": where = "In the terminal, walking to the exit · at %s" % p.current_location.replace("_", " ")
+		"left_airport": where = "Left the airport %s" % AirportClock.display(p.left_airport_tick)
+	var off := "Still aboard" if p.deplaned_airport_tick < 0 else "Off the aircraft %s at gate %s" % [AirportClock.display(p.deplaned_airport_tick), f.assigned_gate_id]
+	var cabin := "Seat %s (%s) · %d bags" % [p.seat_key(), p.seat_type_name(), p.carry_on_count] if f.boarding_mode == "cabin" else "Widebody: no seat model yet"
+	if p.caused_blocked_time > 0: cabin += " · held up others %.0f s" % (float(p.caused_blocked_time) / sim.cabin_config.tick_rate)
+	return "[font_size=23][b]Passenger %04d[/b][/font_size]\nArriving on %s from %s\n\n%s\n%s\n\n[color=#70dec0]%s[/color]" % [p.id, f.flight_number, p.origin, cabin, off, where]

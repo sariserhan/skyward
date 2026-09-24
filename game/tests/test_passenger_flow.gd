@@ -4,6 +4,8 @@ func fixture(count: int = 12, lanes: int = 2) -> AirportSimulation:
 	var config := JsonUtil.load_file(AirportSimulation.CONFIG_PATH)
 	config.start_tick = 0
 	config.flights = config.flights.slice(0, 1)
+	# Departing-flow tests: no inbound passengers on this aircraft.
+	config.flights[0].inbound_load_permille = 0
 	config.flights[0].scheduled_arrival = 20000
 	config.flights[0].scheduled_departure = 40000
 	config.aircraft_types.A220.seats = count

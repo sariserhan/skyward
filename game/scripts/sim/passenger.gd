@@ -12,6 +12,10 @@ enum State {
 	WAITING_FOR_SEAT,
 	SEATING,
 	SEATED,
+	# Deboarding (M5). Appended so earlier values keep their integers.
+	LEAVING_SEAT,
+	RETRIEVING_BAGS,
+	EXITED,
 }
 
 enum SeatType { WINDOW, MIDDLE, AISLE }
@@ -26,6 +30,9 @@ const STATE_NAMES := {
 	State.WAITING_FOR_SEAT: "Waiting for seat access",
 	State.SEATING: "Taking seat",
 	State.SEATED: "Seated",
+	State.LEAVING_SEAT: "Getting up",
+	State.RETRIEVING_BAGS: "Retrieving bags",
+	State.EXITED: "Left the aircraft",
 }
 
 const SEAT_TYPE_NAMES := {
@@ -152,6 +159,19 @@ var boarding_admit_tick: int = -1
 var seated_airport_tick: int = -1
 var missed_flight_id: String = ""
 var missed_reason: String = ""
+
+# Arrivals (M5). "departing" passengers start at the airport entrance;
+# "arriving" ones start seated on current_flight_id and leave through the exit.
+var journey_direction: String = "departing"
+## Deboarding timings in boarding ticks (30 Hz), fixed at generation.
+var deboard_seat_exit_ticks: int = 0
+var deboard_retrieve_ticks: int = 0
+var deboard_walk_ticks_per_cell: int = 0
+## Boarding tick at which the passenger left the cabin; -1 while aboard.
+var exited_tick: int = -1
+## Airport ticks: left the aircraft, and left the airport.
+var deplaned_airport_tick: int = -1
+var left_airport_tick: int = -1
 
 ## Full live state for airport saves; preserve to_dict()'s boarding record API.
 func snapshot() -> Dictionary:

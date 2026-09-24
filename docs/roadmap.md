@@ -22,8 +22,13 @@ it is kept as historical context. The original boarding roadmap remains at
   exclusivity, blocking reasons, a Turnaround tab and an additive delay
   breakdown. Save schema v4. Plan [m4-plan.md](m4-plan.md), report
   [m4-status.md](m4-status.md). Decisions D-025–D-027.
-- **M5 next, not started:** deboarding, plugged into the turnaround framework.
-- M6: connecting passengers.
+- **M5 implemented:** inbound manifests of real passengers; a cabin deboarding
+  engine (widebody deboarding abstraction for the 787); deboarding as a
+  turnaround task gating cleaning and catering; arrivals walk to the airport
+  exit; follow a passenger from seat to exit. Save schema v5. Plan
+  [m5-plan.md](m5-plan.md), report [m5-status.md](m5-status.md). Decisions
+  D-028–D-030.
+- **M6 next, not started:** connecting passengers.
 - M7: baggage.
 - M8: operational resources.
 - M9: airlines and contracts.
@@ -33,4 +38,4 @@ it is kept as historical context. The original boarding roadmap remains at
 The order after M3 follows D-020: the turnaround task framework comes before any
 individual turnaround activity.
 
-M4 stopped here for review. Do not begin M5 until requested.
+M5 stopped here for review. Do not begin M6 until requested.

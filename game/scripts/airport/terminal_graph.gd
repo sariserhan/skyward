@@ -3,10 +3,14 @@ extends RefCounted
 ## Weighted, directed navigation independent of rendered geometry.
 var nodes: Dictionary = {}
 var edges: Dictionary = {}
+## Routes are pure functions of the fixed graph: cache them. Copies are returned
+## because callers consume their routes.
+var _routes: Dictionary = {}
 
 func setup(data: Dictionary) -> void:
 	nodes = data.get("nodes", {}).duplicate(true)
 	edges = {}
+	_routes = {}
 	for id in nodes: edges[id] = []
 	for edge in data.get("edges", []):
 		edges[edge.from].append({"to": edge.to, "ticks": int(edge.walking_ticks)})
@@ -14,6 +18,11 @@ func setup(data: Dictionary) -> void:
 			edges[edge.to].append({"to": edge.from, "ticks": int(edge.walking_ticks)})
 
 func route(start: String, goal: String, airside_only: bool = false) -> Array:
+	var key := "%s>%s>%s" % [start, goal, airside_only]
+	if not _routes.has(key): _routes[key] = _find_route(start, goal, airside_only)
+	return _routes[key].duplicate()
+
+func _find_route(start: String, goal: String, airside_only: bool) -> Array:
 	if not nodes.has(start) or not nodes.has(goal): return []
 	var distance := {start: 0}
 	var previous := {}

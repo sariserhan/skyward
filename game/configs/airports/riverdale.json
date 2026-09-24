@@ -48,6 +48,14 @@
       "seat_per_obstructer_ticks": 330
     }
   },
+  "deboarding": {
+    "seat_exit_ticks": 60,
+    "aisle_entry_ticks": 30,
+    "retrieve_base_ticks": 120,
+    "retrieve_per_bag_ticks": 150,
+    "walk_ticks_per_cell": 40,
+    "door_interval_ticks": 45
+  },
   "turnaround": {
     "variation_permille": 150,
     "tasks": [
@@ -59,29 +67,43 @@
         }
       },
       {
-        "type": "cleaning",
-        "label": "Cleaning",
+        "type": "deboarding",
+        "label": "Deboarding",
+        "kind": "deboarding",
         "after": [
           "arrival_secured"
         ],
         "durations": {
-          "A220": 6000,
-          "737": 7800,
-          "A321": 9000,
-          "787": 10800
+          "A220": 3600,
+          "737": 4800,
+          "A321": 5700,
+          "787": 7200
+        }
+      },
+      {
+        "type": "cleaning",
+        "label": "Cleaning",
+        "after": [
+          "deboarding"
+        ],
+        "durations": {
+          "A220": 3000,
+          "737": 3600,
+          "A321": 4200,
+          "787": 4800
         }
       },
       {
         "type": "catering",
         "label": "Catering",
         "after": [
-          "arrival_secured"
+          "deboarding"
         ],
         "durations": {
-          "A220": 4800,
-          "737": 6600,
-          "A321": 7800,
-          "787": 10200
+          "A220": 2400,
+          "737": 3000,
+          "A321": 3600,
+          "787": 4200
         }
       },
       {
@@ -234,7 +256,10 @@
       "aircraft_type": "A321",
       "scheduled_arrival": 221400,
       "scheduled_departure": 253950,
-      "assigned_gate_id": "A3"
+      "assigned_gate_id": "A3",
+      "deboarding_overrides": {
+        "door_interval_ticks": 180
+      }
     },
     {
       "id": "F004",
@@ -585,6 +610,18 @@
           "x": 920,
           "y": 100,
           "airside": true
+        },
+        "arrivals_hall": {
+          "label": "ARRIVALS",
+          "x": 970,
+          "y": 310,
+          "airside": false
+        },
+        "airport_exit": {
+          "label": "EXIT",
+          "x": 970,
+          "y": 920,
+          "airside": false
         }
       },
       "edges": [
@@ -657,6 +694,24 @@
           "from": "east_hall",
           "to": "A8",
           "walking_ticks": 900
+        },
+        {
+          "from": "west_hall",
+          "to": "arrivals_hall",
+          "walking_ticks": 2100,
+          "bidirectional": false
+        },
+        {
+          "from": "east_hall",
+          "to": "arrivals_hall",
+          "walking_ticks": 900,
+          "bidirectional": false
+        },
+        {
+          "from": "arrivals_hall",
+          "to": "airport_exit",
+          "walking_ticks": 900,
+          "bidirectional": false
         }
       ]
     },
@@ -677,6 +732,7 @@
         "staff": 3,
         "service_ticks": 150
       }
-    ]
+    ],
+    "exit_node": "airport_exit"
   }
 }

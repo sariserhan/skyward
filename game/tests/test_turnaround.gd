@@ -68,18 +68,21 @@ func test_dependency_ordering() -> void:
 	assert_true(not seen_boarding_early, "boarding never starts before cleaning and catering")
 	var secured := task(sim, "arrival_secured")
 	assert_eq(secured.start_tick, f.gate_arrival_tick + 1, "first task starts when the aircraft is at the gate")
-	for type in ["cleaning", "catering", "fueling", "placeholder_baggage_service"]:
+	for type in ["deboarding", "fueling", "placeholder_baggage_service"]:
 		assert_eq(task(sim, type).start_tick, secured.finish_tick, type + " waits for arrival secured")
 		assert_eq(task(sim, type).started_after, "arrival_secured")
+	for type in ["cleaning", "catering"]:
+		assert_eq(task(sim, type).start_tick, task(sim, "deboarding").finish_tick + 1, type + " waits for deboarding")
+		assert_eq(task(sim, type).started_after, "deboarding")
 	var milestone := task(sim, "pushback_ready")
 	for type in milestone.after: assert_true(task(sim, type).finish_tick <= milestone.finish_tick, type)
 
 
 func test_independent_tasks_run_concurrently() -> void:
 	var sim := fixture()
-	run_until(sim, func(): return task(sim, "cleaning").status == TurnaroundTask.RUNNING)
+	run_until(sim, func(): return task(sim, "deboarding").status == TurnaroundTask.RUNNING)
 	sim.step()
-	for type in ["cleaning", "catering", "fueling", "placeholder_baggage_service"]:
+	for type in ["deboarding", "fueling", "placeholder_baggage_service"]:
 		assert_eq(task(sim, type).status, TurnaroundTask.RUNNING, type + " runs alongside the others")
 
 
@@ -172,8 +175,8 @@ func test_deep_clean_blames_cleaning_not_boarding() -> void:
 func test_non_critical_overlap_adds_no_delay() -> void:
 	var baseline := fixture()
 	run_until(baseline, func(): return flight(baseline).status == "departed")
-	# Catering runs 1.5 minutes longer but still ends before cleaning: off the critical path.
-	var slower := fixture({"catering": 900})
+	# Catering runs 30 s longer but still ends before cleaning: off the critical path.
+	var slower := fixture({"catering": 300})
 	run_until(slower, func(): return flight(slower).status == "departed")
 	assert_true(task(slower, "catering").finish_tick <= task(slower, "cleaning").finish_tick, "still not critical")
 	assert_eq(flight(slower).actual_departure, flight(baseline).actual_departure, "no departure change")
@@ -209,7 +212,7 @@ func test_same_seed_same_task_timestamps() -> void:
 		for id in sim.airport.turnaround_tasks: times[id] = sim.airport.turnaround_tasks[id].to_dict()
 		runs.append(times)
 	assert_eq(JSON.stringify(runs[1]), JSON.stringify(runs[0]))
-	assert_true(runs[0].size() == 24 * 7)
+	assert_eq(runs[0].size(), 24 * sim_task_count())
 
 
 func test_full_morning_breakdowns_are_exact() -> void:
@@ -240,3 +243,7 @@ func test_tampered_turnaround_saves_rejected() -> void:
 		var bad: Dictionary = good.duplicate(true)
 		cases[label].call(bad)
 		assert_eq(AirportSimulation.from_snapshot(bad), null, label)
+
+
+func sim_task_count() -> int:
+	return JsonUtil.load_file(AirportSimulation.CONFIG_PATH).turnaround.tasks.size()

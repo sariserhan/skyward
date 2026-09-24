@@ -61,3 +61,14 @@ var turnaround_overrides: Dictionary = {}
 var takeoff_wait_ticks: int = 0
 ## Additive split of takeoff lateness by cause; sums exactly to the lateness.
 var departure_delay_breakdown: Dictionary = {}
+
+# Arrivals (M5). The inbound manifest: passengers seated on this aircraft when
+# it lands, who deboard at the gate and leave through the terminal.
+var inbound_passenger_ids: Array = []
+var inbound_load_permille: int = -1
+## Scenario override of the deboarding timings for this flight (demo aid).
+var deboarding_overrides: Dictionary = {}
+var deboarding_complete_tick: int = -1
+var deplaned_count: int = 0
+## DeboardingSimulation.result() for cabin flights, in boarding ticks.
+var deboarding_result: Dictionary = {}

@@ -1,13 +1,16 @@
 class_name BoardingOverlay
 extends Control
-## Full inspection overlay for one flight's live cabin boarding. It embeds the
-## standalone game's AircraftView bound to the airport's authoritative engine and
-## only observes it: the airport keeps stepping underneath at the chosen speed.
+## Full inspection overlay for one flight's live cabin: boarding or deboarding.
+## It embeds the standalone game's AircraftView bound to the airport's
+## authoritative engine and only observes it: the airport keeps stepping
+## underneath at the chosen speed.
 
 signal closed
 
 var sim: AirportSimulation
 var flight_id: String = ""
+## "boarding" or "deboarding".
+var mode: String = "boarding"
 var view: AircraftView
 var header: Label
 var detail: Label
@@ -53,10 +56,11 @@ func _ready() -> void:
 	layout.add_child(summary)
 
 
-func show_flight(p_sim: AirportSimulation, id: String) -> void:
+func show_flight(p_sim: AirportSimulation, id: String, p_mode := "boarding", follow := -1) -> void:
 	sim = p_sim
 	flight_id = id
-	view.selected_id = -1
+	mode = p_mode
+	view.selected_id = follow
 	visible = true
 	refresh()
 
@@ -68,6 +72,9 @@ func _process(_delta: float) -> void:
 func refresh() -> void:
 	if sim == null or not sim.airport.flights.has(flight_id): return
 	var f: AirportFlight = sim.airport.flights[flight_id]
+	if mode == "deboarding":
+		_refresh_deboarding(f)
+		return
 	var session: FlightBoarding = sim.boarding_sessions.get(flight_id)
 	view.sim = session.engine if session != null else null
 	var boarding := 0
@@ -82,14 +89,34 @@ func refresh() -> void:
 	var close_text := "Gate closes %s" % AirportClock.display(f.gate_close_tick) if f.boarding_phase == "open" else "Gate closed %s" % AirportClock.display(f.gate_closed_tick)
 	detail.text = "Seated %d  ·  In door queue / aisle %d  ·  %s %d  ·  %s  ·  Hold %d min" % [seated, boarding,
 		"Missing" if f.boarding_phase == "open" else "Missed", missing, close_text, f.hold_ticks / 600]
-	summary.text = _passenger_text(session) if session != null else _result_text(f)
+	summary.text = _passenger_text(session.engine, session.engine.config.tick_rate) if session != null else _result_text(f)
 
 
-func _passenger_text(session: FlightBoarding) -> String:
-	var rate := session.engine.config.tick_rate
+func _refresh_deboarding(f: AirportFlight) -> void:
+	var session: FlightDeboarding = sim.deboarding_sessions.get(flight_id)
+	view.sim = session.engine if session != null else null
+	var off := 0
+	var aisle := 0
+	for id in f.inbound_passenger_ids:
+		var p: Passenger = sim.airport.passengers[str(id)]
+		if p.airport_state in ["walking_to_exit", "left_airport"]: off += 1
+		elif p.aisle_position >= 0: aisle += 1
+	var inbound := f.inbound_passenger_ids.size()
+	var done := f.deboarding_complete_tick >= 0
+	header.text = "%s  ·  DEBOARDING%s  ·  Gate %s" % [f.flight_number, " COMPLETE" if done else "", f.assigned_gate_id]
+	detail.text = "Off the aircraft %d / %d  ·  In the aisle %d  ·  Still seated %d" % [off, inbound, aisle, inbound - off - aisle]
+	if session != null: summary.text = _passenger_text(session.engine, sim.cabin_config.tick_rate)
+	elif f.boarding_mode != "cabin": summary.text = "Widebody deboarding abstraction: passengers leave together when it completes (no cabin simulation yet)."
+	elif done: summary.text = "Deboarding complete after %.1f min. Aisle blocked %.0f s in total." % [(f.deboarding_complete_tick - sim.turnaround.task(f, Turnaround.DEBOARDING).start_tick) / 600.0,
+		int(f.deboarding_result.get("blocked_ticks", 0)) / float(sim.cabin_config.tick_rate)]
+	else: summary.text = "Doors not open yet: passengers are seated until the aircraft is secured at the gate."
+
+
+func _passenger_text(engine, rate: int) -> String:
 	if view.selected_id < 0:
 		return "Click a passenger to inspect them. Colours show cabin state: walking, blocked, stowing, waiting for seat access, taking seat."
-	var p: Passenger = session.engine.passenger_by_id(view.selected_id)
+	var p: Passenger = engine.passenger_by_id(view.selected_id)
+	if p == null: return "The selected passenger is not in this cabin."
 	return "P%04d  ·  Seat %s (%s)  ·  %s  ·  Bags %d  ·  Blocked %.0f s  ·  Blocked others %.0f s" % [p.id, p.seat_key(), p.seat_type_name(),
 		p.state_name(), p.carry_on_count, float(p.total_blocked_time) / rate, float(p.caused_blocked_time) / rate]
 

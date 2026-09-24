@@ -2,11 +2,12 @@
 
 A Godot airport operations simulator with a preserved aircraft boarding engine.
 The default scene runs Riverdale International: manage gate conflicts while
-fictional flights land, taxi, turn around and depart. Airport M0–M4 are
-implemented: passengers enter the terminal, clear security, walk to their gates
-and board through the preserved cabin simulation. Aircraft turnaround is a
-visible task graph (cleaning, catering, fueling, baggage, boarding), and
-departures wait for it. Deboarding (M5) is next.
+fictional flights land, taxi, turn around and depart. Airport M0–M5 are
+implemented. Arriving aircraft carry real passengers, who deboard row by row,
+walk through the terminal and leave the airport. Departing passengers clear
+security and board through the preserved cabin simulation. Aircraft turnaround
+is a visible task graph (deboarding, cleaning, catering, fueling, baggage,
+boarding), and departures wait for it. Connecting passengers (M6) are next.
 
 Product direction from M3 onward: [airport_tycoon.md](airport_tycoon.md). M3 report:
 [docs/m3-status.md](docs/m3-status.md).
@@ -45,6 +46,10 @@ and click **Assign gate** to reassign an incoming flight. Overlap warnings allow
 intentional waiting; incompatible gates are rejected. Space pauses/resumes;
 1/2/4 set speed. Save/Load use `user://riverdale_airport.json`. In debug builds,
 F3 reveals +10 minutes, force arrival and +10 minute operational hold controls.
+
+While an aircraft deboards, **View deboarding** shows the cabin emptying. The
+**Passengers** tab lists arrivals (IN) and departures (OUT); select one to
+follow them from seat to exit.
 
 The **Turnaround** tab lists the selected aircraft's tasks: progress, times,
 and what each one is waiting for. The flight details say what is holding
@@ -102,7 +107,7 @@ godot --headless --path game --script tests/strategy_benchmark.gd   # each strat
 Rendered UI smoke tests and the M3 demonstration run under a virtual display:
 
 ```sh
-tools/ui_tests.sh                      # airport UI, terminal UI, M3 and M4 demos
+tools/ui_tests.sh                      # airport UI, terminal UI, M3, M4 and M5 demos
 tools/ui_tests.sh tests/m3_demo.gd     # one script
 ```
 

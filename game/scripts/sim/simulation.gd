@@ -41,6 +41,8 @@ var warnings: Array[String] = []
 ## False while more passengers may still be admitted (airport incremental mode).
 ## Completion requires closed == true; standalone setup() closes immediately.
 var closed: bool = true
+## Direction passengers move along the aisle, for renderers (+1: toward the rear).
+var aisle_direction: int = 1
 ## Incremental mode: passenger id -> position in the full strategy order.
 var _rank: Dictionary = {}
 

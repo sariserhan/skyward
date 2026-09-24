@@ -546,3 +546,108 @@ A save made mid-turnaround resumes to the identical outcome.
 
 Derived caches (per-flight task lists, pre-docking estimate offsets, next-wake
 ticks) are rebuilt after loading, not saved.
+
+
+## D-028 — Arriving passengers are the same canonical passengers
+
+**Date:** 2026-09-24
+**Status:** Accepted
+
+**Inbound manifests.** Each flight has an inbound manifest
+(`inbound_passenger_ids`) of real `Passenger` objects, generated after every
+outbound passenger from their own stream (`SimRng.STREAM_INBOUND`):
+
+- load: the airline's range, drawn per flight
+- seats
+- speed, carry-ons, and deboarding timings
+
+Outbound ids and draws are unchanged. Arrivals are marked
+`journey_direction = "arriving"`.
+
+**Journey.** `on_aircraft` → `deboarding` → `walking_to_exit` → `left_airport`,
+entering the terminal at the gate. Cabin states stay separate: new
+`Passenger.State` values `LEAVING_SEAT`, `RETRIEVING_BAGS` and `EXITED` are
+appended to the enum. Passengers are never despawned at the gate or respawned in
+the terminal.
+
+**Scope.** All arrivals are local in M5. `connection_flight_id` already exists,
+so M6 can route some arrivals onward without replacing deboarding.
+
+**Why:** Continuity: the person who leaves seat 15F is the person who walks out
+of Riverdale, and later the person who makes or misses a connection.
+
+
+## D-029 — Deboarding engine and turnaround task
+
+**Date:** 2026-09-24
+**Status:** Accepted
+
+**Engine.** `DeboardingSimulation` is a new pure-logic engine. It is separate
+from the preserved boarding `Simulation` and uses the same cabins and aisle
+model (D-002), moving toward the door.
+
+- Per row side, only the seated passenger nearest the aisle gets up.
+- Seat leavers take a free aisle cell before walkers from behind, so rows ahead
+  empty first. Retrieving bags occupies the cell.
+- Walkers never pass. The door releases one passenger per interval.
+
+**Timings** are airport config (`deboarding`), in boarding ticks:
+
+| Setting | Value |
+| --- | --- |
+| Get up | 2 s + 0–2 s |
+| Step into the aisle | 1 s |
+| Retrieve bags | 4 s + 5 s per bag + 0–2 s |
+| Walk per row | 1.3 s |
+| Door interval | 1.5 s |
+
+Seeded variation applies only to getting up and to bags. `FlightDeboarding`
+steps it 3:1 like boarding. A flight can override timings with
+`deboarding_overrides`; demo SJ 235 has a 6-second jet-bridge door.
+
+**Widebody deboarding abstraction.** For the 787, the task runs its configured
+duration (12 min), then every inbound passenger enters the terminal together.
+
+**Turnaround graph.**
+
+```
+arrival_secured → deboarding, fueling, placeholder_baggage_service
+deboarding → cleaning, catering → boarding (exclusive with fueling)
+pushback_ready ← boarding, fueling, baggage
+```
+
+Deboarding is planned at A220 6, 737 8, A321 9.5 and 787 12 min. Cleaning and
+catering shrink to fit the D-30 window:
+
+| Task | A220 | 737 | A321 | 787 |
+| --- | --- | --- | --- | --- |
+| Cleaning (min) | 5 | 6 | 7 | 8 |
+| Catering (min) | 4 | 5 | 6 | 7 |
+
+The M4 critical-path attribution blames deboarding only when it is on the
+path.
+
+**Terminal.** New landside nodes, `arrivals_hall` and `airport_exit`, with
+one-way walkways from both concourses. There is no reclaim, customs or ground
+transport.
+
+
+## D-030 — Save schema v5
+
+**Date:** 2026-09-24
+**Status:** Accepted
+
+v5 adds:
+
+- inbound manifests and arrival passenger fields
+- flight deboarding fields
+- active deboarding cabins (engine seat queues, aisle, exits, counters)
+
+v4 is rejected. Validation checks:
+
+- every inbound passenger is in exactly one of seat, aisle or terminal
+- aisle positions agree between engine and passenger
+- the 3:1 tick relationship from the deboarding task's start
+- journey states agree with the flight's deboarding progress
+
+A save made mid-deboarding resumes to the identical outcome.

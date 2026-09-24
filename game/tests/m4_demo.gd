@@ -57,7 +57,7 @@ func _process(_delta: float) -> bool:
 		4:
 			shot("02-boarding-blocked-by-cleaning")
 			check(task("F004", "boarding").blocked_reason == "waiting for cleaning", "boarding visibly blocked by cleaning")
-			check(main.detail.text.contains("Holding departure: Cleaning"), "headline names the task holding departure")
+			check(main.detail.text.contains("Holding turnaround: Cleaning"), "headline names the task holding the turnaround")
 			until(func(): return task("F004", "boarding").status == TurnaroundTask.RUNNING)
 		5:
 			shot("03-boarding-after-cleaning")
@@ -86,8 +86,8 @@ func _report() -> void:
 			"(+%.1f min over plan)" % (overrun / 600.0) if overrun > 0 and t.kind == "timed" else ""])
 	var concurrent := 0
 	for t: TurnaroundTask in tasks:
-		if t.kind == "timed" and t.start_tick == task("F004", "cleaning").start_tick: concurrent += 1
-	check(concurrent >= 4, "2-3: several tasks start together and run concurrently")
+		if t.kind != "milestone" and t.start_tick == task("F004", "arrival_secured").finish_tick: concurrent += 1
+	check(concurrent >= 3, "2-3: several tasks start together and run concurrently")
 	var cleaning := task("F004", "cleaning")
 	var boarding := task("F004", "boarding")
 	check(cleaning.finish_tick - cleaning.start_tick > cleaning.planned_finish_tick - cleaning.planned_start_tick + 9000, "4: cleaning runs long")

@@ -69,6 +69,22 @@ A gate kept open for missing passengers in a late aircraft's shifted window is
 explained by the upstream causes: gate wait, landing queue and turnaround
 variation.
 
+**Deboarding (D-028, D-029).**
+
+- Inbound passengers sit in their seats until doors open (deboarding task
+  released, after arrival secured).
+- Per row side, the passenger nearest the aisle gets up first, then steps into
+  their row's aisle cell when it is free. Seat leavers go ahead of walkers from
+  behind.
+- They retrieve bags in the aisle, which blocks those behind, then walk toward
+  the door. Nobody passes.
+- The door lets one passenger out per interval. Each one enters the terminal at
+  the gate and walks to the airport exit.
+- Deboarding completes when the last passenger is off, which releases cleaning
+  and catering.
+- Widebodies (abstraction): after the configured duration, everyone enters the
+  terminal together.
+
 **Turnaround tasks (D-025).**
 
 - Tasks start when the aircraft reaches the gate. Their order and durations
@@ -90,8 +106,9 @@ Riverdale placeholder durations (minutes):
 | Task | A220 | 737 | A321 | 787 |
 | --- | --- | --- | --- | --- |
 | Arrival secured | 1 | 1 | 1 | 1 |
-| Cleaning | 10 | 13 | 15 | 18 |
-| Catering | 8 | 11 | 13 | 17 |
+| Deboarding (planned; actual from the cabin engine) | 6 | 8 | 9.5 | 12 |
+| Cleaning (after deboarding) | 5 | 6 | 7 | 8 |
+| Catering (after deboarding) | 4 | 5 | 6 | 7 |
 | Fueling | 10 | 14 | 16 | 18 |
 | Baggage (placeholder) | 20 | 24 | 26 | 35 |
 

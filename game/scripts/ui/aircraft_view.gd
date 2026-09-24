@@ -35,7 +35,9 @@ const GROUP_PALETTE := [
 
 const MAX_QUEUE_SHOWN := 48
 
-var sim: Simulation
+## A boarding Simulation or a DeboardingSimulation: both expose aircraft, aisle,
+## seat_occupied, passenger_by_id(), queued_passengers(), tick, aisle_direction.
+var sim
 var selected_id: int = -1
 
 # Layout computed each draw so clicks can be resolved.
@@ -86,7 +88,7 @@ static func state_color(state: int) -> Color:
 			return COLOR_WALKING
 		Passenger.State.BLOCKED:
 			return COLOR_BLOCKED
-		Passenger.State.STOWING:
+		Passenger.State.STOWING, Passenger.State.RETRIEVING_BAGS:
 			return COLOR_STOWING
 		Passenger.State.WAITING_FOR_SEAT:
 			return COLOR_SEAT_WAIT
@@ -100,7 +102,7 @@ func _draw() -> void:
 	_passenger_pos.clear()
 	if sim == null:
 		return
-	var aircraft := sim.aircraft
+	var aircraft: AircraftDef = sim.aircraft
 	var letters := aircraft.letters()
 	var left_count: int = aircraft.sides[0].size()
 	var cells := aircraft.rows + 1
@@ -181,20 +183,20 @@ func _draw() -> void:
 		var cell_cx := cells_left + cell * cell_w + cell_w / 2.0
 		var center := Vector2(cell_cx, aisle_cy)
 		var col := state_color(p.state)
+		var direction: int = sim.aisle_direction
 		match p.state:
 			Passenger.State.ENTERING, Passenger.State.WALKING, Passenger.State.BLOCKED:
-				var frac := 0.0
-				if p.walk_ticks_per_cell > 0:
-					frac = clampf(float(p.progress) / float(p.walk_ticks_per_cell), 0.0, 1.0)
+				var per_cell := p.walk_ticks_per_cell if direction > 0 else p.deboard_walk_ticks_per_cell
+				var frac := clampf(float(p.progress) / float(maxi(1, per_cell)), 0.0, 1.0)
 				# Never draw on top of the passenger ahead.
-				var next_cell := cell + 1
-				if next_cell < cells and sim.aisle[next_cell] != -1:
+				var next_cell := cell + direction
+				if next_cell >= 0 and next_cell < cells and sim.aisle[next_cell] != -1:
 					frac = minf(frac, 0.55)
-				center.x += frac * cell_w
+				center.x += frac * cell_w * direction
 				# Slight stride bob while actually moving.
 				if p.state != Passenger.State.BLOCKED:
 					center.y += sin(t * 0.9 + float(p.id)) * 0.8
-			Passenger.State.STOWING:
+			Passenger.State.STOWING, Passenger.State.RETRIEVING_BAGS:
 				center.y += sin(t * 0.5 + float(p.id)) * 1.2
 			Passenger.State.WAITING_FOR_SEAT:
 				center.x += sin(t * 0.35 + float(p.id)) * 1.5
@@ -210,10 +212,13 @@ func _draw() -> void:
 		draw_circle(center, radius, col)
 		draw_circle(center, radius, group_color(p.boarding_group).darkened(0.3), false, 1.0)
 		match p.state:
-			Passenger.State.STOWING:
-				# Bag travels from the body up into the bin on the seat side.
-				var dur := maxi(1, p.luggage_stow_duration)
+			Passenger.State.STOWING, Passenger.State.RETRIEVING_BAGS:
+				# Bag travels from the body up into the bin on the seat side
+				# (boarding), or down out of the bin (deboarding).
+				var stowing := p.state == Passenger.State.STOWING
+				var dur := maxi(1, p.luggage_stow_duration if stowing else p.deboard_retrieve_ticks)
 				var frac := 1.0 - clampf(float(p.timer) / float(dur), 0.0, 1.0)
+				if not stowing: frac = 1.0 - frac
 				var dir := -1.0 if p.side == 0 else 1.0
 				var bw := radius * 0.9
 				var by := center.y + dir * (radius * 0.2 + frac * (radius + 8.0))
@@ -235,12 +240,17 @@ func _draw() -> void:
 			draw_circle(center, radius + 2.5, COLOR_SELECT, false, 2.0)
 
 	# --- boarding queue strip: next passenger nearest the door ------------
-	var queued := sim.queued_passengers()
+	var queued: Array[Passenger] = sim.queued_passengers()
 	var qy := margin + 10.0
+	var deboarding: bool = sim.has_method("exited_count")
+	if deboarding:
+		draw_string(_font, Vector2(cells_left, qy + 4.0), "DEBOARDING  ·  %d / %d off the aircraft" % [sim.exited_count(), sim.passengers.size()],
+			HORIZONTAL_ALIGNMENT_LEFT, -1, _font_size_small, COLOR_TEXT)
 	var dot_r := clampf(radius * 0.7, 4.0, 7.0)
 	var qx := cells_left
-	draw_string(_font, Vector2(qx, qy + 4.0), "QUEUE  %d waiting" % queued.size(),
-		HORIZONTAL_ALIGNMENT_LEFT, -1, _font_size_small, COLOR_TEXT)
+	if not deboarding:
+		draw_string(_font, Vector2(qx, qy + 4.0), "QUEUE  %d waiting" % queued.size(),
+			HORIZONTAL_ALIGNMENT_LEFT, -1, _font_size_small, COLOR_TEXT)
 	var shown := mini(queued.size(), MAX_QUEUE_SHOWN)
 	var spacing := dot_r * 2.0 + 3.0
 	for i in shown:
@@ -262,7 +272,7 @@ func _draw() -> void:
 	var ly := size.y - margin - 6.0
 	var lx := cabin_left
 	var items := [
-		["Walking", COLOR_WALKING], ["Blocked", COLOR_BLOCKED], ["Stowing", COLOR_STOWING],
+		["Walking", COLOR_WALKING], ["Blocked", COLOR_BLOCKED], ["Bags" if deboarding else "Stowing", COLOR_STOWING],
 		["Seat access", COLOR_SEAT_WAIT], ["Seating", COLOR_SEATING], ["Seated", COLOR_SEAT_TAKEN],
 	]
 	for item in items:

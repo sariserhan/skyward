@@ -78,6 +78,31 @@ func test_incremental_admission_terminates() -> void:
 		checks += 1
 
 
+## M5: deboarding always finishes, for random cabins, loads and timings.
+func test_deboarding_terminates() -> void:
+	var runs := 300
+	var env := OS.get_environment("BOARDING_DEADLOCK_RUNS")
+	if env != "":
+		runs = int(env)
+	var rng := SimRng.new(20260925, SimRng.STREAM_SCENARIO)
+	var cabins := ["narrowbody_30", "a220_26", "a321_37"]
+	for i in runs:
+		var cabin := AircraftDef.load_by_id(cabins[i % cabins.size()])
+		var settings := {"seat_exit_ticks": rng.randi_range(1, 150), "aisle_entry_ticks": rng.randi_range(0, 90),
+			"retrieve_base_ticks": rng.randi_range(0, 300), "retrieve_per_bag_ticks": rng.randi_range(0, 300),
+			"walk_ticks_per_cell": rng.randi_range(1, 90), "door_interval_ticks": rng.randi_range(1, 300)}
+		var count := rng.randi_range(0, cabin.capacity())
+		var seed_value := rng.randi_range(1, 2_000_000_000)
+		var ps := TestDeboardingFixtures.manifest(cabin, count, seed_value, settings)
+		var sim := DeboardingSimulation.new()
+		sim.setup(cabin, ps, settings)
+		sim.run_to_completion(2_000_000)
+		if not sim.is_complete() or sim.exited.size() != count:
+			failures.append("deboarding stuck: seed=%d cabin=%s count=%d settings=%s" % [seed_value, cabin.id, count, str(settings)])
+			return
+		checks += 1
+
+
 static func _random_custom(rng: SimRng, rows: int) -> BoardingStrategy:
 	var groups: Array = []
 	var n := rng.randi_range(1, 5)

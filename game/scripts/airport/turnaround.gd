@@ -11,6 +11,7 @@ extends RefCounted
 
 const PUSHBACK := "pushback_ready"
 const BOARDING := "boarding"
+const DEBOARDING := "deboarding"
 
 var airport: AirportState
 var events: AirportEvents
@@ -85,6 +86,7 @@ func create(f: AirportFlight, aircraft_type: String, rng: SimRng, gate_tick: int
 		t.duration_ticks = t.nominal_ticks
 		if t.kind == "timed":
 			t.duration_ticks += rng.randi_range(0, t.nominal_ticks * variation / 1000)
+		if t.kind in ["timed", "deboarding"]:
 			t.duration_ticks += int(f.turnaround_overrides.get(t.type, 0))
 		airport.turnaround_tasks[t.id] = t
 		f.task_ids.append(t.id)
@@ -98,7 +100,7 @@ func create(f: AirportFlight, aircraft_type: String, rng: SimRng, gate_tick: int
 		var ready := gate_tick
 		for dependency in t.after: ready = maxi(ready, task(f, dependency).planned_finish_tick)
 		match t.kind:
-			"timed":
+			"timed", "deboarding":
 				t.planned_start_tick = ready
 				t.planned_finish_tick = ready + t.nominal_ticks
 			"boarding":
@@ -120,7 +122,7 @@ func dock_offsets(f: AirportFlight) -> Array:
 	for t: TurnaroundTask in tasks_of(f):
 		var ready := 0
 		for dependency in t.after: ready = maxi(ready, int(finish.get(dependency, 0)))
-		finish[t.type] = ready + (t.duration_ticks if t.kind == "timed" else 0)
+		finish[t.type] = ready + (t.duration_ticks if t.kind in ["timed", "deboarding"] else 0)
 		if t.kind == "boarding": boarding_ready = ready
 		if t.type == PUSHBACK:
 			for dependency in t.after:
@@ -143,8 +145,8 @@ func planned_gate_ticks(f: AirportFlight, gate_tick: int) -> int:
 
 ## Advance a docked flight's tasks at `now`, in topological order, so a task
 ## finishing this tick releases its dependents on the same tick.
-## `schedule_boarding` is called when the boarding task is released.
-func update(f: AirportFlight, now: int, schedule_boarding: Callable) -> void:
+## `schedule_boarding` / `start_deboarding` are called when those tasks are released.
+func update(f: AirportFlight, now: int, schedule_boarding: Callable, start_deboarding: Callable) -> void:
 	if int(_wake.get(f.id, now)) > now: return
 	for t: TurnaroundTask in tasks_of(f):
 		match t.status:
@@ -173,6 +175,11 @@ func update(f: AirportFlight, now: int, schedule_boarding: Callable) -> void:
 			"boarding":
 				t.status = TurnaroundTask.READY
 				schedule_boarding.call(f)
+			"deboarding":
+				t.status = TurnaroundTask.RUNNING
+				t.start_tick = now
+				events.record(now, "TASK_STARTED", f.id, {"task": t.type, "after": t.started_after})
+				start_deboarding.call(f)
 	var wake := 2147483647
 	for t: TurnaroundTask in tasks_of(f):
 		if t.status == TurnaroundTask.RUNNING and t.kind == "timed": wake = mini(wake, t.start_tick + t.duration_ticks)
@@ -193,6 +200,13 @@ func boarding_running(f: AirportFlight, now: int) -> void:
 	t.blocked_reason = ""
 	wake(f)
 	events.record(now, "TASK_STARTED", f.id, {"task": t.type, "after": t.started_after})
+
+
+## Every inbound passenger has left the aircraft.
+func deboarding_complete(f: AirportFlight, finished: int) -> void:
+	var t := task(f, DEBOARDING)
+	if t != null: _complete(t, finished)
+	wake(f)
 
 
 ## Boarding reached phase "complete" (gate closed, everyone admitted seated).
