@@ -1,3 +1,8 @@
+> **Precedence (2026-09-24, D-013):** this specification is historical
+> implementation context for M0–M2. For M3 onward, `airport_tycoon.md` at the
+> repository root is the product direction and roadmap and wins where the two
+> conflict. See `docs/DECISIONS.md` D-013–D-020.
+
 # Airport Operations Simulator + Boarding Simulation
 
 ## Agent-Ready Product & Engineering Specification

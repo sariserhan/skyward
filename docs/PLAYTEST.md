@@ -1,9 +1,119 @@
 # Playtest Guide
 
-This is the guide for the prototype playtest (spec §33). Two parts: what to
-send testers, and how to read what comes back.
+There are two things to playtest, and they ship differently.
 
-## For testers
+- **Riverdale airport**, the default game. Exported builds launch straight into
+  it. This part covers the M3 airport workflow.
+- **The standalone boarding prototype** (spec §33), which runs from source
+  only. Release exports cannot open another scene: Godot aborts with "compiled
+  without support for path overrides". Its telemetry (`playtest_log.jsonl`,
+  `tools/playtest_report.py`) records standalone sessions only.
+
+## Riverdale airport (exported builds)
+
+### For testers
+
+Thanks for trying BOARDING. You run the morning at Riverdale International:
+flights land, turn around and leave, and passengers make their way from the
+entrance through security to their gates and onto the aircraft. Keep things
+moving. Try not to leave anyone behind. Play as long as you like.
+
+**Run it**
+
+* Windows: unzip and run `boarding.exe`. Windows may warn that the publisher
+  is unknown. Choose "More info" then "Run anyway".
+* macOS: unzip, then right-click `boarding.app` and choose Open. macOS will
+  warn that it is from an unidentified developer. Choose Open. If it refuses,
+  run `xattr -dr com.apple.quarantine boarding.app` in Terminal once.
+* Linux: `chmod +x boarding.x86_64 && ./boarding.x86_64`.
+
+**Before you quit, press Save and send back this file**
+
+* Windows: `%APPDATA%\Godot\app_userdata\BOARDING\riverdale_airport.json`
+* macOS: `~/Library/Application Support/Godot/app_userdata/BOARDING/riverdale_airport.json`
+* Linux: `~/.local/share/godot/app_userdata/BOARDING/riverdale_airport.json`
+
+It contains only the airport simulation: the clock, flights, passengers, the
+event history and the decisions you made (gate changes, security staffing,
+boarding strategies, holds). Nothing about you or your computer. Saving works
+at any moment, including while a flight is boarding.
+
+Then answer three questions in your reply:
+
+1. When a flight left late or a passenger missed a flight, could you tell why?
+2. Did you ever hold a flight or close a gate yourself? What made you decide?
+3. What was confusing?
+
+### For the person running the playtest
+
+**Don't explain the controls beyond the brief above.** The M3 question
+(`airport_tycoon.md` §52) is whether boarding makes the airport feel alive and
+delays understandable. Explaining the drill-down answers it for them.
+
+What to look for in each returned save (`events` and `decisions`):
+
+| Signal | Where |
+| --- | --- |
+| Used security levers | `set_security` decisions |
+| Chose boarding strategies | `set_boarding_strategy` decisions |
+| Held or closed gates | `hold_flight` / `close_gate` decisions, `FLIGHT_HELD` / `GATE_CLOSED` events (`by`: `player`, `scheduled`, `all_aboard`) |
+| Passengers left behind | `PASSENGER_MISSED_FLIGHT` events, `missed_count` per flight |
+| Boarding cost departures | `delay_reasons.boarding` / `passenger_hold` per flight |
+
+There is no report script for airport saves yet. Read them with `jq`, or load
+one in the game (Load uses the same path).
+
+The baseline a tester starts from, if they never act, is in
+[m3-status.md](m3-status.md): the default morning misses about 1% of passengers,
+and a couple of flights leave a few minutes late because of boarding.
+
+### M3 walkthrough (for developers and reviewers)
+
+Watch one flight go from docking to takeoff, including a passenger who misses
+it. The demo flight is **AW 228** (737, gate A2, 90% load, one deliberately late
+passenger). Times are game clock at 1×; use 4× to get there faster.
+
+1. Start the game (`godot --path game` or an export). Select **AW 228** on the
+   Flights board.
+2. **Terminal** tab from about 05:20: AW 228's passengers clear security and
+   collect at A2. **Security** shows queues. **Passengers** lists the manifest;
+   clicking one follows them.
+3. 06:09: the aircraft docks at A2 (**Airfield** tab). Service before boarding
+   runs until about 06:24. The boarding strategy can still be changed.
+4. 06:27: boarding opens. Press **View boarding**. The cabin fills, and red
+   passengers are stuck behind someone stowing bags or waiting for seat access.
+   Click one to see their seat, bags and the time they have blocked others.
+   Esc returns.
+5. About 06:44: the alert "AW 228 · N missing · gate closes in 3 min" appears,
+   with **HOLD +5 MIN** and **CLOSE GATE** enabled. Do nothing to see the
+   default.
+6. 06:47: the gate closes (D-10). The late passenger, who only reached the
+   airport at 06:47, is flagged as missing. Boarding of everyone else continues.
+7. About 06:50: the last passenger sits down. The late passenger arrives at A2
+   and shows red as **Missed Flight** (select them from the Passengers tab).
+8. 06:53 pushback, taxi, 06:57 takeoff. The flight inspector shows the boarding
+   result: last seated after about 23 minutes, and the seats that held up the
+   aisle longest.
+
+Repeat with **HOLD +5 MIN** at step 5: the late passenger boards. The gate then
+closes as soon as they sit down, and the departure slips by the time the hold
+actually used. With **Window / Middle / Aisle** chosen before step 4, boarding
+finishes minutes earlier.
+
+The scripted version asserts the same sequence and writes screenshots:
+
+```sh
+tools/ui_tests.sh tests/m3_demo.gd
+```
+
+## Standalone boarding prototype (from source)
+
+Run it with `godot --path game res://scenes/main.tscn`. The tester text below
+was written for builds that launched this prototype. Release exports now open
+the airport, so this playtest needs testers who can run from source, or a
+separate export whose main scene is `res://scenes/main.tscn`.
+
+### For testers
 
 Thanks for trying BOARDING. It's a small prototype about boarding a plane as
 fast as possible. There are no instructions on purpose. Play it the way you
@@ -34,7 +144,7 @@ Then answer two questions in your reply:
 1. Did you want to run it again? Why or why not?
 2. What was confusing?
 
-## For the person running the playtest
+### For the person running the playtest
 
 **Do not explain the game.** The question is whether people retry without
 being told to. Explaining the strategies or the goal contaminates that.
@@ -76,6 +186,7 @@ godot --headless --path . --export-release Windows
 godot --headless --path . --export-release macOS
 ```
 
-Builds land in `dist/`. Zip each platform folder before sending. If the
+Builds land in `dist/`. Zip each platform folder before sending. Check the
+airport walkthrough above against the export before sending it out. If the
 simulation constants change between rounds, bump `SIM_VERSION` in
 `simulation.gd` so old personal bests stop counting.

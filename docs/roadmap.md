@@ -1,7 +1,9 @@
 # Airport roadmap
 
-The airport expansion specification is [additional_spec.md](additional_spec.md).
-The original boarding roadmap remains at [ROADMAP.md](ROADMAP.md).
+Product direction for M3 onward is [airport_tycoon.md](../airport_tycoon.md)
+(D-013). The M0–M2 specification is [additional_spec.md](additional_spec.md);
+it is kept as historical context. The original boarding roadmap remains at
+[ROADMAP.md](ROADMAP.md).
 
 - **M0 implemented:** lightweight domain models, shared passenger identity,
   seeded RNG reuse, integer clock, events, headless tests and local serialization.
@@ -10,26 +12,22 @@ The original boarding roadmap remains at [ROADMAP.md](ROADMAP.md).
   board/details, pause/speeds, alerts and debug controls.
 - **M2 implemented:** canonical passengers, terminal graph movement, security
   queues, lane/staff controls, gate rerouting, inspectors and populated saves.
-- **M3 next, not started:** adapter into the preserved boarding engine.
-- M4–M7: deboarding, turnaround tasks, connections and independent baggage flow.
-- M8–M11: operational resources, airline relationships, economy/expansion,
-  scenario objectives/scoring and challenges.
+- **M3 implemented:** terminal passengers board through the existing cabin
+  engine, departure depends on boarding, gate close and player holds, missed
+  flights, widebody boarding abstraction, active-boarding saves (schema v3).
+  Plan [m3-plan.md](m3-plan.md), report [m3-status.md](m3-status.md). Decisions
+  D-014–D-024.
+- **M4 next, not started:** turnaround task framework (replaces the placeholder
+  service-before-boarding timer).
+- M5: deboarding, plugged into the turnaround framework.
+- M6: connecting passengers.
+- M7: baggage.
+- M8: operational resources.
+- M9: airlines and contracts.
+- M10: economy.
+- M11: construction and expansion.
 
-## Recommended M3 slice
+The order after M3 follows D-020: the turnaround task framework comes before any
+individual turnaround activity.
 
-1. Bind each flight's aircraft instance to a supported existing cabin definition;
-   limit first integration to a compatible narrowbody configuration.
-2. Assign seats and boarding timing fields on existing Passenger instances.
-   Preserve airport identity, itinerary, location and security history.
-3. Add a BoardingScenarioAdapter around the existing Simulation engine; keep
-   its algorithm and test suite intact.
-4. Drive boarding ticks from the authoritative airport clock, accounting for
-   the boarding engine's configured tick rate.
-5. Admit passengers that actually reached the gate, including later arrivals;
-   define cutoff behavior and departure readiness explicitly.
-6. Apply BoardingResult timing and structured causes back to AirportFlight.
-7. Extend save/resume coverage to active boarding and test cascading departure
-   delays, late arrivals, deterministic strategy comparisons and passenger identity.
-
-Do not begin M3 until requested. M2 stops at gate waiting; placeholder aircraft
-turnarounds still operate independently of passenger arrivals.
+M3 stopped here for review. Do not begin M4 until requested.

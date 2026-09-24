@@ -71,6 +71,8 @@ func _draw() -> void:
 		if flight.id == selected_id: draw_arc(position, 20, 0, TAU, 32, AMBER, 2)
 		_plane(position, color)
 		_label(position + Vector2(-23, -19), flight.flight_number, color, 10)
+		if flight.boarding_phase == "open": _label(position + Vector2(-23, 27), "BOARDING", MINT, 9)
+		elif flight.boarding_phase == "closed": _label(position + Vector2(-23, 27), "DOORS CLOSING", AMBER, 9)
 		hits[flight.id] = position
 
 func _background() -> StyleBoxFlat:

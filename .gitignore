@@ -13,3 +13,6 @@ game/export/
 
 # Exported builds
 /dist/
+
+# Rendered-test dependencies fetched by tools/ui_tests.sh
+/.cache/

@@ -1,4 +1,4 @@
-# Airport architecture — M0 / M1 / M2
+# Airport architecture — M0 / M1 / M2 / M3
 
 The airport is now the default Godot scene. The existing boarding scene remains
 available at `res://scenes/main.tscn`; its simulation algorithm is unchanged.
@@ -13,6 +13,8 @@ available at `res://scenes/main.tscn`; its simulation algorithm is unchanged.
   of rendered node positions.
 - `security_checkpoint.gd`: lane/staff limits, active screenings, queue and metrics.
 - `passenger_flow_validation.gd`: passenger/manifest/queue/scheduler save invariants.
+- `flight_boarding.gd`: one flight's cabin boarding session. Adapter around the
+  preserved `Simulation` engine; validates saved sessions (M3).
 - `airport_clock.gd`: absolute integer simulation ticks and presentation pacing.
 - `airport_events.gd`: ordered event history plus a signal delivering copied events.
 - `airport_state.gd`: canonical entity registries, money, reputation and resources.
@@ -23,6 +25,8 @@ available at `res://scenes/main.tscn`; its simulation algorithm is unchanged.
 - `scripts/ui/airport/terminal_view.gd`: capped passenger samples, aggregate queue
   and gate counts, route highlighting and passenger hit-testing.
 - `scripts/ui/airport/airport_map.gd`: immediate-mode airport and aircraft rendering.
+- `scripts/ui/airport/boarding_overlay.gd`: full-screen live cabin inspection that
+  embeds the standalone `AircraftView`, bound read-only to a flight's engine.
 - `configs/airports/riverdale.json`: timetable, fictional airlines, eight gates,
   four aircraft categories and all operational durations.
 
@@ -73,6 +77,70 @@ untrusted cloud import or backend verification. No Convex or Better Auth behavio
 was added or replaced. Cloud sync waits for later persistence work.
 
 
+## M3 boarding integration
+
+**Tick domains (D-015).**
+
+- The airport runs at 10 Hz and the boarding engine at 30 Hz.
+- `FlightBoarding.step()` runs once per airport tick and advances its engine by
+  exactly `boarding_ticks_per_airport_tick` (3) engine steps. So
+  `engine.tick == 3 × (airport ticks since open, inclusive)` until completion;
+  save validation checks this.
+- Boarding-tick quantities (passenger cabin timers, `boarding_result`) are never
+  shown raw. The UI converts them with `SimConfig.tick_rate`.
+
+**Step order.**
+
+```
+clock → runway completion → flights (open / close / readiness) → runway start
+→ passenger_flow → boarding sessions (flight_order) → conflicts
+```
+
+A passenger reaching the gate on tick *t* is admitted on tick *t*. A gate that
+closes on tick *t* closes before that tick's arrivals.
+
+**Engine.** `Simulation.setup_incremental()` resolves the strategy over the whole
+manifest, with the same seeded groups and order as `setup()`, but starts with an
+empty door queue:
+
+- `admit(ids)` appends passengers who are physically present, in strategy order
+  among themselves.
+- `close()` ends admission. Completion requires `closed` and everyone admitted
+  seated.
+- `setup()` closes immediately, so standalone results are unchanged. A 48-run
+  golden baseline guards this.
+
+**Identity.** The flight's canonical `Passenger` objects are the engine's
+manifest. `airport_state` (journey) and `state` (cabin) are separate layers on
+that one object (D-016). Seats and boarding-tick durations are assigned at
+generation from `SimRng.STREAM_CABIN` via `PassengerGenerator.apply_cabin_timing`.
+
+**Modes.** An aircraft type with a `cabin` config boards in the engine. Other
+types use the *widebody boarding abstraction*: the same window and gate-close
+rules, and everyone present boards instantly at close.
+
+**Persistence (schema v3).** Each open session saves its engine fields:
+
+- queue, aisle, active list and seat occupancy
+- counters, strategy and config
+- the rank map
+
+Passenger fields travel in `Passenger.snapshot()`. `FlightBoarding.valid_snapshot`
+and `AirportSimulation._valid_boarding` reject inconsistent sessions before
+anything is replaced. Engine state and passengers restore onto the same restored
+objects.
+
+## M3 boundary
+
+- **Service before boarding** is a placeholder timer
+  (`service_before_boarding_ticks`) until M4 turnaround tasks.
+- **Cabin timings** in the airport come from `SimConfig` plus the scenario's
+  `boarding.sim_config_overrides` (D-024). The standalone scenarios are
+  untouched.
+- **Cabins** have one front door.
+- **Missed passengers** are not rebooked.
+- **Airport speeds** remain 1×, 2× and 4×.
+
 ## M2 boundary
 
 Two checkpoints have configurable service times, open-lane counts and assigned
@@ -81,8 +149,5 @@ passenger; it stops starting new work. No wages or other operational resources
 are simulated yet. Check-in is a timed abstraction. Walking edges model travel
 time, not pedestrian capacity or collisions.
 
-Passengers progress to `waiting_at_gate`. A configured gate-arrival target is
-used to measure timeliness; it is not an implemented boarding cutoff. Placeholder
-aircraft departures still operate independently of passengers. M3 will connect
-the same passenger objects to the existing boarding engine, reconcile timing and
-seat assignments, and make flight departures depend on boarding results.
+In M2, passengers stopped at `waiting_at_gate`, and departures ran independently
+of them. M3 replaced that; see above.

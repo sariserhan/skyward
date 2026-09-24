@@ -1,11 +1,14 @@
-# Current status — M0 through M2 implemented
+# Current status — M0 through M3 implemented
 
-M2 terminal flow, security controls, passenger inspectors and populated saves are
-complete. See the [M2 completion report](m2-status.md) for current validation,
-performance and limitations. M3 has not started.
+M3 airport ↔ boarding integration is complete: terminal passengers board through
+the preserved cabin engine, departures depend on boarding, and saves (schema v3)
+include active boarding. See the [M3 completion report](m3-status.md) for
+validation, the measured scenario baseline, the §51 demonstration and
+limitations. M4 has not started.
 
-The report below records the earlier M0/M1 milestone before M2 changed passenger
-flow and save schema. Its limitations and timings are historical.
+Earlier reports: [M2](m2-status.md), and the M0/M1 report below. Their
+limitations and timings are historical; M3 changed the timetable, scenario start,
+security defaults, loads, cabin timings and save schema (D-021, D-023, D-024).
 
 ---
 

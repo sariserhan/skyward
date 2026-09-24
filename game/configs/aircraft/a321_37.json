@@ -1,0 +1,9 @@
+{
+  "id": "a321_37",
+  "display_name": "A321 (37 rows, 3-3)",
+  "rows": 37,
+  "seats_per_row": 6,
+  "aisle_count": 1,
+  "boarding_doors": ["front"],
+  "seat_layout": "ABC|DEF"
+}

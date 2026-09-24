@@ -13,7 +13,12 @@ func fixture(count: int = 3) -> AirportSimulation:
 	config.gate_buffer_ticks = 10
 	config.turnaround_variation_ticks = 3
 	config.flights = config.flights.slice(0, count)
-	for definition in config.aircraft_types.values(): definition.turnaround_ticks = 30
+	for definition in config.aircraft_types.values():
+		definition.turnaround_ticks = 30
+		definition.service_before_boarding_ticks = 30
+	# Boarding window scaled like every other duration here (no passengers).
+	config.boarding = {"open_before_departure_ticks": 20, "gate_close_before_departure_ticks": 16,
+		"close_warning_ticks": 5, "hold_increment_ticks": 10, "max_hold_ticks": 30}
 	for i in config.flights.size():
 		config.flights[i].scheduled_arrival = 20 + i * 5
 		config.flights[i].scheduled_departure = 85 + i * 5
@@ -52,7 +57,7 @@ func test_flight_lifecycle_and_runway_separation() -> void:
 			assert_true(int(event.tick) >= last_end + int(sim.config.separation_ticks), "runway separation")
 			last_end = int(event.details.end_tick)
 		if event.type == "FLIGHT_STATE_CHANGED" and event.flight_id == "F001": transitions.append(event.details.to)
-	assert_eq(transitions, ["approaching", "landed", "taxiing_in", "at_gate", "turnaround", "ready_for_pushback", "taxiing_out", "departed"])
+	assert_eq(transitions, ["approaching", "landed", "taxiing_in", "at_gate", "turnaround", "boarding", "ready_for_pushback", "taxiing_out", "departed"])
 	for gate: AirportGate in sim.airport.gates.values(): assert_eq(gate.occupied_by_flight_id, "")
 	for i in sim.events.history.size(): assert_eq(sim.events.history[i].sequence, i)
 

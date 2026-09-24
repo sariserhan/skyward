@@ -9,6 +9,10 @@ func fixture(count: int = 12, lanes: int = 2) -> AirportSimulation:
 	config.aircraft_types.A220.seats = count
 	var flow: Dictionary = config.passenger_flow
 	flow.load_permille = 1000
+	flow.staff_pool = 6
+	# Exact manifest sizes: use the flat load, not the scenario's load ranges.
+	flow.erase("load_permille_range")
+	flow.erase("airline_load_permille_ranges")
 	flow.arrival_lead_min_ticks = 39999
 	flow.arrival_lead_max_ticks = 39999
 	flow.check_in_ticks = 1

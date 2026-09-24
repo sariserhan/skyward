@@ -2,7 +2,7 @@
   "id": "riverdale_morning",
   "name": "Riverdale International",
   "seed": 8492014,
-  "start_tick": 216000,
+  "start_tick": 189000,
   "landing_ticks": 700,
   "takeoff_ticks": 550,
   "separation_ticks": 400,
@@ -15,22 +15,46 @@
     "A220": {
       "class": "narrow",
       "seats": 130,
-      "turnaround_ticks": 15000
+      "turnaround_ticks": 15000,
+      "cabin": "a220_26",
+      "service_before_boarding_ticks": 7200
     },
     "737": {
       "class": "narrow",
       "seats": 180,
-      "turnaround_ticks": 21000
+      "turnaround_ticks": 21000,
+      "cabin": "narrowbody_30",
+      "service_before_boarding_ticks": 9000
     },
     "A321": {
       "class": "narrow",
       "seats": 220,
-      "turnaround_ticks": 24000
+      "turnaround_ticks": 24000,
+      "cabin": "a321_37",
+      "service_before_boarding_ticks": 10200
     },
     "787": {
       "class": "wide",
       "seats": 276,
-      "turnaround_ticks": 33000
+      "turnaround_ticks": 33000,
+      "service_before_boarding_ticks": 12000
+    }
+  },
+  "boarding": {
+    "open_before_departure_ticks": 18000,
+    "gate_close_before_departure_ticks": 6000,
+    "close_warning_ticks": 1800,
+    "hold_increment_ticks": 3000,
+    "max_hold_ticks": 9000,
+    "default_strategy": "random",
+    "boarding_ticks_per_airport_tick": 3,
+    "sim_config_overrides": {
+      "entry_interval_ticks": 100,
+      "walk_ticks_per_cell": 54,
+      "stow_base_ticks": 240,
+      "stow_per_bag_ticks": 300,
+      "stow_variation_ticks": 90,
+      "seat_per_obstructer_ticks": 330
     }
   },
   "airlines": {
@@ -108,7 +132,7 @@
       "destination": "Ashford",
       "aircraft_type": "A220",
       "scheduled_arrival": 217800,
-      "scheduled_departure": 238150,
+      "scheduled_departure": 246750,
       "assigned_gate_id": "A1"
     },
     {
@@ -119,8 +143,10 @@
       "destination": "Clearwater",
       "aircraft_type": "737",
       "scheduled_arrival": 219600,
-      "scheduled_departure": 245950,
-      "assigned_gate_id": "A2"
+      "scheduled_departure": 250350,
+      "assigned_gate_id": "A2",
+      "load_permille": 900,
+      "late_passengers": 1
     },
     {
       "id": "F003",
@@ -130,7 +156,7 @@
       "destination": "Fairview",
       "aircraft_type": "A321",
       "scheduled_arrival": 221400,
-      "scheduled_departure": 250750,
+      "scheduled_departure": 253950,
       "assigned_gate_id": "A3"
     },
     {
@@ -141,7 +167,7 @@
       "destination": "Eastmere",
       "aircraft_type": "A220",
       "scheduled_arrival": 223200,
-      "scheduled_departure": 243550,
+      "scheduled_departure": 252150,
       "assigned_gate_id": "A4"
     },
     {
@@ -152,7 +178,7 @@
       "destination": "Ashford",
       "aircraft_type": "737",
       "scheduled_arrival": 225000,
-      "scheduled_departure": 251350,
+      "scheduled_departure": 255750,
       "assigned_gate_id": "A5"
     },
     {
@@ -163,7 +189,7 @@
       "destination": "Clearwater",
       "aircraft_type": "A321",
       "scheduled_arrival": 226800,
-      "scheduled_departure": 256150,
+      "scheduled_departure": 259350,
       "assigned_gate_id": "A6"
     },
     {
@@ -174,7 +200,7 @@
       "destination": "Fairview",
       "aircraft_type": "787",
       "scheduled_arrival": 228600,
-      "scheduled_departure": 266950,
+      "scheduled_departure": 262350,
       "assigned_gate_id": "A7"
     },
     {
@@ -185,7 +211,7 @@
       "destination": "Eastmere",
       "aircraft_type": "787",
       "scheduled_arrival": 230400,
-      "scheduled_departure": 268750,
+      "scheduled_departure": 264150,
       "assigned_gate_id": "A8"
     },
     {
@@ -195,8 +221,8 @@
       "origin": "Pinehaven",
       "destination": "Ashford",
       "aircraft_type": "A220",
-      "scheduled_arrival": 235800,
-      "scheduled_departure": 256150,
+      "scheduled_arrival": 247800,
+      "scheduled_departure": 276750,
       "assigned_gate_id": "A1"
     },
     {
@@ -206,8 +232,8 @@
       "origin": "Lakeport",
       "destination": "Clearwater",
       "aircraft_type": "737",
-      "scheduled_arrival": 237600,
-      "scheduled_departure": 263950,
+      "scheduled_arrival": 249600,
+      "scheduled_departure": 280350,
       "assigned_gate_id": "A2"
     },
     {
@@ -217,8 +243,8 @@
       "origin": "Westbridge",
       "destination": "Fairview",
       "aircraft_type": "A321",
-      "scheduled_arrival": 239400,
-      "scheduled_departure": 268750,
+      "scheduled_arrival": 251400,
+      "scheduled_departure": 283950,
       "assigned_gate_id": "A3"
     },
     {
@@ -228,8 +254,8 @@
       "origin": "Seabrook",
       "destination": "Eastmere",
       "aircraft_type": "A220",
-      "scheduled_arrival": 241200,
-      "scheduled_departure": 261550,
+      "scheduled_arrival": 253200,
+      "scheduled_departure": 282150,
       "assigned_gate_id": "A4"
     },
     {
@@ -239,8 +265,8 @@
       "origin": "Pinehaven",
       "destination": "Ashford",
       "aircraft_type": "737",
-      "scheduled_arrival": 243000,
-      "scheduled_departure": 269350,
+      "scheduled_arrival": 255000,
+      "scheduled_departure": 285750,
       "assigned_gate_id": "A5"
     },
     {
@@ -250,8 +276,8 @@
       "origin": "Lakeport",
       "destination": "Clearwater",
       "aircraft_type": "A321",
-      "scheduled_arrival": 244800,
-      "scheduled_departure": 274150,
+      "scheduled_arrival": 256800,
+      "scheduled_departure": 289350,
       "assigned_gate_id": "A6"
     },
     {
@@ -261,8 +287,8 @@
       "origin": "Westbridge",
       "destination": "Fairview",
       "aircraft_type": "787",
-      "scheduled_arrival": 246600,
-      "scheduled_departure": 284950,
+      "scheduled_arrival": 258600,
+      "scheduled_departure": 292350,
       "assigned_gate_id": "A7"
     },
     {
@@ -272,8 +298,8 @@
       "origin": "Seabrook",
       "destination": "Eastmere",
       "aircraft_type": "787",
-      "scheduled_arrival": 248400,
-      "scheduled_departure": 286750,
+      "scheduled_arrival": 260400,
+      "scheduled_departure": 294150,
       "assigned_gate_id": "A8"
     },
     {
@@ -283,8 +309,8 @@
       "origin": "Pinehaven",
       "destination": "Ashford",
       "aircraft_type": "A220",
-      "scheduled_arrival": 253800,
-      "scheduled_departure": 274150,
+      "scheduled_arrival": 277800,
+      "scheduled_departure": 306750,
       "assigned_gate_id": "A1"
     },
     {
@@ -294,8 +320,8 @@
       "origin": "Lakeport",
       "destination": "Clearwater",
       "aircraft_type": "737",
-      "scheduled_arrival": 255600,
-      "scheduled_departure": 281950,
+      "scheduled_arrival": 279600,
+      "scheduled_departure": 310350,
       "assigned_gate_id": "A2"
     },
     {
@@ -305,8 +331,8 @@
       "origin": "Westbridge",
       "destination": "Fairview",
       "aircraft_type": "A321",
-      "scheduled_arrival": 257400,
-      "scheduled_departure": 286750,
+      "scheduled_arrival": 281400,
+      "scheduled_departure": 313950,
       "assigned_gate_id": "A3"
     },
     {
@@ -316,8 +342,8 @@
       "origin": "Seabrook",
       "destination": "Eastmere",
       "aircraft_type": "A220",
-      "scheduled_arrival": 259200,
-      "scheduled_departure": 279550,
+      "scheduled_arrival": 283200,
+      "scheduled_departure": 312150,
       "assigned_gate_id": "A4"
     },
     {
@@ -327,8 +353,8 @@
       "origin": "Pinehaven",
       "destination": "Ashford",
       "aircraft_type": "737",
-      "scheduled_arrival": 261000,
-      "scheduled_departure": 287350,
+      "scheduled_arrival": 285000,
+      "scheduled_departure": 315750,
       "assigned_gate_id": "A5"
     },
     {
@@ -338,8 +364,8 @@
       "origin": "Lakeport",
       "destination": "Clearwater",
       "aircraft_type": "A321",
-      "scheduled_arrival": 262800,
-      "scheduled_departure": 292150,
+      "scheduled_arrival": 286800,
+      "scheduled_departure": 319350,
       "assigned_gate_id": "A6"
     },
     {
@@ -349,8 +375,8 @@
       "origin": "Westbridge",
       "destination": "Fairview",
       "aircraft_type": "787",
-      "scheduled_arrival": 264600,
-      "scheduled_departure": 302950,
+      "scheduled_arrival": 288600,
+      "scheduled_departure": 322350,
       "assigned_gate_id": "A7"
     },
     {
@@ -360,18 +386,40 @@
       "origin": "Seabrook",
       "destination": "Eastmere",
       "aircraft_type": "787",
-      "scheduled_arrival": 266400,
-      "scheduled_departure": 304750,
+      "scheduled_arrival": 290400,
+      "scheduled_departure": 324150,
       "assigned_gate_id": "A8"
     }
   ],
   "passenger_flow": {
-    "load_permille": 450,
-    "arrival_lead_min_ticks": 9000,
-    "arrival_lead_max_ticks": 27000,
-    "gate_target_buffer_ticks": 6000,
+    "load_permille": 800,
+    "load_permille_range": [
+      700,
+      900
+    ],
+    "airline_load_permille_ranges": {
+      "NS": [
+        720,
+        880
+      ],
+      "AW": [
+        700,
+        900
+      ],
+      "SJ": [
+        820,
+        950
+      ],
+      "GA": [
+        680,
+        860
+      ]
+    },
+    "arrival_lead_min_ticks": 27000,
+    "arrival_lead_max_ticks": 60000,
+    "gate_target_buffer_ticks": 18000,
     "check_in_ticks": 200,
-    "staff_pool": 6,
+    "staff_pool": 8,
     "graph": {
       "nodes": {
         "entrance": {
@@ -537,17 +585,17 @@
         "id": "west",
         "node_id": "security_west",
         "max_lanes": 4,
-        "open_lanes": 2,
-        "staff": 2,
-        "service_ticks": 120
+        "open_lanes": 3,
+        "staff": 3,
+        "service_ticks": 150
       },
       {
         "id": "east",
         "node_id": "security_east",
         "max_lanes": 4,
-        "open_lanes": 1,
-        "staff": 1,
-        "service_ticks": 120
+        "open_lanes": 3,
+        "staff": 3,
+        "service_ticks": 150
       }
     ]
   }

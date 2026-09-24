@@ -38,6 +38,11 @@ var seated_count: int = 0
 var ticks_since_entry: int = 1_000_000
 var completed: bool = false
 var warnings: Array[String] = []
+## False while more passengers may still be admitted (airport incremental mode).
+## Completion requires closed == true; standalone setup() closes immediately.
+var closed: bool = true
+## Incremental mode: passenger id -> position in the full strategy order.
+var _rank: Dictionary = {}
 
 
 func setup(p_aircraft: AircraftDef, p_passengers: Array[Passenger], p_strategy: BoardingStrategy,
@@ -69,6 +74,49 @@ func setup(p_aircraft: AircraftDef, p_passengers: Array[Passenger], p_strategy: 
 	seated_count = 0
 	ticks_since_entry = 1_000_000
 	completed = false
+	closed = true
+	_rank.clear()
+
+
+## Airport mode: resolve the strategy over the whole manifest (same groups and
+## seeded in-group order as setup()), but start with an empty door queue.
+## Passengers join through admit() once they are physically at the gate.
+func setup_incremental(p_aircraft: AircraftDef, p_passengers: Array[Passenger], p_strategy: BoardingStrategy,
+		p_config: SimConfig, p_seed: int) -> void:
+	setup(p_aircraft, p_passengers, p_strategy, p_config, p_seed)
+	for i in queue.size():
+		_rank[queue[i]] = i
+	for p in passengers:
+		p.state = Passenger.State.WAITING
+	queue.clear()
+	closed = false
+
+
+## Append passengers to the back of the door queue, in strategy order among
+## themselves. Unknown or already admitted ids are ignored. Returns the ids
+## actually admitted.
+func admit(ids: Array) -> Array[int]:
+	var fresh: Array[int] = []
+	if closed:
+		return fresh
+	for id in ids:
+		var p: Passenger = _by_id.get(int(id))
+		if p != null and p.state == Passenger.State.WAITING and not int(id) in fresh:
+			fresh.append(int(id))
+	fresh.sort_custom(func(a, b): return _rank[a] < _rank[b])
+	for id in fresh:
+		queue.append(id)
+		_set_state(_by_id[id], Passenger.State.QUEUED)
+	return fresh
+
+
+## No further admissions. Boarding completes once everyone admitted is seated,
+## immediately if they already are (airport early close; standalone never calls this).
+func close() -> void:
+	closed = true
+	if seated_count >= queue.size() and not completed:
+		completed = true
+		boarding_completed.emit(tick)
 
 
 func _reset_passenger(p: Passenger) -> void:
@@ -147,7 +195,7 @@ func step() -> void:
 	_attribute_blocking()
 	_step_entry()
 
-	if seated_count >= passengers.size() and not completed:
+	if closed and seated_count >= queue.size() and not completed:
 		completed = true
 		boarding_completed.emit(tick)
 
@@ -283,6 +331,7 @@ func passengers_delayed_behind(cell: int) -> int:
 
 func result() -> Dictionary:
 	var blocked := 0
+	var last_seated := 0
 	var walk := 0
 	var stow := 0
 	var seat_wait := 0
@@ -291,6 +340,7 @@ func result() -> Dictionary:
 		walk += p.total_walk_time
 		stow += p.total_stow_time
 		seat_wait += p.total_seat_wait_time
+		last_seated = maxi(last_seated, p.seated_tick)
 	var blockers: Array = []
 	for p in passengers:
 		if p.caused_blocked_time > 0:
@@ -317,7 +367,10 @@ func result() -> Dictionary:
 		"completed": completed,
 		"total_ticks": tick,
 		"total_seconds": config.ticks_to_seconds(tick),
+		## Differs from total_ticks only while boarding can stay open (airport mode).
+		"last_seated_tick": last_seated,
 		"passengers": passengers.size(),
+		"admitted": queue.size(),
 		"seated": seated_count,
 		"blocked_ticks": blocked,
 		"walk_ticks": walk,
@@ -327,6 +380,65 @@ func result() -> Dictionary:
 		"strategy": strategy.to_dict(),
 		"warnings": warnings.duplicate(),
 	}
+
+
+# --- persistence (airport saves, D-021) -----------------------------------
+# Passenger fields are saved by the owner through Passenger.snapshot(); this
+# covers only the engine's own state. restore() takes the same passenger objects.
+
+func snapshot() -> Dictionary:
+	var ranks := {}
+	for id in _rank:
+		ranks[str(id)] = _rank[id]
+	var seats := {}
+	for key in seat_occupied:
+		seats[key] = seat_occupied[key]
+	var active_ids: Array = []
+	for p in active:
+		active_ids.append(p.id)
+	return {
+		"seed": seed_value, "strategy": strategy.to_dict(), "config": config.to_dict(),
+		"queue": Array(queue), "queue_index": queue_index, "aisle": Array(aisle),
+		"active": active_ids, "seat_occupied": seats, "tick": tick,
+		"seated_count": seated_count, "ticks_since_entry": ticks_since_entry,
+		"completed": completed, "closed": closed, "rank": ranks,
+		"warnings": Array(warnings),
+	}
+
+
+func restore(p_aircraft: AircraftDef, p_passengers: Array[Passenger], data: Dictionary) -> void:
+	aircraft = p_aircraft
+	passengers = p_passengers
+	config = SimConfig.from_dict(data.config)
+	strategy = BoardingStrategy.from_dict(data.strategy)
+	seed_value = int(data.seed)
+	_by_id.clear()
+	for p in passengers:
+		_by_id[p.id] = p
+	queue.clear()
+	for id in data.queue:
+		queue.append(int(id))
+	queue_index = int(data.queue_index)
+	aisle.clear()
+	for id in data.aisle:
+		aisle.append(int(id))
+	active.clear()
+	for id in data.active:
+		active.append(_by_id[int(id)])
+	seat_occupied.clear()
+	for key in data.seat_occupied:
+		seat_occupied[key] = int(data.seat_occupied[key])
+	_rank.clear()
+	for key in data.rank:
+		_rank[int(key)] = int(data.rank[key])
+	tick = int(data.tick)
+	seated_count = int(data.seated_count)
+	ticks_since_entry = int(data.ticks_since_entry)
+	completed = bool(data.completed)
+	closed = bool(data.closed)
+	warnings.clear()
+	for w in data.warnings:
+		warnings.append(str(w))
 
 
 static func format_ticks(ticks: int, tick_rate: int) -> String:

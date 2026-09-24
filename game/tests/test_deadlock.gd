@@ -42,6 +42,42 @@ func test_generated_scenarios_terminate() -> void:
 	print("      %d scenarios in %.1fs, longest %d ticks" % [runs, elapsed, max_ticks_seen])
 
 
+## M3: random admission schedules (some passengers never admitted) must always
+## terminate once boarding is closed.
+func test_incremental_admission_terminates() -> void:
+	var runs := 300
+	var env := OS.get_environment("BOARDING_DEADLOCK_RUNS")
+	if env != "":
+		runs = int(env)
+	var rng := SimRng.new(20260924, SimRng.STREAM_SCENARIO)
+	var cabins := ["narrowbody_30", "a220_26", "a321_37"]
+	for i in runs:
+		var aircraft := AircraftDef.load_by_id(cabins[i % cabins.size()])
+		var config := SimConfig.load_default()
+		var seed_value := rng.randi_range(1, 2_000_000_000)
+		var count := rng.randi_range(1, aircraft.capacity())
+		var passengers := PassengerGenerator.generate(aircraft, count, seed_value, config)
+		var pick := rng.randi_range(0, BoardingStrategy.PRESET_IDS.size())
+		var strat := BoardingStrategy.preset(BoardingStrategy.PRESET_IDS[pick], aircraft) if pick < BoardingStrategy.PRESET_IDS.size() else _random_custom(rng, aircraft.rows)
+		var sim := Simulation.new()
+		sim.setup_incremental(aircraft, passengers, strat, config, seed_value)
+		var pending: Array = []
+		for p in passengers:
+			if rng.randi_range(0, 9) > 0: pending.append(p.id)
+		rng.shuffle(pending)
+		while not pending.is_empty():
+			var batch := rng.randi_range(1, 12)
+			sim.admit(pending.slice(0, batch))
+			pending = pending.slice(batch)
+			for _t in rng.randi_range(0, 400): sim.step()
+		sim.close()
+		sim.run_to_completion(500_000)
+		if not sim.is_complete() or sim.seated_count != sim.queue.size():
+			failures.append("incremental deadlock: seed=%d cabin=%s count=%d tick=%d" % [seed_value, aircraft.id, count, sim.tick])
+			return
+		checks += 1
+
+
 static func _random_custom(rng: SimRng, rows: int) -> BoardingStrategy:
 	var groups: Array = []
 	var n := rng.randi_range(1, 5)

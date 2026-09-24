@@ -1,0 +1,1493 @@
+{
+	"runs": {
+		"carry_on_chaos_001/back_to_front/-1": {
+			"blocked_ticks": 258242,
+			"seat_wait_ticks": 12150,
+			"seated_hash": 4195553949,
+			"stow_ticks": 42368,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 13757,
+					"id": 133,
+					"obstruction_count": 2,
+					"seat": "23A"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 12196,
+					"id": 121,
+					"obstruction_count": 2,
+					"seat": "21A"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 10486,
+					"id": 126,
+					"obstruction_count": 2,
+					"seat": "21F"
+				}
+			],
+			"total_ticks": 23673,
+			"walk_ticks": 54558
+		},
+		"carry_on_chaos_001/back_to_front/1": {
+			"blocked_ticks": 275106,
+			"seat_wait_ticks": 13200,
+			"seated_hash": 2616147177,
+			"stow_ticks": 41919,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 10570,
+					"id": 134,
+					"obstruction_count": 1,
+					"seat": "23B"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 9739,
+					"id": 121,
+					"obstruction_count": 2,
+					"seat": "21A"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 9523,
+					"id": 139,
+					"obstruction_count": 1,
+					"seat": "24A"
+				}
+			],
+			"total_ticks": 25505,
+			"walk_ticks": 54593
+		},
+		"carry_on_chaos_001/back_to_front/2": {
+			"blocked_ticks": 290512,
+			"seat_wait_ticks": 14700,
+			"seated_hash": 741409915,
+			"stow_ticks": 41108,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 12373,
+					"id": 121,
+					"obstruction_count": 2,
+					"seat": "21A"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 11335,
+					"id": 151,
+					"obstruction_count": 1,
+					"seat": "26A"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 10308,
+					"id": 156,
+					"obstruction_count": 2,
+					"seat": "26F"
+				}
+			],
+			"total_ticks": 25850,
+			"walk_ticks": 54882
+		},
+		"carry_on_chaos_001/front_to_back/-1": {
+			"blocked_ticks": 258015,
+			"seat_wait_ticks": 12150,
+			"seated_hash": 322742117,
+			"stow_ticks": 42368,
+			"top_blockers": [
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 10467,
+					"id": 126,
+					"obstruction_count": 2,
+					"seat": "21F"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 9046,
+					"id": 121,
+					"obstruction_count": 1,
+					"seat": "21A"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 8676,
+					"id": 147,
+					"obstruction_count": 0,
+					"seat": "25C"
+				}
+			],
+			"total_ticks": 27028,
+			"walk_ticks": 54558
+		},
+		"carry_on_chaos_001/front_to_back/1": {
+			"blocked_ticks": 285627,
+			"seat_wait_ticks": 13200,
+			"seated_hash": 1772545419,
+			"stow_ticks": 41919,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 9869,
+					"id": 97,
+					"obstruction_count": 2,
+					"seat": "17A"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 9449,
+					"id": 132,
+					"obstruction_count": 1,
+					"seat": "22F"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 7826,
+					"id": 138,
+					"obstruction_count": 2,
+					"seat": "23F"
+				}
+			],
+			"total_ticks": 29749,
+			"walk_ticks": 54593
+		},
+		"carry_on_chaos_001/front_to_back/2": {
+			"blocked_ticks": 282476,
+			"seat_wait_ticks": 14700,
+			"seated_hash": 58750762,
+			"stow_ticks": 41108,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 12226,
+					"id": 121,
+					"obstruction_count": 2,
+					"seat": "21A"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 9924,
+					"id": 96,
+					"obstruction_count": 2,
+					"seat": "16F"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 9480,
+					"id": 144,
+					"obstruction_count": 2,
+					"seat": "24F"
+				}
+			],
+			"total_ticks": 28624,
+			"walk_ticks": 54882
+		},
+		"carry_on_chaos_001/random/-1": {
+			"blocked_ticks": 125087,
+			"seat_wait_ticks": 13050,
+			"seated_hash": 161081567,
+			"stow_ticks": 42368,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 6319,
+					"id": 79,
+					"obstruction_count": 1,
+					"seat": "14A"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 4886,
+					"id": 104,
+					"obstruction_count": 0,
+					"seat": "18B"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 4249,
+					"id": 90,
+					"obstruction_count": 2,
+					"seat": "15F"
+				}
+			],
+			"total_ticks": 19950,
+			"walk_ticks": 54558
+		},
+		"carry_on_chaos_001/random/1": {
+			"blocked_ticks": 127149,
+			"seat_wait_ticks": 12000,
+			"seated_hash": 425863324,
+			"stow_ticks": 41919,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 4497,
+					"id": 60,
+					"obstruction_count": 2,
+					"seat": "10F"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 3862,
+					"id": 53,
+					"obstruction_count": 1,
+					"seat": "9E"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 3812,
+					"id": 66,
+					"obstruction_count": 2,
+					"seat": "11F"
+				}
+			],
+			"total_ticks": 20438,
+			"walk_ticks": 54593
+		},
+		"carry_on_chaos_001/random/2": {
+			"blocked_ticks": 128792,
+			"seat_wait_ticks": 12900,
+			"seated_hash": 3775303148,
+			"stow_ticks": 41108,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 4740,
+					"id": 74,
+					"obstruction_count": 1,
+					"seat": "13B"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 4685,
+					"id": 65,
+					"obstruction_count": 1,
+					"seat": "11E"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 4047,
+					"id": 43,
+					"obstruction_count": 2,
+					"seat": "8A"
+				}
+			],
+			"total_ticks": 21578,
+			"walk_ticks": 54882
+		},
+		"carry_on_chaos_001/window_middle_aisle/-1": {
+			"blocked_ticks": 91016,
+			"seat_wait_ticks": 0,
+			"seated_hash": 678418074,
+			"stow_ticks": 42368,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 2379,
+					"id": 52,
+					"obstruction_count": 0,
+					"seat": "9D"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 2350,
+					"id": 48,
+					"obstruction_count": 0,
+					"seat": "8F"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 2151,
+					"id": 53,
+					"obstruction_count": 0,
+					"seat": "9E"
+				}
+			],
+			"total_ticks": 15801,
+			"walk_ticks": 54558
+		},
+		"carry_on_chaos_001/window_middle_aisle/1": {
+			"blocked_ticks": 94186,
+			"seat_wait_ticks": 0,
+			"seated_hash": 2192179195,
+			"stow_ticks": 41919,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 4196,
+					"id": 78,
+					"obstruction_count": 0,
+					"seat": "13F"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 3715,
+					"id": 84,
+					"obstruction_count": 0,
+					"seat": "14F"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 2932,
+					"id": 62,
+					"obstruction_count": 0,
+					"seat": "11B"
+				}
+			],
+			"total_ticks": 17498,
+			"walk_ticks": 54593
+		},
+		"carry_on_chaos_001/window_middle_aisle/2": {
+			"blocked_ticks": 91754,
+			"seat_wait_ticks": 0,
+			"seated_hash": 3085349681,
+			"stow_ticks": 41108,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 2971,
+					"id": 80,
+					"obstruction_count": 0,
+					"seat": "14B"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 2951,
+					"id": 71,
+					"obstruction_count": 0,
+					"seat": "12E"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 2773,
+					"id": 65,
+					"obstruction_count": 0,
+					"seat": "11E"
+				}
+			],
+			"total_ticks": 15865,
+			"walk_ticks": 54882
+		},
+		"medium_120/back_to_front/-1": {
+			"blocked_ticks": 93734,
+			"seat_wait_ticks": 6900,
+			"seated_hash": 459988652,
+			"stow_ticks": 16917,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 8671,
+					"id": 92,
+					"obstruction_count": 1,
+					"seat": "22E"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 6975,
+					"id": 94,
+					"obstruction_count": 1,
+					"seat": "23B"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 6052,
+					"id": 93,
+					"obstruction_count": 1,
+					"seat": "23A"
+				}
+			],
+			"total_ticks": 11770,
+			"walk_ticks": 35720
+		},
+		"medium_120/back_to_front/1": {
+			"blocked_ticks": 102125,
+			"seat_wait_ticks": 5100,
+			"seated_hash": 1797835718,
+			"stow_ticks": 18228,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 9653,
+					"id": 100,
+					"obstruction_count": 1,
+					"seat": "25F"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 7171,
+					"id": 96,
+					"obstruction_count": 1,
+					"seat": "24F"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 5476,
+					"id": 88,
+					"obstruction_count": 0,
+					"seat": "22D"
+				}
+			],
+			"total_ticks": 11194,
+			"walk_ticks": 35551
+		},
+		"medium_120/back_to_front/2": {
+			"blocked_ticks": 100155,
+			"seat_wait_ticks": 5700,
+			"seated_hash": 87936575,
+			"stow_ticks": 17696,
+			"top_blockers": [
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 10504,
+					"id": 96,
+					"obstruction_count": 2,
+					"seat": "23F"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 7223,
+					"id": 88,
+					"obstruction_count": 1,
+					"seat": "22A"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 4774,
+					"id": 44,
+					"obstruction_count": 2,
+					"seat": "11A"
+				}
+			],
+			"total_ticks": 11839,
+			"walk_ticks": 34341
+		},
+		"medium_120/front_to_back/-1": {
+			"blocked_ticks": 96725,
+			"seat_wait_ticks": 6000,
+			"seated_hash": 1657834497,
+			"stow_ticks": 16917,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 8701,
+					"id": 92,
+					"obstruction_count": 1,
+					"seat": "22E"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 6584,
+					"id": 53,
+					"obstruction_count": 2,
+					"seat": "14A"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 6272,
+					"id": 58,
+					"obstruction_count": 2,
+					"seat": "14F"
+				}
+			],
+			"total_ticks": 13418,
+			"walk_ticks": 35720
+		},
+		"medium_120/front_to_back/1": {
+			"blocked_ticks": 124040,
+			"seat_wait_ticks": 5400,
+			"seated_hash": 2179982380,
+			"stow_ticks": 18228,
+			"top_blockers": [
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 6831,
+					"id": 78,
+					"obstruction_count": 1,
+					"seat": "20B"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 6622,
+					"id": 55,
+					"obstruction_count": 2,
+					"seat": "14A"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 5294,
+					"id": 88,
+					"obstruction_count": 0,
+					"seat": "22D"
+				}
+			],
+			"total_ticks": 13813,
+			"walk_ticks": 35551
+		},
+		"medium_120/front_to_back/2": {
+			"blocked_ticks": 104166,
+			"seat_wait_ticks": 7200,
+			"seated_hash": 1756795841,
+			"stow_ticks": 17696,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 5841,
+					"id": 95,
+					"obstruction_count": 0,
+					"seat": "23E"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 5636,
+					"id": 89,
+					"obstruction_count": 1,
+					"seat": "22B"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 4410,
+					"id": 104,
+					"obstruction_count": 0,
+					"seat": "26C"
+				}
+			],
+			"total_ticks": 14578,
+			"walk_ticks": 34341
+		},
+		"medium_120/random/-1": {
+			"blocked_ticks": 66399,
+			"seat_wait_ticks": 6750,
+			"seated_hash": 4255070429,
+			"stow_ticks": 16917,
+			"top_blockers": [
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 4868,
+					"id": 76,
+					"obstruction_count": 2,
+					"seat": "19A"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 4535,
+					"id": 45,
+					"obstruction_count": 2,
+					"seat": "11F"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 3353,
+					"id": 66,
+					"obstruction_count": 1,
+					"seat": "16F"
+				}
+			],
+			"total_ticks": 11485,
+			"walk_ticks": 35720
+		},
+		"medium_120/random/1": {
+			"blocked_ticks": 34332,
+			"seat_wait_ticks": 4650,
+			"seated_hash": 1385452437,
+			"stow_ticks": 18228,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 3131,
+					"id": 34,
+					"obstruction_count": 1,
+					"seat": "8F"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 2662,
+					"id": 56,
+					"obstruction_count": 1,
+					"seat": "14B"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 1499,
+					"id": 24,
+					"obstruction_count": 0,
+					"seat": "6A"
+				}
+			],
+			"total_ticks": 9637,
+			"walk_ticks": 35551
+		},
+		"medium_120/random/2": {
+			"blocked_ticks": 40466,
+			"seat_wait_ticks": 6750,
+			"seated_hash": 23385384,
+			"stow_ticks": 17696,
+			"top_blockers": [
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 2444,
+					"id": 33,
+					"obstruction_count": 1,
+					"seat": "8A"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 1602,
+					"id": 15,
+					"obstruction_count": 1,
+					"seat": "4A"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 1562,
+					"id": 32,
+					"obstruction_count": 1,
+					"seat": "7F"
+				}
+			],
+			"total_ticks": 11409,
+			"walk_ticks": 34341
+		},
+		"medium_120/window_middle_aisle/-1": {
+			"blocked_ticks": 24481,
+			"seat_wait_ticks": 0,
+			"seated_hash": 2017690301,
+			"stow_ticks": 16917,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 1556,
+					"id": 23,
+					"obstruction_count": 0,
+					"seat": "6D"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 1119,
+					"id": 18,
+					"obstruction_count": 0,
+					"seat": "5D"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 877,
+					"id": 17,
+					"obstruction_count": 0,
+					"seat": "5A"
+				}
+			],
+			"total_ticks": 7898,
+			"walk_ticks": 35720
+		},
+		"medium_120/window_middle_aisle/1": {
+			"blocked_ticks": 25162,
+			"seat_wait_ticks": 0,
+			"seated_hash": 3186094903,
+			"stow_ticks": 18228,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 1663,
+					"id": 36,
+					"obstruction_count": 0,
+					"seat": "9C"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 1334,
+					"id": 61,
+					"obstruction_count": 0,
+					"seat": "15B"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 1110,
+					"id": 37,
+					"obstruction_count": 0,
+					"seat": "9E"
+				}
+			],
+			"total_ticks": 8368,
+			"walk_ticks": 35551
+		},
+		"medium_120/window_middle_aisle/2": {
+			"blocked_ticks": 33211,
+			"seat_wait_ticks": 0,
+			"seated_hash": 2889395672,
+			"stow_ticks": 17696,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 1725,
+					"id": 31,
+					"obstruction_count": 0,
+					"seat": "7E"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 1462,
+					"id": 59,
+					"obstruction_count": 0,
+					"seat": "14E"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 1428,
+					"id": 47,
+					"obstruction_count": 0,
+					"seat": "11D"
+				}
+			],
+			"total_ticks": 8991,
+			"walk_ticks": 34341
+		},
+		"prototype_full_001/back_to_front/-1": {
+			"blocked_ticks": 207138,
+			"seat_wait_ticks": 15150,
+			"seated_hash": 970053518,
+			"stow_ticks": 25280,
+			"top_blockers": [
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 10920,
+					"id": 151,
+					"obstruction_count": 2,
+					"seat": "26A"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 10568,
+					"id": 161,
+					"obstruction_count": 1,
+					"seat": "27E"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 9860,
+					"id": 133,
+					"obstruction_count": 1,
+					"seat": "23A"
+				}
+			],
+			"total_ticks": 20761,
+			"walk_ticks": 54808
+		},
+		"prototype_full_001/back_to_front/1": {
+			"blocked_ticks": 198095,
+			"seat_wait_ticks": 13200,
+			"seated_hash": 1701487084,
+			"stow_ticks": 26383,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 9688,
+					"id": 134,
+					"obstruction_count": 1,
+					"seat": "23B"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 8239,
+					"id": 144,
+					"obstruction_count": 1,
+					"seat": "24F"
+				},
+				{
+					"carry_on_count": 0,
+					"caused_blocked_ticks": 6526,
+					"id": 121,
+					"obstruction_count": 2,
+					"seat": "21A"
+				}
+			],
+			"total_ticks": 20072,
+			"walk_ticks": 54593
+		},
+		"prototype_full_001/back_to_front/2": {
+			"blocked_ticks": 219055,
+			"seat_wait_ticks": 14700,
+			"seated_hash": 3212029882,
+			"stow_ticks": 26862,
+			"top_blockers": [
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 12538,
+					"id": 156,
+					"obstruction_count": 2,
+					"seat": "26F"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 9643,
+					"id": 121,
+					"obstruction_count": 2,
+					"seat": "21A"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 9422,
+					"id": 138,
+					"obstruction_count": 2,
+					"seat": "23F"
+				}
+			],
+			"total_ticks": 20936,
+			"walk_ticks": 54882
+		},
+		"prototype_full_001/front_to_back/-1": {
+			"blocked_ticks": 215459,
+			"seat_wait_ticks": 15150,
+			"seated_hash": 3198570570,
+			"stow_ticks": 25280,
+			"top_blockers": [
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 10088,
+					"id": 139,
+					"obstruction_count": 2,
+					"seat": "24A"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 9474,
+					"id": 120,
+					"obstruction_count": 2,
+					"seat": "20F"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 7548,
+					"id": 127,
+					"obstruction_count": 1,
+					"seat": "22A"
+				}
+			],
+			"total_ticks": 23614,
+			"walk_ticks": 54808
+		},
+		"prototype_full_001/front_to_back/1": {
+			"blocked_ticks": 218178,
+			"seat_wait_ticks": 13200,
+			"seated_hash": 4213999174,
+			"stow_ticks": 26383,
+			"top_blockers": [
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 7659,
+					"id": 97,
+					"obstruction_count": 2,
+					"seat": "17A"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 7306,
+					"id": 138,
+					"obstruction_count": 2,
+					"seat": "23F"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 7012,
+					"id": 160,
+					"obstruction_count": 0,
+					"seat": "27D"
+				}
+			],
+			"total_ticks": 23829,
+			"walk_ticks": 54593
+		},
+		"prototype_full_001/front_to_back/2": {
+			"blocked_ticks": 223999,
+			"seat_wait_ticks": 14700,
+			"seated_hash": 1054894558,
+			"stow_ticks": 26862,
+			"top_blockers": [
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 9496,
+					"id": 121,
+					"obstruction_count": 2,
+					"seat": "21A"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 9080,
+					"id": 144,
+					"obstruction_count": 2,
+					"seat": "24F"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 8007,
+					"id": 145,
+					"obstruction_count": 1,
+					"seat": "25A"
+				}
+			],
+			"total_ticks": 23683,
+			"walk_ticks": 54882
+		},
+		"prototype_full_001/random/-1": {
+			"blocked_ticks": 95551,
+			"seat_wait_ticks": 14400,
+			"seated_hash": 3286800018,
+			"stow_ticks": 25280,
+			"top_blockers": [
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 5947,
+					"id": 79,
+					"obstruction_count": 2,
+					"seat": "14A"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 4395,
+					"id": 80,
+					"obstruction_count": 1,
+					"seat": "14B"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 3936,
+					"id": 43,
+					"obstruction_count": 2,
+					"seat": "8A"
+				}
+			],
+			"total_ticks": 16134,
+			"walk_ticks": 54808
+		},
+		"prototype_full_001/random/1": {
+			"blocked_ticks": 95820,
+			"seat_wait_ticks": 12000,
+			"seated_hash": 2684042950,
+			"stow_ticks": 26383,
+			"top_blockers": [
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 4020,
+					"id": 60,
+					"obstruction_count": 2,
+					"seat": "10F"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 3822,
+					"id": 96,
+					"obstruction_count": 1,
+					"seat": "16F"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 3192,
+					"id": 36,
+					"obstruction_count": 2,
+					"seat": "6F"
+				}
+			],
+			"total_ticks": 16652,
+			"walk_ticks": 54593
+		},
+		"prototype_full_001/random/2": {
+			"blocked_ticks": 93218,
+			"seat_wait_ticks": 12900,
+			"seated_hash": 1419333525,
+			"stow_ticks": 26862,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 4220,
+					"id": 74,
+					"obstruction_count": 1,
+					"seat": "13B"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 3255,
+					"id": 65,
+					"obstruction_count": 1,
+					"seat": "11E"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 3182,
+					"id": 42,
+					"obstruction_count": 2,
+					"seat": "7F"
+				}
+			],
+			"total_ticks": 17628,
+			"walk_ticks": 54882
+		},
+		"prototype_full_001/window_middle_aisle/-1": {
+			"blocked_ticks": 50543,
+			"seat_wait_ticks": 0,
+			"seated_hash": 1358949199,
+			"stow_ticks": 25280,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 2312,
+					"id": 57,
+					"obstruction_count": 0,
+					"seat": "10C"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 2121,
+					"id": 50,
+					"obstruction_count": 0,
+					"seat": "9B"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 1971,
+					"id": 53,
+					"obstruction_count": 0,
+					"seat": "9E"
+				}
+			],
+			"total_ticks": 12488,
+			"walk_ticks": 54808
+		},
+		"prototype_full_001/window_middle_aisle/1": {
+			"blocked_ticks": 55557,
+			"seat_wait_ticks": 0,
+			"seated_hash": 4240086180,
+			"stow_ticks": 26383,
+			"top_blockers": [
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 2508,
+					"id": 78,
+					"obstruction_count": 0,
+					"seat": "13F"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 2492,
+					"id": 62,
+					"obstruction_count": 0,
+					"seat": "11B"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 2382,
+					"id": 84,
+					"obstruction_count": 0,
+					"seat": "14F"
+				}
+			],
+			"total_ticks": 13253,
+			"walk_ticks": 54593
+		},
+		"prototype_full_001/window_middle_aisle/2": {
+			"blocked_ticks": 53085,
+			"seat_wait_ticks": 0,
+			"seated_hash": 3209980817,
+			"stow_ticks": 26862,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 2471,
+					"id": 71,
+					"obstruction_count": 0,
+					"seat": "12E"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 1409,
+					"id": 31,
+					"obstruction_count": 0,
+					"seat": "6A"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 1393,
+					"id": 64,
+					"obstruction_count": 0,
+					"seat": "11D"
+				}
+			],
+			"total_ticks": 12424,
+			"walk_ticks": 54882
+		},
+		"tutorial_060/back_to_front/-1": {
+			"blocked_ticks": 42351,
+			"seat_wait_ticks": 1350,
+			"seated_hash": 3739423825,
+			"stow_ticks": 8516,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 4958,
+					"id": 51,
+					"obstruction_count": 0,
+					"seat": "24D"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 4095,
+					"id": 27,
+					"obstruction_count": 1,
+					"seat": "14E"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 3882,
+					"id": 26,
+					"obstruction_count": 0,
+					"seat": "14D"
+				}
+			],
+			"total_ticks": 5040,
+			"walk_ticks": 18024
+		},
+		"tutorial_060/back_to_front/1": {
+			"blocked_ticks": 16374,
+			"seat_wait_ticks": 1350,
+			"seated_hash": 67936950,
+			"stow_ticks": 8623,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 1465,
+					"id": 43,
+					"obstruction_count": 0,
+					"seat": "21A"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 925,
+					"id": 35,
+					"obstruction_count": 0,
+					"seat": "16F"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 921,
+					"id": 53,
+					"obstruction_count": 1,
+					"seat": "28A"
+				}
+			],
+			"total_ticks": 4513,
+			"walk_ticks": 16466
+		},
+		"tutorial_060/back_to_front/2": {
+			"blocked_ticks": 45612,
+			"seat_wait_ticks": 1350,
+			"seated_hash": 69940812,
+			"stow_ticks": 8768,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 6899,
+					"id": 46,
+					"obstruction_count": 1,
+					"seat": "22B"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 5098,
+					"id": 35,
+					"obstruction_count": 1,
+					"seat": "16F"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 3651,
+					"id": 42,
+					"obstruction_count": 0,
+					"seat": "21A"
+				}
+			],
+			"total_ticks": 5430,
+			"walk_ticks": 16948
+		},
+		"tutorial_060/front_to_back/-1": {
+			"blocked_ticks": 41625,
+			"seat_wait_ticks": 1950,
+			"seated_hash": 4123556937,
+			"stow_ticks": 8516,
+			"top_blockers": [
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 4169,
+					"id": 27,
+					"obstruction_count": 1,
+					"seat": "14E"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 3940,
+					"id": 26,
+					"obstruction_count": 0,
+					"seat": "14D"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 3193,
+					"id": 33,
+					"obstruction_count": 0,
+					"seat": "18B"
+				}
+			],
+			"total_ticks": 7115,
+			"walk_ticks": 18024
+		},
+		"tutorial_060/front_to_back/1": {
+			"blocked_ticks": 28617,
+			"seat_wait_ticks": 1650,
+			"seated_hash": 1204590972,
+			"stow_ticks": 8623,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 4429,
+					"id": 30,
+					"obstruction_count": 1,
+					"seat": "13F"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 3850,
+					"id": 43,
+					"obstruction_count": 1,
+					"seat": "21A"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 2481,
+					"id": 38,
+					"obstruction_count": 0,
+					"seat": "18F"
+				}
+			],
+			"total_ticks": 6989,
+			"walk_ticks": 16466
+		},
+		"tutorial_060/front_to_back/2": {
+			"blocked_ticks": 46698,
+			"seat_wait_ticks": 1200,
+			"seated_hash": 2011243555,
+			"stow_ticks": 8768,
+			"top_blockers": [
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 5443,
+					"id": 38,
+					"obstruction_count": 1,
+					"seat": "18E"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 5018,
+					"id": 28,
+					"obstruction_count": 1,
+					"seat": "13F"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 4528,
+					"id": 35,
+					"obstruction_count": 1,
+					"seat": "16F"
+				}
+			],
+			"total_ticks": 7386,
+			"walk_ticks": 16948
+		},
+		"tutorial_060/random/-1": {
+			"blocked_ticks": 18297,
+			"seat_wait_ticks": 2250,
+			"seated_hash": 1249066082,
+			"stow_ticks": 8516,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 2527,
+					"id": 12,
+					"obstruction_count": 1,
+					"seat": "6A"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 1782,
+					"id": 17,
+					"obstruction_count": 1,
+					"seat": "8B"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 1364,
+					"id": 23,
+					"obstruction_count": 0,
+					"seat": "11C"
+				}
+			],
+			"total_ticks": 5143,
+			"walk_ticks": 18024
+		},
+		"tutorial_060/random/1": {
+			"blocked_ticks": 16915,
+			"seat_wait_ticks": 1800,
+			"seated_hash": 674521815,
+			"stow_ticks": 8623,
+			"top_blockers": [
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 2732,
+					"id": 27,
+					"obstruction_count": 1,
+					"seat": "12F"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 1420,
+					"id": 12,
+					"obstruction_count": 2,
+					"seat": "3F"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 1019,
+					"id": 13,
+					"obstruction_count": 1,
+					"seat": "4A"
+				}
+			],
+			"total_ticks": 6081,
+			"walk_ticks": 16466
+		},
+		"tutorial_060/random/2": {
+			"blocked_ticks": 17905,
+			"seat_wait_ticks": 1200,
+			"seated_hash": 1800417858,
+			"stow_ticks": 8768,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 1592,
+					"id": 11,
+					"obstruction_count": 1,
+					"seat": "4F"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 1525,
+					"id": 8,
+					"obstruction_count": 1,
+					"seat": "4A"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 1036,
+					"id": 28,
+					"obstruction_count": 1,
+					"seat": "13F"
+				}
+			],
+			"total_ticks": 5512,
+			"walk_ticks": 16948
+		},
+		"tutorial_060/window_middle_aisle/-1": {
+			"blocked_ticks": 12459,
+			"seat_wait_ticks": 0,
+			"seated_hash": 2923216527,
+			"stow_ticks": 8516,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 1216,
+					"id": 14,
+					"obstruction_count": 0,
+					"seat": "6D"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 1019,
+					"id": 20,
+					"obstruction_count": 0,
+					"seat": "8F"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 817,
+					"id": 6,
+					"obstruction_count": 0,
+					"seat": "4C"
+				}
+			],
+			"total_ticks": 4361,
+			"walk_ticks": 18024
+		},
+		"tutorial_060/window_middle_aisle/1": {
+			"blocked_ticks": 8942,
+			"seat_wait_ticks": 0,
+			"seated_hash": 2556205354,
+			"stow_ticks": 8623,
+			"top_blockers": [
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 681,
+					"id": 15,
+					"obstruction_count": 0,
+					"seat": "4F"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 677,
+					"id": 8,
+					"obstruction_count": 0,
+					"seat": "3A"
+				},
+				{
+					"carry_on_count": 1,
+					"caused_blocked_ticks": 642,
+					"id": 20,
+					"obstruction_count": 0,
+					"seat": "7F"
+				}
+			],
+			"total_ticks": 4763,
+			"walk_ticks": 16466
+		},
+		"tutorial_060/window_middle_aisle/2": {
+			"blocked_ticks": 21128,
+			"seat_wait_ticks": 0,
+			"seated_hash": 4044443998,
+			"stow_ticks": 8768,
+			"top_blockers": [
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 2179,
+					"id": 22,
+					"obstruction_count": 0,
+					"seat": "10E"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 1757,
+					"id": 16,
+					"obstruction_count": 0,
+					"seat": "7F"
+				},
+				{
+					"carry_on_count": 2,
+					"caused_blocked_ticks": 1378,
+					"id": 34,
+					"obstruction_count": 0,
+					"seat": "16E"
+				}
+			],
+			"total_ticks": 5348,
+			"walk_ticks": 16948
+		}
+	},
+	"sim_version": "0.1.0"
+}

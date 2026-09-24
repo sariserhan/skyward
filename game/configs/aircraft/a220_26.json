@@ -1,0 +1,9 @@
+{
+  "id": "a220_26",
+  "display_name": "A220 (26 rows, 2-3)",
+  "rows": 26,
+  "seats_per_row": 5,
+  "aisle_count": 1,
+  "boarding_doors": ["front"],
+  "seat_layout": "AB|CDE"
+}

@@ -2,7 +2,11 @@ class_name PassengerFlow
 extends RefCounted
 ## Events are scheduled on the airport's integer clock, not a second clock.
 const JOURNEY_STATES := ["not_arrived", "walking_to_check_in", "check_in", "walking_to_security",
-	"security_queue", "security_processing", "walking_to_gate", "waiting_at_gate", "route_blocked"]
+	"security_queue", "security_processing", "walking_to_gate", "waiting_at_gate", "route_blocked",
+	"boarding", "on_aircraft", "departed", "missed_flight"]
+## Journey states with no pending terminal event (the passenger is not moving).
+const RESTING_STATES := ["waiting_at_gate", "security_queue", "route_blocked",
+	"boarding", "on_aircraft", "departed", "missed_flight"]
 var airport: AirportState
 var events: AirportEvents
 var graph := TerminalGraph.new()
@@ -12,6 +16,8 @@ var sequence: int = 0
 var counts: Dictionary = {}
 var rng := SimRng.new(0)
 var ready_by_flight: Dictionary = {}
+## Passenger ids that reached their gate this tick, drained by boarding each tick.
+var gate_arrivals: Array = []
 
 func bind(state: AirportState, event_bus: AirportEvents, settings: Dictionary) -> void:
 	airport = state
@@ -19,9 +25,15 @@ func bind(state: AirportState, event_bus: AirportEvents, settings: Dictionary) -
 	config = settings.duplicate(true)
 	graph.setup(config.get("graph", {}))
 
-func generate(seed_value: int, now: int, flights: Array[AirportFlight]) -> void:
+## `cabins` maps aircraft type -> AircraftDef for types that board in the cabin
+## engine; their passengers get seats and boarding-tick durations from a
+## separate RNG stream so terminal-flow draws are unchanged.
+func generate(seed_value: int, now: int, flights: Array[AirportFlight], cabins: Dictionary = {},
+		cabin_config: SimConfig = null, gate_close_offset: int = 0) -> void:
 	if config.is_empty(): return
 	rng = SimRng.new(seed_value, SimRng.STREAM_PASSENGERS)
+	var cabin_rng := SimRng.new(seed_value, SimRng.STREAM_CABIN)
+	var load_rng := SimRng.new(seed_value, SimRng.STREAM_LOAD)
 	for data in config.checkpoints:
 		var checkpoint := SecurityCheckpoint.new()
 		checkpoint.restore(data)
@@ -29,7 +41,16 @@ func generate(seed_value: int, now: int, flights: Array[AirportFlight]) -> void:
 	var next_id := 1
 	for f in flights:
 		var aircraft: AirportAircraft = airport.aircraft[f.aircraft_id]
-		var count := int(aircraft.seat_capacity * int(config.load_permille) / 1000)
+		# Always draw, so an explicit override does not shift other flights' loads.
+		var drawn := _draw_load(f, load_rng)
+		if f.load_permille < 0: f.load_permille = drawn
+		var count := int(aircraft.seat_capacity * f.load_permille / 1000)
+		var seats: Array = []
+		if cabins.has(aircraft.aircraft_type_id):
+			var cabin: AircraftDef = cabins[aircraft.aircraft_type_id]
+			seats = cabin.all_seats()
+			cabin_rng.shuffle(seats)
+			count = mini(count, seats.size())
 		var earliest := maxi(now + 1, f.scheduled_departure - int(config.arrival_lead_max_ticks))
 		var latest := maxi(earliest, f.scheduled_departure - int(config.arrival_lead_min_ticks))
 		ready_by_flight[f.id] = 0
@@ -46,10 +67,27 @@ func generate(seed_value: int, now: int, flights: Array[AirportFlight]) -> void:
 			p.arrival_time_at_airport = rng.randi_range(earliest, latest)
 			p.gate_target_tick = f.scheduled_departure - int(config.gate_target_buffer_ticks)
 			p.security_checkpoint_id = _choose_checkpoint(f.assigned_gate_id)
+			if i >= count - f.late_passengers:
+				# Demonstration: reaches the airport as the gate closes.
+				p.arrival_time_at_airport = maxi(now + 1, f.scheduled_departure - gate_close_offset)
+			if not seats.is_empty():
+				var cabin: AircraftDef = cabins[aircraft.aircraft_type_id]
+				p.seat_row = seats[i][0]
+				p.seat_letter = seats[i][1]
+				p.seat_type = cabin.seat_type_of(p.seat_letter)
+				p.side = cabin.side_of(p.seat_letter)
+				PassengerGenerator.apply_cabin_timing(p, cabin_config, cabin_rng)
 			airport.passengers[str(p.id)] = p
 			f.passenger_ids.append(p.id)
 			counts["not_arrived"] = int(counts.get("not_arrived", 0)) + 1
 			_schedule(p, p.arrival_time_at_airport, "arrive")
+
+## Load factor in permille: the airline's range, else the scenario range, else
+## the flat scenario default.
+func _draw_load(f: AirportFlight, load_rng: SimRng) -> int:
+	var bounds: Array = config.get("airline_load_permille_ranges", {}).get(f.airline_id, config.get("load_permille_range", []))
+	if bounds.size() != 2: return int(config.load_permille)
+	return load_rng.randi_range(int(bounds[0]), int(bounds[1]))
 
 func _choose_checkpoint(gate: String) -> String:
 	var best := ""
@@ -90,6 +128,12 @@ func step(now: int) -> void:
 			"security":
 				_finish_security(p, now)
 
+## Journey transitions made by boarding. Keeps counts and gate-ready caches exact.
+func set_journey_state(p: Passenger, state: String) -> void:
+	if p.airport_state == "waiting_at_gate" and state != "waiting_at_gate":
+		ready_by_flight[p.current_flight_id] = int(ready_by_flight[p.current_flight_id]) - 1
+	_set_state(p, state)
+
 func _set_state(p: Passenger, state: String) -> void:
 	counts[p.airport_state] = int(counts.get(p.airport_state, 0)) - 1
 	p.airport_state = state
@@ -122,8 +166,14 @@ func _continue_walk(p: Passenger, now: int) -> void:
 				_emit(now, "PASSENGER_SECURITY_ENTER", p, {"checkpoint": cp.id})
 				_dispatch(cp, now)
 			"walking_to_gate":
-				_set_state(p, "waiting_at_gate")
 				p.gate_arrival_time = now
+				if not p.missed_flight_id.is_empty():
+					# The gate closed while they were on the way: they arrive, never board.
+					_set_state(p, "missed_flight")
+					_emit(now, "PASSENGER_GATE_ARRIVE", p, {"gate_id": p.current_location, "missed_flight": true})
+					return
+				_set_state(p, "waiting_at_gate")
+				gate_arrivals.append(p.id)
 				ready_by_flight[p.current_flight_id] = int(ready_by_flight.get(p.current_flight_id, 0)) + 1
 				p.risk_flags.erase("late_to_gate")
 				if now > p.gate_target_tick: p.risk_flags.append("late_to_gate")

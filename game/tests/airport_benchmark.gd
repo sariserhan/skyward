@@ -18,9 +18,12 @@ func _initialize() -> void:
 		sim.setup(config)
 		var ticks := 144000 if count == 24 else 216000
 		var start := Time.get_ticks_usec()
-		sim.advance(ticks)
+		var worst := 0
+		for _i in ticks:
+			sim.step()
+			worst = maxi(worst, sim.last_tick_usec)
 		var elapsed := Time.get_ticks_usec() - start
-		print("%d flights / %d ticks: %.3f s, %.2f us/tick, departed %d, events %d" % [count, ticks, elapsed / 1000000.0, float(elapsed) / ticks, sim.metrics().departed, sim.events.history.size()])
+		print("%d flights / %d ticks: %.3f s, %.2f us/tick, worst tick %d us, departed %d, events %d" % [count, ticks, elapsed / 1000000.0, float(elapsed) / ticks, worst, sim.metrics().departed, sim.events.history.size()])
 		if count == 24 and sim.metrics().departed != 24:
 			push_error("Default schedule did not finish within four hours")
 			quit(1)

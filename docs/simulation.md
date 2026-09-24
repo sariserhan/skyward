@@ -28,7 +28,58 @@ A caller can reproduce them at the recorded tick; a replay player UI is deferred
 ## Flight transitions
 
 `scheduled → approaching → landed → taxiing_in → at_gate → turnaround →
-ready_for_pushback → taxiing_out → departed`
+boarding → ready_for_pushback → taxiing_out → departed`
+
+Since M3, `turnaround` is only the service before boarding (placeholder until M4
+tasks). `boarding` runs its own phases, `scheduled → open → closed → complete`:
+
+- When service finishes at tick *s*, the departure target becomes
+  `max(D, s + 30 min)`, where D is the scheduled takeoff.
+- Boarding opens at target − 30 min and the gate closes at target − 10 min
+  (config `boarding.*`). An on-time aircraft therefore opens at D-30 and closes
+  at D-10. A late one shifts the whole window and opens on the tick service
+  ends.
+- The gate closes early as soon as the whole manifest is aboard: seated for
+  cabin flights, or at the gate for the widebody abstraction. Otherwise it
+  closes at the scheduled time and the hold decision stays with the player.
+- At close:
+  - Cabin flights stop admitting and complete once everyone admitted is seated.
+  - Widebody flights (boarding abstraction) board everyone at the gate
+    instantly.
+  - Every other manifest passenger is flagged missed.
+- Pushback happens once boarding is complete, but never before
+  `D + hold used − taxi-out − takeoff`. An on-time flight never leaves early. A
+  late aircraft that boards quickly does not wait out its shifted window, so
+  efficient boarding recovers delay.
+
+**Holds.** `hold_flight` adds `hold_increment_ticks` (5 min) to both the close
+time and the target, up to `max_hold_ticks` (15 min). It is only available while
+the gate is open and never automatic. `close_gate` closes now and cancels unused
+hold time.
+
+**Boarding delay attribution.** At pushback *P*, lateness beyond the scheduled
+pushback `D − exit` is split additively:
+
+- first `passenger_hold`: the hold time actually used
+- then `boarding`: the cabin still boarding after both the pushback floor and
+  gate close
+
+A gate kept open for missing passengers in a late aircraft's shifted window is
+explained by the upstream causes: gate wait, landing queue and turnaround
+variation.
+
+**Loads and cabin calibration (D-024).** Each flight's load is an explicit
+`load_permille`, or else drawn once from `SimRng.STREAM_LOAD` within its
+airline's `airline_load_permille_ranges`, or else within the scenario's
+`load_permille_range`. The resolved value is stored on the flight. Riverdale
+boards with airport-only cabin timings (`boarding.sim_config_overrides`):
+
+- 3.3 s between door entries
+- 1.8 s per row walked
+- 8 s + 10 s per bag to stow
+- 11 s per seated passenger who must get up
+
+The standalone game keeps `sim_config.json`.
 
 A flight requests landing to target its scheduled arrival. Actual arrival means
 landing completion. Taxi-in follows. An occupied gate leaves the incoming flight
@@ -46,9 +97,11 @@ late because landing shares the runway with takeoff.
 
 Default game durations: landing 70 seconds, takeoff 55 seconds, separation 40
 seconds, taxi-in/out 180 seconds. These are gameplay settings, not real-world
-operating procedure. Turnaround baselines are A220 25, 737 35, A321 40, 787 55
-minutes, with 0–2 minutes seeded variation. The deliberately compressed waves
-make gate conflicts possible without passengers.
+operating procedure. Service before boarding is A220 12, 737 15, A321 17 and
+787 20 minutes, with 0–2 minutes of seeded variation. The morning starts at
+05:15. Three waves arrive 50 minutes apart, with arrival-to-takeoff block times
+of 48–56 minutes (D-023). Gate reuse stays tight, so late aircraft and holds
+still cascade.
 
 ## Gates, estimates and delay causes
 

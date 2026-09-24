@@ -18,18 +18,20 @@ func _process(_delta: float) -> bool:
 	match frame:
 		2:
 			main.sim.clock.paused = true
-			main.sim.advance(12000)
+			main.sim.advance(228000 - main.sim.clock.tick)  # 06:20
+			var east: SecurityCheckpoint = main.sim.airport.security_checkpoints.east
+			var before := [east.staff, east.open_lanes]
 			main.view_tabs.current_tab = 1
 			main.operations_tabs.current_tab = 1
 			main._refresh()
 			main.security_buttons.east[3].pressed.emit()
 			main.security_buttons.east[1].pressed.emit()
-			check(main.sim.airport.security_checkpoints.east.staff == 2, "staff button assigns staff")
-			check(main.sim.airport.security_checkpoints.east.open_lanes == 2, "lane button opens lane")
-			main.security_buttons.west[0].pressed.emit()
-			main.security_buttons.west[0].pressed.emit()
+			check(east.staff == before[0] + 1, "staff button assigns staff")
+			check(east.open_lanes == before[1] + 1, "lane button opens lane")
+			for _i in main.sim.airport.security_checkpoints.west.max_lanes:
+				main.security_buttons.west[0].pressed.emit()
 			check(main.sim.airport.security_checkpoints.west.open_lanes == 0, "lane controls can close checkpoint")
-			main.sim.advance(130)
+			main.sim.advance(main.sim.airport.security_checkpoints.west.service_ticks + 10)
 			check(main.sim.airport.security_checkpoints.west.active.is_empty(), "closed checkpoint drains screening")
 			main._refresh()
 		4:

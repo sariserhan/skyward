@@ -18,6 +18,11 @@ static func valid(data: Dictionary) -> bool:
 	for key in ["load_permille", "arrival_lead_min_ticks", "arrival_lead_max_ticks", "gate_target_buffer_ticks", "check_in_ticks", "staff_pool"]:
 		if not settings.get(key) is int or settings[key] < 0: return false
 	if not settings.get("graph") is Dictionary: return false
+	var ranges: Array = settings.get("airline_load_permille_ranges", {}).values()
+	if settings.has("load_permille_range"): ranges.append(settings.load_permille_range)
+	for bounds in ranges:
+		if not bounds is Array or bounds.size() != 2 or not bounds[0] is int or not bounds[1] is int: return false
+		if bounds[0] < 0 or bounds[0] > bounds[1] or bounds[1] > 1000: return false
 	var graph_data: Dictionary = settings.graph
 	if not graph_data.get("nodes") is Dictionary or not graph_data.get("edges") is Array: return false
 	for node in ["entrance", "check_in"]:
@@ -101,7 +106,7 @@ static func valid(data: Dictionary) -> bool:
 		var p = state.passengers[key]
 		if p.airport_state in ["security_queue", "security_processing"] and not in_security.has(key): return false
 		if (p.flow_due_tick >= 0) != scheduled.has(key): return false
-		if not p.airport_state in ["waiting_at_gate", "security_queue", "route_blocked"] and not scheduled.has(key): return false
+		if not p.airport_state in PassengerFlow.RESTING_STATES and not scheduled.has(key): return false
 	return true
 
 static func _security_member(state: Dictionary, id: Variant, checkpoint: String, phase: String, seen: Dictionary) -> bool:

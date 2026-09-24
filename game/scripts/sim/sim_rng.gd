@@ -8,6 +8,10 @@ extends RefCounted
 const STREAM_PASSENGERS := 0x1001
 const STREAM_STRATEGY := 0x2002
 const STREAM_SCENARIO := 0x3003
+## Airport seat and cabin-timing draws, separate so terminal flow (M2) is unchanged.
+const STREAM_CABIN := 0x4004
+## Per-flight airport load factors, one draw per flight in scenario order.
+const STREAM_LOAD := 0x5005
 
 var _rng := RandomNumberGenerator.new()
 

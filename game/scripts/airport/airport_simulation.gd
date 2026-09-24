@@ -1,10 +1,24 @@
 class_name AirportSimulation
 extends RefCounted
-## One world, one clock. M1 deliberately uses timed turnarounds.
-const SAVE_VERSION := 2
+## One world, one clock. Cabin flights board through the preserved boarding
+## engine (M3); widebodies use the widebody boarding abstraction (D-022).
+const SAVE_VERSION := 3
 const CONFIG_PATH := "res://configs/airports/riverdale.json"
 const STATES := ["scheduled", "approaching", "landed", "taxiing_in", "at_gate",
-	"turnaround", "ready_for_pushback", "taxiing_out", "departed"]
+	"turnaround", "boarding", "ready_for_pushback", "taxiing_out", "departed"]
+## Statuses during which a flight owns its gate.
+const AT_GATE_STATES := ["at_gate", "turnaround", "boarding", "ready_for_pushback"]
+const BOARDING_PHASES := ["", "scheduled", "open", "closed", "complete"]
+## Airport-tick defaults when a scenario has no "boarding" block (D-017).
+const BOARDING_DEFAULTS := {
+	"open_before_departure_ticks": 18000,
+	"gate_close_before_departure_ticks": 6000,
+	"close_warning_ticks": 1800,
+	"hold_increment_ticks": 3000,
+	"max_hold_ticks": 9000,
+	"default_strategy": "random",
+	"boarding_ticks_per_airport_tick": 3,
+}
 var airport := AirportState.new()
 var clock := AirportClock.new()
 var events := AirportEvents.new()
@@ -16,6 +30,12 @@ var decisions: Array = []
 var conflicts: Dictionary = {}
 var last_tick_usec: int = 0
 var flight_order: Array[AirportFlight] = []
+## Active cabin boarding sessions by flight id (open until pushback).
+var boarding_sessions: Dictionary = {}
+## Cabin layouts by cabin config id, and by aircraft type for cabin-boarding types.
+var cabins: Dictionary = {}
+var cabins_by_type: Dictionary = {}
+var cabin_config: SimConfig = SimConfig.load_default()
 
 func setup(scenario: Dictionary = {}, seed_override: int = -1) -> void:
 	config = (JsonUtil.load_file(CONFIG_PATH) if scenario.is_empty() else scenario).duplicate(true)
@@ -27,6 +47,8 @@ func setup(scenario: Dictionary = {}, seed_override: int = -1) -> void:
 	decisions = []
 	conflicts = {}
 	flight_order = []
+	boarding_sessions = {}
+	_load_cabins()
 	clock.tick = int(config.start_tick)
 	airport.name = config.name
 	airport.airlines = config.airlines.duplicate(true)
@@ -46,16 +68,43 @@ func setup(scenario: Dictionary = {}, seed_override: int = -1) -> void:
 		aircraft.required_gate_type = definition["class"]
 		aircraft.seat_capacity = int(definition.seats)
 		flight.aircraft_id = aircraft.id
-		flight.turnaround_ticks = int(definition.turnaround_ticks) + rng.randi_range(0, int(config.turnaround_variation_ticks))
+		if cabins_by_type.has(data.aircraft_type):
+			flight.boarding_mode = "cabin"
+			aircraft.seat_map = definition.cabin
+		if flight.boarding_strategy.is_empty():
+			flight.boarding_strategy = str(_boarding("default_strategy"))
+		# M3: the timer covers service before boarding only; boarding itself is
+		# simulated (cabin) or abstracted (widebody). M4 replaces it with tasks.
+		var service := int(definition.get("service_before_boarding_ticks", definition.turnaround_ticks))
+		flight.turnaround_ticks = service + rng.randi_range(0, int(config.turnaround_variation_ticks))
 		airport.aircraft[aircraft.id] = aircraft
 		airport.flights[flight.id] = flight
 		flight_order.append(flight)
-		var variation := flight.turnaround_ticks - int(definition.turnaround_ticks)
+		var variation := flight.turnaround_ticks - service
 		if variation > 0: _add_delay(flight, "turnaround_variation", variation)
 	events.record(clock.tick, "SCENARIO_STARTED", "", {"seed": seed_value, "scenario": config.id})
 	passenger_flow = PassengerFlow.new()
 	passenger_flow.bind(airport, events, config.get("passenger_flow", {}))
-	passenger_flow.generate(seed_value, clock.tick, flight_order)
+	passenger_flow.generate(seed_value, clock.tick, flight_order, cabins_by_type, cabin_config,
+		int(_boarding("gate_close_before_departure_ticks")))
+
+func _boarding(key: String) -> Variant:
+	return config.get("boarding", {}).get(key, BOARDING_DEFAULTS[key])
+
+## Cabin definitions for aircraft types that board in the engine (D-014). The
+## engine tick rate must be an exact multiple of the airport rate (D-015).
+func _load_cabins() -> void:
+	cabins = {}
+	cabins_by_type = {}
+	cabin_config = SimConfig.load_default()
+	cabin_config.apply_overrides(config.get("boarding", {}).get("sim_config_overrides", {}))
+	var ratio := int(_boarding("boarding_ticks_per_airport_tick"))
+	assert(cabin_config.tick_rate == ratio * AirportClock.TICKS_PER_SECOND, "boarding/airport tick ratio mismatch")
+	for type_id in config.aircraft_types:
+		var cabin_id := str(config.aircraft_types[type_id].get("cabin", ""))
+		if cabin_id.is_empty(): continue
+		if not cabins.has(cabin_id): cabins[cabin_id] = AircraftDef.load_by_id(cabin_id)
+		cabins_by_type[type_id] = cabins[cabin_id]
 
 func step() -> void:
 	var started := Time.get_ticks_usec()
@@ -65,6 +114,7 @@ func step() -> void:
 		_update_flight(flight)
 	_start_runway()
 	passenger_flow.step(clock.tick)
+	_step_boarding()
 	if clock.tick % AirportClock.TICKS_PER_SECOND == 0:
 		_update_conflicts()
 	last_tick_usec = Time.get_ticks_usec() - started
@@ -104,14 +154,14 @@ func _update_flight(f: AirportFlight) -> void:
 			_transition(f, "turnaround", f.turnaround_ticks + f.forced_delay_ticks)
 		"turnaround":
 			if clock.tick >= f.due_tick:
-				_transition(f, "ready_for_pushback")
+				_schedule_boarding(f)
+				_transition(f, "boarding")
+				# A late aircraft opens boarding on this same tick.
+				_update_boarding(f)
+		"boarding":
+			_update_boarding(f)
 		"ready_for_pushback":
-			if clock.tick >= f.scheduled_departure - int(config.taxi_out_ticks) - int(config.takeoff_ticks):
-				var gate: AirportGate = airport.gates[f.assigned_gate_id]
-				gate.occupied_by_flight_id = ""
-				f.gate_release_tick = clock.tick
-				_transition(f, "taxiing_out", int(config.taxi_out_ticks))
-				events.record(clock.tick, "FLIGHT_PUSHBACK", f.id, {"gate_id": gate.id})
+			_try_pushback(f)
 		"taxiing_out":
 			if clock.tick >= f.due_tick:
 				_request_runway(f, "takeoff")
@@ -160,18 +210,29 @@ func _complete_runway() -> void:
 		f.actual_departure = clock.tick
 		f.estimated_departure = clock.tick
 		_transition(f, "departed")
-		events.record(clock.tick, "FLIGHT_DEPARTED", f.id, {"delay_ticks": maxi(0, clock.tick - f.scheduled_departure), "causes": f.delay_reasons})
+		for id in f.passenger_ids:
+			var p: Passenger = airport.passengers[str(id)]
+			if p.airport_state == "on_aircraft": passenger_flow.set_journey_state(p, "departed")
+		events.record(clock.tick, "FLIGHT_DEPARTED", f.id, {"delay_ticks": maxi(0, clock.tick - f.scheduled_departure), "causes": f.delay_reasons,
+			"boarded": f.boarded_count, "missed": f.missed_count})
 
 func _estimate_departure(f: AirportFlight) -> int:
 	var exit_time := int(config.taxi_out_ticks) + int(config.takeoff_ticks)
-	var earliest := f.scheduled_arrival + int(config.taxi_in_ticks) + f.turnaround_ticks + f.forced_delay_ticks + exit_time + 3
+	# After service, boarding needs its window before the departure target.
+	var after_service := int(_boarding("open_before_departure_ticks"))
+	var earliest := f.scheduled_arrival + int(config.taxi_in_ticks) + f.turnaround_ticks + f.forced_delay_ticks + after_service + 3
 	match f.status:
-		"approaching": earliest = maxi(clock.tick + int(config.taxi_in_ticks) + f.turnaround_ticks + f.forced_delay_ticks + exit_time, earliest)
-		"landed": earliest = clock.tick + int(config.taxi_in_ticks) + f.turnaround_ticks + f.forced_delay_ticks + exit_time + 2
-		"taxiing_in": earliest = maxi(clock.tick, f.due_tick) + f.turnaround_ticks + f.forced_delay_ticks + exit_time + 2
-		"at_gate": earliest = clock.tick + f.turnaround_ticks + f.forced_delay_ticks + exit_time + 2
-		"turnaround": earliest = f.due_tick + exit_time + 1
-		"ready_for_pushback": earliest = clock.tick + exit_time
+		"approaching": earliest = maxi(clock.tick + int(config.taxi_in_ticks) + f.turnaround_ticks + f.forced_delay_ticks + after_service, earliest)
+		"landed": earliest = clock.tick + int(config.taxi_in_ticks) + f.turnaround_ticks + f.forced_delay_ticks + after_service + 2
+		"taxiing_in": earliest = maxi(clock.tick, f.due_tick) + f.turnaround_ticks + f.forced_delay_ticks + after_service + 2
+		"at_gate": earliest = clock.tick + f.turnaround_ticks + f.forced_delay_ticks + after_service + 2
+		"turnaround": earliest = f.due_tick + after_service + 1
+		"boarding":
+			# Ready at gate close (earlier if everyone boards), never before schedule + holds.
+			var ready := clock.tick if f.boarding_phase in ["closed", "complete"] else maxi(clock.tick, f.gate_close_tick)
+			if f.boarding_phase == "scheduled": ready = maxi(ready, f.boarding_open_tick)
+			earliest = maxi(f.scheduled_departure + f.hold_ticks, ready + exit_time + 1)
+		"ready_for_pushback": earliest = maxi(f.scheduled_departure + f.hold_ticks, clock.tick + exit_time)
 		"taxiing_out":
 			earliest = maxi(clock.tick, f.due_tick) + int(config.takeoff_ticks)
 			var operation := airport.runway.active_operation
@@ -215,7 +276,7 @@ func assign_gate(flight_id: String, gate_id: String) -> Dictionary:
 			return {"ok": false, "warnings": warnings}
 	var f: AirportFlight = airport.flights[flight_id]
 	if not f.status in ["scheduled", "approaching", "landed", "taxiing_in"]:
-		return {"ok": false, "warnings": ["Gate locked after docking"]}
+		return {"ok": false, "warnings": ["Gate locked after docking" if f.status != "boarding" else "Gate locked during boarding"]}
 	var old_gate := f.assigned_gate_id
 	f.assigned_gate_id = gate_id
 	if old_gate != gate_id: passenger_flow.reroute(f, clock.tick)
@@ -291,13 +352,21 @@ func metrics() -> Dictionary:
 func snapshot() -> Dictionary:
 	return _integer_json({"version": SAVE_VERSION, "engine": Engine.get_version_info().string, "scenario": config.duplicate(true),
 		"seed": seed_value, "clock": clock.to_dict(), "rng": rng.snapshot(), "airport": airport.to_dict(),
-		"events": events.history.duplicate(true), "decisions": decisions.duplicate(true), "conflicts": conflicts.duplicate(true), "passenger_flow": passenger_flow.snapshot()})
+		"events": events.history.duplicate(true), "decisions": decisions.duplicate(true), "conflicts": conflicts.duplicate(true), "passenger_flow": passenger_flow.snapshot(),
+		"boarding": _boarding_snapshot()})
+
+## Active cabin sessions (D-021). Passenger cabin fields are already inside
+## airport.passengers through Passenger.snapshot().
+func _boarding_snapshot() -> Dictionary:
+	var out := {}
+	for id in boarding_sessions: out[id] = boarding_sessions[id].snapshot()
+	return out
 
 static func from_snapshot(data: Dictionary) -> AirportSimulation:
 	data = _integer_json(data)
 	if int(data.get("version", -1)) != SAVE_VERSION or data.get("engine", "") != Engine.get_version_info().string:
 		return null
-	for key in ["scenario", "clock", "rng", "airport", "conflicts", "passenger_flow"]:
+	for key in ["scenario", "clock", "rng", "airport", "conflicts", "passenger_flow", "boarding"]:
 		if not data.get(key) is Dictionary: return null
 	for key in ["events", "decisions"]:
 		if not data.get(key) is Array: return null
@@ -305,6 +374,8 @@ static func from_snapshot(data: Dictionary) -> AirportSimulation:
 	if not PassengerFlowValidation.valid(data): return null
 	var sim := AirportSimulation.new()
 	sim.config = data.scenario.duplicate(true)
+	sim._load_cabins()
+	if not sim._valid_boarding(data): return null
 	sim.seed_value = int(data.seed)
 	sim.clock.restore(data.clock)
 	sim.rng.restore(data.rng)
@@ -316,7 +387,40 @@ static func from_snapshot(data: Dictionary) -> AirportSimulation:
 	sim.conflicts = data.conflicts.duplicate(true)
 	sim.passenger_flow.bind(sim.airport, sim.events, sim.config.get("passenger_flow", {}))
 	sim.passenger_flow.restore(data.passenger_flow)
+	for id in data.boarding:
+		var f: AirportFlight = sim.airport.flights[id]
+		sim.boarding_sessions[id] = FlightBoarding.from_snapshot(data.boarding[id], sim.cabins[data.boarding[id].cabin_id], sim._manifest(f))
 	return sim
+
+## Every open/closed/complete cabin flight still at the gate has exactly one
+## valid session, and no other flight does.
+func _valid_boarding(data: Dictionary) -> bool:
+	var state: Dictionary = data.airport
+	for key in BOARDING_DEFAULTS:
+		if data.scenario.get("boarding", {}).has(key) and typeof(data.scenario.boarding[key]) != typeof(BOARDING_DEFAULTS[key]): return false
+	for id in state.flights:
+		var f: Dictionary = state.flights[id]
+		if not f.boarding_phase in BOARDING_PHASES or not f.boarding_mode in ["cabin", "placeholder"]: return false
+		if f.boarding_mode == "cabin" and not cabins.has(state.aircraft[f.aircraft_id].seat_map): return false
+		var needs_session: bool = f.boarding_mode == "cabin" and f.boarding_phase in ["open", "closed", "complete"] and f.status in AT_GATE_STATES
+		if needs_session != data.boarding.has(id): return false
+		if f.status == "boarding" and f.boarding_phase == "": return false
+		if f.status in ["ready_for_pushback", "taxiing_out", "departed"] and f.boarding_phase != "complete": return false
+	for id in data.boarding:
+		if data.boarding[id].get("flight_id") != id: return false
+		if not FlightBoarding.valid_snapshot(data.boarding[id], state, int(data.clock.tick), cabins): return false
+	for key in state.passengers:
+		var p: Dictionary = state.passengers[key]
+		var f: Dictionary = state.flights[p.current_flight_id]
+		match p.airport_state:
+			"boarding", "on_aircraft":
+				if not f.boarding_phase in ["open", "closed", "complete"] or f.status == "departed": return false
+			"departed":
+				if f.status != "departed": return false
+			"missed_flight":
+				if p.missed_flight_id != f.id: return false
+		if not p.missed_flight_id.is_empty() and not f.boarding_phase in ["closed", "complete"]: return false
+	return true
 
 func save_file(path: String) -> Error:
 	var file := FileAccess.open(path + ".tmp", FileAccess.WRITE)
@@ -384,13 +488,13 @@ static func _valid_snapshot(data: Dictionary) -> bool:
 		if not state.aircraft.has(f.aircraft_id) or not state.gates.has(f.assigned_gate_id): return false
 		if not f.status in STATES or not state.airlines.has(f.airline_id): return false
 		var gate = state.gates[f.assigned_gate_id]
-		if f.status in ["at_gate", "turnaround", "ready_for_pushback"] and gate.occupied_by_flight_id != f.id: return false
+		if f.status in AT_GATE_STATES and gate.occupied_by_flight_id != f.id: return false
 		if not state.aircraft[f.aircraft_id].required_gate_type in gate.supported_aircraft_classes: return false
 	for key in state.gates:
 		var gate = state.gates[key]
 		if gate.occupied_by_flight_id != "":
 			var f = state.flights[gate.occupied_by_flight_id]
-			if f.assigned_gate_id != key or not f.status in ["at_gate", "turnaround", "ready_for_pushback"]: return false
+			if f.assigned_gate_id != key or not f.status in AT_GATE_STATES: return false
 	var scenario: Dictionary = data.scenario
 	for key in ["landing_ticks", "takeoff_ticks", "taxi_in_ticks", "taxi_out_ticks", "approach_ticks", "gate_buffer_ticks", "separation_ticks"]:
 		if not scenario.get(key) is int or scenario[key] < 0: return false
@@ -431,3 +535,205 @@ func set_security(checkpoint_id: String, lanes: int, staff: int) -> bool:
 	decisions.append(decision)
 	events.record(clock.tick, "SECURITY_CAPACITY_CHANGED", "", decision)
 	return true
+
+
+# --- boarding (M3) -----------------------------------------------------------
+# Window (D-017): boarding opens at D-30 and the gate closes at D-10, where D is
+# the scheduled takeoff. A late aircraft shifts the whole window: the departure
+# target becomes service-ready + the open offset. Holds move close and target.
+
+func _manifest(f: AirportFlight) -> Array[Passenger]:
+	var out: Array[Passenger] = []
+	for id in f.passenger_ids: out.append(airport.passengers[str(id)])
+	return out
+
+func _schedule_boarding(f: AirportFlight) -> void:
+	var open_offset := int(_boarding("open_before_departure_ticks"))
+	f.service_ready_tick = clock.tick
+	f.departure_target_tick = maxi(f.scheduled_departure, clock.tick + open_offset)
+	f.boarding_open_tick = f.departure_target_tick - open_offset
+	f.gate_close_tick = f.departure_target_tick - int(_boarding("gate_close_before_departure_ticks"))
+	f.boarding_phase = "scheduled"
+
+func _update_boarding(f: AirportFlight) -> void:
+	if f.boarding_phase == "scheduled" and clock.tick >= f.boarding_open_tick:
+		_open_boarding(f)
+	if f.boarding_phase == "open" and f.boarding_mode != "cabin" and int(passenger_flow.ready_by_flight.get(f.id, 0)) == f.passenger_ids.size():
+		_close_gate(f, "all_aboard")
+	if f.boarding_phase == "open" and clock.tick >= f.gate_close_tick:
+		_close_gate(f, "scheduled")
+	if f.boarding_phase == "closed" and f.boarding_complete_tick >= 0:
+		f.boarding_phase = "complete"
+		events.record(clock.tick, "BOARDING_COMPLETE", f.id, {"boarded": f.boarded_count, "missed": f.missed_count,
+			"duration_ticks": f.boarding_complete_tick - f.boarding_open_tick})
+		_transition(f, "ready_for_pushback")
+		_try_pushback(f)
+
+## Pushback once boarding is complete, never before the scheduled pushback plus
+## any hold actually used. A late aircraft that boards quickly recovers time: it
+## does not wait for its shifted boarding window.
+func _try_pushback(f: AirportFlight) -> void:
+	if clock.tick < _pushback_floor(f): return
+	var gate: AirportGate = airport.gates[f.assigned_gate_id]
+	gate.occupied_by_flight_id = ""
+	f.gate_release_tick = clock.tick
+	_attribute_boarding_delay(f)
+	_finalize_boarding(f)
+	_transition(f, "taxiing_out", int(config.taxi_out_ticks))
+	events.record(clock.tick, "FLIGHT_PUSHBACK", f.id, {"gate_id": gate.id})
+
+func _pushback_floor(f: AirportFlight) -> int:
+	return f.scheduled_departure + f.hold_ticks - int(config.taxi_out_ticks) - int(config.takeoff_ticks)
+
+func _open_boarding(f: AirportFlight) -> void:
+	f.boarding_phase = "open"
+	f.boarding_open_tick = clock.tick
+	var present: Array = []
+	for p in _manifest(f):
+		if p.airport_state == "waiting_at_gate": present.append(p.id)
+	events.record(clock.tick, "BOARDING_OPENED", f.id, {"mode": f.boarding_mode, "strategy": f.boarding_strategy,
+		"at_gate": present.size(), "manifest": f.passenger_ids.size(), "gate_close_tick": f.gate_close_tick})
+	if f.boarding_mode != "cabin": return
+	var session := FlightBoarding.new()
+	var cabin: AircraftDef = cabins[airport.aircraft[f.aircraft_id].seat_map]
+	# Strategy order is seeded per flight, independent of other flights.
+	var seed := absi(hash("%d:%s" % [seed_value, f.id]))
+	session.open(f, cabin, _manifest(f), BoardingStrategy.preset(f.boarding_strategy, cabin), cabin_config, seed,
+		int(_boarding("boarding_ticks_per_airport_tick")))
+	boarding_sessions[f.id] = session
+	_admit(f, present)
+
+## Passengers physically at the gate join the door queue (never anyone else).
+func _admit(f: AirportFlight, ids: Array) -> void:
+	var session: FlightBoarding = boarding_sessions[f.id]
+	for id in session.engine.admit(ids):
+		var p: Passenger = airport.passengers[str(id)]
+		p.boarding_admit_tick = clock.tick
+		passenger_flow.set_journey_state(p, "boarding")
+		passenger_flow._emit(clock.tick, "PASSENGER_BOARDING", p, {"seat": p.seat_key(), "group": p.boarding_group_name})
+
+func _close_gate(f: AirportFlight, by: String) -> void:
+	f.boarding_phase = "closed"
+	f.gate_closed_tick = clock.tick
+	if clock.tick < f.gate_close_tick:
+		# Closing early cancels the unused part of any hold.
+		var unused := mini(f.hold_ticks, f.gate_close_tick - clock.tick)
+		f.hold_ticks -= unused
+		f.departure_target_tick -= unused
+		f.gate_close_tick = clock.tick
+	var boarded := 0
+	for p in _manifest(f):
+		if f.boarding_mode != "cabin" and p.airport_state == "waiting_at_gate":
+			# Widebody boarding abstraction: everyone present boards at close.
+			p.boarding_admit_tick = clock.tick
+			p.seated_airport_tick = clock.tick
+			f.last_seated_tick = clock.tick
+			passenger_flow.set_journey_state(p, "on_aircraft")
+			passenger_flow._emit(clock.tick, "PASSENGER_ON_AIRCRAFT", p, {"mode": "widebody_boarding_abstraction"})
+		if p.airport_state in ["boarding", "on_aircraft"]:
+			boarded += 1
+			continue
+		p.missed_flight_id = f.id
+		p.missed_reason = p.airport_state
+		if p.airport_state == "waiting_at_gate": passenger_flow.set_journey_state(p, "missed_flight")
+		f.missed_count += 1
+		passenger_flow._emit(clock.tick, "PASSENGER_MISSED_FLIGHT", p, {"reason": p.missed_reason})
+	f.boarded_count = boarded
+	if f.boarding_mode == "cabin":
+		var engine: Simulation = boarding_sessions[f.id].engine
+		engine.close()
+		if engine.is_complete(): f.boarding_complete_tick = clock.tick
+	else:
+		f.boarding_complete_tick = clock.tick
+	events.record(clock.tick, "GATE_CLOSED", f.id, {"by": by, "boarding": boarded, "missed": f.missed_count, "hold_ticks": f.hold_ticks})
+
+## Advance every open cabin engine by exactly the configured boarding ticks.
+func _step_boarding() -> void:
+	var arrivals := passenger_flow.gate_arrivals
+	passenger_flow.gate_arrivals = []
+	var by_flight := {}
+	for id in arrivals:
+		var p: Passenger = airport.passengers[str(id)]
+		if not by_flight.has(p.current_flight_id): by_flight[p.current_flight_id] = []
+		by_flight[p.current_flight_id].append(id)
+	for f: AirportFlight in flight_order:
+		if not boarding_sessions.has(f.id): continue
+		if f.boarding_phase == "open" and by_flight.has(f.id): _admit(f, by_flight[f.id])
+		var session: FlightBoarding = boarding_sessions[f.id]
+		if session.engine.is_complete(): continue
+		for p in session.step():
+			p.seated_airport_tick = clock.tick
+			f.last_seated_tick = clock.tick
+			passenger_flow.set_journey_state(p, "on_aircraft")
+			passenger_flow._emit(clock.tick, "PASSENGER_ON_AIRCRAFT", p, {"seat": p.seat_key()})
+		if session.engine.is_complete(): f.boarding_complete_tick = clock.tick
+		# Whole manifest aboard: no reason to keep the gate open until D-10.
+		if f.boarding_phase == "open" and session.engine.seated_count == f.passenger_ids.size():
+			_close_gate(f, "all_aboard")
+
+func _finalize_boarding(f: AirportFlight) -> void:
+	if not boarding_sessions.has(f.id): return
+	f.boarding_result = boarding_sessions[f.id].engine.result()
+	boarding_sessions.erase(f.id)
+
+## Additive split of pushback lateness beyond the scheduled pushback: first the
+## hold the player used, then cabin boarding still running after the gate closed.
+## A gate kept open for missing passengers in a late aircraft's shifted window is
+## explained by the upstream causes (gate wait, landing queue, variation).
+func _attribute_boarding_delay(f: AirportFlight) -> void:
+	var planned := f.scheduled_departure - int(config.taxi_out_ticks) - int(config.takeoff_ticks)
+	var hold := clampi(clock.tick - planned, 0, f.hold_ticks)
+	if hold > 0: _add_delay(f, "passenger_hold", hold)
+	var boarding := clock.tick - maxi(_pushback_floor(f), f.gate_closed_tick)
+	if boarding > 0: _add_delay(f, "boarding", boarding)
+
+func set_boarding_strategy(flight_id: String, strategy_id: String) -> bool:
+	if not airport.flights.has(flight_id) or not strategy_id in BoardingStrategy.PRESET_IDS: return false
+	var f: AirportFlight = airport.flights[flight_id]
+	if f.boarding_mode != "cabin" or not f.boarding_phase in ["", "scheduled"]: return false
+	f.boarding_strategy = strategy_id
+	decisions.append({"tick": clock.tick, "type": "set_boarding_strategy", "flight_id": flight_id, "strategy": strategy_id})
+	events.record(clock.tick, "BOARDING_STRATEGY_SET", flight_id, {"strategy": strategy_id})
+	return true
+
+## Hold +increment: the gate stays open longer and the departure target moves
+## with it. Limited to max_hold_ticks per flight; never automatic (D-017).
+func hold_flight(flight_id: String) -> bool:
+	if not can_hold(flight_id): return false
+	var f: AirportFlight = airport.flights[flight_id]
+	var increment := int(_boarding("hold_increment_ticks"))
+	f.hold_ticks += increment
+	f.gate_close_tick += increment
+	f.departure_target_tick += increment
+	f.estimated_departure = _estimate_departure(f)
+	decisions.append({"tick": clock.tick, "type": "hold_flight", "flight_id": flight_id})
+	events.record(clock.tick, "FLIGHT_HELD", flight_id, {"hold_ticks": f.hold_ticks, "gate_close_tick": f.gate_close_tick})
+	_update_conflicts()
+	return true
+
+func can_hold(flight_id: String) -> bool:
+	if not airport.flights.has(flight_id): return false
+	var f: AirportFlight = airport.flights[flight_id]
+	return f.boarding_phase == "open" and f.hold_ticks + int(_boarding("hold_increment_ticks")) <= int(_boarding("max_hold_ticks"))
+
+func close_gate(flight_id: String) -> bool:
+	if not airport.flights.has(flight_id) or airport.flights[flight_id].boarding_phase != "open": return false
+	decisions.append({"tick": clock.tick, "type": "close_gate", "flight_id": flight_id})
+	_close_gate(airport.flights[flight_id], "player")
+	return true
+
+## Manifest passengers of an open flight who have not reached boarding yet.
+func missing_passengers(f: AirportFlight) -> int:
+	var missing := 0
+	for p in _manifest(f):
+		if not p.airport_state in ["boarding", "on_aircraft", "departed", "waiting_at_gate"]: missing += 1
+	return missing
+
+## Flights whose gate closes soon with passengers still missing.
+func boarding_alerts() -> Array:
+	var out: Array = []
+	for f: AirportFlight in flight_order:
+		if f.boarding_phase != "open" or f.gate_close_tick - clock.tick > int(_boarding("close_warning_ticks")): continue
+		var missing := missing_passengers(f)
+		if missing > 0: out.append({"flight_id": f.id, "missing": missing, "closes_in": f.gate_close_tick - clock.tick})
+	return out

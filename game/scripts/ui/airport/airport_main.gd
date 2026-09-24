@@ -23,6 +23,11 @@ var pause_button: Button
 var debug_panel: VBoxContainer
 var debug_label: Label
 var assign_button: Button
+var strategy_choice: OptionButton
+var hold_button: Button
+var close_gate_button: Button
+var view_boarding_button: Button
+var boarding_overlay: BoardingOverlay
 var selected_id: String = "F001"
 var refresh_timer: float = 0
 var rows: Dictionary = {}
@@ -138,6 +143,27 @@ func _build() -> void:
 	gate_choice.item_selected.connect(func(_index): _refresh_warnings())
 	gate_row.add_child(gate_choice)
 	assign_button = _button(gate_row, "Assign gate", _assign)
+	var boarding_row := HBoxContainer.new()
+	right.add_child(boarding_row)
+	strategy_choice = OptionButton.new()
+	for id in BoardingStrategy.PRESET_IDS: strategy_choice.add_item(BoardingStrategy.PRESET_NAMES[id])
+	strategy_choice.tooltip_text = "Boarding strategy (until boarding opens)"
+	strategy_choice.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	strategy_choice.item_selected.connect(func(index):
+		var ok := sim.set_boarding_strategy(selected_id, BoardingStrategy.PRESET_IDS[index])
+		status_label.text = "Boarding strategy set" if ok else "Strategy locked once boarding opens"
+		_refresh())
+	boarding_row.add_child(strategy_choice)
+	view_boarding_button = _button(boarding_row, "View boarding", func(): boarding_overlay.show_flight(sim, selected_id))
+	var gate_actions := HBoxContainer.new()
+	right.add_child(gate_actions)
+	hold_button = _button(gate_actions, "HOLD +5 MIN", func():
+		status_label.text = "Flight held: gate stays open 5 more minutes" if sim.hold_flight(selected_id) else "Cannot hold: gate not open or maximum hold reached"
+		_refresh())
+	close_gate_button = _button(gate_actions, "CLOSE GATE", func():
+		status_label.text = "Gate closed" if sim.close_gate(selected_id) else "Gate is not open"
+		_refresh())
+	for button in [hold_button, close_gate_button]: button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	warnings = _label(right, "", 12)
 	warnings.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	warnings.custom_minimum_size.y = 48
@@ -167,6 +193,10 @@ func _build() -> void:
 		_refresh())
 	status_label = _label(layout, "Space: pause  ·  1 / 2 / 4: speed  ·  F3: debug   |   Select a flight or aircraft to inspect", 12)
 	status_label.modulate = Color("a7becd")
+	boarding_overlay = BoardingOverlay.new()
+	boarding_overlay.visible = false
+	boarding_overlay.closed.connect(func(): boarding_overlay.visible = false)
+	add_child(boarding_overlay)
 
 func _rebuild_board() -> void:
 	board.clear()
@@ -219,8 +249,9 @@ func _refresh() -> void:
 	var turnaround := "Waiting for gate"
 	if flight.status == "turnaround":
 		turnaround = "In progress · %d min remaining" % ceili(maxi(0, flight.due_tick - sim.clock.tick) / 600.0)
-	elif flight.status in ["ready_for_pushback", "taxiing_out", "departed"]: turnaround = "Complete"
-	var text := "[font_size=23][b]%s[/b][/font_size]  ·  %s\n%s\n%s → %s\n\nGate %s  ·  %s\nArrival  %s  /  %s\nDeparture  %s\nEstimated  %s\n\n[b]Turnaround[/b]  %s\n" % [flight.flight_number, aircraft.aircraft_type_id, sim.airport.airlines[flight.airline_id], flight.origin, flight.destination, flight.assigned_gate_id, flight.status.replace("_", " "), AirportClock.display(flight.scheduled_arrival), "pending" if flight.actual_arrival < 0 else AirportClock.display(flight.actual_arrival), AirportClock.display(flight.scheduled_departure), AirportClock.display(flight.estimated_departure), turnaround]
+	elif flight.status in ["boarding", "ready_for_pushback", "taxiing_out", "departed"]: turnaround = "Complete"
+	var text := "[font_size=23][b]%s[/b][/font_size]  ·  %s\n%s\n%s → %s\n\nGate %s  ·  %s\nArrival  %s  /  %s\nDeparture  %s\nEstimated  %s\n\n[b]Service before boarding[/b]  %s" % [flight.flight_number, aircraft.aircraft_type_id, sim.airport.airlines[flight.airline_id], flight.origin, flight.destination, flight.assigned_gate_id, flight.status.replace("_", " "), AirportClock.display(flight.scheduled_arrival), "pending" if flight.actual_arrival < 0 else AirportClock.display(flight.actual_arrival), AirportClock.display(flight.scheduled_departure), AirportClock.display(flight.estimated_departure), turnaround]
+	text += _boarding_text(flight) + "\n"
 	for reason in flight.delay_reasons:
 		if int(flight.delay_reasons[reason]) > 0:
 			text += "\n[color=#ffc078]%s: %.1f min[/color]" % [reason.replace("_", " ").capitalize(), int(flight.delay_reasons[reason]) / 600.0]
@@ -243,6 +274,11 @@ func _refresh() -> void:
 		if current.oldest_wait >= 6000 or (cp.capacity() == 0 and not cp.queue.is_empty()):
 			alerts.add_item("%s security · %d waiting" % [cp.id.capitalize(), cp.queue.size()])
 			alert_ids.append("security:" + cp.id)
+	for alert in sim.boarding_alerts():
+		var held: AirportFlight = sim.airport.flights[alert.flight_id]
+		alerts.add_item("%s · %d missing · gate closes in %d min" % [held.flight_number, alert.missing, ceili(alert.closes_in / 600.0)])
+		alerts.set_item_tooltip(alerts.item_count - 1, "Select to hold the flight or close the gate. It closes automatically if you do nothing.")
+		alert_ids.append(held.id)
 	if alert_ids.is_empty():
 		alerts.add_item("No active operations alerts")
 		alerts.set_item_disabled(0, true)
@@ -252,7 +288,15 @@ func _refresh_warnings() -> void:
 	var gate_id := gate_choice.get_item_text(gate_choice.selected)
 	var messages := sim.assignment_warnings(selected_id, gate_id)
 	warnings.text = "Compatible gate · schedule clear" if messages.is_empty() else "\n".join(messages)
-	assign_button.disabled = not sim.airport.flights[selected_id].status in ["scheduled", "approaching", "landed", "taxiing_in"]
+	var f: AirportFlight = sim.airport.flights[selected_id]
+	assign_button.disabled = not f.status in ["scheduled", "approaching", "landed", "taxiing_in"]
+	strategy_choice.set_block_signals(true)
+	strategy_choice.select(BoardingStrategy.PRESET_IDS.find(f.boarding_strategy))
+	strategy_choice.set_block_signals(false)
+	strategy_choice.disabled = f.boarding_mode != "cabin" or not f.boarding_phase in ["", "scheduled"]
+	hold_button.disabled = not sim.can_hold(selected_id)
+	close_gate_button.disabled = f.boarding_phase != "open"
+	view_boarding_button.disabled = f.boarding_mode != "cabin" or f.boarding_phase == "" or f.boarding_phase == "scheduled"
 
 func _assign() -> void:
 	var result := sim.assign_gate(selected_id, gate_choice.get_item_text(gate_choice.selected))
@@ -280,6 +324,7 @@ func _load_save() -> void:
 	sim = loaded
 	map.sim = sim
 	terminal_view.sim = sim
+	boarding_overlay.visible = false
 	selected_passenger_id = -1
 	_rebuild_board()
 	_select(sim.airport.flights.keys()[0])
@@ -366,7 +411,30 @@ func _refresh_terminal() -> void:
 		var gate_time := "Not yet at gate" if p.gate_arrival_time < 0 else AirportClock.display(p.gate_arrival_time)
 		var risk := "Late to gate target" if "late_to_gate" in p.risk_flags else "En route"
 		if p.airport_state == "waiting_at_gate" and p.risk_flags.is_empty(): risk = "At gate on time"
+		if p.airport_state in ["boarding", "on_aircraft", "departed"]: risk = "Boarded %s" % AirportClock.display(p.seated_airport_tick) if p.seated_airport_tick >= 0 else "In the door queue / aisle"
+		if not p.missed_flight_id.is_empty(): risk = "MISSED FLIGHT · was %s at gate close" % p.missed_reason.replace("_", " ")
 		elif p.airport_state == "not_arrived": risk = "Expected at terminal"
 		elif p.gate_arrival_time < 0 and sim.clock.tick > p.gate_target_tick: risk = "Past gate-arrival target"
-		detail.text = "[font_size=23][b]Passenger %04d[/b][/font_size]\n%s\n\nFlight %s  ·  Gate %s\nDestination %s\n\nLocation: %s\nSecurity: %s  ·  %s\nQueue wait: %.1f min\n\nTerminal arrival: %s\nGate target: %s\nGate arrival: %s\n\n[color=#70dec0]%s[/color]" % [p.id, state_text, flight.flight_number, flight.assigned_gate_id, p.destination, location, p.security_checkpoint_id.capitalize(), "cleared" if p.security_cleared else "not cleared", wait / 600.0, AirportClock.display(p.arrival_time_at_airport), AirportClock.display(p.gate_target_tick), gate_time, risk]
+		detail.text = "[font_size=23][b]Passenger %04d[/b][/font_size]\n%s\n\nFlight %s  ·  Gate %s\nDestination %s\n\nLocation: %s\nSecurity: %s  ·  %s\nQueue wait: %.1f min\n\nTerminal arrival: %s\nGate target: %s\nGate arrival: %s\n%s\n\n[color=#70dec0]%s[/color]" % [p.id, state_text, flight.flight_number, flight.assigned_gate_id, p.destination, location, p.security_checkpoint_id.capitalize(), "cleared" if p.security_cleared else "not cleared", wait / 600.0, AirportClock.display(p.arrival_time_at_airport), AirportClock.display(p.gate_target_tick), gate_time, _cabin_text(p, flight), risk]
 	terminal_view.refresh_population()
+
+
+func _boarding_text(f: AirportFlight) -> String:
+	var mode := "Cabin simulation" if f.boarding_mode == "cabin" else "Widebody boarding abstraction"
+	var text := "\n\n[b]Boarding[/b]  %s · %s\nLoad %d%% · %d booked" % [mode, BoardingStrategy.PRESET_NAMES.get(f.boarding_strategy, f.boarding_strategy) if f.boarding_mode == "cabin" else "no cabin model yet",
+		f.load_permille / 10, f.passenger_ids.size()]
+	match f.boarding_phase:
+		"": return text + "\nOpens about 30 min before departure, once service is done"
+		"scheduled": text += "\nOpens %s · gate closes %s" % [AirportClock.display(f.boarding_open_tick), AirportClock.display(f.gate_close_tick)]
+		"open": text += "\n[color=#70dec0]OPEN[/color] · gate closes %s · %d still missing" % [AirportClock.display(f.gate_close_tick), sim.missing_passengers(f)]
+		_: text += "\nGate closed %s · boarded %d · missed %d" % [AirportClock.display(f.gate_closed_tick), f.boarded_count, f.missed_count]
+	if f.hold_ticks > 0: text += "\n[color=#ffc078]Held %d min[/color]" % (f.hold_ticks / 600)
+	if not f.boarding_result.is_empty(): text += "\n" + BoardingOverlay.result_summary(f, sim.cabin_config.tick_rate)
+	return text
+
+func _cabin_text(p: Passenger, f: AirportFlight) -> String:
+	if f.boarding_mode != "cabin": return "Seat: widebody boarding abstraction"
+	var text := "Seat %s (%s) · %d bags" % [p.seat_key(), p.seat_type_name(), p.carry_on_count]
+	if p.airport_state == "boarding": text += " · cabin: " + p.state_name()
+	if p.caused_blocked_time > 0: text += " · blocked others %.0f s" % (float(p.caused_blocked_time) / sim.cabin_config.tick_rate)
+	return text

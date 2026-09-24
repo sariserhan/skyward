@@ -146,6 +146,13 @@ var walk_to: String = ""
 var walk_started_tick: int = -1
 var flow_due_tick: int = -1
 
+# Airport boarding (M3), in airport ticks. Cabin timing above stays in boarding
+# ticks (D-015). A missed passenger keeps walking and settles at the closed gate.
+var boarding_admit_tick: int = -1
+var seated_airport_tick: int = -1
+var missed_flight_id: String = ""
+var missed_reason: String = ""
+
 ## Full live state for airport saves; preserve to_dict()'s boarding record API.
 func snapshot() -> Dictionary:
 	var result := {}

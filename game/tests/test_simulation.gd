@@ -276,6 +276,95 @@ func test_aircraft_seat_geometry() -> void:
 	assert_eq(a.seats_between_aisle("E"), ["D"])
 
 
+func test_standalone_matches_golden_baseline() -> void:
+	# M3 step 1 baseline: the airport integration must not move standalone outcomes.
+	var expected = JSON.parse_string(FileAccess.get_file_as_string(StandaloneGolden.PATH))
+	var actual = JSON.parse_string(JSON.stringify(StandaloneGolden.compute()))
+	assert_eq(actual.sim_version, expected.sim_version, "SIM_VERSION")
+	assert_eq(actual.runs.size(), expected.runs.size(), "run count")
+	for key in expected.runs:
+		assert_eq(JSON.stringify(actual.runs.get(key), "", true), JSON.stringify(expected.runs[key], "", true), key)
+
+
+func test_incremental_admission_order_and_close() -> void:
+	var sc := full_flight()
+	var aircraft := sc.load_aircraft()
+	var config := sc.build_config()
+	var manifest := PassengerGenerator.generate(aircraft, 30, 7, config)
+	var sim := Simulation.new()
+	sim.setup_incremental(aircraft, manifest, strategy("back_to_front"), config, 7)
+	assert_eq(sim.queue.size(), 0, "nobody queued before admission")
+	for p in manifest: assert_eq(p.state, Passenger.State.WAITING)
+	# Admit the back half first: they queue in strategy order among themselves.
+	var late: Array = []
+	var early: Array = []
+	for p in manifest:
+		(early if p.id % 2 == 0 else late).append(p.id)
+	assert_eq(sim.admit(early).size(), early.size())
+	assert_eq(sim.admit(early).size(), 0, "re-admission is ignored")
+	for i in range(1, sim.queue.size()):
+		assert_lt(sim.passenger_by_id(sim.queue[i - 1]).queue_position, sim.passenger_by_id(sim.queue[i]).queue_position)
+	sim.run_to_completion(20000)
+	assert_true(not sim.is_complete(), "open boarding never completes on its own")
+	assert_eq(sim.seated_count, early.size())
+	sim.admit(late)
+	sim.close()
+	assert_eq(sim.admit([manifest[0].id]).size(), 0, "closed boarding admits nobody")
+	sim.run_to_completion()
+	assert_true(sim.is_complete())
+	assert_eq(sim.seated_count, manifest.size())
+	assert_eq(sim.result().admitted, manifest.size())
+
+
+func test_incremental_close_with_missing_passengers_completes() -> void:
+	var sc := full_flight()
+	var aircraft := sc.load_aircraft()
+	var config := sc.build_config()
+	var manifest := PassengerGenerator.generate(aircraft, 20, 3, config)
+	var sim := Simulation.new()
+	sim.setup_incremental(aircraft, manifest, strategy("random"), config, 3)
+	sim.admit([manifest[0].id, manifest[1].id])
+	sim.close()
+	sim.run_to_completion()
+	assert_true(sim.is_complete())
+	assert_eq(sim.seated_count, 2)
+	assert_eq(manifest[5].state, Passenger.State.WAITING, "missing passenger never entered")
+	assert_eq(sim.result().passengers, 20)
+
+
+func test_engine_snapshot_resume_matches_uninterrupted() -> void:
+	var sc := full_flight()
+	var aircraft := sc.load_aircraft()
+	var config := sc.build_config()
+	var runs: Array = []
+	for interrupt in [false, true]:
+		var manifest := PassengerGenerator.generate(aircraft, 150, 11, config)
+		var sim := Simulation.new()
+		sim.setup_incremental(aircraft, manifest, strategy("window_middle_aisle"), config, 11)
+		var ids: Array = []
+		for p in manifest: ids.append(p.id)
+		sim.admit(ids.slice(0, 100))
+		for _i in 2500: sim.step()
+		if interrupt:
+			# Round-trip everything through JSON, as an airport save does.
+			var engine_data = JSON.parse_string(JSON.stringify(sim.snapshot()))
+			var restored: Array[Passenger] = []
+			for p in manifest:
+				var copy := Passenger.new()
+				copy.restore_snapshot(JSON.parse_string(JSON.stringify(p.snapshot())))
+				restored.append(copy)
+			manifest = restored
+			sim = Simulation.new()
+			sim.restore(aircraft, manifest, engine_data)
+		sim.admit(ids.slice(100))
+		sim.close()
+		sim.run_to_completion()
+		var seated: Array = []
+		for p in manifest: seated.append([p.id, p.seat_key(), p.seated_tick, p.caused_blocked_time, p.total_blocked_time])
+		runs.append({"result": sim.result(), "seated": seated})
+	assert_eq(JSON.stringify(runs[1]), JSON.stringify(runs[0]), "resumed engine diverged")
+
+
 # --- helpers -------------------------------------------------------------
 
 static func _mk(id: int, row: int, letter: String, aircraft: AircraftDef, config: SimConfig) -> Passenger:

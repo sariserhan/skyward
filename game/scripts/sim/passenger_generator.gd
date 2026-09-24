@@ -33,23 +33,26 @@ static func generate(aircraft: AircraftDef, count: int, seed_value: int, config:
 		p.side = aircraft.side_of(p.seat_letter)
 
 		p.walking_speed = rng.randi_range(config.speed_min_permille, config.speed_max_permille)
-		p.walk_ticks_per_cell = maxi(1, _div_round(config.walk_ticks_per_cell * 1000, p.walking_speed))
-
 		p.carry_on_count = rng.weighted_index(config.bag_weights)
-		# Always draw the variation so the RNG stream is stable regardless of bag count.
-		var stow_var := rng.randi_range(-config.stow_variation_ticks, config.stow_variation_ticks)
-		if p.carry_on_count > 0:
-			p.luggage_stow_duration = maxi(1,
-				config.stow_base_ticks + config.stow_per_bag_ticks * p.carry_on_count + stow_var)
-		else:
-			p.luggage_stow_duration = 0
-
-		var seat_var := rng.randi_range(-config.seat_variation_ticks, config.seat_variation_ticks)
-		p.seat_access_duration = maxi(1, config.seat_base_ticks + seat_var)
-
+		apply_cabin_timing(p, config, rng)
 		p.state = Passenger.State.WAITING
 		out.append(p)
 	return out
+
+
+## Derive boarding-tick durations from a passenger's speed and carry-ons. Shared
+## by the standalone generator and airport passengers so the formulas cannot
+## drift. Always draws both variations, keeping the RNG stream stable.
+static func apply_cabin_timing(p: Passenger, config: SimConfig, rng: SimRng) -> void:
+	p.walk_ticks_per_cell = maxi(1, _div_round(config.walk_ticks_per_cell * 1000, p.walking_speed))
+	var stow_var := rng.randi_range(-config.stow_variation_ticks, config.stow_variation_ticks)
+	if p.carry_on_count > 0:
+		p.luggage_stow_duration = maxi(1,
+			config.stow_base_ticks + config.stow_per_bag_ticks * p.carry_on_count + stow_var)
+	else:
+		p.luggage_stow_duration = 0
+	var seat_var := rng.randi_range(-config.seat_variation_ticks, config.seat_variation_ticks)
+	p.seat_access_duration = maxi(1, config.seat_base_ticks + seat_var)
 
 
 static func _div_round(num: int, den: int) -> int:

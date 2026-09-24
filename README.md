@@ -2,9 +2,13 @@
 
 A Godot airport operations simulator with a preserved aircraft boarding engine.
 The default scene runs Riverdale International: manage gate conflicts while
-fictional flights land, taxi, turn around and depart. Airport M0–M2 are
-implemented: passengers now enter the terminal, clear security and walk to their
-assigned gates. Boarding integration is the next milestone.
+fictional flights land, taxi, turn around and depart. Airport M0–M3 are
+implemented: passengers enter the terminal, clear security, walk to their gates
+and board through the preserved cabin simulation. Departures wait for boarding.
+The turnaround task framework (M4) is next.
+
+Product direction from M3 onward: [airport_tycoon.md](airport_tycoon.md). M3 report:
+[docs/m3-status.md](docs/m3-status.md).
 
 Airport architecture: [docs/architecture.md](docs/architecture.md).
 Current validation and limitations: [docs/status.md](docs/status.md).
@@ -47,9 +51,21 @@ Click a passenger on the terminal map to follow their route. Six staff members
 are available across two checkpoints; every active lane needs one. Closing a
 lane lets its current screening finish. Gate changes reroute the same passengers.
 
-Passenger flow ends at gate waiting in M2. Aircraft still use placeholder
-turnarounds and do not wait for passengers; boarding and cutoff consequences
-arrive in M3. Saves now use schema v2; v1 airport saves are rejected explicitly.
+**Boarding.** Boarding opens about 30 minutes before departure. The gate closes
+as soon as every booked passenger is aboard. Otherwise it closes automatically
+10 minutes before departure unless you hold the flight. Flights run at 70–95%
+load, varying by airline and flight.
+
+- Pick a flight's boarding strategy before boarding opens.
+- **HOLD +5 MIN** keeps the gate open for stragglers, at the cost of departure
+  delay. You can hold for up to 15 minutes.
+- **CLOSE GATE** closes it now.
+- **View boarding** opens the live cabin for single-aisle flights. Esc closes it.
+
+Anyone not aboard at close misses the flight. They still walk to the gate; no
+one teleports. The 787 uses a temporary *widebody boarding abstraction* (no
+cabin simulation yet). Saves use schema v3 and can be made during boarding.
+Older saves are rejected explicitly.
 
 Run the preserved boarding prototype separately:
 
@@ -61,7 +77,7 @@ Boarding controls: click a passenger to inspect it. Space starts or pauses,
 1/2/4/8 set speed, R restarts, F3 opens its debug panel.
 
 On Linux the editor and game need the usual X11 client libraries. If Godot
-reports it cannot load `libXcursor`, install `libxcursor1`.
+reports it cannot load `libXcursor`, install `libxcursor1` (and `libxinerama1`).
 
 ## Run the tests
 
@@ -70,25 +86,29 @@ reports it cannot load `libXcursor`, install `libxcursor1`.
 ./run_tests.sh --quick    # 50 deadlock scenarios
 ```
 
-Airport benchmark and rendered interaction smoke test:
+Benchmarks (headless):
 
 ```sh
-godot --headless --path game --script tests/airport_benchmark.gd
-xvfb-run -a -s "-screen 0 1280x800x24" godot --path game --audio-driver Dummy --script tests/airport_ui_smoke.gd
+godot --headless --path game --script tests/airport_benchmark.gd    # airside, 24 and 100 flights
+godot --headless --path game --script tests/passenger_benchmark.gd  # full morning baseline
+godot --headless --path game --script tests/strategy_benchmark.gd   # each strategy on every flight
 ```
 
-M2 population benchmark and terminal interaction test:
+Rendered UI smoke tests and the M3 demonstration run under a virtual display:
 
 ```sh
-godot --headless --path game --script tests/passenger_benchmark.gd
-xvfb-run -a -s "-screen 0 1280x800x24" godot --path game --audio-driver Dummy --script tests/terminal_ui_smoke.gd
+tools/ui_tests.sh                      # airport UI, terminal UI, M3 demo
+tools/ui_tests.sh tests/m3_demo.gd     # one script
 ```
 
-The terminal smoke test writes `/tmp/terminal-security.png` and
-`/tmp/terminal-passenger.png`. Both UI tests use isolated test saves.
-
-The airport UI smoke test writes screenshots to `/tmp/airport-operations.png` and
-`/tmp/airport-debug.png` and exercises selection, reassignment, pause and save/load.
+This needs `xvfb-run` (package `xvfb`). Godot's X11 driver also needs libXcursor
+and libXinerama. If they are missing, the script fetches the Ubuntu packages once
+with `apt-get download` (no root) into the git-ignored `.cache/ui-test-libs`.
+Installing `libxcursor1 libxinerama1` system-wide avoids that step. Screenshots
+go to `/tmp/airport-*.png`, `/tmp/terminal-*.png` and `/tmp/m3-demo-*.png`. The
+demo follows AW 228 from docking to takeoff, with one deliberately late
+passenger, and prints a timeline. [docs/PLAYTEST.md](docs/PLAYTEST.md) has the
+manual walkthrough.
 
 ## Playtest builds
 

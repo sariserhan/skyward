@@ -228,3 +228,231 @@ use FIFO queues and non-interrupting lane closure, with a finite six-person staf
 pool. Schema v2 persists active journeys and rejects old/inconsistent snapshots.
 Gate-arrival targets measure security consequences; M3 will make boarding and
 departure readiness consume these same passengers.
+
+
+## D-013 — `airport_tycoon.md` supersedes the roadmap from M3 onward
+
+**Date:** 2026-09-24
+**Status:** Accepted
+
+`airport_tycoon.md` is the product direction and roadmap for M3 and later.
+`docs/additional_spec.md` stays as historical implementation context for M0–M2.
+Where the two conflict for M3+, `airport_tycoon.md` wins. Decisions in this file
+still refine both. Both files carry a precedence note at the top.
+
+**Why:** Two overlapping specs would pull later work in different directions.
+
+
+## D-014 — M3 real boarding covers single-aisle aircraft only
+
+**Date:** 2026-09-24
+**Status:** Accepted
+
+The boarding engine runs real cabin boarding only for aircraft types that map to
+a single-aisle cabin definition: the 130-, 180- and 220-seat classes. The
+276-seat widebody keeps a placeholder timer. Twin-aisle boarding is not built in
+M3. The mapping is data: an aircraft type with a cabin reference boards in the
+cabin engine; one without uses the placeholder.
+
+M3 does not try to model airline boarding policy precisely. Its goal is to prove
+that real terminal passengers enter the existing cabin simulation and that the
+resulting boarding performance changes airport operations.
+
+**Why:** The engine models one aisle and one door (D-002, D-005). Extending it to
+twin aisles is a separate piece of work that M3's proof does not need.
+
+
+## D-015 — Two tick domains with a fixed 3:1 relationship
+
+**Date:** 2026-09-24
+**Status:** Accepted
+
+- Airport simulation: 10 Hz (`AirportClock.TICKS_PER_SECOND`).
+- Boarding simulation: 30 Hz (`SimConfig.tick_rate`).
+- Every airport tick advances each active boarding simulation by exactly three
+  boarding ticks.
+
+Code distinguishes `airport_ticks` and `boarding_ticks` wherever both can appear.
+Player-facing diagnostics never show a bare "ticks"; the UI normally converts
+both to seconds or minutes. The airport refuses a boarding configuration whose
+tick rate is not an integer multiple of the airport rate.
+
+**Why:** An integer ratio keeps both simulations deterministic with no rounding
+drift. Blame numbers are only comparable once their unit is explicit.
+
+
+## D-016 — Journey state and cabin state stay separate on one passenger
+
+**Date:** 2026-09-24
+**Status:** Accepted
+
+`Passenger.airport_state` is the journey layer (`waiting_at_gate`, `boarding`,
+`on_aircraft`, `departed`, `missed_flight`, …). `Passenger.state` is the cabin
+layer (`QUEUED`, `WALKING`, `STOWING`, `WAITING_FOR_SEAT`, `SEATED`, …). They
+are not merged. The same object and ID moves through both; no second passenger
+class is introduced (extends D-011, D-012).
+
+
+## D-017 — Boarding window, gate close and player holds
+
+**Date:** 2026-09-24
+**Status:** Accepted
+
+Boarding opens about D-30 and the gate normally closes about D-10, where D is the
+flight's scheduled departure. Both offsets are configuration values, not
+constants in UI code. Passengers board only after they are physically at the
+gate. Late arrivals may board while the gate is open.
+
+At gate close, if passengers are missing, the player chooses to **close the
+gate** or **hold the flight**. A hold is a fixed increment (for example
+`Hold +5 min`) up to a configured maximum. The system never waits indefinitely.
+A hold has a direct cost: departure delay keeps accumulating, and the aircraft
+keeps its gate and its runway slot moves later. Missing passengers who arrive
+during an active hold can board. Anyone not boarded when the gate finally closes
+becomes `missed_flight` and a `PASSENGER_MISSED_FLIGHT` event is recorded. They
+never teleport. Rebooking is not part of M3.
+
+Normal load factors stay data-driven. Demonstration and test flights run at
+roughly 85–95% load so that carry-ons, aisle congestion, seat interference and
+strategy produce visible differences. Every flight is not forced to 95%.
+
+
+## D-018 — No saving while a cabin boarding is in progress (M3)
+
+**Date:** 2026-09-24
+**Status:** Superseded by D-021
+
+In M3, saving is refused while any flight is actively boarding, with the message
+`Cannot save while boarding is in progress.` Cabin snapshots are not implemented
+in M3. Loading still rejects any snapshot that claims an active boarding.
+
+
+## D-019 — Gate locked once boarding opens
+
+**Date:** 2026-09-24
+**Status:** Accepted
+
+Once boarding opens, the flight's gate is locked; gate reassignment during
+boarding is not supported in M3.
+
+
+## D-020 — Post-M3 milestone order
+
+**Date:** 2026-09-24
+**Status:** Accepted
+
+M3 boarding integration → M4 turnaround task framework → M5 deboarding plugged
+into that framework → M6 connecting passengers → M7 baggage → M8 operational
+resources → M9 airlines/contracts → M10 economy → M11 construction/expansion.
+
+**Why:** Deboarding, cleaning, catering, fueling and baggage loading are all
+turnaround tasks. Building the task framework first avoids implementing those
+activities and then restructuring them immediately afterward.
+
+
+## D-021 — Active boarding is saved and restored (schema v3)
+
+**Date:** 2026-09-24
+**Status:** Accepted (supersedes D-018)
+
+Saving is not blocked during boarding. Schema v3 serializes each active cabin
+engine (queue, aisle, seat occupancy, counters, strategy) next to the existing
+full `Passenger.snapshot()`. Restoring mid-boarding must reproduce the outcome of
+uninterrupted play: final seating, boarding completion time, blame totals,
+missed passengers and flight departure state. Save determinism is an M3
+acceptance criterion with its own regression test.
+
+**Why:** Boarding windows overlap almost continuously from about 06:18 to 08:07,
+so a save block would make saving unusable during play. Engine state is small,
+and cabin fields on `Passenger` were already serialized.
+
+
+## D-022 — Gate close defaults, scenario start, widebody abstraction, speeds
+
+**Date:** 2026-09-24
+**Status:** Accepted
+
+- **Gate close:** at D-10 the gate closes automatically unless the player has
+  explicitly held the flight. There is no modal. An alert appears several
+  minutes before close, and the flight UI offers `CLOSE` and `HOLD +5 MIN`.
+  Holds add measurable departure delay and repeat only up to a configurable
+  maximum.
+- **Scenario start:** the Riverdale morning starts at about 05:15. Passenger
+  arrivals are retuned around real boarding cutoffs. The target is that most
+  passengers arrive in reasonable time, congestion and bad decisions can still
+  make passengers late or cause missed flights, and the baseline does not
+  produce mass missed flights before the player has acted. The final baseline
+  (at gate by D-30 and by D-10, missed, security wait distribution) is measured
+  and documented.
+- **Widebody boarding abstraction:** 787 passengers still walk to the gate and
+  follow the D-30, D-10 and hold rules. At final close, passengers present
+  become `on_aircraft` and absent ones `missed_flight`. The aircraft still
+  respects service, boarding and departure dependencies. This is labelled
+  *widebody boarding abstraction* in code and docs, and is not the final
+  simulation.
+- **Speeds:** airport speeds stay 1×, 2× and 4×, and the existing rejection test
+  for 8× is kept. The standalone boarding game keeps its own 8×.
+
+
+## D-023 — Riverdale retimed around the boarding window
+
+**Date:** 2026-09-24
+**Status:** Accepted
+
+M3 tuning showed that the M2 timetable could not fit dock, service and a
+30-minute boarding window. 23 of 24 flights left late (19.6 min average) whatever
+the passengers did.
+
+- Waves are now 50 minutes apart.
+- Arrival-to-takeoff block times are A220 48, 737 51, A321 54 and 787 56 min.
+- The morning starts at 05:15.
+- Placeholder service before boarding is A220 12, 737 15, A321 17 and 787 20 min,
+  until the M4 turnaround tasks replace it.
+- Security defaults to two staffed lanes per checkpoint (4 of 6 staff) with an
+  18-second screening.
+- Passengers arrive 45–100 minutes before departure, and the gate-arrival target
+  is D-30.
+
+Demo flight F002 runs at 90% load with one late passenger. Measured baselines
+are in `m3-status.md`.
+
+**Why:** Designed around the real cutoffs, as D-022 asks. The baseline misses
+0.5% of passengers without player action. Bad staffing decisions miss around 40%.
+Full staffing misses none. Flights stay punctual unless the player holds them.
+
+
+## D-024 — M3 closeout: realistic loads, airport cabin timings, early gate close
+
+**Date:** 2026-09-24
+**Status:** Accepted
+
+- **Loads.** Airport load factors are data-driven: an explicit per-flight
+  `load_permille`, else a deterministic draw from the airline's range, else the
+  scenario range. Riverdale uses 700–900‰ overall, with Northstar 720–880,
+  Atlantic Wings 700–900, SunJet 820–950 and Global Airways 680–860.
+  Low-load scenarios remain possible through the same keys.
+- **Airport cabin timings.** Riverdale applies realistic cabin timings through
+  `boarding.sim_config_overrides`:
+  - door entry every 100 boarding ticks
+  - 54 ticks per row walked
+  - stow 240 + 300 per bag (±90)
+  - 330 ticks per seated passenger who must move
+
+  With everyone at the gate when boarding opens, an 85% 737 takes 21.8 min with
+  Random, 17.3 with Window/Middle/Aisle and 30.4 with Front-to-Back; an A321
+  takes 24.3 with Random. The standalone puzzle keeps its faster
+  `sim_config.json` and golden baseline.
+- **Security.** Capacity is resized for the larger population: staff pool 8,
+  default 3 staffed lanes per checkpoint, 15-second screening.
+- **Early gate close.** When the whole manifest is aboard, the gate closes
+  immediately. Pushback then follows once `D + hold used − exit` is reached, so
+  a late aircraft that boards quickly departs as soon as it is ready. With
+  passengers missing, the D-10 close and the HOLD/CLOSE decision are unchanged.
+  An unused hold is cancelled on early close; only the hold used delays the
+  departure.
+
+**Why:** At 45% load and puzzle-speed cabins, boarding never affected
+punctuality, and strategy differences had no operational effect. With these
+settings, default play sees boarding delay an occasional flight. Window/Middle/
+Aisle removes that delay; Front-to-Back produces widespread lateness.
+Measurements are in `m3-status.md`.
