@@ -3,6 +3,7 @@ extends TestCase
 func fixture(count: int = 3) -> AirportSimulation:
 	var config := JsonUtil.load_file(AirportSimulation.CONFIG_PATH)
 	config.erase("passenger_flow")
+	config.erase("baggage")
 	config.start_tick = 0
 	config.landing_ticks = 7
 	config.takeoff_ticks = 5
@@ -13,7 +14,7 @@ func fixture(count: int = 3) -> AirportSimulation:
 	config.gate_buffer_ticks = 10
 	config.flights = config.flights.slice(0, count)
 	# Turnaround tasks scaled like every other duration here.
-	var durations := {"arrival_secured": 2, "cleaning": 20, "catering": 15, "fueling": 10, "placeholder_baggage_service": 28}
+	var durations := {"arrival_secured": 2, "cleaning": 20, "catering": 15, "fueling": 10, "baggage_unload": 14, "baggage_load": 14}
 	for spec in config.turnaround.tasks:
 		if durations.has(spec.type): spec.durations = {"*": durations[spec.type]}
 	# Boarding window scaled like every other duration here (no passengers).

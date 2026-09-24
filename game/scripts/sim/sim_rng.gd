@@ -16,6 +16,8 @@ const STREAM_LOAD := 0x5005
 const STREAM_INBOUND := 0x6006
 ## Connecting itineraries (M6): who connects, onto which flight, which seat.
 const STREAM_CONNECTION := 0x7007
+## Checked baggage (M7): who checks bags, and how many.
+const STREAM_BAGGAGE := 0x8008
 
 var _rng := RandomNumberGenerator.new()
 

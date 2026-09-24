@@ -123,16 +123,31 @@
         }
       },
       {
-        "type": "placeholder_baggage_service",
-        "label": "Baggage (placeholder)",
+        "type": "baggage_unload",
+        "label": "Baggage unload",
+        "kind": "baggage_unload",
         "after": [
           "arrival_secured"
         ],
         "durations": {
-          "A220": 12000,
-          "737": 14400,
-          "A321": 15600,
-          "787": 21000
+          "A220": 4200,
+          "737": 6600,
+          "A321": 7800,
+          "787": 9000
+        }
+      },
+      {
+        "type": "baggage_load",
+        "label": "Baggage load",
+        "kind": "baggage_load",
+        "after": [
+          "baggage_unload"
+        ],
+        "durations": {
+          "A220": 4200,
+          "737": 6600,
+          "A321": 7800,
+          "787": 9000
         }
       },
       {
@@ -151,7 +166,7 @@
         "after": [
           "boarding",
           "fueling",
-          "placeholder_baggage_service"
+          "baggage_load"
         ]
       }
     ]
@@ -296,7 +311,10 @@
       "aircraft_type": "A321",
       "scheduled_arrival": 226800,
       "scheduled_departure": 259350,
-      "assigned_gate_id": "A6"
+      "assigned_gate_id": "A6",
+      "baggage_overrides": {
+        "load_ticks_per_bag": 300
+      }
     },
     {
       "id": "F007",
@@ -623,6 +641,12 @@
           "x": 970,
           "y": 920,
           "airside": false
+        },
+        "baggage_reclaim": {
+          "label": "RECLAIM",
+          "x": 970,
+          "y": 615,
+          "airside": false
         }
       },
       "edges": [
@@ -710,8 +734,14 @@
         },
         {
           "from": "arrivals_hall",
+          "to": "baggage_reclaim",
+          "walking_ticks": 450,
+          "bidirectional": false
+        },
+        {
+          "from": "baggage_reclaim",
           "to": "airport_exit",
-          "walking_ticks": 900,
+          "walking_ticks": 450,
           "bidirectional": false
         }
       ]
@@ -756,6 +786,54 @@
           ]
         }
       ]
-    }
+    },
+    "reclaim_node": "baggage_reclaim"
+  },
+  "baggage": {
+    "checked_permille": 450,
+    "airline_checked_permille": {
+      "NS": 450,
+      "AW": 500,
+      "SJ": 300,
+      "GA": 600
+    },
+    "second_bag_permille": 120,
+    "bag_cutoff_before_departure_ticks": 9000,
+    "aircraft": {
+      "unload_base_ticks": 1800,
+      "unload_ticks_per_bag": 60,
+      "load_ticks_per_bag": 60,
+      "offload_ticks_per_bag": 150
+    },
+    "aircraft_types": {
+      "787": {
+        "unload_ticks_per_bag": 30,
+        "load_ticks_per_bag": 30
+      }
+    },
+    "stages": {
+      "outbound_sortation": {
+        "servers": 4,
+        "service_ticks": 100,
+        "transit_ticks": 1200
+      },
+      "transfer_sortation": {
+        "servers": 2,
+        "service_ticks": 150,
+        "transit_ticks": 1800
+      },
+      "reclaim": {
+        "servers": 3,
+        "service_ticks": 50,
+        "transit_ticks": 2400
+      }
+    },
+    "demo_bags": [
+      {
+        "flight": "F005",
+        "seat": "1A",
+        "bags": 1
+      }
+    ]
   }
 }

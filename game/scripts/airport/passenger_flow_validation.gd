@@ -129,7 +129,7 @@ static func valid(data: Dictionary) -> bool:
 			"not_arrived": kind = "arrive"
 			"check_in": kind = "check_in"
 			"security_processing": kind = "security"
-			"walking_to_check_in", "walking_to_security", "walking_to_gate", "walking_to_exit": kind = "walk"
+			"walking_to_check_in", "walking_to_security", "walking_to_gate", "walking_to_exit", "walking_to_reclaim": kind = "walk"
 		if kind.is_empty() or event.get("kind") != kind: return false
 		scheduled[key] = true
 		if i > 0:

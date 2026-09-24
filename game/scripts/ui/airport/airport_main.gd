@@ -19,6 +19,8 @@ var warnings: Label
 var status_label: Label
 var clock_label: Label
 var metrics_label: Label
+var bag_metrics: Dictionary = {}
+var bag_metrics_second: int = -1
 var pause_button: Button
 var debug_panel: VBoxContainer
 var debug_label: Label
@@ -191,6 +193,7 @@ func _build() -> void:
 		if str(alert_ids[index]).begins_with("security:"):
 			view_tabs.current_tab = 1
 			operations_tabs.current_tab = 1
+		elif str(alert_ids[index]).begins_with("baggage:"): return
 		else: _select(alert_ids[index]))
 	right.add_child(alerts)
 	debug_panel = VBoxContainer.new()
@@ -255,7 +258,12 @@ func _refresh() -> void:
 		if stats.oldest_wait >= 6000 or (cp.capacity() == 0 and not cp.queue.is_empty()): security_alert_count += 1
 	var punctuality := "—" if metrics.departed == 0 else "%d%%" % (100 * (metrics.departed - metrics.late) / metrics.departed)
 	var connections := sim.connection_metrics()
-	metrics_label.text = "MORNING RUSH    |    %d× %s    |    Gates %d / 8    |    Departed %d / %d    |    On time %s    |    Connections %d made · %d missed    |    Alerts %d" % [sim.clock.speed, "PAUSED" if sim.clock.paused else "LIVE", metrics.occupied, metrics.departed, sim.airport.flights.size(), punctuality, connections.made, connections.missed, sim.conflicts.size() + security_alert_count]
+	# Bag totals walk every bag: refresh once per simulated second.
+	if bag_metrics.is_empty() or sim.clock.tick / 10 != bag_metrics_second:
+		bag_metrics = sim.baggage_metrics()
+		bag_metrics_second = sim.clock.tick / 10
+	var bags := "" if bag_metrics.bags == 0 else "   |   Bags %d missed · %d at reclaim" % [bag_metrics.transfer_missed + bag_metrics.missed_flight, bag_metrics.at_reclaim]
+	metrics_label.text = "MORNING RUSH   |   %d× %s   |   Gates %d / 8   |   Departed %d / %d   |   On time %s   |   Connections %d made · %d missed%s   |   Alerts %d" % [sim.clock.speed, "PAUSED" if sim.clock.paused else "LIVE", metrics.occupied, metrics.departed, sim.airport.flights.size(), punctuality, connections.made, connections.missed, bags, sim.conflicts.size() + security_alert_count]
 	for f: AirportFlight in sim.airport.flights.values():
 		var values := [f.flight_number, f.origin + " → " + f.destination, f.assigned_gate_id,
 			AirportClock.display(f.scheduled_departure).left(5), AirportClock.display(f.estimated_departure).left(5), f.status.replace("_", " ").capitalize()]
@@ -264,7 +272,7 @@ func _refresh() -> void:
 	var flight: AirportFlight = sim.airport.flights[selected_id]
 	var aircraft: AirportAircraft = sim.airport.aircraft[flight.aircraft_id]
 	var text := "[font_size=23][b]%s[/b][/font_size]  ·  %s\n%s\n%s → %s\n\nGate %s  ·  %s\nArrival  %s  /  %s\nDeparture  %s\nEstimated  %s" % [flight.flight_number, aircraft.aircraft_type_id, sim.airport.airlines[flight.airline_id], flight.origin, flight.destination, flight.assigned_gate_id, flight.status.replace("_", " "), AirportClock.display(flight.scheduled_arrival), "pending" if flight.actual_arrival < 0 else AirportClock.display(flight.actual_arrival), AirportClock.display(flight.scheduled_departure), AirportClock.display(flight.estimated_departure)]
-	text += _holding_text(flight) + _delay_text(flight) + _turnaround_text(flight) + _boarding_text(flight) + "\n"
+	text += _holding_text(flight) + _delay_text(flight) + _turnaround_text(flight) + _baggage_text(flight) + _boarding_text(flight) + "\n"
 	text += "\n\n[b]Passengers at gate[/b]  %d / %d" % [int(sim.passenger_flow.ready_by_flight.get(flight.id, 0)), flight.passenger_ids.size()]
 	detail.text = text
 	_refresh_turnaround_tree(flight)
@@ -285,6 +293,12 @@ func _refresh() -> void:
 		if current.oldest_wait >= 6000 or (cp.capacity() == 0 and not cp.queue.is_empty()):
 			alerts.add_item("%s security · %d waiting" % [cp.id.capitalize(), cp.queue.size()])
 			alert_ids.append("security:" + cp.id)
+	for stage_id in sim.baggage.stages:
+		var queued: int = sim.baggage.stages[stage_id].queue.size()
+		if queued >= int(sim.config.get("baggage", {}).get("backlog_alert_bags", 25)):
+			alerts.add_item("%s · %d bags queued" % [stage_id.capitalize(), queued])
+			alerts.set_item_tooltip(alerts.item_count - 1, "A baggage backlog: bags that are not sorted by their flight's bag cutoff will miss it.")
+			alert_ids.append("baggage:" + stage_id)
 	for alert in sim.boarding_alerts():
 		var held: AirportFlight = sim.airport.flights[alert.flight_id]
 		var connecting := " (%d connecting)" % alert.connecting if alert.connecting > 0 else ""
@@ -435,7 +449,7 @@ func _refresh_terminal() -> void:
 		if not p.missed_flight_id.is_empty(): risk = "MISSED FLIGHT · was %s at gate close" % p.missed_reason.replace("_", " ")
 		elif p.airport_state == "not_arrived": risk = "Expected at terminal"
 		elif p.gate_arrival_time < 0 and sim.clock.tick > p.gate_target_tick: risk = "Past gate-arrival target"
-		detail.text = "[font_size=23][b]Passenger %04d[/b][/font_size]\n%s\n\nFlight %s  ·  Gate %s\nDestination %s\n\nLocation: %s\nSecurity: %s  ·  %s\nQueue wait: %.1f min\n\nTerminal arrival: %s\nGate target: %s\nGate arrival: %s\n%s\n\n[color=#70dec0]%s[/color]" % [p.id, state_text, flight.flight_number, flight.assigned_gate_id, p.destination, location, p.security_checkpoint_id.capitalize(), "cleared" if p.security_cleared else "not cleared", wait / 600.0, AirportClock.display(p.arrival_time_at_airport), AirportClock.display(p.gate_target_tick), gate_time, _cabin_text(p, flight), risk]
+		detail.text = "[font_size=23][b]Passenger %04d[/b][/font_size]\n%s\n\nFlight %s  ·  Gate %s\nDestination %s\n\nLocation: %s\nSecurity: %s  ·  %s\nQueue wait: %.1f min\n\nTerminal arrival: %s\nGate target: %s\nGate arrival: %s\n%s\n\n[color=#70dec0]%s[/color]" % [p.id, state_text, flight.flight_number, flight.assigned_gate_id, p.destination, location, p.security_checkpoint_id.capitalize(), "cleared" if p.security_cleared else "not cleared", wait / 600.0, AirportClock.display(p.arrival_time_at_airport), AirportClock.display(p.gate_target_tick), gate_time, _cabin_text(p, flight) + _bag_lines(p), risk]
 	terminal_view.refresh_population()
 
 
@@ -458,7 +472,7 @@ func _boarding_text(f: AirportFlight) -> String:
 
 func _cabin_text(p: Passenger, f: AirportFlight) -> String:
 	if f.boarding_mode != "cabin": return "Seat: widebody boarding abstraction"
-	var text := "Seat %s (%s) · %d bags" % [p.seat_key(), p.seat_type_name(), p.carry_on_count]
+	var text := "Seat %s (%s) · %d carry-on" % [p.seat_key(), p.seat_type_name(), p.carry_on_count]
 	if p.airport_state == "boarding": text += " · cabin: " + p.state_name()
 	if p.caused_blocked_time > 0: text += " · blocked others %.0f s" % (float(p.caused_blocked_time) / sim.cabin_config.tick_rate)
 	return text
@@ -517,7 +531,7 @@ func _turnaround_text(f: AirportFlight) -> String:
 		return "\n\n[b]Turnaround[/b]  %d tasks start at the gate" % tasks.size()
 	var running: Array = []
 	for t: TurnaroundTask in tasks:
-		if t.status == TurnaroundTask.RUNNING and t.kind in ["timed", "deboarding"]: running.append(t.label)
+		if t.status == TurnaroundTask.RUNNING and t.kind in ["timed", "deboarding", "baggage_unload", "baggage_load"]: running.append(t.label)
 	var text := "\n\n[b]Turnaround[/b]  %d / %d complete" % [sim.turnaround.completed_count(f), tasks.size()]
 	if not running.is_empty(): text += " · running: " + ", ".join(running)
 	return text
@@ -533,6 +547,16 @@ func _task_state(f: AirportFlight, t: TurnaroundTask, table: bool) -> String:
 				var total := f.inbound_passenger_ids.size()
 				if f.boarding_mode != "cabin": return "widebody deboarding abstraction · %d min left" % ceili((t.start_tick + t.duration_ticks - sim.clock.tick) / 600.0)
 				return "%d%% · %d / %d off" % [100 * f.deplaned_count / maxi(1, total), f.deplaned_count, total]
+			if t.kind in ["baggage_unload", "baggage_load"] and not sim.baggage.enabled():
+				return "%d%% · %d min left" % [int(t.progress(sim.clock.tick) * 100), ceili((t.start_tick + t.duration_ticks - sim.clock.tick) / 600.0)]
+			if t.kind == "baggage_unload":
+				var bags := sim.flight_baggage(f)
+				return "%d%% · %d / %d bags off" % [100 * bags.unloaded / maxi(1, bags.inbound), bags.unloaded, bags.inbound]
+			if t.kind == "baggage_load":
+				var bags := sim.flight_baggage(f)
+				var pct: int = 100 * bags.loaded / maxi(1, bags.expected)
+				if f.bag_load_finalized and not f.bag_loader_current.is_empty() and f.bag_loader_current.begins_with("-"): return "%d%% · offloading a no-show's bag" % pct
+				return "%d%% · %d / %d loaded" % [pct, bags.loaded, bags.expected] + ("" if f.bag_load_finalized else " · final at gate close")
 			if f.boarding_phase == "open": return "gate closes %s" % AirportClock.display(f.gate_close_tick).left(5)
 			return "doors closing · seating"
 		TurnaroundTask.READY: return "opens %s" % AirportClock.display(f.boarding_open_tick).left(5)
@@ -573,10 +597,13 @@ func _arrival_text(p: Passenger, f: AirportFlight) -> String:
 			if f.boarding_mode != "cabin": where = "Deboarding (widebody deboarding abstraction)"
 			elif p.aisle_position >= 0: where = "In the aisle at row %d · %s" % [p.aisle_position, p.state_name()]
 			else: where = "Seat %s · %s" % [p.seat_key(), p.state_name()]
-		"walking_to_exit": where = "In the terminal, walking to the exit · at %s" % p.current_location.replace("_", " ")
+		"walking_to_reclaim": where = "Walking to baggage reclaim · at %s" % p.current_location.replace("_", " ")
+		"waiting_at_reclaim": where = "Waiting at baggage reclaim for %d bag(s) · %s" % [p.checked_bag_ids.size(), _mmss(sim.clock.tick - p.reclaim_arrival_tick)]
+		"walking_to_exit": where = "In the terminal, walking to the exit · at %s" % p.current_location.replace("_", " ") + (" · collected bags %s" % AirportClock.display(p.bags_collected_tick).left(8) if p.bags_collected_tick >= 0 else "")
 		"left_airport": where = "Left the airport %s" % AirportClock.display(p.left_airport_tick)
 	var off := "Still aboard" if p.deplaned_airport_tick < 0 else "Off the aircraft %s at gate %s" % [AirportClock.display(p.deplaned_airport_tick), f.assigned_gate_id]
-	var cabin := "Seat %s (%s) · %d bags" % [p.seat_key(), p.seat_type_name(), p.carry_on_count] if f.boarding_mode == "cabin" else "Widebody: no seat model yet"
+	var cabin := "Seat %s (%s) · %d carry-on" % [p.seat_key(), p.seat_type_name(), p.carry_on_count] if f.boarding_mode == "cabin" else "Widebody: no seat model yet"
+	cabin += _bag_lines(p)
 	if p.caused_blocked_time > 0: cabin += " · held up others %.0f s" % (float(p.caused_blocked_time) / sim.cabin_config.tick_rate)
 	return "[font_size=23][b]Passenger %04d[/b][/font_size]\nArriving on %s from %s\n\n%s\n%s\n\n[color=#70dec0]%s[/color]" % [p.id, f.flight_number, p.origin, cabin, off, where]
 
@@ -611,6 +638,7 @@ func _connection_text(p: Passenger) -> String:
 		"missed_connection": where = "Stranded at the closed gate %s" % b.assigned_gate_id
 		_: where = p.airport_state.replace("_", " ")
 	var status := ""
+	var passenger_status := ""
 	match p.connection_status:
 		"made": status = "[color=#70dec0]CONNECTION MADE[/color]"
 		"missed":
@@ -623,10 +651,54 @@ func _connection_text(p: Passenger) -> String:
 			var close := b.gate_close_tick if b.gate_close_tick >= 0 else b.scheduled_departure - 6000
 			var eta: Dictionary = sim.connector_eta(p, b) if p.airport_state != "waiting_at_gate" else {"eta": sim.clock.tick}
 			var slack := close - int(eta.eta)
+			passenger_status = "ON TRACK" if slack > 1800 else "AT RISK"
 			status = ("[color=#70dec0]ON TRACK[/color]" if slack > 1800 else "[color=#ffc078]CONNECTION AT RISK[/color]") + \
 				" · gate closes %s (in %s) · ETA %s" % [AirportClock.display(close).left(5), _mmss(close - sim.clock.tick), AirportClock.display(int(eta.eta)).left(5)]
-	return "[font_size=23][b]Passenger %04d[/b][/font_size]\nCONNECTING %s → %s\nFrom %s to %s · gate %s\n\n%s\n\n%s" % [
-		p.id, a.flight_number, b.flight_number, a.origin, b.destination, b.assigned_gate_id, where, status]
+	if passenger_status.is_empty(): passenger_status = {"made": "BOARDED" if p.airport_state in ["on_aircraft", "departed"] else "CONNECTION MADE", "missed": "MISSED CONNECTION"}.get(p.connection_status, "")
+	return "[font_size=23][b]Passenger %04d[/b][/font_size]\nCONNECTING %s → %s\nFrom %s to %s · gate %s\n\n%s\n\n%s%s%s" % [
+		p.id, a.flight_number, b.flight_number, a.origin, b.destination, b.assigned_gate_id, where, status, _bag_connection_text(p, passenger_status), _bag_lines(p)]
+
+## Passenger vs bag, side by side: they make (or miss) the connection separately.
+func _bag_connection_text(p: Passenger, passenger_status: String) -> String:
+	if p.checked_bag_ids.is_empty(): return "\n\nPassenger: %s · no checked bags" % passenger_status
+	var colors := {"ON TRACK": "70dec0", "LOADED": "70dec0", "READY": "70dec0", "CONNECTION MADE": "70dec0", "BOARDED": "70dec0", "AT RISK": "ffc078", "HELD": "ffc078", "MISSED CONNECTION": "e5484d"}
+	var worst := {}
+	for id in p.checked_bag_ids:
+		var s := sim.bag_connection_status(sim.airport.bags[id])
+		if worst.is_empty() or ["LOADED", "READY", "ON TRACK", "AT RISK", "HELD", "MISSED CONNECTION"].find(s.status) > ["LOADED", "READY", "ON TRACK", "AT RISK", "HELD", "MISSED CONNECTION"].find(worst.status): worst = s
+	var detail := ""
+	if worst.status in ["ON TRACK", "AT RISK"] and int(worst.ready) >= 0: detail = " · ready ~%s vs bag cutoff %s" % [AirportClock.display(int(worst.ready)).left(5), AirportClock.display(int(worst.cutoff)).left(5)]
+	elif worst.status == "MISSED CONNECTION": detail = " · ready %s, bag cutoff was %s" % [AirportClock.display(int(worst.ready)).left(5) if int(worst.ready) >= 0 else "later", AirportClock.display(int(worst.cutoff)).left(5)]
+	return "\n\n[b]Passenger: [color=#%s]%s[/color] / Bag: [color=#%s]%s[/color][/b]%s" % [colors.get(passenger_status, "a7becd"), passenger_status,
+		colors.get(worst.status, "a7becd"), worst.status, detail]
+
+## "Checked bag: BAG_000123 · Ready for AW 228", one line per bag.
+func _bag_lines(p: Passenger) -> String:
+	var text := ""
+	if p.checked_bag_ids.is_empty(): return "\nNo checked bags" if sim.baggage.enabled() else ""
+	for id in p.checked_bag_ids:
+		var bag: AirportBag = sim.airport.bags[id]
+		text += "\nChecked bag: %s · %s" % [bag.id, sim.baggage.describe(bag)]
+	return text
+
+## The flight's hold: loaded of expected, what is still coming, the bag cutoff.
+func _baggage_text(f: AirportFlight) -> String:
+	if not sim.baggage.enabled() or f.status == "departed" and f.bags_loaded == 0 and f.bags_missed == 0: return ""
+	var b := sim.flight_baggage(f)
+	var text := "\n\n[b]Baggage[/b]  Loaded %d / %d" % [b.loaded, b.expected]
+	var parts: Array = []
+	if b.ready > 0: parts.append("%d ready" % b.ready)
+	if b.sorting > 0: parts.append("%d sorting" % b.sorting)
+	if b.transfer_inbound > 0: parts.append("%d transfer inbound" % b.transfer_inbound)
+	if b.not_checked > 0 and not f.bag_cutoff_passed: parts.append("%d not checked in" % b.not_checked)
+	if not parts.is_empty(): text += " · " + " · ".join(parts)
+	if f.status != "departed":
+		if f.bag_cutoff_tick >= 0 and not f.bag_cutoff_passed: text += "\nBag cutoff in %s (%s)" % [_mmss(f.bag_cutoff_tick - sim.clock.tick), AirportClock.display(f.bag_cutoff_tick).left(5)]
+		elif f.bag_cutoff_passed: text += "\nBag cutoff passed %s" % AirportClock.display(f.bag_cutoff_tick).left(5)
+	if b.missed > 0 or b.held > 0:
+		text += "\n[color=#ffc078]%d missed the bag cutoff · %d held (passenger not aboard)[/color]" % [b.missed, b.held]
+	if b.inbound > 0 and f.status != "departed": text += "\nInbound bags off %d / %d" % [b.unloaded, b.inbound]
+	return text
 
 static func _mmss(ticks: int) -> String:
 	var seconds := maxi(0, ticks) / 10

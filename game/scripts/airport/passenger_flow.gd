@@ -4,15 +4,15 @@ extends RefCounted
 const JOURNEY_STATES := ["not_arrived", "walking_to_check_in", "check_in", "walking_to_security",
 	"security_queue", "security_processing", "walking_to_gate", "waiting_at_gate", "route_blocked",
 	"boarding", "on_aircraft", "departed", "missed_flight",
-	"deboarding", "walking_to_exit", "left_airport", "missed_connection"]
-## Journey states of arriving passengers (M5).
-const ARRIVING_STATES := ["on_aircraft", "deboarding", "walking_to_exit", "left_airport"]
+	"deboarding", "walking_to_exit", "left_airport", "missed_connection", "walking_to_reclaim", "waiting_at_reclaim"]
+## Journey states of arriving passengers (M5; reclaim M7).
+const ARRIVING_STATES := ["on_aircraft", "deboarding", "walking_to_reclaim", "waiting_at_reclaim", "walking_to_exit", "left_airport"]
 ## Journey states of a connecting passenger on each leg (M6).
 const CONNECTING_STATES := [["on_aircraft", "deboarding"],
 	["walking_to_gate", "waiting_at_gate", "route_blocked", "boarding", "on_aircraft", "departed", "missed_connection"]]
 ## Journey states with no pending terminal event (the passenger is not moving).
 const RESTING_STATES := ["waiting_at_gate", "security_queue", "route_blocked",
-	"boarding", "on_aircraft", "departed", "missed_flight", "deboarding", "left_airport", "missed_connection"]
+	"boarding", "on_aircraft", "departed", "missed_flight", "deboarding", "left_airport", "missed_connection", "waiting_at_reclaim"]
 var airport: AirportState
 var events: AirportEvents
 var graph := TerminalGraph.new()
@@ -24,6 +24,8 @@ var rng := SimRng.new(0)
 var ready_by_flight: Dictionary = {}
 ## Passenger ids that reached their gate this tick, drained by boarding each tick.
 var gate_arrivals: Array = []
+## Checked baggage (M7): bags follow check-in and wait at reclaim. Optional.
+var baggage: BaggageSystem
 
 func bind(state: AirportState, event_bus: AirportEvents, settings: Dictionary) -> void:
 	airport = state
@@ -237,10 +239,24 @@ func transfer_to_connection(p: Passenger, gate: String, now: int) -> void:
 	_begin_walk(p, "walking_to_gate", airport.flights[p.current_flight_id].assigned_gate_id, now)
 
 ## A passenger has left the aircraft at `gate`: into the terminal, toward the exit.
+## Passengers with checked bags go to reclaim first (M7).
 func arrive_from_aircraft(p: Passenger, gate: String, now: int) -> void:
 	p.current_location = gate
 	p.deplaned_airport_tick = now
 	_emit(now, "PASSENGER_DEPLANED", p, {"gate_id": gate})
+	if not p.checked_bag_ids.is_empty():
+		_begin_walk(p, "walking_to_reclaim", str(config.get("reclaim_node", "baggage_reclaim")), now)
+	else:
+		_begin_walk(p, "walking_to_exit", str(config.get("exit_node", "airport_exit")), now)
+
+## One of the passenger's bags reached the reclaim belt.
+func bag_at_reclaim(p: Passenger, now: int) -> void:
+	if p.airport_state == "waiting_at_reclaim" and baggage.all_at_reclaim(p): _collect(p, now)
+
+func _collect(p: Passenger, now: int) -> void:
+	baggage.collect(p, now)
+	p.bags_collected_tick = now
+	_emit(now, "PASSENGER_COLLECTED_BAGS", p, {"waited_ticks": now - p.reclaim_arrival_tick})
 	_begin_walk(p, "walking_to_exit", str(config.get("exit_node", "airport_exit")), now)
 
 ## Load factor in permille: the airline's range, else the scenario range, else
@@ -282,6 +298,7 @@ func step(now: int) -> void:
 				p.walk_to = ""
 				_continue_walk(p, now)
 			"check_in":
+				if baggage != null: baggage.check_in(p, now)
 				if p.security_checkpoint_id.is_empty():
 					_set_state(p, "route_blocked")
 				else:
@@ -326,6 +343,11 @@ func _continue_walk(p: Passenger, now: int) -> void:
 				cp.queue.append(p.id)
 				_emit(now, "PASSENGER_SECURITY_ENTER", p, {"checkpoint": cp.id})
 				_dispatch(cp, now)
+			"walking_to_reclaim":
+				p.reclaim_arrival_tick = now
+				_emit(now, "PASSENGER_AT_RECLAIM", p)
+				if baggage.all_at_reclaim(p): _collect(p, now)
+				else: _set_state(p, "waiting_at_reclaim")
 			"walking_to_exit":
 				_set_state(p, "left_airport")
 				p.left_airport_tick = now

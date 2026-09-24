@@ -182,6 +182,9 @@ var itinerary_seats: Array = []
 var leg_index: int = 0
 ## "" (not connecting), "pending", "made" or "missed".
 var connection_status: String = ""
+# Reclaim (M7), airport ticks: reached the reclaim hall, collected every bag.
+var reclaim_arrival_tick: int = -1
+var bags_collected_tick: int = -1
 
 ## Full live state for airport saves; preserve to_dict()'s boarding record API.
 func snapshot() -> Dictionary:

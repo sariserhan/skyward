@@ -9,6 +9,7 @@ const SUITES := [
 	"res://tests/test_turnaround.gd",
 	"res://tests/test_deboarding.gd",
 	"res://tests/test_connections.gd",
+	"res://tests/test_baggage.gd",
 	"res://tests/test_simulation.gd",
 	"res://tests/test_deadlock.gd",
 ]
@@ -19,7 +20,10 @@ func _initialize() -> void:
 	var failed := 0
 	var started := Time.get_ticks_msec()
 	print("BOARDING test harness — Godot %s, sim %s" % [Engine.get_version_info()["string"], Simulation.SIM_VERSION])
+	# Optional filter: suite file names after "--" (e.g. -- test_baggage.gd).
+	var only := OS.get_cmdline_user_args()
 	for path in SUITES:
+		if not only.is_empty() and not path.get_file() in only: continue
 		var script: GDScript = load(path)
 		var suite: TestCase = script.new()
 		print("\n%s" % path.get_file())

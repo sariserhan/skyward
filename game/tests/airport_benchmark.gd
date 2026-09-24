@@ -28,7 +28,8 @@ func _initialize() -> void:
 			push_error("Default schedule did not finish within four hours")
 			quit(1)
 			return
-		var restored := AirportSimulation.from_snapshot(sim.snapshot())
+		# Through JSON, as a real save file is.
+		var restored := AirportSimulation.from_snapshot(JSON.parse_string(JSON.stringify(sim.snapshot())))
 		if restored == null:
 			push_error("Benchmark ended with invalid domain invariants")
 			quit(1)

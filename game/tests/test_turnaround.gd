@@ -20,8 +20,10 @@ func fixture(overrides := {}, edit := Callable()) -> AirportSimulation:
 	f.turnaround_overrides = overrides
 	config.flights = [f]
 	var flow: Dictionary = config.passenger_flow
-	# Earlier-milestone fixtures: no connecting itineraries (M6 tests opt in).
+	# Earlier-milestone fixtures: no connecting itineraries (M6 tests opt in)
+	# and no checked-baggage model (M7 tests opt in).
 	flow.erase("connections")
+	config.erase("baggage")
 	flow.arrival_lead_min_ticks = 30000
 	flow.arrival_lead_max_ticks = 34000
 	flow.check_in_ticks = 1
@@ -70,7 +72,7 @@ func test_dependency_ordering() -> void:
 	assert_true(not seen_boarding_early, "boarding never starts before cleaning and catering")
 	var secured := task(sim, "arrival_secured")
 	assert_eq(secured.start_tick, f.gate_arrival_tick + 1, "first task starts when the aircraft is at the gate")
-	for type in ["deboarding", "fueling", "placeholder_baggage_service"]:
+	for type in ["deboarding", "fueling", "baggage_unload"]:
 		assert_eq(task(sim, type).start_tick, secured.finish_tick, type + " waits for arrival secured")
 		assert_eq(task(sim, type).started_after, "arrival_secured")
 	for type in ["cleaning", "catering"]:
@@ -84,7 +86,7 @@ func test_independent_tasks_run_concurrently() -> void:
 	var sim := fixture()
 	run_until(sim, func(): return task(sim, "deboarding").status == TurnaroundTask.RUNNING)
 	sim.step()
-	for type in ["deboarding", "fueling", "placeholder_baggage_service"]:
+	for type in ["deboarding", "fueling", "baggage_unload"]:
 		assert_eq(task(sim, type).status, TurnaroundTask.RUNNING, type + " runs alongside the others")
 
 
@@ -112,9 +114,9 @@ func test_late_aircraft_shifts_turnaround() -> void:
 		var sim := fixture({}, func(config): config.flights[0].scheduled_arrival = arrival)
 		run_until(sim, func(): return flight(sim).status == "departed")
 		var row := {"dock": flight(sim).gate_arrival_tick}
-		for type in ["arrival_secured", "cleaning", "placeholder_baggage_service"]: row[type] = task(sim, type).start_tick
+		for type in ["arrival_secured", "cleaning", "baggage_unload"]: row[type] = task(sim, type).start_tick
 		starts.append(row)
-	for type in ["arrival_secured", "cleaning", "placeholder_baggage_service"]:
+	for type in ["arrival_secured", "cleaning", "baggage_unload"]:
 		assert_eq(starts[1][type] - starts[0][type], starts[1].dock - starts[0].dock, type + " shifts with the late gate arrival")
 
 
@@ -138,28 +140,29 @@ func test_boarding_waits_for_prerequisites_then_completes_through_framework() ->
 
 
 func test_no_pushback_with_required_task_incomplete() -> void:
-	# Baggage placeholder runs 15 minutes past scheduled pushback.
-	var sim := fixture({"placeholder_baggage_service": 25000})
+	# Baggage unload (nominal timing here) runs far past scheduled pushback.
+	var sim := fixture({"baggage_unload": 32000})
 	var f := flight(sim)
 	run_until(sim, func(): return f.boarding_phase == "complete")
 	sim.step()
 	assert_eq(f.status, "boarding", "boarded but not pushback-ready")
-	assert_eq(task(sim, "pushback_ready").blocked_reason, "waiting for baggage (placeholder)")
-	var baggage := task(sim, "placeholder_baggage_service")
+	assert_eq(task(sim, "pushback_ready").blocked_reason, "waiting for baggage load")
+	var baggage := task(sim, "baggage_load")
 	run_until(sim, func(): return f.status == "departed")
 	assert_eq(f.gate_release_tick, baggage.finish_tick, "pushes back the tick the last required task completes")
 	assert_true(f.gate_release_tick > D - exit_ticks(sim))
 
 
 func test_critical_task_delay_is_measured_and_attributed() -> void:
-	var sim := fixture({"placeholder_baggage_service": 25000})
+	var sim := fixture({"baggage_unload": 32000})
 	var f := flight(sim)
 	run_until(sim, func(): return f.status == "departed")
 	var late := f.actual_departure - D
 	assert_true(late > 6000, "real departure delay")
 	assert_eq(sum(f.departure_delay_breakdown), late, "breakdown is additive and complete")
-	var baggage := int(f.departure_delay_breakdown.get("placeholder_baggage_service", 0))
+	var baggage := int(f.departure_delay_breakdown.get("baggage_unload", 0)) + int(f.departure_delay_breakdown.get("baggage_load", 0))
 	assert_eq(baggage, f.gate_release_tick - (D - exit_ticks(sim)), "all pushback lateness is baggage")
+	assert_true(int(f.departure_delay_breakdown.get("baggage_unload", 0)) > 0, "the slow unload is blamed")
 	assert_true(not f.departure_delay_breakdown.has("boarding"), "boarding finished on time: not blamed")
 
 

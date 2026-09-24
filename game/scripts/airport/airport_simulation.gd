@@ -3,7 +3,7 @@ extends RefCounted
 ## One world, one clock. Turnaround is a task graph (M4); cabin flights deboard
 ## (M5) and board (M3) through cabin engines as tasks of it; widebodies use the
 ## widebody deboarding and boarding abstractions (D-022, D-029).
-const SAVE_VERSION := 6
+const SAVE_VERSION := 7
 const CONFIG_PATH := "res://configs/airports/riverdale.json"
 const STATES := ["scheduled", "approaching", "landed", "taxiing_in", "at_gate",
 	"turnaround", "boarding", "ready_for_pushback", "taxiing_out", "departed"]
@@ -26,11 +26,14 @@ var events := AirportEvents.new()
 var rng := SimRng.new(0)
 var passenger_flow := PassengerFlow.new()
 var turnaround := Turnaround.new()
+var baggage := BaggageSystem.new()
 var config: Dictionary = {}
 var seed_value: int = 0
 var decisions: Array = []
 var conflicts: Dictionary = {}
 var last_tick_usec: int = 0
+## Profiling: total time spent in the baggage event step (not saved).
+var baggage_usec: int = 0
 var flight_order: Array[AirportFlight] = []
 ## Active cabin boarding sessions by flight id (open until pushback).
 var boarding_sessions: Dictionary = {}
@@ -97,6 +100,11 @@ func setup(scenario: Dictionary = {}, seed_override: int = -1) -> void:
 		if deboarding != null: plans[f.id] = [deboarding.planned_start_tick, deboarding.planned_finish_tick, 0 if cabin == null else cabin.rows]
 	passenger_flow.generate(seed_value, clock.tick, flight_order, cabins_by_type, cabin_config,
 		int(_boarding("gate_close_before_departure_ticks")), config.get("deboarding", {}), plans)
+	# Checked bags for every passenger, from their own stream (M7).
+	baggage = BaggageSystem.new()
+	baggage.bind(airport, events, passenger_flow, config.get("baggage", {}))
+	passenger_flow.baggage = baggage
+	baggage.generate(seed_value)
 
 func _boarding(key: String) -> Variant:
 	return config.get("boarding", {}).get(key, BOARDING_DEFAULTS[key])
@@ -126,6 +134,9 @@ func step() -> void:
 	passenger_flow.step(clock.tick)
 	_step_boarding()
 	_step_deboarding()
+	var baggage_started := Time.get_ticks_usec()
+	baggage.step(clock.tick)
+	baggage_usec += Time.get_ticks_usec() - baggage_started
 	if clock.tick % AirportClock.TICKS_PER_SECOND == 0:
 		_update_conflicts()
 	last_tick_usec = Time.get_ticks_usec() - started
@@ -182,11 +193,13 @@ func _update_flight(f: AirportFlight) -> void:
 ## release the pushback milestone (and anything exclusive with boarding).
 func _update_turnaround(f: AirportFlight) -> void:
 	var release := Callable(self, "_release_boarding")
-	var deboard := Callable(self, "_start_deboarding")
+	var starters := {"deboarding": Callable(self, "_start_deboarding"), "baggage_unload": Callable(self, "_start_baggage_unload"),
+		"baggage_load": Callable(self, "_start_baggage_load")}
 	_update_abstract_deboarding(f)
-	turnaround.update(f, clock.tick, release, deboard)
+	turnaround.update(f, clock.tick, release, starters)
 	if f.status == "boarding": _update_boarding(f)
-	turnaround.update(f, clock.tick, release, deboard)
+	_update_baggage_tasks(f)
+	turnaround.update(f, clock.tick, release, starters)
 	if turnaround.pushback_ready(f) and f.status in ["turnaround", "boarding"]:
 		_transition(f, "ready_for_pushback")
 		_try_pushback(f)
@@ -241,6 +254,7 @@ func _complete_runway() -> void:
 		f.actual_departure = clock.tick
 		f.estimated_departure = clock.tick
 		f.departure_delay_breakdown = turnaround.attribute(f, _scheduled_pushback(f), f.takeoff_wait_ticks)
+		baggage.depart(f)
 		_transition(f, "departed")
 		for id in f.passenger_ids:
 			var p: Passenger = airport.passengers[str(id)]
@@ -286,13 +300,21 @@ func _estimate_pushback(f: AirportFlight, dock: int) -> int:
 			TurnaroundTask.COMPLETE: finish[t.type] = t.finish_tick
 			_:
 				match t.kind:
-					"timed", "deboarding":
+					"timed", "deboarding", "baggage_unload":
 						var started := t.start_tick if t.status == TurnaroundTask.RUNNING else ready
 						finish[t.type] = maxi(clock.tick, started + t.duration_ticks)
 					"boarding":
 						if f.boarding_phase in ["closed", "complete"]: finish[t.type] = clock.tick
 						elif f.boarding_phase in ["scheduled", "open"]: finish[t.type] = maxi(clock.tick, f.gate_close_tick)
 						else: finish[t.type] = maxi(f.scheduled_departure, ready + open_offset) - close_offset
+					"baggage_load":
+						# Loading finalizes once the gate has closed.
+						var close := f.gate_close_tick if f.gate_close_tick >= 0 else f.scheduled_departure - close_offset
+						finish[t.type] = maxi(maxi(ready, close), clock.tick)
+						if t.status == TurnaroundTask.RUNNING and baggage.enabled():
+							# The loader's backlog: bags queued plus the one in hand.
+							var left: int = f.bag_load_queue.size() + (0 if f.bag_loader_current.is_empty() else 1)
+							finish[t.type] = maxi(finish[t.type], clock.tick + left * int(baggage._rates(f).get("load_ticks_per_bag", 0)))
 					_: finish[t.type] = ready
 		if t.type == Turnaround.PUSHBACK: pushback = maxi(pushback, int(finish[t.type]))
 	return pushback
@@ -418,7 +440,7 @@ func snapshot() -> Dictionary:
 	return _integer_json({"version": SAVE_VERSION, "engine": Engine.get_version_info().string, "scenario": config.duplicate(true),
 		"seed": seed_value, "clock": clock.to_dict(), "rng": rng.snapshot(), "airport": airport.to_dict(),
 		"events": events.history.duplicate(true), "decisions": decisions.duplicate(true), "conflicts": conflicts.duplicate(true), "passenger_flow": passenger_flow.snapshot(),
-		"boarding": _boarding_snapshot(), "deboarding": _deboarding_snapshot()})
+		"boarding": _boarding_snapshot(), "deboarding": _deboarding_snapshot(), "baggage": baggage.snapshot()})
 
 ## Active cabin sessions (D-021). Passenger cabin fields are already inside
 ## airport.passengers through Passenger.snapshot().
@@ -431,13 +453,14 @@ static func from_snapshot(data: Dictionary) -> AirportSimulation:
 	data = _integer_json(data)
 	if int(data.get("version", -1)) != SAVE_VERSION or data.get("engine", "") != Engine.get_version_info().string:
 		return null
-	for key in ["scenario", "clock", "rng", "airport", "conflicts", "passenger_flow", "boarding", "deboarding"]:
+	for key in ["scenario", "clock", "rng", "airport", "conflicts", "passenger_flow", "boarding", "deboarding", "baggage"]:
 		if not data.get(key) is Dictionary: return null
 	for key in ["events", "decisions"]:
 		if not data.get(key) is Array: return null
 	if not _valid_snapshot(data): return null
 	if not PassengerFlowValidation.valid(data): return null
 	if not Turnaround.valid_snapshot(data): return null
+	if not BaggageSystem.valid_snapshot(data): return null
 	var sim := AirportSimulation.new()
 	sim.config = data.scenario.duplicate(true)
 	sim._load_cabins()
@@ -454,6 +477,9 @@ static func from_snapshot(data: Dictionary) -> AirportSimulation:
 	sim.passenger_flow.bind(sim.airport, sim.events, sim.config.get("passenger_flow", {}))
 	sim.passenger_flow.restore(data.passenger_flow)
 	sim.turnaround.bind(sim.airport, sim.events, sim.config.get("turnaround", {}))
+	sim.baggage.bind(sim.airport, sim.events, sim.passenger_flow, sim.config.get("baggage", {}))
+	sim.baggage.restore(data.baggage)
+	sim.passenger_flow.baggage = sim.baggage
 	for id in data.boarding:
 		var f: AirportFlight = sim.airport.flights[id]
 		sim.boarding_sessions[id] = FlightBoarding.from_snapshot(data.boarding[id], sim.cabins[data.boarding[id].cabin_id], sim._manifest(f))
@@ -625,6 +651,8 @@ func _schedule_boarding(f: AirportFlight) -> void:
 	f.departure_target_tick = maxi(f.scheduled_departure, clock.tick + open_offset)
 	f.boarding_open_tick = f.departure_target_tick - open_offset
 	f.gate_close_tick = f.departure_target_tick - int(_boarding("gate_close_before_departure_ticks"))
+	# Bags must be sorted and ready before this (M7); holds do not move it.
+	f.bag_cutoff_tick = f.departure_target_tick - int(config.get("baggage", {}).get("bag_cutoff_before_departure_ticks", 0))
 	f.boarding_phase = "scheduled"
 
 func _update_boarding(f: AirportFlight) -> void:
@@ -999,3 +1027,141 @@ func connector_eta(p: Passenger, f: AirportFlight) -> Dictionary:
 		return {"status": "deboarding %s at %s" % [a.flight_number, a.assigned_gate_id], "eta": clock.tick + walk}
 	var dock := a.gate_arrival_tick if a.gate_arrival_tick >= 0 else a.scheduled_arrival + a.inbound_delay_ticks + int(config.taxi_in_ticks)
 	return {"status": "on %s (%s)" % [a.flight_number, a.status.replace("_", " ")], "eta": maxi(dock, clock.tick) + walk}
+
+
+
+# --- baggage (M7) ------------------------------------------------------------
+
+func _start_baggage_unload(f: AirportFlight) -> void:
+	if baggage.enabled(): baggage.start_unload(f, clock.tick)
+	else: f.bag_unload_due_tick = clock.tick + turnaround.task(f, Turnaround.BAGGAGE_UNLOAD).duration_ticks
+
+func _start_baggage_load(f: AirportFlight) -> void:
+	baggage.start_load(f, clock.tick)
+
+## Unload ends with the last bag off. The bag cutoff marks unready bags missed.
+## Loading finalizes once the gate has closed and the cutoff has passed, and
+## completes when the loader has nothing left to load or offload.
+func _update_baggage_tasks(f: AirportFlight) -> void:
+	var unload := turnaround.task(f, Turnaround.BAGGAGE_UNLOAD)
+	if unload != null and unload.status == TurnaroundTask.RUNNING and clock.tick >= f.bag_unload_due_tick:
+		turnaround.complete_task(f, Turnaround.BAGGAGE_UNLOAD, clock.tick)
+	if baggage.enabled() and f.boarding_phase != "" and not f.bag_cutoff_passed and clock.tick >= f.bag_cutoff_tick:
+		baggage.cutoff(f, clock.tick)
+	var load := turnaround.task(f, Turnaround.BAGGAGE_LOAD)
+	if load == null or load.status != TurnaroundTask.RUNNING: return
+	if not baggage.enabled():
+		# No baggage model in this scenario: loading takes its nominal time.
+		if clock.tick >= load.start_tick + load.duration_ticks: turnaround.complete_task(f, Turnaround.BAGGAGE_LOAD, clock.tick)
+		return
+	if not f.bag_load_finalized and f.bag_cutoff_passed and f.boarding_phase in ["closed", "complete"]:
+		baggage.finalize(f, clock.tick)
+	if baggage.load_done(f):
+		turnaround.complete_task(f, Turnaround.BAGGAGE_LOAD, clock.tick)
+
+## Airport-wide baggage summary (data for later airline measures and economy).
+func baggage_metrics() -> Dictionary:
+	var out := {"bags": 0, "passengers_with_bags": 0, "originating": 0, "local": 0, "transfer": 0, "departed": 0,
+		"transfer_made": 0, "transfer_missed": 0, "missed_flight": 0, "held": 0, "at_reclaim": 0, "collected": 0,
+		"reclaim_waits": 0, "reclaim_wait_ticks": 0, "max_reclaim_wait_ticks": 0, "baggage_delay_ticks": 0, "in_processing": 0}
+	for bag: AirportBag in airport.bags.values():
+		out.bags += 1
+		out[bag.kind] += 1
+		match bag.state:
+			"departed":
+				out.departed += 1
+				if bag.kind == "transfer": out.transfer_made += 1
+			"missed_connection": out.transfer_missed += 1
+			"missed_flight": out.missed_flight += 1
+			"held": out.held += 1
+			"at_reclaim": out.at_reclaim += 1
+			"collected": out.collected += 1
+			"in_transit", "queued", "sorting", "unloading", "loading", "ready_for_flight": out.in_processing += 1
+	for p: Passenger in airport.passengers.values():
+		if p.checked_bag_ids.is_empty(): continue
+		out.passengers_with_bags += 1
+		if p.bags_collected_tick >= 0:
+			var wait := p.bags_collected_tick - p.reclaim_arrival_tick
+			out.reclaim_waits += 1
+			out.reclaim_wait_ticks += wait
+			out.max_reclaim_wait_ticks = maxi(out.max_reclaim_wait_ticks, wait)
+	for f: AirportFlight in flight_order:
+		out.baggage_delay_ticks += int(f.departure_delay_breakdown.get("baggage_load", 0)) + int(f.departure_delay_breakdown.get("baggage_unload", 0))
+	out["bags_per_passenger"] = float(out.bags) / maxi(1, airport.passengers.size())
+	out["mean_reclaim_wait_ticks"] = 0 if out.reclaim_waits == 0 else out.reclaim_wait_ticks / out.reclaim_waits
+	return out
+
+## A transfer bag's slack: ready for its outbound flight vs that flight's bag cutoff.
+func bag_transfer_margin(bag: AirportBag) -> int:
+	var f: AirportFlight = airport.flights[bag.legs[-1]]
+	if bag.ready_tick < 0 or f.bag_cutoff_tick < 0: return 0
+	return f.bag_cutoff_tick - bag.ready_tick
+
+## One flight's baggage at a glance: loaded of expected, still in processing,
+## transfer bags still on inbound aircraft, not yet checked in, and outcomes.
+func flight_baggage(f: AirportFlight) -> Dictionary:
+	var out := {"expected": 0, "loaded": 0, "ready": 0, "sorting": 0, "transfer_inbound": 0, "not_checked": 0,
+		"missed": f.bags_missed, "held": f.bags_held, "inbound": 0, "unloaded": 0}
+	for bag: AirportBag in baggage.bags_for(f):
+		if bag.missed_flight_id == f.id: continue
+		out.expected += 1
+		if bag.leg_index < bag.legs.size() - 1:
+			out.transfer_inbound += 1
+			continue
+		match bag.state:
+			"created": out.not_checked += 1
+			"in_transit", "queued", "sorting": out.sorting += 1
+			"ready_for_flight", "loading": out.ready += 1
+			"on_aircraft", "departed": out.loaded += 1
+	for id in f.inbound_passenger_ids:
+		for bag_id in airport.passengers[str(id)].checked_bag_ids:
+			var bag: AirportBag = airport.bags[bag_id]
+			if bag.legs[0] != f.id: continue
+			out.inbound += 1
+			if bag.unloaded_tick >= 0: out.unloaded += 1
+	return out
+
+## When a bag should be sorted and ready for its (last) flight, from its
+## scheduled events, queue position and the inbound aircraft's unload plan.
+func bag_ready_estimate(bag: AirportBag) -> int:
+	if bag.ready_tick >= 0: return bag.ready_tick
+	var stage_id := "transfer_sortation" if bag.kind == "transfer" else "outbound_sortation"
+	var s: Dictionary = baggage.stages.get(stage_id, {})
+	if s.is_empty(): return -1
+	var sort_ticks: int = int(s.service_ticks) * (1 + s.queue.size() / maxi(1, int(s.servers)))
+	var due := -1
+	for e in baggage.pending:
+		if e.bag_id == bag.id: due = int(e.tick)
+	match bag.state:
+		"sorting": return due
+		"queued": return clock.tick + int(s.service_ticks) * (1 + s.queue.find(bag.id) / maxi(1, int(s.servers)))
+		"in_transit": return due + sort_ticks
+		"unloading": return due + int(s.transit_ticks) + sort_ticks
+		"on_aircraft":
+			if bag.leg_index != 0 or bag.kind != "transfer": return -1
+			var a: AirportFlight = airport.flights[bag.legs[0]]
+			var dock := a.gate_arrival_tick if a.gate_arrival_tick >= 0 else a.scheduled_arrival + a.inbound_delay_ticks + int(config.taxi_in_ticks)
+			var secured: TurnaroundTask = turnaround.task(a, "arrival_secured")
+			var rates := baggage._rates(a)
+			var rank := 1
+			for id in a.inbound_passenger_ids:
+				for other in airport.passengers[str(id)].checked_bag_ids:
+					if other < bag.id and airport.bags[other].legs[0] == a.id: rank += 1
+			return maxi(dock, clock.tick) + (secured.duration_ticks if secured != null else 0) + int(rates.get("unload_base_ticks", 0)) + \
+				rank * int(rates.get("unload_ticks_per_bag", 0)) + int(s.transit_ticks) + sort_ticks
+	return -1
+
+## A transfer bag's outlook: ON BOARD, MISSED CONNECTION, HELD, or while still
+## moving ON TRACK / AT RISK against its flight's bag cutoff.
+func bag_connection_status(bag: AirportBag) -> Dictionary:
+	var f: AirportFlight = airport.flights[bag.legs[-1]]
+	var cutoff := f.bag_cutoff_tick if f.bag_cutoff_tick >= 0 else f.scheduled_departure - int(config.get("baggage", {}).get("bag_cutoff_before_departure_ticks", 0))
+	if bag.missed_flight_id == f.id and not bag.state in ["missed_connection", "held"]:
+		return {"status": "HELD" if bag.missed_reason == BaggageSystem.REASON_NOT_BOARDED else "MISSED CONNECTION", "ready": bag_ready_estimate(bag), "cutoff": cutoff}
+	match bag.state:
+		"missed_connection": return {"status": "MISSED CONNECTION", "ready": bag.ready_tick, "cutoff": cutoff}
+		"held": return {"status": "HELD", "ready": bag.ready_tick, "cutoff": cutoff}
+		"on_aircraft", "departed", "loading", "ready_for_flight":
+			if bag.leg_index == bag.legs.size() - 1: return {"status": "LOADED" if bag.state in ["on_aircraft", "departed"] else "READY", "ready": bag.ready_tick, "cutoff": cutoff}
+	var ready := bag_ready_estimate(bag)
+	return {"status": "ON TRACK" if ready >= 0 and ready <= cutoff - 1800 else "AT RISK", "ready": ready, "cutoff": cutoff}

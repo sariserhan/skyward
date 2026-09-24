@@ -84,3 +84,22 @@ var inbound_delay_ticks: int = 0
 var target_bookings: int = 0
 var originating_bookings: int = 0
 var connecting_bookings: int = 0
+
+# Baggage (M7). Airport ticks.
+## Bags must be sorted and ready by this tick (departure target - cutoff).
+var bag_cutoff_tick: int = -1
+var bag_cutoff_passed: bool = false
+## Gate closed and cutoff passed: not-boarded passengers' bags are held.
+var bag_load_finalized: bool = false
+var bag_finalized_tick: int = -1
+var bag_unload_due_tick: int = -1
+## Loader: ready bag ids waiting to be loaded (or offloaded, prefixed "-").
+var bag_load_queue: Array = []
+var bag_loader_current: String = ""
+var bags_loaded: int = 0
+var bags_missed: int = 0
+var bags_held: int = 0
+## Scenario override of the baggage load/unload rates for this flight (demo aid).
+var baggage_overrides: Dictionary = {}
+## The baggage_load task is running: newly sorted bags join the load queue.
+var bag_loading_open: bool = false

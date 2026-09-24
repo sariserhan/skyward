@@ -798,3 +798,115 @@ coordination, not hidden passenger inflation.
 **Result:** the booked load averages 82.1% (configured 82.4%, rounded down per
 flight). The morning's mean delay drops from 3.0 to 1.9 minutes. Only the three
 demo flights are more than 5 minutes late.
+
+
+## D-035 — Checked bags are persistent objects on logical stages
+
+**Date:** 2026-09-24
+**Status:** Accepted (M7)
+
+Every checked bag is one `AirportBag`, id `BAG_000123`, from generation to its
+end state. It carries:
+
+- its passenger, its legs and a leg index
+- its kind: originating, local or transfer
+- a state and the stage it is in or heading for
+- timestamps and missed or held details
+
+A transfer bag stays the same object from the inbound aircraft through
+transfer sortation onto the outbound aircraft.
+
+**Generation.** Bags come from their own stream (`SimRng.STREAM_BAGGAGE`) after
+all passengers and connections, so turning bags off changes no passenger. Two
+draws are made per passenger whatever the result. The checked-bag probability
+is set per airline (the first leg's airline): Riverdale uses NS 45%, AW 50%,
+SJ 30% and GA 60%, with a 12% chance of a second bag.
+
+**Processing.** It is logical, not physical. Each stage (outbound sortation,
+transfer sortation, reclaim delivery) has, from airport config:
+
+- a transit time into it
+- a number of servers
+- a FIFO queue
+- a fixed service time
+
+Aircraft unload and load bags one at a time at configured rates, per aircraft
+type (the 787 twice as fast). Scenario per-flight `baggage_overrides` can
+change the rates. One stable event heap runs everything on the airport clock.
+
+There are no belts, vehicles or handlers yet. The logical stages are where
+those will plug in.
+
+**Turnaround.** `placeholder_baggage_service` is gone. There are two driven
+tasks:
+
+- `baggage_unload` (after arrival secured): ends with the last bag off
+- `baggage_load` (after unload): pushback requires it
+
+Loading cannot finalize before the passenger gate closes. That wait is passed
+to boarding's chain in the critical-path attribution, so a deep clean that
+delays boarding is still blamed on cleaning, not baggage.
+
+**Why:** real objects keep the "follow one thing" promise that passengers
+already have. Logical stages give congestion (queues, capacity and service
+time) without committing to a physical baggage hall before the resource
+milestones.
+
+
+## D-036 — Bag cutoff, passenger precedence, holds
+
+**Date:** 2026-09-24
+**Status:** Accepted (M7)
+
+**Bag cutoff.** Departure target − `bag_cutoff_before_departure_ticks` (D-15 at
+Riverdale), fixed when boarding is scheduled. Holds do not move it. A bag not
+sorted and ready by then misses the flight:
+
+- `missed_flight` (originating)
+- `missed_connection` (transfer)
+
+It is never flown on the wrong flight.
+
+**Load finalization.** When the gate has closed and the cutoff has passed, the
+bags of passengers who are not aboard are not flown:
+
+- queued or ready bags are held
+- loaded bags are offloaded, which costs loader time, then held
+
+**Passenger precedence (V1).** If a passenger didn't fly, their bag is `held`,
+even if it had also missed the cutoff. "Missed baggage connection" therefore
+counts only the case the player cares about: the passenger made it, the bag
+didn't.
+
+**Connections.** Eligibility is unchanged (passenger reachability only). The
+passenger's margin and the bag's margin are tracked separately.
+
+**Why:** the rule is simple and explainable, and it keeps passenger and bag
+outcomes independent. Rebooking, rush tags and delivery are later systems.
+
+
+## D-037 — Save schema v7
+
+**Date:** 2026-09-24
+**Status:** Accepted (M7)
+
+v7 adds:
+
+- bags
+- baggage-system state: event heap, sequence, stage queues and busy servers
+- flight loader state (queue, current operation), bag cutoff and finalization
+  flags, bag counters
+- passenger reclaim ticks
+
+v6 is rejected. Validation cross-checks:
+
+- every bag has exactly one owner and a consistent leg
+- each state has exactly the bookkeeping it needs (a sorting bag has a
+  `sorted` event and a server; a queued bag is in its stage queue; a loading
+  bag is its flight's current loader operation)
+- server slots are in range
+- the heap is ordered, unique and in the future
+- no bag is loaded twice
+
+A save taken mid-flow (bags in transit, sorting, loading, unloading or at
+reclaim) resumes identically.

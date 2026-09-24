@@ -1,4 +1,4 @@
-# Airport architecture — M0 to M6
+# Airport architecture — M0 to M7
 
 The airport is now the default Godot scene. The existing boarding scene remains
 available at `res://scenes/main.tscn`; its simulation algorithm is unchanged.
@@ -162,6 +162,42 @@ alongside the conflict check.
 - A compact turnaround summary sits under it.
 - A **Turnaround** tab holds the full task table.
 - After takeoff, the additive delay breakdown is shown.
+
+## M7 baggage
+
+**Ownership.** `baggage_system.gd` (`BaggageSystem`) owns bag processing:
+
+- the logical stages (queue, busy servers)
+- one stable event heap (transit arrivals, service completions, unloads,
+  loads, offloads)
+- per-flight loader operations (`bag_load_queue`, `bag_loader_current`)
+
+Bags are `AirportBag` entities in `AirportState.bags`. Passengers hold
+`checked_bag_ids`.
+
+**Each tick** `AirportSimulation.step()` runs `baggage.step()` after
+passengers, boarding and deboarding. Flights drive the two driven turnaround
+tasks through `Turnaround.update(f, now, schedule_boarding, starters)`, which
+now takes a starter per driven kind (`deboarding`, `baggage_unload`,
+`baggage_load`). `_update_baggage_tasks()` then:
+
+- completes unload at its due tick
+- applies the bag cutoff
+- finalizes loading once the gate is closed
+- completes loading when the loader is idle and empty
+
+**Passenger side.** `PassengerFlow` calls `baggage.check_in()` at check-in.
+`arrive_from_aircraft()` routes passengers with bags to the reclaim node.
+`bag_at_reclaim()` releases a waiting passenger once all their bags are on
+the belt.
+
+**Reporting.** `flight_baggage()`, `baggage_metrics()`,
+`bag_ready_estimate()`, `bag_connection_status()` and `bag_transfer_margin()`
+feed the UI (flight baggage block, task progress, passenger bag lines,
+Passenger / Bag outlook for connectors, backlog alerts, top bar).
+
+**Without baggage config** (earlier fixtures), the two tasks run on their
+nominal durations and nobody stops at reclaim.
 
 ## M6 connections
 

@@ -51,4 +51,19 @@ static func measure(sim: AirportSimulation) -> Dictionary:
 		"boarded_load_pct": snappedf(boarded_load / sim.flight_order.size(), 0.1), "empty_seats_at_departure": empty_seats,
 		"originating_bookings": originating, "connecting_bookings": connecting,
 		"departed": metrics.departed, "late_departures": metrics.late, "late_over_5_min": late_over_5,
-		"flights_delayed_by_boarding": boarding_delayed, "mean_delay_min": snappedf(metrics.delay_ticks / 600.0 / maxi(1, metrics.departed), 0.1)}
+		"flights_delayed_by_boarding": boarding_delayed, "mean_delay_min": snappedf(metrics.delay_ticks / 600.0 / maxi(1, metrics.departed), 0.1),
+		"baggage": _baggage(sim)}
+
+
+## M7: checked bags for the morning, and which flights baggage delayed.
+static func _baggage(sim: AirportSimulation) -> Dictionary:
+	var m := sim.baggage_metrics()
+	var delayed := 0
+	for f: AirportFlight in sim.flight_order:
+		if int(f.departure_delay_breakdown.get("baggage_load", 0)) + int(f.departure_delay_breakdown.get("baggage_unload", 0)) > 0: delayed += 1
+	return {"bags": m.bags, "bags_per_passenger": snappedf(m.bags_per_passenger, 0.01), "passengers_with_bags": m.passengers_with_bags,
+		"originating": m.originating, "local": m.local, "transfer": m.transfer, "departed": m.departed,
+		"transfer_made": m.transfer_made, "transfer_missed": m.transfer_missed, "missed_flight": m.missed_flight, "held": m.held,
+		"collected": m.collected, "at_reclaim": m.at_reclaim, "mean_reclaim_wait_min": snappedf(m.mean_reclaim_wait_ticks / 600.0, 0.1),
+		"max_reclaim_wait_min": snappedf(m.max_reclaim_wait_ticks / 600.0, 0.1), "baggage_delay_min": snappedf(m.baggage_delay_ticks / 600.0, 0.1),
+		"flights_delayed_by_baggage": delayed}

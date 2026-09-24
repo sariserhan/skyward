@@ -13,7 +13,9 @@ const STATUSES := [PENDING, BLOCKED, READY, RUNNING, COMPLETE]
 ## window. deboarding: driven by the M5 cabin engine (or widebody abstraction),
 ## planned at its nominal duration. milestone: completes as soon as its
 ## prerequisites are complete.
-const KINDS := ["timed", "boarding", "deboarding", "milestone"]
+const KINDS := ["timed", "boarding", "deboarding", "baggage_unload", "baggage_load", "milestone"]
+## Kinds whose completion the airport simulation reports (not timed here).
+const DRIVEN := ["deboarding", "baggage_unload", "baggage_load"]
 
 var id: String = ""
 var flight_id: String = ""

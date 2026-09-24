@@ -1,13 +1,14 @@
-# Current status — M0 through M6 implemented
+# Current status — M0 through M7 implemented
 
-M6 connecting passengers are complete. The same passenger arrives on one flight,
-deboards, transfers airside, and boards another. Missed connections are
-stranded, with derived causes, and gate-close decisions show which connectors
-are still inbound. A flight's load is its total bookings, split into originating
-and connecting passengers (D-034). Save schema v6. See the
-[M6 completion report](m6-status.md). M7 baggage has not started.
+M7 checked baggage is complete. Every checked bag is a persistent object linked
+to its passenger. Bags pass logical sortation and reclaim stages with finite
+capacity. Real baggage unload and load tasks sit in the turnaround, and pushback
+waits for the last bag. Local arrivals wait at reclaim for their own bags.
+Transfer bags follow connectors onto their next flight, or miss the D-15 bag
+cutoff even when the passenger makes it. Save schema v7. See the
+[M7 completion report](m7-status.md). M8 operational resources has not started.
 
-Earlier reports: [M5](m5-status.md), [M4](m4-status.md), [M3](m3-status.md), [M2](m2-status.md), and the M0/M1 report below. Their
+Earlier reports: [M6](m6-status.md), [M5](m5-status.md), [M4](m4-status.md), [M3](m3-status.md), [M2](m2-status.md), and the M0/M1 report below. Their
 limitations and timings are historical; M3 changed the timetable, scenario start,
 security defaults, loads, cabin timings and save schema (D-021, D-023, D-024).
 

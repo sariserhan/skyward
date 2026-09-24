@@ -34,8 +34,15 @@ it is kept as historical context. The original boarding roadmap remains at
   derived causes; connection context at gate close (the M3 hold is unchanged);
   connection metrics; save schema v6. Plan [m6-plan.md](m6-plan.md), report
   [m6-status.md](m6-status.md). Decisions D-031–D-033.
-- **M7 next, not started:** baggage.
-- M8: operational resources.
+- **M7 implemented:** checked baggage. Persistent bags linked to passengers
+  (0, 1 or 2, per-airline rates); logical sortation and reclaim stages with
+  capacity, queues and service time; real baggage unload and load turnaround
+  tasks replace M4's placeholder, and pushback requires baggage loading; local
+  arrivals wait at reclaim for their own bags; transfer bags follow connectors
+  through transfer sortation; a D-15 bag cutoff, with passengers and bags
+  missing independently; save schema v7. Plan [m7-plan.md](m7-plan.md), report
+  [m7-status.md](m7-status.md). Decisions D-035–D-037.
+- **M8 next, not started:** operational resources.
 - M9: airlines and contracts.
 - M10: economy.
 - M11: construction and expansion.
@@ -43,4 +50,4 @@ it is kept as historical context. The original boarding roadmap remains at
 The order after M3 follows D-020: the turnaround task framework comes before any
 individual turnaround activity.
 
-M6 stopped here for review. Do not begin M7 until requested.
+M7 stopped here for review. Do not begin M8 until requested.

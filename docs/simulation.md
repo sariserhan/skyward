@@ -112,12 +112,14 @@ variation.
 - The boarding task is released when cleaning and catering are done and
   fueling isn't running. On that tick the M3 window is scheduled: target
   `max(D, release + 30 min)`.
-- `pushback_ready` completes when boarding, fueling and baggage are complete.
+- `pushback_ready` completes when boarding, fueling and baggage loading are
+  complete.
   Pushback follows once the scheduled pushback plus hold used has passed.
 - A debug ramp hold extends the first task if it's unfinished, else every
   running timed task.
 
-Riverdale placeholder durations (minutes):
+Riverdale durations (minutes; the baggage rows are planning values, and the
+actual times come from the bags, see Checked baggage below):
 
 | Task | A220 | 737 | A321 | 787 |
 | --- | --- | --- | --- | --- |
@@ -126,9 +128,48 @@ Riverdale placeholder durations (minutes):
 | Cleaning (after deboarding) | 5 | 6 | 7 | 8 |
 | Catering (after deboarding) | 4 | 5 | 6 | 7 |
 | Fueling | 10 | 14 | 16 | 18 |
-| Baggage (placeholder) | 20 | 24 | 26 | 35 |
+| Baggage unload (after arrival secured; planned) | 7 | 11 | 13 | 15 |
+| Baggage load (after unload; planned) | 7 | 11 | 13 | 15 |
 
-Demo flight F004 (GA 242) has a 25-minute deep-clean override.
+Demo flight F004 (GA 242) has a 25-minute deep-clean override. F006 (AW 256)
+has a slow baggage loader (`baggage_overrides`).
+
+**Checked baggage (D-035, D-036).**
+
+- **Generation.** Bags are drawn from `SimRng.STREAM_BAGGAGE` after all
+  passengers: two draws per passenger, always. The chance of checking a bag
+  follows the first leg's airline (`baggage.airline_checked_permille`: NS 45%,
+  AW 50%, SJ 30%, GA 60%), with a 12% chance of a second bag. Scenario
+  `demo_bags` fixes a count by flight and seat.
+- **Stages** (`baggage.stages`): transit time in, servers, a FIFO queue and a
+  fixed service time.
+
+  | Stage | Transit | Servers | Service |
+  | --- | --- | --- | --- |
+  | Outbound sortation (from check-in) | 2 min | 4 | 10 s |
+  | Transfer sortation (from the inbound aircraft) | 3 min | 2 | 15 s |
+  | Reclaim delivery | 4 min | 3 | 5 s |
+
+- **Unload.** 3 minutes to open the hold, then 6 s per bag (3 s on the 787),
+  in bag-id order. The task ends with the last bag off. Local bags go to
+  reclaim; transfer bags go to transfer sortation for their next flight.
+- **Load.** Opens after unload. Ready bags are loaded one at a time (6 s each,
+  3 s on the 787) as they become ready.
+- **Bag cutoff.** D-15, from the departure target, set when boarding is
+  scheduled; holds do not move it. A bag not ready by then misses the flight
+  (`missed_flight` or `missed_connection`).
+- **Finalization.** Once the gate has closed and the cutoff has passed, bags
+  of passengers not aboard are held. Loaded ones are offloaded first (15 s
+  each). If a passenger didn't fly, their bag counts as held, not missed. The
+  load task completes when finalized with an empty loader. Pushback requires
+  it.
+- **Reclaim.** A local arrival with checked bags walks Arrivals → Reclaim
+  (`walking_to_reclaim`). They wait (`waiting_at_reclaim`) until all their own
+  bags are on the belt, collect them, and walk to the exit. Passengers without
+  bags walk straight through.
+- **Attribution.** Baggage load lateness first passes any wait for the gate
+  close to boarding's chain. What remains is the load's own overrun (a slow
+  loader or backlog), then its late start, which passes to unload.
 
 **Departure delay breakdown (D-026).** At takeoff, the lateness is split into:
 

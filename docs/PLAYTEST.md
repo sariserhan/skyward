@@ -107,6 +107,33 @@ The scripted version asserts the same sequence and writes screenshots:
 tools/ui_tests.sh tests/m3_demo.gd
 ```
 
+### M7 walkthrough: checked baggage
+
+1. **Reclaim.** Select **NS 221** → **Passengers** and pick P0098 (IN). After
+   deboarding they walk to **RECLAIM** on the Terminal tab, arriving at 06:13.
+   The details read *Waiting at baggage reclaim for 1 bag(s)*, with *Checked
+   bag: BAG_000052 · Being unloaded from NS 221*. The bag reaches the belt at
+   06:19; they collect it on the spot and leave. Passengers without bags walk
+   straight past.
+2. **Transfer, both make it.** P0457 connects GA 242 → SJ 319. The details show
+   *Passenger: ON TRACK / Bag: ON TRACK* with the bag's estimated ready time
+   against SJ 319's bag cutoff.
+3. **The passenger made it; the suitcase didn't.** Follow NS 249's 1A passenger
+   (P0565, 18 minutes late, connecting to AW 228).
+   - At 06:37 they are off and walking to A2: *Passenger: ON TRACK / Bag: AT
+     RISK · ready ~06:43 vs bag cutoff 06:42*.
+   - At 06:42 AW 228's bag cutoff passes (D-15; a hold would not move it). The
+     bag reads *MISSED CONNECTION to AW 228*.
+   - At 06:47 the passenger is seated on AW 228 and the bag stays behind.
+     AW 228's details show *missed the bag cutoff*.
+4. **Baggage holds a departure.** AW 256 (A6) has a slow loader. Its gate
+   closes at 07:02 with everyone aboard, but at 07:05 the details read *Holding
+   departure: Baggage load · 75% · 63 / 84 loaded*, estimated 07:20. The
+   **Turnaround** tab shows the same row. It departs at 07:20, and the
+   explanation reads *Runway queue +1.0 min, Baggage load +7.6 min*.
+
+Scripted: `tools/ui_tests.sh tests/m7_demo.gd`.
+
 ### M6 walkthrough: the connection bank
 
 NS 249 (gate A5) arrives 18 minutes late. Four of its passengers, in seats 1A,
@@ -157,7 +184,7 @@ Select **GA 242** (A220, gate A4) and open the **Turnaround** tab. Its scenario
 gives it a 25-minute deep clean.
 
 1. 06:15: it docks. Arrival secured runs, then deboarding, fueling and baggage
-   start together; cleaning and catering follow deboarding.
+   unload start together; cleaning and catering follow deboarding.
 2. Deboarding finishes around 06:22, and the deep clean starts. By 06:26,
    catering and fueling are done. The details say **Holding turnaround:
    Cleaning**, and boarding reads *waiting for cleaning*.
