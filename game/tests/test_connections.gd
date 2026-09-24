@@ -6,8 +6,9 @@ const ARRIVAL := 20000
 
 
 ## Inbound FA: a full 737 at A5 landing at ARRIVAL. Outbound FB: a 737 already
-## at its gate, departing at `departure`, carrying only connectors named by
-## inbound seat. Real walking times; no turnaround variation.
+## at its gate, departing at `departure`, booked for 3 (its load is total
+## bookings): the connectors named by inbound seat, locals for the rest. Real
+## walking times; no turnaround variation.
 func fixture(seats: Array, departure: int, edit := Callable(), b_gate := "A2") -> AirportSimulation:
 	var config := JsonUtil.load_file(AirportSimulation.CONFIG_PATH)
 	config.start_tick = 0
@@ -18,7 +19,7 @@ func fixture(seats: Array, departure: int, edit := Callable(), b_gate := "A2") -
 		"late_passengers": 0, "inbound_delay_ticks": 0}, true)
 	var b: Dictionary = config.flights[1].duplicate(true)
 	b.merge({"id": "FB", "flight_number": "AW 900", "aircraft_type": "737", "assigned_gate_id": b_gate,
-		"scheduled_arrival": 3000, "scheduled_departure": departure, "load_permille": 0, "inbound_load_permille": 0,
+		"scheduled_arrival": 3000, "scheduled_departure": departure, "load_permille": 17, "inbound_load_permille": 0,
 		"late_passengers": 0, "boarding_strategy": "random", "inbound_delay_ticks": 0}, true)
 	config.flights = [a, b]
 	config.passenger_flow.connections = {"default_permille": 0, "demo_bank": [{"from": "FA", "to": "FB", "seats": seats}]}
@@ -211,12 +212,14 @@ func test_save_mid_connection_resumes_identically() -> void:
 func test_same_seed_same_connections() -> void:
 	var runs: Array = []
 	for _i in 2:
-		var sim := fixture([], 60000, func(config): config.passenger_flow.connections = {"default_permille": 250})
+		var sim := fixture([], 60000, func(config):
+			config.flights[1].load_permille = 1000
+			config.passenger_flow.connections = {"default_permille": 250})
 		depart(sim)
 		var rows: Array = []
 		for id in sim.airport.flights.FB.passenger_ids:
 			var p: Passenger = sim.airport.passengers[str(id)]
-			rows.append([p.id, p.itinerary_seats, p.connection_status, p.gate_arrival_time])
+			if p.journey_direction == "connecting": rows.append([p.id, p.itinerary_seats, p.connection_status, p.gate_arrival_time])
 		runs.append(rows)
 	assert_true(runs[0].size() > 20, "a rate-generated bank: %d" % runs[0].size())
 	assert_eq(JSON.stringify(runs[1]), JSON.stringify(runs[0]))
@@ -226,6 +229,7 @@ func test_widebody_connectors_leave_the_abstraction_for_their_gate() -> void:
 	var sim := fixture([], 60000, func(config):
 		config.flights[0].aircraft_type = "787"
 		config.flights[0].assigned_gate_id = "A7"
+		config.flights[1].load_permille = 1000
 		config.passenger_flow.connections = {"default_permille": 150})
 	var a: AirportFlight = sim.airport.flights.FA
 	var connectors: Array = []
@@ -242,6 +246,28 @@ func test_widebody_connectors_leave_the_abstraction_for_their_gate() -> void:
 	for p in connectors: assert_eq(p.connection_status, "made")
 
 
+func test_connections_fill_bookings_never_add_to_them() -> void:
+	# A full-load outbound: connectors take booked seats, locals the rest.
+	var sim := fixture([], 60000, func(config):
+		config.flights[1].load_permille = 850
+		config.passenger_flow.connections = {"default_permille": 400})
+	var b: AirportFlight = sim.airport.flights.FB
+	assert_eq(b.target_bookings, 180 * 850 / 1000)
+	assert_eq(b.passenger_ids.size(), b.target_bookings, "total bookings are the configured load")
+	assert_true(b.connecting_bookings > 20, "plenty of connectors: %d" % b.connecting_bookings)
+	assert_eq(b.originating_bookings + b.connecting_bookings, b.target_bookings)
+	var seats := {}
+	var connecting := 0
+	for id in b.passenger_ids:
+		var p: Passenger = sim.airport.passengers[str(id)]
+		var seat: Array = p.itinerary_seats[1] if p.journey_direction == "connecting" else [p.seat_row, p.seat_letter]
+		var key := AircraftDef.seat_key(int(seat[0]), str(seat[1]))
+		assert_true(not seats.has(key), "seat %s booked once" % key)
+		seats[key] = true
+		if p.journey_direction == "connecting": connecting += 1
+	assert_eq(connecting, b.connecting_bookings)
+
+
 func test_riverdale_itineraries_are_valid_and_the_demo_bank_is_decisive() -> void:
 	var sim := AirportSimulation.new()
 	sim.setup()
@@ -256,7 +282,10 @@ func test_riverdale_itineraries_are_valid_and_the_demo_bank_is_decisive() -> voi
 		assert_eq(p.origin, a.origin)
 		assert_eq(p.destination, b.destination)
 	var arriving := 0
-	for f: AirportFlight in sim.flight_order: arriving += f.inbound_passenger_ids.size()
+	for f: AirportFlight in sim.flight_order:
+		arriving += f.inbound_passenger_ids.size()
+		assert_eq(f.passenger_ids.size(), f.target_bookings, f.id + ": bookings equal capacity × load")
+		assert_eq(f.target_bookings, int(sim.airport.aircraft[f.aircraft_id].seat_capacity * f.load_permille / 1000))
 	assert_true(count > arriving * 8 / 100 and count < arriving * 20 / 100, "%d of %d arrivals connect" % [count, arriving])
 	# Demo bank: NS 249 (18 min late) connects four passengers to AW 228.
 	var b: AirportFlight = sim.airport.flights.F002

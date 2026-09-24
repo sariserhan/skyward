@@ -47,6 +47,9 @@ static func valid(data: Dictionary) -> bool:
 				if not id is int or pair[1].has(str(id)) or not state.passengers.has(str(id)): return false
 				if not state.passengers[str(id)] is Dictionary: return false
 				pair[1][str(id)] = f.id
+	# Bookings (D-034): the manifest is exactly the target, split by origin.
+	for f in state.flights.values():
+		if f.passenger_ids.size() != f.target_bookings or f.originating_bookings + f.connecting_bookings != f.target_bookings: return false
 	for key in state.passengers:
 		var p = state.passengers[key]
 		if not p is Dictionary: return false

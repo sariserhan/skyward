@@ -79,3 +79,8 @@ var connections_missed: int = 0
 ## Scenario aid (M6 demo): the aircraft is this late from its origin, so its
 ## approach and landing start later than scheduled.
 var inbound_delay_ticks: int = 0
+## Bookings (M6 closeout): target = capacity × load (total bookings),
+## split into originating (local) and connecting passengers.
+var target_bookings: int = 0
+var originating_bookings: int = 0
+var connecting_bookings: int = 0

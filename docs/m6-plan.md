@@ -1,6 +1,7 @@
 # M6 plan: connecting passengers
 
-**Status:** implemented 2026-09-24; see [m6-status.md](m6-status.md). No
+**Status:** implemented 2026-09-24, with a closeout in which a flight's load
+means total bookings (D-034); see [m6-status.md](m6-status.md). No
 decision needed escalation, so the plan was recorded and implemented.
 Decisions: D-031 to D-033.
 

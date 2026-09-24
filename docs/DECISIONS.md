@@ -760,3 +760,41 @@ v5 is rejected. Validation is direction- and leg-aware:
 
 A save while a connector is seated inbound, deboarding, walking, waiting or
 boarding resumes to the identical outcome.
+
+
+## D-034 — A flight's load means total bookings
+
+**Date:** 2026-09-24
+**Status:** Accepted (M6 closeout; supersedes M6's "connectors on top of
+local bookings")
+
+A flight's configured load factor is how full it is intended to be **in
+total**, originating and connecting passengers together.
+
+**Generation order.**
+
+1. Each flight gets `target_bookings = capacity × load` and an outbound seat
+   order.
+2. Inbound passengers are generated. They now take the lowest ids.
+3. Connectors are allocated from each flight's booked-seat pool, never beyond
+   its target.
+4. Local (originating) passengers fill exactly the seats that remain.
+
+Flights record `target_bookings`, `originating_bookings` and
+`connecting_bookings`. `boarded_count` stays separate: missed connections and
+missed passengers let an aircraft leave below its bookings.
+
+**Scope.** Connection eligibility, deterministic streams, identity, seat
+uniqueness and hold behavior are unchanged. Normal connection assignment never
+pushes a flight above its target. Overbooking, standby or excess demand will be
+explicit future systems. Save validation checks that every manifest equals its
+target and its split.
+
+**Why:** Treating connectors as extra demand made an 82% flight behave like a
+93–100% one. It silently changed boarding, delays, security demand, and (from
+M7) baggage volume. Connections should create difficulty through timing and
+coordination, not hidden passenger inflation.
+
+**Result:** the booked load averages 82.1% (configured 82.4%, rounded down per
+flight). The morning's mean delay drops from 3.0 to 1.9 minutes. Only the three
+demo flights are more than 5 minutes late.

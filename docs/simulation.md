@@ -87,9 +87,11 @@ variation.
 
 **Connections (D-031, D-032).**
 
-- About 12% of arrivals connect. At generation, each connector is placed on an
+- About 13% of arrivals connect. At generation, each connector is placed on an
   outbound flight they could make under ideal conditions, and is on its
-  manifest from the start.
+  manifest from the start. A flight's load is its total bookings (D-034):
+  connectors take booked seats and local passengers fill the rest, so
+  connections change the passenger mix, not the size.
 - On leaving the inbound aircraft they switch to the outbound leg and seat,
   then walk airside to the outbound gate. The normal boarding rules apply:
   admitted once at the gate, D-10 close unless held, early close once everyone

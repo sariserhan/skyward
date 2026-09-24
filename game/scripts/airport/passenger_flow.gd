@@ -34,6 +34,11 @@ func bind(state: AirportState, event_bus: AirportEvents, settings: Dictionary) -
 ## `cabins` maps aircraft type -> AircraftDef for types that board in the cabin
 ## engine; their passengers get seats and boarding-tick durations from a
 ## separate RNG stream so terminal-flow draws are unchanged.
+## Generation order (M6 closeout, D-034): each flight's target bookings
+## (capacity × load, the load meaning total bookings) and outbound seat order;
+## inbound passengers; connectors, taking booked seats within each target; then
+## local (originating) passengers for exactly the seats that remain. Connections
+## change a flight's passenger mix, never its size.
 func generate(seed_value: int, now: int, flights: Array[AirportFlight], cabins: Dictionary = {},
 		cabin_config: SimConfig = null, gate_close_offset: int = 0, deboarding: Dictionary = {}, deboard_plans: Dictionary = {}) -> void:
 	if config.is_empty(): return
@@ -44,19 +49,31 @@ func generate(seed_value: int, now: int, flights: Array[AirportFlight], cabins: 
 		var checkpoint := SecurityCheckpoint.new()
 		checkpoint.restore(data)
 		airport.security_checkpoints[checkpoint.id] = checkpoint
-	var next_id := 1
+	var booked := {}
 	for f in flights:
 		var aircraft: AirportAircraft = airport.aircraft[f.aircraft_id]
 		# Always draw, so an explicit override does not shift other flights' loads.
 		var drawn := _draw_load(f, load_rng)
 		if f.load_permille < 0: f.load_permille = drawn
-		var count := int(aircraft.seat_capacity * f.load_permille / 1000)
+		var target := int(aircraft.seat_capacity * f.load_permille / 1000)
+		var cabin: AircraftDef = cabins.get(aircraft.aircraft_type_id)
 		var seats: Array = []
-		if cabins.has(aircraft.aircraft_type_id):
-			var cabin: AircraftDef = cabins[aircraft.aircraft_type_id]
+		if cabin != null:
 			seats = cabin.all_seats()
 			cabin_rng.shuffle(seats)
-			count = mini(count, seats.size())
+			target = mini(target, seats.size())
+			seats = seats.slice(0, target)
+		f.target_bookings = target
+		# The booked-seat pool: connectors take seats from it first, locals the rest.
+		booked[f.id] = {"seats": seats, "left": target, "cabin": cabin}
+	var next_id := _generate_inbound(seed_value, 1, flights, cabins, deboarding)
+	_generate_connections(seed_value, flights, cabin_config, deboard_plans, gate_close_offset, booked)
+	for f in flights:
+		var pool: Dictionary = booked[f.id]
+		var cabin: AircraftDef = pool.cabin
+		var count: int = pool.left
+		f.connecting_bookings = f.passenger_ids.size()
+		f.originating_bookings = count
 		var earliest := maxi(now + 1, f.scheduled_departure - int(config.arrival_lead_max_ticks))
 		var latest := maxi(earliest, f.scheduled_departure - int(config.arrival_lead_min_ticks))
 		ready_by_flight[f.id] = 0
@@ -76,10 +93,10 @@ func generate(seed_value: int, now: int, flights: Array[AirportFlight], cabins: 
 			if i >= count - f.late_passengers:
 				# Demonstration: reaches the airport as the gate closes.
 				p.arrival_time_at_airport = maxi(now + 1, f.scheduled_departure - gate_close_offset)
-			if not seats.is_empty():
-				var cabin: AircraftDef = cabins[aircraft.aircraft_type_id]
-				p.seat_row = seats[i][0]
-				p.seat_letter = seats[i][1]
+			if cabin != null:
+				var seat: Array = pool.seats[i]
+				p.seat_row = seat[0]
+				p.seat_letter = seat[1]
 				p.seat_type = cabin.seat_type_of(p.seat_letter)
 				p.side = cabin.side_of(p.seat_letter)
 				PassengerGenerator.apply_cabin_timing(p, cabin_config, cabin_rng)
@@ -87,13 +104,10 @@ func generate(seed_value: int, now: int, flights: Array[AirportFlight], cabins: 
 			f.passenger_ids.append(p.id)
 			counts["not_arrived"] = int(counts.get("not_arrived", 0)) + 1
 			_schedule(p, p.arrival_time_at_airport, "arrive")
-	_generate_inbound(seed_value, next_id, flights, cabins, deboarding)
-	_generate_connections(seed_value, flights, cabins, cabin_config, deboard_plans, gate_close_offset)
 
-## Arriving passengers, after every outbound one so outbound ids and draws are
-## unchanged. Own stream: load, seats, speed, bags and deboarding timings. All
-## are local arrivals in M5; connection_flight_id stays empty until M6.
-func _generate_inbound(seed_value: int, next_id: int, flights: Array[AirportFlight], cabins: Dictionary, deboarding: Dictionary) -> void:
+## Arriving passengers, from their own stream: load, seats, speed, bags and
+## deboarding timings. Returns the next free passenger id.
+func _generate_inbound(seed_value: int, next_id: int, flights: Array[AirportFlight], cabins: Dictionary, deboarding: Dictionary) -> int:
 	var inbound_rng := SimRng.new(seed_value, SimRng.STREAM_INBOUND)
 	for f in flights:
 		var aircraft: AirportAircraft = airport.aircraft[f.aircraft_id]
@@ -129,29 +143,20 @@ func _generate_inbound(seed_value: int, next_id: int, flights: Array[AirportFlig
 			airport.passengers[str(p.id)] = p
 			f.inbound_passenger_ids.append(p.id)
 			counts["on_aircraft"] = int(counts.get("on_aircraft", 0)) + 1
+	return next_id
 
-## Connecting itineraries (M6), after every manifest so nothing else reshuffles.
-## Each arriving passenger may connect, at the arriving airline's rate, onto a
-## flight they could make under ideal conditions: their share of the planned
-## deboarding plus the ideal gate-to-gate walk before its scheduled gate close.
-## The connector joins that flight's outbound manifest now; the airline expects
-## them. A scenario demo_bank names exact inbound seats to connect.
-func _generate_connections(seed_value: int, flights: Array[AirportFlight], cabins: Dictionary, cabin_config: SimConfig,
-		plans: Dictionary, close_offset: int) -> void:
+## Connecting itineraries (M6). Each arriving passenger may connect, at the
+## arriving airline's rate, onto a flight they could make under ideal
+## conditions: their share of the planned deboarding plus the ideal gate-to-gate
+## walk before its scheduled gate close. Connectors take booked seats within the
+## target (`booked`), never beyond it, and join that flight's manifest now: the
+## airline expects them. A scenario demo_bank names exact inbound seats.
+func _generate_connections(seed_value: int, flights: Array[AirportFlight], cabin_config: SimConfig,
+		plans: Dictionary, close_offset: int, booked: Dictionary) -> void:
 	var settings: Dictionary = config.get("connections", {})
 	if settings.is_empty(): return
 	var rng := SimRng.new(seed_value, SimRng.STREAM_CONNECTION)
-	var free := {}
-	for f in flights:
-		var aircraft: AirportAircraft = airport.aircraft[f.aircraft_id]
-		var cabin: AircraftDef = cabins.get(aircraft.aircraft_type_id)
-		var taken := {}
-		for id in f.passenger_ids: taken[airport.passengers[str(id)].seat_key()] = true
-		var seats: Array = []
-		if cabin != null:
-			for seat in cabin.all_seats():
-				if not taken.has(AircraftDef.seat_key(seat[0], seat[1])): seats.append(seat)
-		free[f.id] = {"seats": seats, "left": aircraft.seat_capacity - f.passenger_ids.size(), "cabin": cabin}
+	var free := booked
 	var banked := {}
 	for entry in settings.get("demo_bank", []):
 		if not airport.flights.has(entry.from) or not airport.flights.has(entry.to): continue
