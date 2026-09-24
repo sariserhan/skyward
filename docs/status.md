@@ -1,13 +1,13 @@
-# Current status — M0 through M9 implemented
+# Current status — M0 through M10 implemented
 
-M9 airlines are complete. Northstar, Atlantic Wings, SunJet and Global Airways
-judge Riverdale from real flight outcomes, each with its own priorities. Every
-relationship score can be traced to its inputs. Contracts give operational
-goals, and strong performance earns requests for more flights. Priority, gate
-and hold decisions shift those results between airlines. Save schema v9. See
-the [M9 completion report](m9-status.md). M10 economy has not started.
+M10 turns Riverdale into a tycoon loop. Each day earns fees from real
+operations and pays for the capacity the player planned. Contracts pay or
+charge. Every cent is a traceable ledger transaction. The end-of-day report
+leads into planning the next day, and accepted airline requests fly from the
+following day. Save schema v10 (career with an optional operating day). See
+the [M10 completion report](m10-status.md). M11 construction has not started.
 
-Earlier reports: [M8](m8-status.md), [M7](m7-status.md), [M6](m6-status.md), [M5](m5-status.md), [M4](m4-status.md), [M3](m3-status.md), [M2](m2-status.md), and the M0/M1 report below. Their
+Earlier reports: [M9](m9-status.md), [M8](m8-status.md), [M7](m7-status.md), [M6](m6-status.md), [M5](m5-status.md), [M4](m4-status.md), [M3](m3-status.md), [M2](m2-status.md), and the M0/M1 report below. Their
 limitations and timings are historical; M3 changed the timetable, scenario start,
 security defaults, loads, cabin timings and save schema (D-021, D-023, D-024).
 

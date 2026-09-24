@@ -212,6 +212,20 @@ adjustments. Contracts settle when the day's last flight departs. A request is
 offered when the relationship, flights operated, contract and a free
 compatible gate allow; accepted flights are committed to the next day.
 
+**Economy and days (D-044 to D-047).** All money is integer cents in ledger
+transactions with stable ids.
+
+- **At each takeoff:** aircraft and gate service by type, $12 per departed
+  passenger, and $2.50 per bag handling operation (flown out, and unloaded
+  from its inbound).
+- **At the day's start:** the plan's units × daily cost, security staff ×
+  $900, and $55,000 overhead.
+- **At the day's end:** each contract's bonus or penalty.
+
+A day ends when its last flight departs. It is settled once, then planned;
+the next day is a fresh simulation from the scenario plus the career's
+decisions.
+
 **Departure delay breakdown (D-026).** At takeoff, the lateness is split into:
 
 - runway queue

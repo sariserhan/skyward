@@ -26,6 +26,14 @@ var resource_tree: Tree
 ## M9: the Airlines tab and the airline shown in the details panel.
 var airline_tree: Tree
 var selected_airline := ""
+## M10: the career (days, cash, plan), the Finance tab and the end-of-day screen.
+var career := AirportCareer.new()
+var finance_tree: Tree
+var day_panel: PanelContainer
+var day_report: RichTextLabel
+var plan_rows: Dictionary = {}
+var plan_total: Label
+var start_day_button: Button
 var bag_metrics_second: int = -1
 var pause_button: Button
 var debug_panel: VBoxContainer
@@ -50,7 +58,9 @@ var scenario_path := ""
 func _ready() -> void:
 	for arg in OS.get_cmdline_user_args() + OS.get_cmdline_args():
 		if arg.begins_with("--scenario="): scenario_path = arg.trim_prefix("--scenario=")
-	sim.setup({} if scenario_path.is_empty() else AirportSimulation.load_config(scenario_path))
+	career.new_career(scenario_path)
+	career.start_day()
+	sim = career.sim
 	# Scenario variants may not include the default first flight.
 	if not sim.airport.flights.has(selected_id): selected_id = sim.flight_order[0].id
 	_build()
@@ -189,6 +199,15 @@ func _build() -> void:
 		var item := airline_tree.get_selected()
 		if item != null: _select_airline(item.get_metadata(0)))
 	operations_tabs.add_child(airline_tree)
+	finance_tree = Tree.new()
+	finance_tree.name = "Finance"
+	finance_tree.columns = 2
+	finance_tree.hide_root = true
+	finance_tree.add_theme_font_size_override("font_size", 13)
+	finance_tree.set_column_expand(0, true)
+	finance_tree.set_column_expand(1, false)
+	finance_tree.set_column_custom_minimum_width(1, 140)
+	operations_tabs.add_child(finance_tree)
 	_rebuild_board()
 	var right := VBoxContainer.new()
 	right.custom_minimum_size.x = 320
@@ -299,7 +318,13 @@ func _rebuild_board() -> void:
 		rows[flight.id] = row
 
 func _process(delta: float) -> void:
+	if day_panel != null and day_panel.visible: return
 	sim.advance(sim.clock.frame_steps(delta))
+	# The last departure ends the day: settle once, then plan the next.
+	if career.day_complete():
+		career.settle_day()
+		sim.clock.paused = true
+		_show_day_panel()
 	map.queue_redraw()
 	if terminal_view.is_visible_in_tree(): terminal_view.queue_redraw()
 	refresh_timer += delta
@@ -338,7 +363,7 @@ func _refresh() -> void:
 	var bags := "" if bag_metrics.bags == 0 else "   |   Bags %d missed · %d at reclaim" % [bag_metrics.transfer_missed + bag_metrics.missed_flight, bag_metrics.at_reclaim]
 	for type in sim.resources.order:
 		if sim.resources.pools[type].queue.size() >= 2: security_alert_count += 1
-	metrics_label.text = "MORNING RUSH   |   %d× %s   |   Gates %d / 8   |   Departed %d / %d   |   On time %s   |   Connections %d made · %d missed%s   |   Alerts %d" % [sim.clock.speed, "PAUSED" if sim.clock.paused else "LIVE", metrics.occupied, metrics.departed, sim.airport.flights.size(), punctuality, connections.made, connections.missed, bags, sim.conflicts.size() + security_alert_count]
+	metrics_label.text = "DAY %d · %s   |" % [career.day if career.phase == "operating" else career.day - 1, AirportEconomy.money(career.cash_cents())] + "   %d× %s   |   Gates %d / 8   |   Departed %d / %d   |   On time %s   |   Connections %d made · %d missed%s   |   Alerts %d" % [sim.clock.speed, "PAUSED" if sim.clock.paused else "LIVE", metrics.occupied, metrics.departed, sim.airport.flights.size(), punctuality, connections.made, connections.missed, bags, sim.conflicts.size() + security_alert_count]
 	for f: AirportFlight in sim.airport.flights.values():
 		var values := [f.flight_number, f.origin + " → " + f.destination, f.assigned_gate_id,
 			AirportClock.display(f.scheduled_departure).left(5), AirportClock.display(f.estimated_departure).left(5), f.status.replace("_", " ").capitalize()]
@@ -353,6 +378,7 @@ func _refresh() -> void:
 	_refresh_turnaround_tree(flight)
 	_refresh_resources()
 	_refresh_airlines()
+	_refresh_finance()
 	_refresh_terminal()
 	_refresh_warnings()
 	alerts.clear()
@@ -377,7 +403,7 @@ func _refresh() -> void:
 			alerts.set_item_tooltip(alerts.item_count - 1, "Select to see which terms are at risk and why.")
 			alert_ids.append("airline:" + airline)
 		if sim.airlines.state[airline].request == "offered":
-			alerts.add_item("%s requests +%d daily flights" % [sim.airport.airlines[airline], sim.airlines.profile(airline).request.flights.size()])
+			alerts.add_item("%s requests +%d daily flights" % [sim.airport.airlines[airline], sim.airlines.request_of(airline).flights.size()])
 			alert_ids.append("airline:" + airline)
 	for type in sim.resources.order:
 		var queue: Array = sim.resource_queue(type)
@@ -440,22 +466,33 @@ func _skip() -> void:
 		_refresh()
 
 func _save() -> void:
-	var error := sim.save_file(save_path)
+	var error := career.save_file(save_path)
 	status_label.text = "Airport saved locally" if error == OK else "Save failed: " + error_string(error)
 
 func _load_save() -> void:
-	var loaded := AirportSimulation.load_file(save_path)
+	var loaded := AirportCareer.load_file(save_path)
 	if loaded == null:
 		status_label.text = "No compatible local airport save found"
 		return
-	sim = loaded
+	career = loaded
+	if career.phase == "planning":
+		# Between days: nothing is operating; plan the next day.
+		_show_day_panel()
+		status_label.text = "Airport restored · planning day %d" % career.day
+		return
+	if day_panel != null: day_panel.visible = false
+	_adopt(career.sim)
+	status_label.text = "Airport restored"
+
+## Point every view at a (new) day's simulation.
+func _adopt(day_sim: AirportSimulation) -> void:
+	sim = day_sim
 	map.sim = sim
 	terminal_view.sim = sim
 	boarding_overlay.visible = false
 	selected_passenger_id = -1
 	_rebuild_board()
-	_select(sim.airport.flights.keys()[0])
-	status_label.text = "Airport restored"
+	_select(sim.flight_order[0].id)
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo: return
@@ -887,7 +924,7 @@ func _refresh_airlines() -> void:
 		row.set_text(0, str(sim.airport.airlines[airline]))
 		row.set_text(1, "%d  %s" % [e.relationship, e.band])
 		row.set_text(2, "%s · %s" % [e.contract.label, e.contract.status] if not e.contract.label.is_empty() else "—")
-		row.set_text(3, {"offered": "+%d flights?" % sim.airlines.profile(airline).get("request", {}).get("flights", []).size(), "accepted": "accepted", "declined": "declined"}.get(sim.airlines.state[airline].request, ""))
+		row.set_text(3, {"offered": "+%d flights?" % sim.airlines.request_of(airline).get("flights", []).size(), "accepted": "accepted", "declined": "declined"}.get(sim.airlines.state[airline].request, ""))
 		row.set_metadata(0, airline)
 		row.set_custom_color(1, Color(BAND_COLORS[e.band]))
 		row.set_custom_color(2, Color(STATUS_COLORS.get(e.contract.status, "a7becd")))
@@ -919,6 +956,9 @@ func _airline_text(airline: String) -> String:
 	var c: Dictionary = e.contract
 	if not c.label.is_empty():
 		text += "\n\n[b]CONTRACT[/b]  %s · [color=#%s]%s[/color]" % [c.label, STATUS_COLORS.get(c.status, "a7becd"), c.status]
+		var terms: Dictionary = sim.config.get("airline_relations", {}).get("contracts", {}).get(c.id, {})
+		if terms.has("bonus_cents") or terms.has("penalty_cents"):
+			text += "\n  Settles at the day's end: passed %s · failed %s" % [AirportEconomy.money(int(terms.get("bonus_cents", 0)), true), AirportEconomy.money(-int(terms.get("penalty_cents", 0)))]
 		for t in c.terms:
 			text += "\n  [color=#%s]%s[/color] %s %s: %s" % [STATUS_COLORS.get(t.status, "a7becd"), {"PASSING": "✓", "AT RISK": "!", "FAILING": "✗"}.get(t.status, "·"),
 				t.label, t.get("target", ""), "—" if t.value == null else AirlineRelations._fmt(t.metric, float(t.value))]
@@ -958,7 +998,7 @@ func _problem_flights(airline: String) -> Array:
 	return out
 
 func _request_text(airline: String, e: Dictionary) -> String:
-	var request: Dictionary = sim.airlines.profile(airline).get("request", {})
+	var request: Dictionary = sim.airlines.request_of(airline)
 	if request.is_empty(): return ""
 	var names: Array = []
 	for flight in request.flights: names.append(flight.flight_number)
@@ -973,3 +1013,146 @@ func _request_text(airline: String, e: Dictionary) -> String:
 	if e.contract.status in ["FAILING", "FAILED"]: why.append("contract " + e.contract.status.to_lower())
 	if sim.airlines.state[airline].final: why.append("the day is over")
 	return text + "\n  Not offered: " + ("; ".join(why) if not why.is_empty() else "no compatible gate free")
+
+
+# --- economy and days (M10) -----------------------------------------------------------
+
+## Finance tab: cash, today's money by category (each expands to its
+## transactions), net, and revenue by airline.
+func _refresh_finance() -> void:
+	if operations_tabs.current_tab != finance_tree.get_index(): return
+	var collapsed := {}
+	var root_old := finance_tree.get_root()
+	if root_old != null:
+		for item in root_old.get_children(): collapsed[str(item.get_metadata(0))] = item.collapsed
+	finance_tree.clear()
+	var root := finance_tree.create_item()
+	var summary := sim.economy.summary()
+	var add := func(parent: TreeItem, label: String, cents: int, color := "") -> TreeItem:
+		var item := finance_tree.create_item(parent)
+		item.set_text(0, label)
+		item.set_text(1, AirportEconomy.money(cents))
+		item.set_text_alignment(1, HORIZONTAL_ALIGNMENT_RIGHT)
+		if not color.is_empty():
+			item.set_custom_color(0, Color(color))
+			item.set_custom_color(1, Color(color))
+		return item
+	add.call(root, "Cash now (day %d)" % sim.economy.day, career.cash_cents(), "70dec0")
+	add.call(root, "Opening cash", summary.opening_cents)
+	for category in AirportEconomy.CATEGORIES:
+		var txs := sim.economy.in_category(category)
+		var item: TreeItem = add.call(root, "%s  (%d)" % [AirportEconomy.LABELS[category], txs.size()], int(summary.by_category[category]),
+			"70dec0" if category in AirportEconomy.REVENUE else "ffc078")
+		item.set_metadata(0, category)
+		item.collapsed = collapsed.get(category, true)
+		for tx in txs: add.call(item, tx.reason, int(tx.amount_cents))
+	add.call(root, "Revenue %s · costs %s" % [AirportEconomy.money(summary.revenue_cents), AirportEconomy.money(summary.cost_cents)], summary.net_cents, "ffffff")
+	var airlines: Array = summary.by_airline.keys()
+	airlines.sort()
+	var by := add.call(root, "Revenue by airline (shared costs stay shared)", 0) as TreeItem
+	by.set_text(1, "")
+	by.set_metadata(0, "by_airline")
+	by.collapsed = collapsed.get("by_airline", false)
+	for airline in airlines: add.call(by, str(sim.airport.airlines.get(airline, airline)), int(summary.by_airline[airline]))
+
+func _build_day_panel() -> void:
+	day_panel = PanelContainer.new()
+	day_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color("0d1c26")
+	style.content_margin_left = 40
+	style.content_margin_right = 40
+	style.content_margin_top = 24
+	style.content_margin_bottom = 24
+	day_panel.add_theme_stylebox_override("panel", style)
+	day_panel.visible = false
+	add_child(day_panel)
+	var columns := HBoxContainer.new()
+	columns.add_theme_constant_override("separation", 40)
+	day_panel.add_child(columns)
+	day_report = RichTextLabel.new()
+	day_report.bbcode_enabled = true
+	day_report.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	day_report.add_theme_font_size_override("normal_font_size", 15)
+	day_report.add_theme_font_size_override("bold_font_size", 15)
+	day_report.add_theme_font_size_override("mono_font_size", 15)
+	columns.add_child(day_report)
+	var plan := VBoxContainer.new()
+	plan.custom_minimum_size.x = 440
+	plan.add_theme_constant_override("separation", 10)
+	columns.add_child(plan)
+	_label(plan, "NEXT DAY OPERATIONS", 18)
+	_label(plan, "Capacity is paid for by the day, whether it is busy or not.", 13).modulate = Color("a7becd")
+	for type in career.resource_plan:
+		var row := HBoxContainer.new()
+		plan.add_child(row)
+		var name_label := _label(row, str(career.base.economy.resources[type].label), 15)
+		name_label.custom_minimum_size.x = 150
+		_button(row, "−", func():
+			career.set_units(type, int(career.resource_plan[type]) - 1)
+			_show_day_panel())
+		var count := _label(row, "", 15)
+		count.custom_minimum_size.x = 36
+		count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_button(row, "+", func():
+			career.set_units(type, int(career.resource_plan[type]) + 1)
+			_show_day_panel())
+		var cost := _label(row, "", 15)
+		cost.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		cost.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		plan_rows[type] = [count, cost]
+	plan_total = _label(plan, "", 15)
+	start_day_button = _button(plan, "START DAY", func():
+		if not career.start_day(): return
+		day_panel.visible = false
+		_adopt(career.sim)
+		status_label.text = "Day %d started" % career.day)
+	start_day_button.custom_minimum_size.y = 44
+
+## The settled day's report and the next day's plan.
+func _show_day_panel() -> void:
+	if day_panel == null: _build_day_panel()
+	day_panel.visible = true
+	day_report.text = _day_report_text(career.reports[-1]) if not career.reports.is_empty() else "[font_size=26][b]RIVERDALE[/b][/font_size]\n\nNo day settled yet."
+	var economy: Dictionary = career.base.economy
+	for type in plan_rows:
+		var units := int(career.resource_plan[type])
+		var each := int(economy.resources[type].daily_cents)
+		plan_rows[type][0].text = str(units)
+		plan_rows[type][1].text = "%s each · %s" % [AirportEconomy.money(each), AirportEconomy.money(each * units)]
+	var security := int(economy.costs.security_staff_daily_cents) * career.security_staff()
+	var committed := career.committed_cost_cents()
+	var text := "Security staff × %d   %s\nAirport operations   %s\n\nCommitted daily cost   %s\nCash available   %s\nExpected flights: %d" % [career.security_staff(),
+		AirportEconomy.money(security), AirportEconomy.money(int(economy.costs.fixed_daily_cents)), AirportEconomy.money(committed),
+		AirportEconomy.money(career.settled_cash_cents()), career.expected_flights()]
+	if career.insolvent(): text += "\n\nINSOLVENT: even the minimum plan costs more than the cash available."
+	elif not career.can_start(): text += "\n\nThis plan costs more than the cash available: reduce capacity."
+	plan_total.text = text
+	start_day_button.text = "START DAY %d" % career.day
+	start_day_button.disabled = not career.can_start()
+
+func _day_report_text(r: Dictionary) -> String:
+	# Two columns, amounts right-aligned.
+	var row := func(label: String, amount: String, style := "") -> String:
+		var open := "[%s]" % style if not style.is_empty() else ""
+		var close := "[/%s]" % style.get_slice("=", 0) if not style.is_empty() else ""
+		return "[cell]%s%s%s[/cell][cell][p align=right]%s%s%s[/p][/cell]" % [open, label, close, open, amount, close]
+	var t := "[font_size=26][b]RIVERDALE — DAY %d[/b][/font_size]\n\n[table=2]" % int(r.day)
+	t += row.call("Starting cash", AirportEconomy.money(int(r.opening_cents)))
+	t += row.call(" ", " ") + row.call("REVENUE", "", "b")
+	for c in ["aircraft", "passengers", "baggage", "contract_bonus"]: t += row.call(AirportEconomy.LABELS[c], AirportEconomy.money(int(r.by_category[c])))
+	t += row.call("Total revenue", AirportEconomy.money(int(r.revenue_cents)), "b")
+	t += row.call(" ", " ") + row.call("COSTS", "", "b")
+	for c in ["resources", "security", "fixed", "contract_penalty"]: t += row.call(AirportEconomy.LABELS[c], AirportEconomy.money(-int(r.by_category[c])))
+	t += row.call("Total costs", AirportEconomy.money(int(r.cost_cents)), "b")
+	t += row.call(" ", " ") + row.call("NET", AirportEconomy.money(int(r.net_cents), true), "color=#%s" % ("70dec0" if int(r.net_cents) >= 0 else "e5484d"))
+	t += row.call("ENDING CASH", AirportEconomy.money(int(r.closing_cents)), "b") + "[/table]\n\n"
+	t += "[b]OPERATIONS[/b]\n%d flights · %d passengers departed · mean delay %.1f min · %d missed connections · %d missed bags\n\n[b]AIRLINES[/b]" % [
+		int(r.flights), int(r.passengers), float(r.mean_delay_min), int(r.missed_connections), int(r.missed_bags)]
+	var airlines: Array = r.contracts.keys()
+	airlines.sort()
+	for airline in airlines:
+		var c: Dictionary = r.contracts[airline]
+		t += "\n%s · %d · %s [color=#%s]%s[/color] · revenue %s" % [career.base.airlines.get(airline, airline), int(c.relationship), c.contract,
+			STATUS_COLORS.get(c.status, "a7becd"), c.status, AirportEconomy.money(int(r.by_airline.get(airline, 0)))]
+	return t

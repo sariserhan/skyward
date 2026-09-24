@@ -57,10 +57,18 @@ it is kept as historical context. The original boarding roadmap remains at
   flight requests earned by performance, committed to the next day; Airlines
   tab and detail; save schema v9. Plan [m9-plan.md](m9-plan.md), report
   [m9-status.md](m9-status.md). Decisions D-041–D-043.
-- **M10 next, not started:** economy.
-- M11: construction and expansion.
+- **M10 implemented:** economy and multi-day operation. An integer-cent ledger
+  with stable transaction ids; revenue from real operations (aircraft and gate
+  service, departed passengers, bag handling) and contract bonuses; costs from
+  daily resource capacity, security staff and overhead; careers of fresh
+  operating days with persistent cash, relationships and growth; accepted
+  airline requests become real flights; between-day capacity planning,
+  solvency; Finance tab and end-of-day report; save schema v10. Plan
+  [m10-plan.md](m10-plan.md), report [m10-status.md](m10-status.md).
+  Decisions D-044–D-047.
+- **M11 next, not started:** construction and expansion.
 
 The order after M3 follows D-020: the turnaround task framework comes before any
 individual turnaround activity.
 
-M9 stopped here for review. Do not begin M10 until requested.
+M10 stopped here for review. Do not begin M11 until requested.

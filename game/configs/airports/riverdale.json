@@ -235,7 +235,9 @@
             "max": 6,
             "risk": 2
           }
-        ]
+        ],
+        "bonus_cents": 300000,
+        "penalty_cents": 400000
       },
       "fast_turnaround": {
         "label": "Fast Turnaround Agreement",
@@ -258,7 +260,9 @@
             "max": 6,
             "risk": 2
           }
-        ]
+        ],
+        "bonus_cents": 400000,
+        "penalty_cents": 500000
       },
       "connection_hub": {
         "label": "Connection Hub Agreement",
@@ -286,7 +290,9 @@
             "max": 8,
             "risk": 2
           }
-        ]
+        ],
+        "bonus_cents": 600000,
+        "penalty_cents": 800000
       },
       "premium_reliability": {
         "label": "Premium Reliability Agreement",
@@ -315,7 +321,9 @@
             "max": 3,
             "risk": 1
           }
-        ]
+        ],
+        "bonus_cents": 500000,
+        "penalty_cents": 600000
       }
     },
     "profiles": {
@@ -333,24 +341,57 @@
           "A8"
         ],
         "contract": "connection_hub",
-        "request": {
-          "min_relationship": 78,
-          "min_flights_operated": 4,
-          "flights": [
-            {
-              "flight_number": "GA 390",
-              "aircraft_type": "787",
-              "scheduled_arrival": 342000,
-              "scheduled_departure": 372000
-            },
-            {
-              "flight_number": "GA 398",
-              "aircraft_type": "A220",
-              "scheduled_arrival": 345600,
-              "scheduled_departure": 372600
-            }
-          ]
-        }
+        "requests": [
+          {
+            "id": "GA_EXPANSION_01",
+            "label": "Global Airways evening bank",
+            "min_relationship": 78,
+            "min_flights_operated": 4,
+            "flights": [
+              {
+                "id": "GA401",
+                "airline_id": "GA",
+                "flight_number": "GA 401",
+                "origin": "Seabrook",
+                "destination": "Eastmere",
+                "aircraft_type": "A220",
+                "scheduled_arrival": 309000,
+                "scheduled_departure": 339000,
+                "assigned_gate_id": "A1"
+              },
+              {
+                "id": "GA418",
+                "airline_id": "GA",
+                "flight_number": "GA 418",
+                "origin": "Seabrook",
+                "destination": "Eastmere",
+                "aircraft_type": "787",
+                "scheduled_arrival": 324000,
+                "scheduled_departure": 357000,
+                "assigned_gate_id": "A7"
+              }
+            ]
+          },
+          {
+            "id": "GA_EXPANSION_02",
+            "label": "Global Airways late service",
+            "min_relationship": 85,
+            "min_flights_operated": 6,
+            "flights": [
+              {
+                "id": "GA426",
+                "airline_id": "GA",
+                "flight_number": "GA 426",
+                "origin": "Seabrook",
+                "destination": "Eastmere",
+                "aircraft_type": "A220",
+                "scheduled_arrival": 330000,
+                "scheduled_departure": 360000,
+                "assigned_gate_id": "A5"
+              }
+            ]
+          }
+        ]
       },
       "SJ": {
         "starting_relationship": 70,
@@ -363,24 +404,38 @@
         },
         "preferred_gates": [],
         "contract": "fast_turnaround",
-        "request": {
-          "min_relationship": 78,
-          "min_flights_operated": 4,
-          "flights": [
-            {
-              "flight_number": "SJ 403",
-              "aircraft_type": "A321",
-              "scheduled_arrival": 342000,
-              "scheduled_departure": 370800
-            },
-            {
-              "flight_number": "SJ 411",
-              "aircraft_type": "A321",
-              "scheduled_arrival": 349200,
-              "scheduled_departure": 378000
-            }
-          ]
-        }
+        "requests": [
+          {
+            "id": "SJ_EXPANSION_01",
+            "label": "SunJet extra rotations",
+            "min_relationship": 78,
+            "min_flights_operated": 4,
+            "flights": [
+              {
+                "id": "SJ403",
+                "airline_id": "SJ",
+                "flight_number": "SJ 403",
+                "origin": "Westbridge",
+                "destination": "Fairview",
+                "aircraft_type": "A321",
+                "scheduled_arrival": 312000,
+                "scheduled_departure": 342000,
+                "assigned_gate_id": "A2"
+              },
+              {
+                "id": "SJ411",
+                "airline_id": "SJ",
+                "flight_number": "SJ 411",
+                "origin": "Westbridge",
+                "destination": "Fairview",
+                "aircraft_type": "A321",
+                "scheduled_arrival": 318000,
+                "scheduled_departure": 348000,
+                "assigned_gate_id": "A3"
+              }
+            ]
+          }
+        ]
       },
       "AW": {
         "starting_relationship": 70,
@@ -411,19 +466,83 @@
           "A5"
         ],
         "contract": "premium_reliability",
-        "request": {
-          "min_relationship": 80,
-          "min_flights_operated": 4,
-          "flights": [
-            {
-              "flight_number": "NS 417",
-              "aircraft_type": "737",
-              "scheduled_arrival": 345600,
-              "scheduled_departure": 374400
-            }
-          ]
-        }
+        "requests": [
+          {
+            "id": "NS_EXPANSION_01",
+            "label": "Northstar extra rotation",
+            "min_relationship": 80,
+            "min_flights_operated": 4,
+            "flights": [
+              {
+                "id": "NS417",
+                "airline_id": "NS",
+                "flight_number": "NS 417",
+                "origin": "Pinehaven",
+                "destination": "Ashford",
+                "aircraft_type": "737",
+                "scheduled_arrival": 315000,
+                "scheduled_departure": 345000,
+                "assigned_gate_id": "A4"
+              }
+            ]
+          }
+        ]
       }
+    }
+  },
+  "economy": {
+    "starting_cash_cents": 40000000,
+    "fees": {
+      "aircraft_cents": {
+        "A220": 90000,
+        "737": 120000,
+        "A321": 140000,
+        "787": 260000
+      },
+      "gate_cents": {
+        "A220": 40000,
+        "737": 50000,
+        "A321": 60000,
+        "787": 100000
+      },
+      "passenger_cents": 1200,
+      "bag_handling_cents": 250
+    },
+    "resources": {
+      "cleaning_crew": {
+        "label": "Cleaning crews",
+        "daily_cents": 180000,
+        "min": 1,
+        "max": 8
+      },
+      "catering_crew": {
+        "label": "Catering crews",
+        "daily_cents": 180000,
+        "min": 1,
+        "max": 8
+      },
+      "fuel_unit": {
+        "label": "Fuel units",
+        "daily_cents": 400000,
+        "min": 1,
+        "max": 8
+      },
+      "baggage_crew": {
+        "label": "Baggage crews",
+        "daily_cents": 240000,
+        "min": 2,
+        "max": 12
+      },
+      "pushback_tug": {
+        "label": "Pushback tugs",
+        "daily_cents": 150000,
+        "min": 1,
+        "max": 6
+      }
+    },
+    "costs": {
+      "security_staff_daily_cents": 90000,
+      "fixed_daily_cents": 5500000
     }
   },
   "airlines": {

@@ -25,6 +25,9 @@ var records: Dictionary = {}
 var state: Dictionary = {}
 ## Airline -> latest evaluation (derived; rebuilt on restore).
 var evaluations: Dictionary = {}
+## M10: called once per airline when its contract settles at the day's end:
+## (airline, contract template with "id", passed, tick).
+var on_settle: Callable
 
 
 func bind(airport_state: AirportState, event_bus: AirportEvents, settings: Dictionary, flights: Array) -> void:
@@ -85,6 +88,10 @@ func _refresh(airline: String, now: int, gate_free: Callable, day_over: bool) ->
 		var points := int(config.get("scoring", {}).get("contract_passed_points" if passed else "contract_failed_points", 0))
 		s.adjustments.append(["contract " + ("passed" if passed else "failed"), points])
 		events.record(now, "CONTRACT_" + ("PASSED" if passed else "FAILED"), "", {"airline": airline, "contract": e.contract.id})
+		if on_settle.is_valid() and not e.contract.id.is_empty():
+			var template: Dictionary = config.get("contracts", {}).get(e.contract.id, {}).duplicate()
+			template["id"] = e.contract.id
+			on_settle.call(airline, template, passed, now)
 		e = evaluate(airline)
 	if e.contract.status != s.contract:
 		events.record(now, "CONTRACT_STATUS_CHANGED", "", {"airline": airline, "from": s.contract, "to": e.contract.status})
@@ -92,7 +99,8 @@ func _refresh(airline: String, now: int, gate_free: Callable, day_over: bool) ->
 	if s.request == "" and not s.final and _request_ready(airline, e, gate_free):
 		s.request = "offered"
 		s.request_tick = now
-		events.record(now, "AIRLINE_REQUEST_OFFERED", "", {"airline": airline, "flights": profile(airline).get("request", {}).get("flights", []).size()})
+		s["request_id"] = str(request_of(airline).get("id", ""))
+		events.record(now, "AIRLINE_REQUEST_OFFERED", "", {"airline": airline, "request": s.request_id, "flights": request_of(airline).get("flights", []).size()})
 		e = evaluate(airline)
 	evaluations[airline] = e
 
@@ -110,8 +118,17 @@ func answer_request(airline: String, accept: bool, now: int) -> bool:
 	return true
 
 
+## The request on offer today: a single `request`, or the first of the
+## `requests` tiers (M10's career passes the next undecided tier as `request`).
+func request_of(airline: String) -> Dictionary:
+	var p := profile(airline)
+	if p.has("request"): return p.request
+	var tiers: Array = p.get("requests", [])
+	return {} if tiers.is_empty() else tiers[0]
+
+
 func _request_ready(airline: String, e: Dictionary, gate_free: Callable) -> bool:
-	var request: Dictionary = profile(airline).get("request", {})
+	var request: Dictionary = request_of(airline)
 	if request.is_empty(): return false
 	if e.relationship < int(request.get("min_relationship", 101)): return false
 	if e.metrics.flights < int(request.get("min_flights_operated", 0)): return false

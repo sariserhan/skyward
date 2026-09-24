@@ -1,4 +1,4 @@
-# Airport architecture — M0 to M9
+# Airport architecture — M0 to M10
 
 The airport is now the default Godot scene. The existing boarding scene remains
 available at `res://scenes/main.tscn`; its simulation algorithm is unchanged.
@@ -162,6 +162,38 @@ alongside the conflict check.
 - A compact turnaround summary sits under it.
 - A **Turnaround** tab holds the full task table.
 - After takeoff, the additive delay breakdown is shown.
+
+## M10 economy and careers
+
+**Layers.** `career.gd` (`AirportCareer`) sits above the day simulation:
+
+- **`new_career()`**
+- **`day_config()`:** the base scenario plus activated growth, the plan,
+  relationships, request tiers, day number and opening cash
+- **`start_day()`:** checks solvency, activates accepted tiers, calls
+  `AirportSimulation.setup()` with the day seed, and posts the committed costs
+- **`day_complete()`** / **`settle_day()`:** once per day; finishes the
+  remaining flows, merges the ledger, and keeps relationships, decisions,
+  history and the report
+- **`snapshot()`** / **`from_snapshot()`:** reconcile cash and check settled
+  days
+
+**The scene owns a career.** `airport_main.gd` settles when the last flight
+departs, shows the end-of-day panel (report and plan), and adopts the next
+day's simulation (`_adopt()`). Saves are career files.
+
+**Day ledger.** `airport_economy.gd` (`AirportEconomy`) belongs to each day's
+simulation. It posts transactions with stable ids and refuses duplicates.
+
+- `AirportSimulation._post_flight_revenue()` runs at takeoff.
+- `_contract_settled()` is the `AirlineRelations.on_settle` hook, called when
+  a contract settles at the day's end.
+- `charge_day_start()` is called by the career.
+- `summary()` and `in_category()` feed the **Finance** tab.
+
+**Requests.** `AirlineRelations.request_of()` reads either a single `request`
+(set by the career for the day) or the first of the profile's `requests`
+tiers. `_request_slot_free()` honors a request's assigned gate.
 
 ## M9 airlines
 

@@ -1130,3 +1130,155 @@ mode or M10 will consume the commitments.
 **Save schema v9** adds records and per-airline state: contract status, the
 settled flag, adjustments and request state. Records may exist only for
 departed flights; states and airlines must be known. v8 is rejected.
+
+
+## D-044 — An integer-cent ledger with stable transaction ids
+
+**Date:** 2026-09-24
+**Status:** Accepted (M10)
+
+Money is integer cents. Each day's simulation owns an `AirportEconomy`: an
+append-only list of transactions:
+
+```
+{id, day, tick, amount_cents, category, airline, flight_id, ref, reason}
+```
+
+**Ids are stable** (`D2:F014:passengers`, `D2:COST:fuel_unit`,
+`D2:CONTRACT:GA`), and posting an existing id is refused. The career keeps
+every settled transaction. Cash is always `starting cash + Σ ledger` (+
+today's transactions while operating), and a save whose stored cash differs by
+a cent does not load. This is an operating ledger, not accounting: no
+double entry, taxes or depreciation.
+
+**Revenue** comes only from real operations, charged once at the flight's
+takeoff:
+
+- an aircraft and gate service fee by aircraft type
+- a passenger service fee per passenger who actually departed on it
+- a bag handling fee per handling operation: each bag flown out on this
+  departure, and each bag unloaded from its inbound flight
+
+A transfer bag is handled twice and charged twice. There are no delay fines;
+operational failures cost money only through lost fees and contracts.
+
+**Costs** are the day's committed capacity, charged when the day starts:
+
+- each resource unit's daily cost × planned units (available, not busy, time)
+- the M2 security staff pool × a daily cost (the within-day model is
+  unchanged)
+- one airport operating overhead
+
+**Contracts** gain `bonus_cents` / `penalty_cents`, shown in the airline
+detail before the day. They are paid or charged once, when M9 settles the
+contract at the day's end. M9 scoring is unchanged.
+
+
+## D-045 — Careers: persistent state, fresh operating days
+
+**Date:** 2026-09-24
+**Status:** Accepted (M10)
+
+`AirportCareer` holds:
+
+- scenario and seed, day number, phase (`planning` / `operating`)
+- starting cash and the ledger
+- relationships, request decisions and activated growth
+- the resource plan, contract history, settled days and reports
+
+**Each day** is a fresh `AirportSimulation`, built from the base scenario
+plus:
+
+- activated growth flights
+- the plan
+- yesterday's settled relationships (as each airline's starting value; M9's
+  evaluation stays authoritative)
+- the next undecided request tier per airline
+- the economy's day and opening cash
+
+**Seeds.** Day 1 uses the scenario seed, so an unchanged career's first day is
+the M9 morning. Later days use a fixed mix of the career seed and the day
+number, never the wall clock. Nothing operational carries over.
+
+**Settling a day** happens once, when every flight has departed. Remaining
+arrivals and bags finish first, then:
+
+- transactions move to the ledger (known ids skipped)
+- relationships, request decisions, contract history and the report are kept
+- the day's entities are dropped
+
+A settled day is never settled again, even from a reload.
+
+
+## D-046 — Accepted requests become scheduled flights
+
+**Date:** 2026-09-24
+**Status:** Accepted (M10; completes D-043)
+
+Airline profiles list request tiers with stable ids (`GA_EXPANSION_01`, …),
+each holding full flight definitions: ids, numbers, types, times and gates.
+
+- **Offer:** a day offers an airline's first undecided tier, provided the
+  earlier ones were accepted. A declined tier ends that airline's growth; no
+  tier is ever offered twice.
+- **Activation:** an accepted tier is activated at the next day's start, and
+  its flights join every later day's schedule. Passengers, bags, connections,
+  gates, turnaround tasks and resources come from the normal generation, like
+  any flight.
+
+Riverdale's tiers:
+
+| Tier | Flights |
+| --- | --- |
+| GA_EXPANSION_01 | GA 401 (A220, A1) and GA 418 (787, A7) |
+| GA_EXPANSION_02 | GA 426 (A220, A5) |
+| SJ_EXPANSION_01 | SJ 403 and SJ 411 (A321, A2/A3) |
+| NS_EXPANSION_01 | NS 417 (737, A4) |
+
+They arrive between 08:35 and 09:10, as the third wave departs, so growth
+brings real runway, resource, security and connection load.
+
+
+## D-047 — Daily capacity planning and solvency; save schema v10
+
+**Date:** 2026-09-24
+**Status:** Accepted (M10)
+
+**Planning.** Resource counts change only between days, within
+`economy.resources[].min/max`. During the day, M8 priority is the lever. A day
+starts only if cash covers its committed cost. If not even the minimum plan
+fits, the career is insolvent; there are no loans in M10.
+
+**Riverdale economy:**
+
+- **Starting cash:** $400,000
+- **Aircraft and gate service:** A220 $1,300; 737 $1,700; A321 $2,000;
+  787 $3,600
+- **Passengers:** $12 each
+- **Bag handling:** $2.50 per operation
+- **Units per day:** cleaning $1,800; catering $1,800; fuel $4,000; baggage
+  $2,400; tug $1,500
+- **Security:** $900 per staff member
+- **Overhead:** $55,000
+- **Contracts (bonus / penalty):**
+
+  | Contract | Bonus | Penalty |
+  | --- | --- | --- |
+  | Basic | $3,000 | $4,000 |
+  | Fast Turnaround | $4,000 | $5,000 |
+  | Hub | $6,000 | $8,000 |
+  | Premium | $5,000 | $6,000 |
+
+**Save schema v10.** A career file is `{version, kind: "career", career,
+day}`, where `day` is the operating day's simulation snapshot (also v10, now
+with its economy) or null between days. Validation checks that:
+
+- settled days are exactly 1..day−1
+- transaction ids are unique and no day runs ahead
+- cash reconciles
+- plans are within range
+- request states are known
+- an operating day's opening cash equals the settled cash and repeats no
+  settled transaction
+
+v9 is rejected.

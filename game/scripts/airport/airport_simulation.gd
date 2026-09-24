@@ -3,7 +3,7 @@ extends RefCounted
 ## One world, one clock. Turnaround is a task graph (M4); cabin flights deboard
 ## (M5) and board (M3) through cabin engines as tasks of it; widebodies use the
 ## widebody deboarding and boarding abstractions (D-022, D-029).
-const SAVE_VERSION := 9
+const SAVE_VERSION := 10
 const CONFIG_PATH := "res://configs/airports/riverdale.json"
 const STATES := ["scheduled", "approaching", "landed", "taxiing_in", "at_gate",
 	"turnaround", "boarding", "ready_for_pushback", "taxiing_out", "departed"]
@@ -29,6 +29,7 @@ var turnaround := Turnaround.new()
 var baggage := BaggageSystem.new()
 var resources := AirportResources.new()
 var airlines := AirlineRelations.new()
+var economy := AirportEconomy.new()
 ## Built once: what the turnaround calls to release boarding and start driven work.
 var _release := Callable(self, "_release_boarding")
 var _starters := {"deboarding": Callable(self, "_start_deboarding"), "baggage_unload": Callable(self, "_start_baggage_unload"),
@@ -44,6 +45,8 @@ var baggage_usec: int = 0
 var resource_usec: int = 0
 ## Profiling: total time spent evaluating airlines at departures (not saved).
 var airline_usec: int = 0
+## Profiling: total time spent posting flight revenue (not saved).
+var economy_usec: int = 0
 var flight_order: Array[AirportFlight] = []
 ## Active cabin boarding sessions by flight id (open until pushback).
 var boarding_sessions: Dictionary = {}
@@ -151,6 +154,10 @@ func setup(scenario: Dictionary = {}, seed_override: int = -1) -> void:
 	# Airlines judge the day from real flight outcomes (M9).
 	airlines = AirlineRelations.new()
 	airlines.bind(airport, events, config.get("airline_relations", {}), flight_order)
+	airlines.on_settle = Callable(self, "_contract_settled")
+	# The day's money (M10): revenue at takeoff, contracts at the day's end.
+	economy = AirportEconomy.new()
+	economy.bind(config.get("economy", {}))
 
 func _boarding(key: String) -> Variant:
 	return config.get("boarding", {}).get(key, BOARDING_DEFAULTS[key])
@@ -313,6 +320,10 @@ func _complete_runway() -> void:
 			if p.current_flight_id == f.id and p.airport_state == "on_aircraft": passenger_flow.set_journey_state(p, "departed")
 		events.record(clock.tick, "FLIGHT_DEPARTED", f.id, {"delay_ticks": maxi(0, clock.tick - f.scheduled_departure), "causes": f.delay_reasons,
 			"breakdown": f.departure_delay_breakdown, "boarded": f.boarded_count, "missed": f.missed_count})
+		if economy.enabled():
+			var economy_started := Time.get_ticks_usec()
+			_post_flight_revenue(f)
+			economy_usec += Time.get_ticks_usec() - economy_started
 		if airlines.enabled():
 			var airline_started := Time.get_ticks_usec()
 			airlines.record(f, _airline_record(f), clock.tick, Callable(self, "_request_slot_free"))
@@ -503,7 +514,7 @@ func snapshot() -> Dictionary:
 		"seed": seed_value, "clock": clock.to_dict(), "rng": rng.snapshot(), "airport": airport.to_dict(),
 		"events": events.history.duplicate(true), "decisions": decisions.duplicate(true), "conflicts": conflicts.duplicate(true), "passenger_flow": passenger_flow.snapshot(),
 		"boarding": _boarding_snapshot(), "deboarding": _deboarding_snapshot(), "baggage": baggage.snapshot(), "resources": resources.snapshot(),
-		"airline_relations": airlines.snapshot()})
+		"airline_relations": airlines.snapshot(), "economy": economy.snapshot()})
 
 ## Active cabin sessions (D-021). Passenger cabin fields are already inside
 ## airport.passengers through Passenger.snapshot().
@@ -516,7 +527,7 @@ static func from_snapshot(data: Dictionary) -> AirportSimulation:
 	data = _integer_json(data)
 	if int(data.get("version", -1)) != SAVE_VERSION or data.get("engine", "") != Engine.get_version_info().string:
 		return null
-	for key in ["scenario", "clock", "rng", "airport", "conflicts", "passenger_flow", "boarding", "deboarding", "baggage", "resources", "airline_relations"]:
+	for key in ["scenario", "clock", "rng", "airport", "conflicts", "passenger_flow", "boarding", "deboarding", "baggage", "resources", "airline_relations", "economy"]:
 		if not data.get(key) is Dictionary: return null
 	for key in ["events", "decisions"]:
 		if not data.get(key) is Array: return null
@@ -526,6 +537,7 @@ static func from_snapshot(data: Dictionary) -> AirportSimulation:
 	if not BaggageSystem.valid_snapshot(data): return null
 	if not AirportResources.valid_snapshot(data): return null
 	if not AirlineRelations.valid_snapshot(data): return null
+	if not AirportEconomy.valid_snapshot(data): return null
 	var sim := AirportSimulation.new()
 	sim.config = data.scenario.duplicate(true)
 	sim._load_cabins()
@@ -550,6 +562,9 @@ static func from_snapshot(data: Dictionary) -> AirportSimulation:
 	if not sim.resources.queues_ordered(): return null
 	sim.airlines.bind(sim.airport, sim.events, sim.config.get("airline_relations", {}), sim.flight_order)
 	sim.airlines.restore(data.airline_relations)
+	sim.airlines.on_settle = Callable(sim, "_contract_settled")
+	sim.economy.bind(sim.config.get("economy", {}))
+	sim.economy.restore(data.economy)
 	for id in data.boarding:
 		var f: AirportFlight = sim.airport.flights[id]
 		sim.boarding_sessions[id] = FlightBoarding.from_snapshot(data.boarding[id], sim.cabins[data.boarding[id].cabin_id], sim._manifest(f))
@@ -1414,11 +1429,14 @@ func _served_while_waiting(f: AirportFlight, cause: String) -> Array:
 ## scheduled occupancy (with the gate buffer) overlapping its slot.
 func _request_slot_free(spec: Dictionary) -> bool:
 	var type: Dictionary = config.aircraft_types.get(spec.aircraft_type, {})
+	# A request that names its gate needs that gate; otherwise any compatible one.
+	var only := str(spec.get("assigned_gate_id", ""))
 	var start := int(spec.scheduled_arrival) + int(config.taxi_in_ticks)
 	var finish := int(spec.scheduled_departure)
 	var buffer := int(config.gate_buffer_ticks)
 	for gate: AirportGate in airport.gates.values():
 		if not str(type.get("class", "")) in gate.supported_aircraft_classes: continue
+		if not only.is_empty() and gate.id != only: continue
 		var clear := true
 		for f: AirportFlight in flight_order:
 			if f.assigned_gate_id != gate.id: continue
@@ -1435,3 +1453,28 @@ func answer_airline_request(airline: String, accept: bool) -> bool:
 	if not airlines.answer_request(airline, accept, clock.tick): return false
 	decisions.append({"tick": clock.tick, "type": "airline_request", "airline": airline, "accept": accept})
 	return true
+
+
+
+# --- economy (M10) ------------------------------------------------------------------
+
+## A departed flight's revenue: service fee by aircraft type, its departed
+## passengers, and the bags it handled (flown out, and unloaded from its
+## inbound). Posted once, at takeoff.
+func _post_flight_revenue(f: AirportFlight) -> void:
+	var passengers := 0
+	for id in f.passenger_ids:
+		var p: Passenger = airport.passengers[str(id)]
+		if p.current_flight_id == f.id and p.airport_state == "departed": passengers += 1
+	var bags_out := 0
+	for bag in baggage.bags_for(f):
+		if bag.state == "departed" and bag.current_flight_id == f.id: bags_out += 1
+	var bags_in := 0
+	for id in f.inbound_passenger_ids:
+		for bag_id in airport.passengers[str(id)].checked_bag_ids:
+			var bag: AirportBag = airport.bags[bag_id]
+			if bag.legs[0] == f.id and bag.unloaded_tick >= 0: bags_in += 1
+	economy.flight_departed(f, airport.aircraft[f.aircraft_id].aircraft_type_id, passengers, bags_out, bags_in, clock.tick)
+
+func _contract_settled(airline: String, contract: Dictionary, passed: bool, now: int) -> void:
+	economy.contract_settled(airline, str(airport.airlines.get(airline, airline)), contract, passed, now)

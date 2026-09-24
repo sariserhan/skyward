@@ -107,6 +107,36 @@ The scripted version asserts the same sequence and writes screenshots:
 tools/ui_tests.sh tests/m3_demo.gd
 ```
 
+### M10 walkthrough: running the airport as a business
+
+1. The top bar shows **DAY 1 · $292,…**: the day's committed capacity, security
+   and overhead ($108,800) are paid at the start. Open **Finance**. Revenue
+   arrives flight by flight as they take off; expand a category to see the
+   flights behind it.
+2. Around 08:10 Global Airways asks for more flights. Open its details and
+   press **ACCEPT**. The contract lines already show what passing or failing
+   is worth.
+3. When the last flight departs, the day's report appears:
+   - revenue by category, costs, net and ending cash
+   - flights, passengers, delay, missed connections and bags
+   - each airline's relationship, contract result and revenue
+
+   Default day 1: +$18,415.50.
+4. Plan tomorrow on the right. Each + or − changes the committed cost at
+   once. START DAY is disabled if the cash can't cover it (INSOLVENT if even
+   the minimum plan can't be paid for).
+5. Day 2: GA 401 (A1) and GA 418 (A7, a 787) are on the board, with their own
+   passengers, bags, connections and turnaround crews.
+
+What to try:
+
+- A lean plan (fewer fuel units): saves cost, but costs contracts.
+  - Fuel 4 → 2 turns +$18.4k into −$14.8k.
+- A generous plan: buys nothing the default doesn't already provide (−$5.5k
+  net).
+
+Scripted: `tools/ui_tests.sh tests/m10_demo.gd`.
+
 ### M9 walkthrough: airlines
 
 1. **Who cares about what.** Open **Airlines** during the default morning.
