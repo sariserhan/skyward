@@ -910,3 +910,107 @@ v6 is rejected. Validation cross-checks:
 
 A save taken mid-flow (bags in transit, sorting, loading, unloading or at
 reclaim) resumes identically.
+
+
+## D-038 — Operational resources are abstract pools held by turnaround tasks
+
+**Date:** 2026-09-24
+**Status:** Accepted (M8)
+
+Cleaning crews, catering crews, fuel units, baggage crews and pushback tugs
+are pools of abstract units, configured per airport (`resources`: label and
+unit count). Each unit is explicit (`fuel_unit#2`) and records the task that
+holds it. There is no movement, travel or parking. A granted unit is in use on
+the tick it is granted: AVAILABLE → IN USE → released → AVAILABLE.
+
+**Requirements.** A turnaround task spec may name a `resource`. Riverdale:
+
+| Task | Resource |
+| --- | --- |
+| Cleaning | cleaning crew |
+| Catering | catering crew |
+| Fueling | fuel unit |
+| Baggage unload and baggage load | baggage crew (shared, so arrivals and departures compete) |
+| Pushback | tug |
+
+Deboarding and boarding need none. A resource type with no pool is free,
+which keeps earlier fixtures unchanged.
+
+**Waiting.** A task whose prerequisites are met but whose unit is not
+available is `WAITING` and does not progress. A waiting task counts as active
+for exclusivity, so a flight still waiting for fuel does not start boarding.
+
+**Pushback** becomes a small task (kind `pushback`) after `pushback_ready`.
+Once the aircraft may leave, it requests a tug. It pushes back (the gate is
+released and taxi-out starts) when the tug is granted, and the tug is freed
+after the tug time, during taxi-out.
+
+**Baggage loading window.** A task may declare
+`opens_before_departure_ticks`; Riverdale opens baggage loading at D-35.
+Without this, a baggage crew would be held from unload to pushback and
+contention would be all-or-nothing. Bags sorted earlier wait `ready`. The M7
+cutoff and finalization are unchanged.
+
+**Riverdale capacity** (by measurement): 3 cleaning, 3 catering, 4 fuel,
+7 baggage crews, 2 tugs. The waves produce short queues, and only 2 flights
+lose a few minutes to shortages. `riverdale_shortage.json` (2 fuel units,
+4 baggage crews, 1 tug) is the deliberate shortage.
+
+**Security staff** keeps its own allocation model: staff are assigned to lanes
+rather than held by tasks. A shared staffing architecture may unify them
+later.
+
+
+## D-039 — Deterministic, event-driven allocation with player service priority
+
+**Date:** 2026-09-24
+**Status:** Accepted (M8)
+
+Each pool has one queue ordered by:
+
+1. flight service priority (HIGH, NORMAL, LOW)
+2. scheduled departure
+3. the tick the task became ready
+4. the flight's scenario order
+5. the task's graph order
+
+Pools are dispatched in type-name order. Saves sort object keys, so config
+order is not used.
+
+**Event-driven dispatch.** Requests, releases, priority changes and restores
+mark a pool dirty. Once per tick, after every flight has updated (so
+same-tick requests compete by the order above, not by flight iteration), dirty
+pools hand free units to the head of their queue. A granted task starts on
+that tick. There is no per-tick scan.
+
+**Priority.** `set_service_priority(flight, low|normal|high)` is a recorded
+player decision. It reorders that flight's waiting tasks and never adds
+capacity: raising one flight makes another wait.
+
+
+## D-040 — Resource waits in the critical path; save schema v8
+
+**Date:** 2026-09-24
+**Status:** Accepted (M8)
+
+**Attribution.** A task's late start is split. Its resource wait is blamed
+first, as `wait:<type>` (for example *Waiting for fuel unit*); the rest passes
+upstream as before. Execution overrun (start to finish) stays with the task,
+so waiting time and working time are never mixed. A wait off the critical path
+receives no blame. The pushback tug wait comes off the pushback lateness
+before the hold and the milestone.
+
+**Save schema v8** adds:
+
+- pools (units with holders, queues, statistics, dirty flags)
+- task `resource`, `ready_tick`, `resource_wait_ticks`, `unit_id` and
+  `earliest_start_tick`
+- flight `service_priority`
+
+v7 is rejected. Validation checks:
+
+- every held unit's task is running and names that unit
+- every waiting task is in exactly its pool's queue
+- running resource work holds a unit
+- units and pools match the scenario
+- queues are in deterministic order (after restore)

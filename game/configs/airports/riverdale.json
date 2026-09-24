@@ -91,7 +91,8 @@
           "737": 3600,
           "A321": 4200,
           "787": 4800
-        }
+        },
+        "resource": "cleaning_crew"
       },
       {
         "type": "catering",
@@ -104,7 +105,8 @@
           "737": 3000,
           "A321": 3600,
           "787": 4200
-        }
+        },
+        "resource": "catering_crew"
       },
       {
         "type": "fueling",
@@ -120,7 +122,8 @@
           "737": 8400,
           "A321": 9600,
           "787": 10800
-        }
+        },
+        "resource": "fuel_unit"
       },
       {
         "type": "baggage_unload",
@@ -134,7 +137,8 @@
           "737": 6600,
           "A321": 7800,
           "787": 9000
-        }
+        },
+        "resource": "baggage_crew"
       },
       {
         "type": "baggage_load",
@@ -148,7 +152,9 @@
           "737": 6600,
           "A321": 7800,
           "787": 9000
-        }
+        },
+        "resource": "baggage_crew",
+        "opens_before_departure_ticks": 21000
       },
       {
         "type": "boarding",
@@ -168,8 +174,42 @@
           "fueling",
           "baggage_load"
         ]
+      },
+      {
+        "type": "pushback",
+        "label": "Pushback",
+        "kind": "pushback",
+        "after": [
+          "pushback_ready"
+        ],
+        "resource": "pushback_tug",
+        "durations": {
+          "*": 1200
+        }
       }
     ]
+  },
+  "resources": {
+    "cleaning_crew": {
+      "label": "Cleaning crews",
+      "units": 3
+    },
+    "catering_crew": {
+      "label": "Catering crews",
+      "units": 3
+    },
+    "fuel_unit": {
+      "label": "Fuel units",
+      "units": 4
+    },
+    "baggage_crew": {
+      "label": "Baggage crews",
+      "units": 7
+    },
+    "pushback_tug": {
+      "label": "Pushback tugs",
+      "units": 2
+    }
   },
   "airlines": {
     "NS": "Northstar Air",

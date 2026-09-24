@@ -3,7 +3,7 @@ extends RefCounted
 ## One world, one clock. Turnaround is a task graph (M4); cabin flights deboard
 ## (M5) and board (M3) through cabin engines as tasks of it; widebodies use the
 ## widebody deboarding and boarding abstractions (D-022, D-029).
-const SAVE_VERSION := 7
+const SAVE_VERSION := 8
 const CONFIG_PATH := "res://configs/airports/riverdale.json"
 const STATES := ["scheduled", "approaching", "landed", "taxiing_in", "at_gate",
 	"turnaround", "boarding", "ready_for_pushback", "taxiing_out", "departed"]
@@ -27,6 +27,11 @@ var rng := SimRng.new(0)
 var passenger_flow := PassengerFlow.new()
 var turnaround := Turnaround.new()
 var baggage := BaggageSystem.new()
+var resources := AirportResources.new()
+## Built once: what the turnaround calls to release boarding and start driven work.
+var _release := Callable(self, "_release_boarding")
+var _starters := {"deboarding": Callable(self, "_start_deboarding"), "baggage_unload": Callable(self, "_start_baggage_unload"),
+	"baggage_load": Callable(self, "_start_baggage_load")}
 var config: Dictionary = {}
 var seed_value: int = 0
 var decisions: Array = []
@@ -34,6 +39,8 @@ var conflicts: Dictionary = {}
 var last_tick_usec: int = 0
 ## Profiling: total time spent in the baggage event step (not saved).
 var baggage_usec: int = 0
+## Profiling: total time spent dispatching resources (not saved).
+var resource_usec: int = 0
 var flight_order: Array[AirportFlight] = []
 ## Active cabin boarding sessions by flight id (open until pushback).
 var boarding_sessions: Dictionary = {}
@@ -43,6 +50,23 @@ var deboarding_sessions: Dictionary = {}
 var cabins: Dictionary = {}
 var cabins_by_type: Dictionary = {}
 var cabin_config: SimConfig = SimConfig.load_default()
+
+## A scenario file, resolving "extends": the named base file (relative to this
+## one) with this file's keys merged over it (objects merge, anything else
+## replaces). Used for variants such as the M8 resource-shortage morning.
+static func load_config(path: String) -> Dictionary:
+	var data: Dictionary = JsonUtil.load_file(path)
+	if not data.has("extends"): return data
+	var base := load_config(path.get_base_dir().path_join(str(data.extends)))
+	data.erase("extends")
+	return _merged(base, data)
+
+static func _merged(base: Dictionary, over: Dictionary) -> Dictionary:
+	var out := base.duplicate(true)
+	for key in over:
+		if out.get(key) is Dictionary and over[key] is Dictionary: out[key] = _merged(out[key], over[key])
+		else: out[key] = over[key].duplicate(true) if over[key] is Dictionary or over[key] is Array else over[key]
+	return out
 
 func setup(scenario: Dictionary = {}, seed_override: int = -1) -> void:
 	config = (JsonUtil.load_file(CONFIG_PATH) if scenario.is_empty() else scenario).duplicate(true)
@@ -89,6 +113,7 @@ func setup(scenario: Dictionary = {}, seed_override: int = -1) -> void:
 		# Turnaround tasks with seeded durations and a planned schedule (M4).
 		turnaround.create(flight, data.aircraft_type, rng, flight.scheduled_arrival + int(config.taxi_in_ticks),
 			flight.scheduled_departure - int(_boarding("open_before_departure_ticks")), _scheduled_pushback(flight))
+	_bind_resources()
 	events.record(clock.tick, "SCENARIO_STARTED", "", {"seed": seed_value, "scenario": config.id})
 	passenger_flow = PassengerFlow.new()
 	passenger_flow.bind(airport, events, config.get("passenger_flow", {}))
@@ -130,6 +155,11 @@ func step() -> void:
 	_complete_runway()
 	for flight: AirportFlight in flight_order:
 		_update_flight(flight)
+	# Resources are handed out once every flight has asked (M8, event-driven).
+	if not resources.dirty.is_empty():
+		var resources_started := Time.get_ticks_usec()
+		resources.dispatch(clock.tick, Callable(self, "_grant"))
+		resource_usec += Time.get_ticks_usec() - resources_started
 	_start_runway()
 	passenger_flow.step(clock.tick)
 	_step_boarding()
@@ -181,6 +211,7 @@ func _update_flight(f: AirportFlight) -> void:
 		"ready_for_pushback":
 			_try_pushback(f)
 		"taxiing_out":
+			_finish_pushback(f)
 			if clock.tick >= f.due_tick:
 				_request_runway(f, "takeoff")
 	# Estimates refresh once per simulated second, with the conflict check that
@@ -192,14 +223,11 @@ func _update_flight(f: AirportFlight) -> void:
 ## aircraft opens on this same tick. A second pass lets boarding completion
 ## release the pushback milestone (and anything exclusive with boarding).
 func _update_turnaround(f: AirportFlight) -> void:
-	var release := Callable(self, "_release_boarding")
-	var starters := {"deboarding": Callable(self, "_start_deboarding"), "baggage_unload": Callable(self, "_start_baggage_unload"),
-		"baggage_load": Callable(self, "_start_baggage_load")}
 	_update_abstract_deboarding(f)
-	turnaround.update(f, clock.tick, release, starters)
+	turnaround.update(f, clock.tick, _release, _starters)
 	if f.status == "boarding": _update_boarding(f)
 	_update_baggage_tasks(f)
-	turnaround.update(f, clock.tick, release, starters)
+	turnaround.update(f, clock.tick, _release, _starters)
 	if turnaround.pushback_ready(f) and f.status in ["turnaround", "boarding"]:
 		_transition(f, "ready_for_pushback")
 		_try_pushback(f)
@@ -255,6 +283,9 @@ func _complete_runway() -> void:
 		f.estimated_departure = clock.tick
 		f.departure_delay_breakdown = turnaround.attribute(f, _scheduled_pushback(f), f.takeoff_wait_ticks)
 		baggage.depart(f)
+		# A tug time longer than taxi-out still ends by takeoff.
+		var op := turnaround.task(f, Turnaround.PUSHBACK_OP)
+		if op != null and op.status == TurnaroundTask.RUNNING: turnaround.complete_task(f, Turnaround.PUSHBACK_OP, clock.tick)
 		_transition(f, "departed")
 		for id in f.passenger_ids:
 			var p: Passenger = airport.passengers[str(id)]
@@ -272,7 +303,10 @@ func _estimate_departure(f: AirportFlight) -> int:
 		"landed": dock = clock.tick + int(config.taxi_in_ticks) + 2
 		"taxiing_in": dock = maxi(clock.tick, f.due_tick) + 2
 		"at_gate", "turnaround", "boarding": dock = clock.tick
-		"ready_for_pushback": earliest = maxi(_pushback_floor(f), clock.tick) + exit_time
+		"ready_for_pushback":
+			earliest = maxi(_pushback_floor(f), clock.tick) + exit_time
+			var op := turnaround.task(f, Turnaround.PUSHBACK_OP)
+			if op != null and op.status == TurnaroundTask.WAITING: earliest = maxi(earliest, resources.expected_start(op, clock.tick) + exit_time)
 		"taxiing_out":
 			earliest = maxi(clock.tick, f.due_tick) + int(config.takeoff_ticks)
 			var operation := airport.runway.active_operation
@@ -301,7 +335,9 @@ func _estimate_pushback(f: AirportFlight, dock: int) -> int:
 			_:
 				match t.kind:
 					"timed", "deboarding", "baggage_unload":
-						var started := t.start_tick if t.status == TurnaroundTask.RUNNING else ready
+						var started := t.start_tick if t.status == TurnaroundTask.RUNNING else maxi(ready, t.earliest_start_tick)
+						# Queued for a resource: when a unit should come free for it.
+						if t.status == TurnaroundTask.WAITING: started = maxi(started, resources.expected_start(t, clock.tick))
 						finish[t.type] = maxi(clock.tick, started + t.duration_ticks)
 					"boarding":
 						if f.boarding_phase in ["closed", "complete"]: finish[t.type] = clock.tick
@@ -311,6 +347,7 @@ func _estimate_pushback(f: AirportFlight, dock: int) -> int:
 						# Loading finalizes once the gate has closed.
 						var close := f.gate_close_tick if f.gate_close_tick >= 0 else f.scheduled_departure - close_offset
 						finish[t.type] = maxi(maxi(ready, close), clock.tick)
+						if t.status == TurnaroundTask.WAITING: finish[t.type] = maxi(finish[t.type], resources.expected_start(t, clock.tick) + 600)
 						if t.status == TurnaroundTask.RUNNING and baggage.enabled():
 							# The loader's backlog: bags queued plus the one in hand.
 							var left: int = f.bag_load_queue.size() + (0 if f.bag_loader_current.is_empty() else 1)
@@ -440,7 +477,7 @@ func snapshot() -> Dictionary:
 	return _integer_json({"version": SAVE_VERSION, "engine": Engine.get_version_info().string, "scenario": config.duplicate(true),
 		"seed": seed_value, "clock": clock.to_dict(), "rng": rng.snapshot(), "airport": airport.to_dict(),
 		"events": events.history.duplicate(true), "decisions": decisions.duplicate(true), "conflicts": conflicts.duplicate(true), "passenger_flow": passenger_flow.snapshot(),
-		"boarding": _boarding_snapshot(), "deboarding": _deboarding_snapshot(), "baggage": baggage.snapshot()})
+		"boarding": _boarding_snapshot(), "deboarding": _deboarding_snapshot(), "baggage": baggage.snapshot(), "resources": resources.snapshot()})
 
 ## Active cabin sessions (D-021). Passenger cabin fields are already inside
 ## airport.passengers through Passenger.snapshot().
@@ -453,7 +490,7 @@ static func from_snapshot(data: Dictionary) -> AirportSimulation:
 	data = _integer_json(data)
 	if int(data.get("version", -1)) != SAVE_VERSION or data.get("engine", "") != Engine.get_version_info().string:
 		return null
-	for key in ["scenario", "clock", "rng", "airport", "conflicts", "passenger_flow", "boarding", "deboarding", "baggage"]:
+	for key in ["scenario", "clock", "rng", "airport", "conflicts", "passenger_flow", "boarding", "deboarding", "baggage", "resources"]:
 		if not data.get(key) is Dictionary: return null
 	for key in ["events", "decisions"]:
 		if not data.get(key) is Array: return null
@@ -461,6 +498,7 @@ static func from_snapshot(data: Dictionary) -> AirportSimulation:
 	if not PassengerFlowValidation.valid(data): return null
 	if not Turnaround.valid_snapshot(data): return null
 	if not BaggageSystem.valid_snapshot(data): return null
+	if not AirportResources.valid_snapshot(data): return null
 	var sim := AirportSimulation.new()
 	sim.config = data.scenario.duplicate(true)
 	sim._load_cabins()
@@ -480,6 +518,9 @@ static func from_snapshot(data: Dictionary) -> AirportSimulation:
 	sim.baggage.bind(sim.airport, sim.events, sim.passenger_flow, sim.config.get("baggage", {}))
 	sim.baggage.restore(data.baggage)
 	sim.passenger_flow.baggage = sim.baggage
+	sim._bind_resources()
+	sim.resources.restore(data.resources)
+	if not sim.resources.queues_ordered(): return null
 	for id in data.boarding:
 		var f: AirportFlight = sim.airport.flights[id]
 		sim.boarding_sessions[id] = FlightBoarding.from_snapshot(data.boarding[id], sim.cabins[data.boarding[id].cabin_id], sim._manifest(f))
@@ -673,6 +714,38 @@ func _update_boarding(f: AirportFlight) -> void:
 ## does not wait for its shifted boarding window.
 func _try_pushback(f: AirportFlight) -> void:
 	if clock.tick < _pushback_floor(f) or not turnaround.pushback_ready(f): return
+	var op := turnaround.task(f, Turnaround.PUSHBACK_OP)
+	if op != null:
+		# M8: ready and allowed to leave; the push itself needs a tug.
+		if op.status != TurnaroundTask.PENDING: return
+		op.ready_tick = clock.tick
+		op.started_after = Turnaround.PUSHBACK
+		if resources.needs(op):
+			resources.request(op, clock.tick)
+			return
+		_push_back(f, op)
+		return
+	_release_gate(f)
+
+## A waiting task was granted its unit (M8).
+func _grant(t: TurnaroundTask) -> void:
+	if t.kind == "pushback": _push_back(airport.flights[t.flight_id], t)
+	else: turnaround.grant(t, clock.tick, _release, _starters)
+
+func _push_back(f: AirportFlight, op: TurnaroundTask) -> void:
+	op.status = TurnaroundTask.RUNNING
+	op.start_tick = clock.tick
+	op.blocked_reason = ""
+	events.record(clock.tick, "TASK_STARTED", f.id, {"task": op.type, "after": op.started_after, "unit": op.unit_id})
+	_release_gate(f)
+
+## The tug's part ends during taxi-out; it is free again.
+func _finish_pushback(f: AirportFlight) -> void:
+	var op := turnaround.task(f, Turnaround.PUSHBACK_OP)
+	if op != null and op.status == TurnaroundTask.RUNNING and clock.tick >= op.start_tick + op.duration_ticks:
+		turnaround.complete_task(f, Turnaround.PUSHBACK_OP, op.start_tick + op.duration_ticks)
+
+func _release_gate(f: AirportFlight) -> void:
 	var gate: AirportGate = airport.gates[f.assigned_gate_id]
 	gate.occupied_by_flight_id = ""
 	f.gate_release_tick = clock.tick
@@ -1165,3 +1238,56 @@ func bag_connection_status(bag: AirportBag) -> Dictionary:
 			if bag.leg_index == bag.legs.size() - 1: return {"status": "LOADED" if bag.state in ["on_aircraft", "departed"] else "READY", "ready": bag.ready_tick, "cutoff": cutoff}
 	var ready := bag_ready_estimate(bag)
 	return {"status": "ON TRACK" if ready >= 0 and ready <= cutoff - 1800 else "AT RISK", "ready": ready, "cutoff": cutoff}
+
+
+
+# --- operational resources (M8) -----------------------------------------------
+
+func _bind_resources() -> void:
+	var ids: Array = []
+	for f: AirportFlight in flight_order: ids.append(f.id)
+	resources = AirportResources.new()
+	resources.bind(airport, events, config.get("resources", {}), ids, turnaround.order)
+	turnaround.resources = resources
+
+## Player decision: which flight goes first when turnaround resources are
+## scarce. Reorders its waiting tasks; never adds capacity.
+func set_service_priority(flight_id: String, priority: String) -> bool:
+	if not airport.flights.has(flight_id) or not priority in AirportResources.PRIORITIES: return false
+	var f: AirportFlight = airport.flights[flight_id]
+	if f.status == "departed" or f.service_priority == priority: return false
+	f.service_priority = priority
+	resources.reprioritize(f)
+	decisions.append({"tick": clock.tick, "type": "set_service_priority", "flight_id": flight_id, "priority": priority})
+	events.record(clock.tick, "SERVICE_PRIORITY_CHANGED", flight_id, {"priority": priority})
+	return true
+
+## Per resource type: utilization, waits and queues; plus which departures the
+## shortage delayed (critical-path blame on "wait:<type>").
+func resource_metrics() -> Dictionary:
+	var pools := resources.metrics(clock.tick, int(config.start_tick))
+	var delayed := 0
+	var delay_ticks := 0
+	for f: AirportFlight in flight_order:
+		var mine := 0
+		for cause in f.departure_delay_breakdown:
+			if str(cause).begins_with("wait:"):
+				mine += int(f.departure_delay_breakdown[cause])
+				var type := str(cause).substr(5)
+				if pools.has(type): pools[type]["delay_ticks"] = int(pools[type].get("delay_ticks", 0)) + int(f.departure_delay_breakdown[cause])
+		if mine > 0: delayed += 1
+		delay_ticks += mine
+	return {"pools": pools, "flights_delayed": delayed, "delay_ticks": delay_ticks}
+
+## Waiting tasks for one resource type, in queue order (for the UI).
+func resource_queue(type: String) -> Array:
+	var out: Array = []
+	for id in resources.pools[type].queue: out.append(airport.turnaround_tasks[id])
+	return out
+
+## The tasks holding units of one resource type, by unit.
+func resource_holders(type: String) -> Array:
+	var out: Array = []
+	for unit in resources.pools[type].units:
+		out.append(null if unit.task_id.is_empty() else airport.turnaround_tasks[unit.task_id])
+	return out

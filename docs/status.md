@@ -1,14 +1,14 @@
-# Current status — M0 through M7 implemented
+# Current status — M0 through M8 implemented
 
-M7 checked baggage is complete. Every checked bag is a persistent object linked
-to its passenger. Bags pass logical sortation and reclaim stages with finite
-capacity. Real baggage unload and load tasks sit in the turnaround, and pushback
-waits for the last bag. Local arrivals wait at reclaim for their own bags.
-Transfer bags follow connectors onto their next flight, or miss the D-15 bag
-cutoff even when the passenger makes it. Save schema v7. See the
-[M7 completion report](m7-status.md). M8 operational resources has not started.
+M8 operational resources are complete. Cleaning and catering crews, fuel
+units, baggage crews and pushback tugs are limited. Turnaround tasks wait for
+them, flights compete, and the player's LOW / NORMAL / HIGH service priority
+decides who goes first, which redistributes delay rather than removing it.
+Resource waits appear in the departure-delay breakdown only when they are on
+the critical path. Save schema v8. See the [M8 completion report](m8-status.md).
+M9 airlines and contracts has not started.
 
-Earlier reports: [M6](m6-status.md), [M5](m5-status.md), [M4](m4-status.md), [M3](m3-status.md), [M2](m2-status.md), and the M0/M1 report below. Their
+Earlier reports: [M7](m7-status.md), [M6](m6-status.md), [M5](m5-status.md), [M4](m4-status.md), [M3](m3-status.md), [M2](m2-status.md), and the M0/M1 report below. Their
 limitations and timings are historical; M3 changed the timetable, scenario start,
 security defaults, loads, cabin timings and save schema (D-021, D-023, D-024).
 

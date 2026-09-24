@@ -2,7 +2,7 @@
 
 A Godot airport operations simulator with a preserved aircraft boarding engine.
 The default scene runs Riverdale International: manage gate conflicts while
-fictional flights land, taxi, turn around and depart. Airport M0–M7 are
+fictional flights land, taxi, turn around and depart. Airport M0–M8 are
 implemented. Arriving aircraft carry real passengers, who deboard row by row and
 either leave the airport or connect: they walk to another gate and board
 another flight, as the same person. Departing passengers clear
@@ -11,6 +11,8 @@ is a visible task graph (deboarding, cleaning, catering, fueling, baggage
 unload and load, boarding), and departures wait for it. Checked bags are real
 objects: they are sorted, loaded, unloaded, transferred between flights and
 collected at reclaim, and they can miss a connection their passenger makes.
+Crews, fuel units and pushback tugs are limited: flights queue for them, and
+the player chooses which flight gets served first.
 
 Product direction from M3 onward: [airport_tycoon.md](airport_tycoon.md). M3 report:
 [docs/m3-status.md](docs/m3-status.md).

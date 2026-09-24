@@ -42,12 +42,19 @@ it is kept as historical context. The original boarding roadmap remains at
   through transfer sortation; a D-15 bag cutoff, with passengers and bags
   missing independently; save schema v7. Plan [m7-plan.md](m7-plan.md), report
   [m7-status.md](m7-status.md). Decisions D-035–D-037.
-- **M8 next, not started:** operational resources.
-- M9: airlines and contracts.
+- **M8 implemented:** operational resources. Cleaning and catering crews, fuel
+  units, baggage crews and pushback tugs are limited pools held by turnaround
+  tasks. Tasks wait when none is free; a tug-backed pushback operation;
+  deterministic, event-driven allocation; LOW / NORMAL / HIGH service priority
+  that redistributes delay; resource waits in the critical-path delay
+  breakdown; a Resources tab and shortage alerts; a shortage scenario; save
+  schema v8. Plan [m8-plan.md](m8-plan.md), report
+  [m8-status.md](m8-status.md). Decisions D-038–D-040.
+- **M9 next, not started:** airlines and contracts.
 - M10: economy.
 - M11: construction and expansion.
 
 The order after M3 follows D-020: the turnaround task framework comes before any
 individual turnaround activity.
 
-M7 stopped here for review. Do not begin M8 until requested.
+M8 stopped here for review. Do not begin M9 until requested.

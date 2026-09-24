@@ -23,9 +23,11 @@ func fixture(aircraft := "737", overrides := {}, edit := Callable()) -> AirportS
 	config.flights = [f]
 	var flow: Dictionary = config.passenger_flow
 	# Earlier-milestone fixtures: no connecting itineraries (M6 tests opt in)
-	# and no checked-baggage model (M7 tests opt in).
+	# no checked-baggage model (M7 tests opt in) and no operational resource
+	# limits (M8 tests opt in).
 	flow.erase("connections")
 	config.erase("baggage")
+	config.erase("resources")
 	flow.arrival_lead_min_ticks = 30000
 	flow.arrival_lead_max_ticks = 34000
 	flow.check_in_ticks = 1

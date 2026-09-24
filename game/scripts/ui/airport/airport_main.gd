@@ -20,6 +20,9 @@ var status_label: Label
 var clock_label: Label
 var metrics_label: Label
 var bag_metrics: Dictionary = {}
+## M8: service priority buttons (low, normal, high) and the Resources tab.
+var priority_buttons: Dictionary = {}
+var resource_tree: Tree
 var bag_metrics_second: int = -1
 var pause_button: Button
 var debug_panel: VBoxContainer
@@ -37,8 +40,14 @@ var rows: Dictionary = {}
 var alert_ids: Array = []
 var save_path: String = "user://riverdale_airport.json"
 
+## Optional scenario file (M8 variants), set before the scene enters the tree
+## or passed as --scenario=res://configs/airports/riverdale_shortage.json.
+var scenario_path := ""
+
 func _ready() -> void:
-	sim.setup()
+	for arg in OS.get_cmdline_user_args() + OS.get_cmdline_args():
+		if arg.begins_with("--scenario="): scenario_path = arg.trim_prefix("--scenario=")
+	sim.setup({} if scenario_path.is_empty() else AirportSimulation.load_config(scenario_path))
 	_build()
 	_refresh()
 
@@ -142,6 +151,23 @@ func _build() -> void:
 	passenger_list.name = "Passengers"
 	passenger_list.item_selected.connect(func(index): _select_passenger(passenger_list_ids[index]))
 	operations_tabs.add_child(passenger_list)
+	resource_tree = Tree.new()
+	resource_tree.name = "Resources"
+	resource_tree.columns = 4
+	resource_tree.hide_root = true
+	resource_tree.column_titles_visible = true
+	resource_tree.select_mode = Tree.SELECT_ROW
+	resource_tree.add_theme_constant_override("v_separation", 0)
+	resource_tree.add_theme_font_size_override("font_size", 13)
+	resource_tree.add_theme_font_size_override("title_button_font_size", 13)
+	for i in 4:
+		resource_tree.set_column_title(i, ["Resource", "Busy", "Waiting", "Flights"][i])
+		resource_tree.set_column_expand(i, i == 3)
+		resource_tree.set_column_custom_minimum_width(i, [150, 120, 80, 250][i])
+	resource_tree.item_selected.connect(func():
+		var item := resource_tree.get_selected()
+		if item != null and item.get_metadata(0) is String and not str(item.get_metadata(0)).is_empty(): _select(item.get_metadata(0)))
+	operations_tabs.add_child(resource_tree)
 	_rebuild_board()
 	var right := VBoxContainer.new()
 	right.custom_minimum_size.x = 320
@@ -182,6 +208,21 @@ func _build() -> void:
 		status_label.text = "Gate closed" if sim.close_gate(selected_id) else "Gate is not open"
 		_refresh())
 	for button in [hold_button, close_gate_button]: button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var priority_row := HBoxContainer.new()
+	right.add_child(priority_row)
+	var priority_label := _label(priority_row, "Service priority", 13)
+	priority_label.tooltip_text = "Who goes first when crews, fuel units or tugs are scarce. Never adds capacity: another flight waits instead."
+	var group := ButtonGroup.new()
+	for level in ["low", "normal", "high"]:
+		var button := _button(priority_row, level.to_upper(), func():
+			if sim.set_service_priority(selected_id, level):
+				status_label.text = "%s service priority %s" % [sim.airport.flights[selected_id].flight_number, level.to_upper()]
+			_refresh())
+		button.toggle_mode = true
+		button.button_group = group
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		button.add_theme_font_size_override("font_size", 13)
+		priority_buttons[level] = button
 	warnings = _label(right, "", 12)
 	warnings.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	warnings.custom_minimum_size.y = 48
@@ -194,6 +235,9 @@ func _build() -> void:
 			view_tabs.current_tab = 1
 			operations_tabs.current_tab = 1
 		elif str(alert_ids[index]).begins_with("baggage:"): return
+		elif str(alert_ids[index]).begins_with("resources:"):
+			view_tabs.current_tab = 0
+			operations_tabs.current_tab = resource_tree.get_index()
 		else: _select(alert_ids[index]))
 	right.add_child(alerts)
 	debug_panel = VBoxContainer.new()
@@ -263,6 +307,8 @@ func _refresh() -> void:
 		bag_metrics = sim.baggage_metrics()
 		bag_metrics_second = sim.clock.tick / 10
 	var bags := "" if bag_metrics.bags == 0 else "   |   Bags %d missed · %d at reclaim" % [bag_metrics.transfer_missed + bag_metrics.missed_flight, bag_metrics.at_reclaim]
+	for type in sim.resources.order:
+		if sim.resources.pools[type].queue.size() >= 2: security_alert_count += 1
 	metrics_label.text = "MORNING RUSH   |   %d× %s   |   Gates %d / 8   |   Departed %d / %d   |   On time %s   |   Connections %d made · %d missed%s   |   Alerts %d" % [sim.clock.speed, "PAUSED" if sim.clock.paused else "LIVE", metrics.occupied, metrics.departed, sim.airport.flights.size(), punctuality, connections.made, connections.missed, bags, sim.conflicts.size() + security_alert_count]
 	for f: AirportFlight in sim.airport.flights.values():
 		var values := [f.flight_number, f.origin + " → " + f.destination, f.assigned_gate_id,
@@ -276,6 +322,7 @@ func _refresh() -> void:
 	text += "\n\n[b]Passengers at gate[/b]  %d / %d" % [int(sim.passenger_flow.ready_by_flight.get(flight.id, 0)), flight.passenger_ids.size()]
 	detail.text = text
 	_refresh_turnaround_tree(flight)
+	_refresh_resources()
 	_refresh_terminal()
 	_refresh_warnings()
 	alerts.clear()
@@ -293,6 +340,16 @@ func _refresh() -> void:
 		if current.oldest_wait >= 6000 or (cp.capacity() == 0 and not cp.queue.is_empty()):
 			alerts.add_item("%s security · %d waiting" % [cp.id.capitalize(), cp.queue.size()])
 			alert_ids.append("security:" + cp.id)
+	for type in sim.resources.order:
+		var queue: Array = sim.resource_queue(type)
+		if queue.size() >= 2:
+			alerts.add_item("%s · %d flights waiting" % [str(sim.resources.pools[type].label), queue.size()])
+			alerts.set_item_tooltip(alerts.item_count - 1, "All %s are busy. Select to see the queue; raise a flight's service priority to move it up." % str(sim.resources.pools[type].label).to_lower())
+			alert_ids.append("resources:" + type)
+		for t: TurnaroundTask in queue:
+			if t.kind == "pushback" and sim.clock.tick - t.ready_tick >= 1200:
+				alerts.add_item("Pushback · %s waiting %d min for tug" % [sim.airport.flights[t.flight_id].flight_number, (sim.clock.tick - t.ready_tick) / 600])
+				alert_ids.append(t.flight_id)
 	for stage_id in sim.baggage.stages:
 		var queued: int = sim.baggage.stages[stage_id].queue.size()
 		if queued >= int(sim.config.get("baggage", {}).get("backlog_alert_bags", 25)):
@@ -321,6 +378,9 @@ func _refresh_warnings() -> void:
 	strategy_choice.set_block_signals(false)
 	strategy_choice.disabled = f.boarding_mode != "cabin" or not f.boarding_phase in ["", "scheduled"]
 	hold_button.disabled = not sim.can_hold(selected_id)
+	for level in priority_buttons:
+		priority_buttons[level].set_pressed_no_signal(f.service_priority == level)
+		priority_buttons[level].disabled = f.status == "departed" or not sim.resources.enabled()
 	close_gate_button.disabled = f.boarding_phase != "open"
 	var deboarding := _deboarding_running(f)
 	view_boarding_button.text = "View deboarding" if deboarding else "View boarding"
@@ -493,6 +553,7 @@ func _delay_text(f: AirportFlight) -> String:
 	return text
 
 func _cause_label(f: AirportFlight, cause: String) -> String:
+	if cause.begins_with("wait:"): return "Waiting for " + sim.resources.unit_name(cause.substr(5))
 	var t: TurnaroundTask = sim.turnaround.task(f, cause)
 	if t != null: return t.label
 	return {"late_inbound": "Late inbound", "passenger_hold": "Passenger hold", "runway_takeoff_queue": "Runway queue"}.get(cause, cause.capitalize())
@@ -501,6 +562,9 @@ func _cause_label(f: AirportFlight, cause: String) -> String:
 func _holding_text(f: AirportFlight) -> String:
 	var t: TurnaroundTask = sim.turnaround.holding(f)
 	if t == null:
+		var op: TurnaroundTask = sim.turnaround.task(f, Turnaround.PUSHBACK_OP)
+		if f.status == "ready_for_pushback" and op != null and op.status == TurnaroundTask.WAITING:
+			return "\n[color=#ffc078]Holding departure: Pushback · %s[/color]" % _task_state(f, op, false)
 		if f.status == "ready_for_pushback": return "\n[color=#70dec0]Ready · pushback %s[/color]" % AirportClock.display(sim._pushback_floor(f)).left(5)
 		return ""
 	# Before boarding starts the turnaround itself is being held up.
@@ -534,6 +598,11 @@ func _turnaround_text(f: AirportFlight) -> String:
 		if t.status == TurnaroundTask.RUNNING and t.kind in ["timed", "deboarding", "baggage_unload", "baggage_load"]: running.append(t.label)
 	var text := "\n\n[b]Turnaround[/b]  %d / %d complete" % [sim.turnaround.completed_count(f), tasks.size()]
 	if not running.is_empty(): text += " · running: " + ", ".join(running)
+	# M8: every task queued for a resource, whether or not it holds departure.
+	for t: TurnaroundTask in tasks:
+		if t.status == TurnaroundTask.WAITING:
+			text += "\n[color=#e5484d]%s: %s[/color]\nPriority %s · position %d in the %s queue" % [t.label, _task_state(f, t, false),
+				f.service_priority.to_upper(), sim.resources.position(t) + 1, sim.resources.unit_name(t.resource)]
 	return text
 
 func _task_state(f: AirportFlight, t: TurnaroundTask, table: bool) -> String:
@@ -560,13 +629,18 @@ func _task_state(f: AirportFlight, t: TurnaroundTask, table: bool) -> String:
 			if f.boarding_phase == "open": return "gate closes %s" % AirportClock.display(f.gate_close_tick).left(5)
 			return "doors closing · seating"
 		TurnaroundTask.READY: return "opens %s" % AirportClock.display(f.boarding_open_tick).left(5)
+		TurnaroundTask.WAITING:
+			var pool: Dictionary = sim.resources.pools[t.resource]
+			var ahead := sim.resources.position(t)
+			return "WAITING FOR %s · %s · %d / %d busy · waited %s" % [sim.resources.unit_name(t.resource).to_upper(),
+				"next in line" if ahead == 0 else "%d ahead" % ahead, AirportResources.busy(pool), pool.units.size(), _mmss(sim.clock.tick - t.ready_tick)]
 		TurnaroundTask.BLOCKED: return t.blocked_reason
 	return "starts at the gate" if table else "not started"
 
 func _refresh_turnaround_tree(f: AirportFlight) -> void:
 	turnaround_tree.clear()
 	var root := turnaround_tree.create_item()
-	var colors := {TurnaroundTask.COMPLETE: Color("70dec0"), TurnaroundTask.RUNNING: Color("ffc078"), TurnaroundTask.READY: Color("a7becd"), TurnaroundTask.BLOCKED: Color("a7becd"), TurnaroundTask.PENDING: Color("6b7684")}
+	var colors := {TurnaroundTask.COMPLETE: Color("70dec0"), TurnaroundTask.RUNNING: Color("ffc078"), TurnaroundTask.WAITING: Color("e5484d"), TurnaroundTask.READY: Color("a7becd"), TurnaroundTask.BLOCKED: Color("a7becd"), TurnaroundTask.PENDING: Color("6b7684")}
 	var holding: TurnaroundTask = sim.turnaround.holding(f)
 	for t: TurnaroundTask in sim.turnaround.tasks_of(f):
 		var row := turnaround_tree.create_item(root)
@@ -703,3 +777,44 @@ func _baggage_text(f: AirportFlight) -> String:
 static func _mmss(ticks: int) -> String:
 	var seconds := maxi(0, ticks) / 10
 	return "%d:%02d" % [seconds / 60, seconds % 60]
+
+
+## Resources tab: per type, units busy and flights waiting; expanded rows list
+## the queue in allocation order, then who holds each unit.
+func _refresh_resources() -> void:
+	if not sim.resources.enabled() or operations_tabs.current_tab != resource_tree.get_index(): return
+	resource_tree.clear()
+	var root := resource_tree.create_item()
+	for type in sim.resources.order:
+		var pool: Dictionary = sim.resources.pools[type]
+		var queue: Array = sim.resource_queue(type)
+		var row := resource_tree.create_item(root)
+		var busy := AirportResources.busy(pool)
+		row.set_text(0, str(pool.label))
+		row.set_text(1, "%d / %d" % [busy, pool.units.size()])
+		row.set_text(2, "%d waiting" % queue.size() if not queue.is_empty() else "—")
+		row.set_text(3, "ALL BUSY" if busy == pool.units.size() else "")
+		row.set_metadata(0, "")
+		var color := Color("ffc078") if not queue.is_empty() else (Color("a7becd") if busy < pool.units.size() else Color("70dec0"))
+		# Pools nobody is waiting for stay folded, so shortages are on screen.
+		row.collapsed = queue.is_empty()
+		for i in 4: row.set_custom_color(i, color)
+		for i in queue.size():
+			var t: TurnaroundTask = queue[i]
+			var f: AirportFlight = sim.airport.flights[t.flight_id]
+			var item := resource_tree.create_item(row)
+			item.set_text(0, "  #%d  %s" % [i + 1, f.flight_number])
+			item.set_text(1, t.label)
+			item.set_text(2, _mmss(sim.clock.tick - t.ready_tick))
+			item.set_text(3, "%s priority · departs %s" % [f.service_priority.to_upper(), AirportClock.display(f.scheduled_departure).left(5)])
+			item.set_metadata(0, f.id)
+			for c in 4: item.set_custom_color(c, Color("ffc078"))
+		for t in sim.resource_holders(type):
+			if t == null: continue
+			var f: AirportFlight = sim.airport.flights[t.flight_id]
+			var item := resource_tree.create_item(row)
+			item.set_text(0, "  %s  %s" % [t.unit_id.get_slice("#", 1).insert(0, "#"), f.flight_number])
+			item.set_text(1, t.label)
+			item.set_text(2, "in use")
+			item.set_text(3, "since %s%s" % [AirportClock.display(t.start_tick).left(5), " · waited %s" % _mmss(t.resource_wait_ticks) if t.resource_wait_ticks > 0 else ""])
+			item.set_metadata(0, f.id)

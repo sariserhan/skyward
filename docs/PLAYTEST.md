@@ -107,6 +107,29 @@ The scripted version asserts the same sequence and writes screenshots:
 tools/ui_tests.sh tests/m3_demo.gd
 ```
 
+### M8 walkthrough: scarce resources
+
+Launch the shortage morning (2 fuel units, 4 baggage crews, 1 tug):
+`godot --path game -- --scenario=res://configs/airports/riverdale_shortage.json`.
+
+1. **Contention.** At 06:16 open **Resources**. *Fuel units 2 / 2 · 2
+   waiting · ALL BUSY*, with GA 242 then SJ 235 in line. Select GA 242: *Fueling:
+   WAITING FOR FUEL UNIT · next in line · 2 / 2 busy*, *Priority NORMAL ·
+   position 1*. At 06:18 a unit frees and GA 242 starts, as shown.
+2. **Your call.** At 06:28 SJ 263 is first in the fuel queue and GA 270
+   second. Select GA 270 and press **HIGH**. It moves to the front of every
+   queue it is in.
+   - Without the change: SJ 263 leaves +10.1 min, GA 270 +17.2 min.
+   - With GA 270 HIGH: GA 270 +2.8 min, SJ 263 +22.7 min.
+
+   The breakdown says why: *Waiting for fuel unit +20.1*.
+3. **Cascade.** SJ 235 waits 7.7 minutes for fuel, so it is still at A3 when
+   SJ 291 lands at 07:02. SJ 291 waits 7.4 minutes for the gate.
+
+In the default morning resources are busy but not broken: a few flights wait a
+minute or two for a crew or a fuel unit, and only 2 flights lose time to it.
+Scripted: `tools/ui_tests.sh tests/m8_demo.gd`.
+
 ### M7 walkthrough: checked baggage
 
 1. **Reclaim.** Select **NS 221** → **Passengers** and pick P0098 (IN). After
@@ -127,10 +150,11 @@ tools/ui_tests.sh tests/m3_demo.gd
    - At 06:47 the passenger is seated on AW 228 and the bag stays behind.
      AW 228's details show *missed the bag cutoff*.
 4. **Baggage holds a departure.** AW 256 (A6) has a slow loader. Its gate
-   closes at 07:02 with everyone aboard, but at 07:05 the details read *Holding
-   departure: Baggage load · 75% · 63 / 84 loaded*, estimated 07:20. The
-   **Turnaround** tab shows the same row. It departs at 07:20, and the
-   explanation reads *Runway queue +1.0 min, Baggage load +7.6 min*.
+   closes at 07:02 with everyone aboard, but the details read *Holding
+   departure: Baggage load* with the loaded count still climbing. The
+   **Turnaround** tab shows the same row. It departs at 07:23, and the
+   explanation reads *Runway queue +0.2 min, Baggage load +10.9 min*. (Since
+   M8, loading opens at D-35, so the slow loader starts with a backlog.)
 
 Scripted: `tools/ui_tests.sh tests/m7_demo.gd`.
 

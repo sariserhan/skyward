@@ -171,6 +171,27 @@ has a slow baggage loader (`baggage_overrides`).
   close to boarding's chain. What remains is the load's own overrun (a slow
   loader or backlog), then its late start, which passes to unload.
 
+**Operational resources (D-038 to D-040).** Pools from `resources`:
+
+| Resource | Riverdale | Shortage scenario | Used by |
+| --- | --- | --- | --- |
+| Cleaning crews | 3 | 3 | Cleaning |
+| Catering crews | 3 | 3 | Catering |
+| Fuel units | 4 | 2 | Fueling |
+| Baggage crews | 7 | 4 | Baggage unload and baggage load |
+| Pushback tugs | 2 | 1 | Pushback (2 minutes of tug time) |
+
+- A task whose prerequisites are complete asks for its unit. Without one it
+  is WAITING and doesn't progress. A waiting task counts as active for
+  exclusivity, so no boarding happens while waiting for fuel.
+- Units are handed out once per tick, after all flights have updated, in
+  queue order: service priority (HIGH, NORMAL, LOW), scheduled departure,
+  readiness tick, scenario order, task order.
+- The unit is released when the task completes. Pushback holds the tug for
+  the tug time from gate release.
+- Baggage loading opens at D-35 (`opens_before_departure_ticks`).
+- Service priority reorders waiting tasks; it never adds units.
+
 **Departure delay breakdown (D-026).** At takeoff, the lateness is split into:
 
 - runway queue
@@ -179,6 +200,9 @@ has a slow baggage loader (`baggage_overrides`).
   first, and passes the rest (up to its own late start) to the task that
   released it
 - `late_inbound` for whatever reaches the gate
+- resource waits (M8): a task's late start is first blamed on its wait for a
+  unit (`wait:fuel_unit`, shown *Waiting for fuel unit*), and the tug wait
+  comes off pushback lateness first. Waits off the critical path get nothing
 
 The parts sum exactly to the lateness.
 

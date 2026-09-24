@@ -1,0 +1,10 @@
+{
+  "extends": "riverdale.json",
+  "id": "riverdale_shortage",
+  "name": "Riverdale International (resource shortage)",
+  "resources": {
+    "fuel_unit": {"units": 2},
+    "baggage_crew": {"units": 4},
+    "pushback_tug": {"units": 1}
+  }
+}

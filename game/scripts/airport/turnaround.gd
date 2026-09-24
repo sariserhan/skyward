@@ -14,10 +14,14 @@ const BOARDING := "boarding"
 const DEBOARDING := "deboarding"
 const BAGGAGE_UNLOAD := "baggage_unload"
 const BAGGAGE_LOAD := "baggage_load"
+## The pushback operation after readiness (M8): holds a tug while it runs.
+const PUSHBACK_OP := "pushback"
 
 var airport: AirportState
 var events: AirportEvents
 var config: Dictionary = {}
+## M8: operational resources. Tasks that need one wait in its queue.
+var resources: AirportResources
 ## Task types in configured order. The order is topological (validated at bind).
 var order: Array = []
 ## Per flight: tasks in order and by type. Derived from the registry, not saved.
@@ -83,6 +87,8 @@ func create(f: AirportFlight, aircraft_type: String, rng: SimRng, gate_tick: int
 		t.required = bool(spec.get("required", true))
 		t.after = spec.get("after", []).duplicate()
 		t.exclusive_with = spec.get("exclusive_with", []).duplicate()
+		t.resource = str(spec.get("resource", ""))
+		if spec.has("opens_before_departure_ticks"): t.earliest_start_tick = f.scheduled_departure - int(spec.opens_before_departure_ticks)
 		var durations: Dictionary = spec.get("durations", {})
 		t.nominal_ticks = int(durations.get(aircraft_type, durations.get("*", 0)))
 		t.duration_ticks = t.nominal_ticks
@@ -101,12 +107,15 @@ func create(f: AirportFlight, aircraft_type: String, rng: SimRng, gate_tick: int
 	for t: TurnaroundTask in tasks_of(f):
 		var ready := gate_tick
 		for dependency in t.after: ready = maxi(ready, task(f, dependency).planned_finish_tick)
+		if t.earliest_start_tick >= 0: ready = maxi(ready, t.earliest_start_tick)
+		# A loading window replaces boarding's D-30 as the load's planned start.
+		var opens := t.earliest_start_tick if t.kind == "baggage_load" and t.earliest_start_tick >= 0 else open_tick
 		match t.kind:
-			"timed", "deboarding", "baggage_unload":
+			"timed", "deboarding", "baggage_unload", "pushback":
 				t.planned_start_tick = ready
 				t.planned_finish_tick = ready + t.nominal_ticks
 			"boarding", "baggage_load":
-				t.planned_start_tick = maxi(ready, open_tick)
+				t.planned_start_tick = maxi(ready, opens)
 				t.planned_finish_tick = maxi(t.planned_start_tick, pushback_tick)
 			_:
 				t.planned_start_tick = ready
@@ -153,40 +162,59 @@ func update(f: AirportFlight, now: int, schedule_boarding: Callable, starters: D
 	if int(_wake.get(f.id, now)) > now: return
 	for t: TurnaroundTask in tasks_of(f):
 		match t.status:
-			TurnaroundTask.COMPLETE, TurnaroundTask.READY:
+			TurnaroundTask.COMPLETE, TurnaroundTask.READY, TurnaroundTask.WAITING:
 				continue
 			TurnaroundTask.RUNNING:
 				if t.kind == "timed" and now >= t.start_tick + t.duration_ticks:
 					_complete(t, t.start_tick + t.duration_ticks)
 				continue
+		# The aircraft asks for its pushback itself once it may leave.
+		if t.kind == "pushback": continue
 		var reason := _blocker(f, t)
+		if reason.is_empty() and now < t.earliest_start_tick: reason = "opens %s" % AirportClock.display(t.earliest_start_tick).left(5)
 		if not reason.is_empty():
 			t.status = TurnaroundTask.BLOCKED
 			t.blocked_reason = reason
 			continue
 		t.blocked_reason = ""
 		t.started_after = _released_by(f, t)
-		match t.kind:
-			"timed":
-				t.status = TurnaroundTask.RUNNING
-				t.start_tick = now
-				events.record(now, "TASK_STARTED", f.id, {"task": t.type, "after": t.started_after, "duration_ticks": t.duration_ticks})
-				if t.duration_ticks <= 0: _complete(t, now)
-			"milestone":
-				t.start_tick = now
-				_complete(t, now)
-			"boarding":
-				t.status = TurnaroundTask.READY
-				schedule_boarding.call(f)
-			_:
-				t.status = TurnaroundTask.RUNNING
-				t.start_tick = now
-				events.record(now, "TASK_STARTED", f.id, {"task": t.type, "after": t.started_after})
-				starters[t.kind].call(f)
+		if resources != null and resources.needs(t):
+			resources.request(t, now)
+			continue
+		_start(f, t, now, schedule_boarding, starters)
 	var wake := 2147483647
 	for t: TurnaroundTask in tasks_of(f):
 		if t.status == TurnaroundTask.RUNNING and t.kind == "timed": wake = mini(wake, t.start_tick + t.duration_ticks)
+		if t.status in [TurnaroundTask.PENDING, TurnaroundTask.BLOCKED] and t.earliest_start_tick > now: wake = mini(wake, t.earliest_start_tick)
 	_wake[f.id] = wake
+
+
+## A waiting task was granted its resource unit: it starts now.
+func grant(t: TurnaroundTask, now: int, schedule_boarding: Callable, starters: Dictionary) -> void:
+	var f: AirportFlight = airport.flights[t.flight_id]
+	t.blocked_reason = ""
+	_start(f, t, now, schedule_boarding, starters)
+	wake(f)
+
+
+func _start(f: AirportFlight, t: TurnaroundTask, now: int, schedule_boarding: Callable, starters: Dictionary) -> void:
+	match t.kind:
+		"timed":
+			t.status = TurnaroundTask.RUNNING
+			t.start_tick = now
+			events.record(now, "TASK_STARTED", f.id, {"task": t.type, "after": t.started_after, "duration_ticks": t.duration_ticks})
+			if t.duration_ticks <= 0: _complete(t, now)
+		"milestone":
+			t.start_tick = now
+			_complete(t, now)
+		"boarding":
+			t.status = TurnaroundTask.READY
+			schedule_boarding.call(f)
+		_:
+			t.status = TurnaroundTask.RUNNING
+			t.start_tick = now
+			events.record(now, "TASK_STARTED", f.id, {"task": t.type, "after": t.started_after})
+			starters[t.kind].call(f)
 
 
 ## Something outside the timed tasks changed: re-evaluate on the next update.
@@ -261,12 +289,15 @@ func _complete(t: TurnaroundTask, at: int) -> void:
 	t.status = TurnaroundTask.COMPLETE
 	t.finish_tick = at
 	t.blocked_reason = ""
+	if resources != null: resources.release(t, at)
 	events.record(at, "TASK_COMPLETED", t.flight_id, {"task": t.type, "start_tick": t.start_tick,
 		"overrun_ticks": (t.finish_tick - t.start_tick) - (t.planned_finish_tick - t.planned_start_tick)})
 
 
+## Running, or committed to running: boarding's window is scheduled, or the
+## task is queued for its resource (a flight waiting for fuel doesn't board).
 func _active(t: TurnaroundTask) -> bool:
-	return t.status == TurnaroundTask.RUNNING or (t.kind == "boarding" and t.status == TurnaroundTask.READY)
+	return t.status in [TurnaroundTask.RUNNING, TurnaroundTask.WAITING] or (t.kind == "boarding" and t.status == TurnaroundTask.READY)
 
 
 func _blocker(f: AirportFlight, t: TurnaroundTask) -> String:
@@ -307,8 +338,14 @@ func attribute(f: AirportFlight, planned_pushback: int, takeoff_wait: int) -> Di
 	var pushback_late := f.gate_release_tick - planned_pushback
 	var hold := clampi(pushback_late, 0, f.hold_ticks)
 	_add(out, "passenger_hold", hold)
-	var milestone := task(f, PUSHBACK)
 	var rest := pushback_late - hold
+	# Ready but no tug: the last wait before the gate released.
+	var op := task(f, PUSHBACK_OP)
+	if op != null and op.resource_wait_ticks > 0:
+		var tug := clampi(op.resource_wait_ticks, 0, rest)
+		_add(out, "wait:" + op.resource, tug)
+		rest -= tug
+	var milestone := task(f, PUSHBACK)
 	if milestone == null: _add(out, "late_inbound", rest)
 	else: _blame(f, milestone, rest, out)
 	return out
@@ -326,9 +363,13 @@ func _blame(f: AirportFlight, t: TurnaroundTask, amount: int, out: Dictionary) -
 	var overrun := (t.finish_tick - t.start_tick) - (t.planned_finish_tick - t.planned_start_tick)
 	var own := clampi(overrun, 0, amount)
 	var rest := amount - own
-	# Pass on only what this task inherited: its own late start.
+	# Pass on only what this task inherited: its own late start. The part spent
+	# queued for a resource is the shortage's; the rest came from upstream.
 	var inherited := clampi(t.start_tick - t.planned_start_tick, 0, rest)
 	own += rest - inherited
+	var waited := clampi(t.resource_wait_ticks, 0, inherited)
+	_add(out, "wait:" + t.resource, waited)
+	inherited -= waited
 	if t.started_after != "gate" and task(f, t.started_after) != null:
 		_blame(f, task(f, t.started_after), inherited, out)
 	else:
@@ -372,9 +413,16 @@ static func valid_snapshot(data: Dictionary) -> bool:
 			if t.status in [TurnaroundTask.RUNNING, TurnaroundTask.COMPLETE] and (t.start_tick < 0 or t.start_tick > now): return false
 			if t.status == TurnaroundTask.COMPLETE and (t.finish_tick < t.start_tick or t.finish_tick > now): return false
 			if t.status == TurnaroundTask.RUNNING and t.kind == "timed" and now >= t.start_tick + t.duration_ticks: return false
+			if t.status == TurnaroundTask.WAITING and (t.resource.is_empty() or t.ready_tick < 0 or t.ready_tick > now): return false
+			if t.resource_wait_ticks < 0: return false
 			for dependency in t.after:
 				if not by_type.has(dependency): return false
-				if t.status in [TurnaroundTask.RUNNING, TurnaroundTask.COMPLETE] and by_type[dependency].status != TurnaroundTask.COMPLETE: return false
+				if t.status in [TurnaroundTask.RUNNING, TurnaroundTask.COMPLETE, TurnaroundTask.WAITING] and by_type[dependency].status != TurnaroundTask.COMPLETE: return false
+			# The pushback operation runs from gate release into taxi-out.
+			if t.kind == "pushback":
+				var expected_op: Array = {"ready_for_pushback": [TurnaroundTask.PENDING, TurnaroundTask.WAITING],
+					"taxiing_out": [TurnaroundTask.RUNNING, TurnaroundTask.COMPLETE], "departed": [TurnaroundTask.COMPLETE]}.get(f.status, [TurnaroundTask.PENDING])
+				if not t.status in expected_op: return false
 			for other in t.exclusive_with:
 				if not other in types: return false
 			by_type[t.type] = t

@@ -1,4 +1,4 @@
-# Airport architecture — M0 to M7
+# Airport architecture — M0 to M8
 
 The airport is now the default Godot scene. The existing boarding scene remains
 available at `res://scenes/main.tscn`; its simulation algorithm is unchanged.
@@ -162,6 +162,47 @@ alongside the conflict check.
 - A compact turnaround summary sits under it.
 - A **Turnaround** tab holds the full task table.
 - After takeoff, the additive delay breakdown is shown.
+
+## M8 operational resources
+
+**Ownership.** `airport_resources.gd` (`AirportResources`) owns the pools:
+
+- explicit units and their holder tasks
+- one ordered queue per type
+- statistics and dirty flags
+
+`Turnaround` holds a reference to it:
+
+- `update()` calls `request()` instead of starting a task that needs a unit
+- `_complete()` calls `release()`
+- `grant()` starts a task handed a unit
+
+**Each tick** `AirportSimulation.step()` calls `resources.dispatch()` once,
+after the flight loop and only when a pool is dirty. It calls `_grant()`,
+which either starts the task through `Turnaround.grant()` or, for the
+pushback operation, `_push_back()`, which releases the gate.
+
+**Pushback.**
+
+- `_try_pushback()` requests a tug once the milestone is complete and the
+  floor has passed.
+- `_finish_pushback()` releases the tug during taxi-out.
+
+**Blame.** `Turnaround._blame()` splits a task's late start into its resource
+wait (`wait:<type>`) and inherited lateness. `attribute()` takes the tug wait
+first.
+
+**Commands and reporting.** `set_service_priority()` is recorded as a
+decision. `resource_metrics()`, `resource_queue()`, `resource_holders()` and
+`AirportResources.expected_start()` (used by estimates) feed the UI:
+
+- the Resources tab
+- turnaround WAITING rows and the flight's waiting lines
+- the service priority row
+- shortage and tug alerts
+
+**Scenarios.** `AirportSimulation.load_config()` resolves `extends` overlays.
+The airport scene takes `--scenario=<path>`.
 
 ## M7 baggage
 

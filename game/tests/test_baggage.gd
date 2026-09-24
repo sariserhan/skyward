@@ -178,7 +178,8 @@ func test_unload_then_load_and_pushback_requires_baggage_load() -> void:
 	assert_true(inbound > 50, "inbound bags to unload")
 	var rates: Dictionary = sim.config.baggage.aircraft
 	assert_eq(unload.finish_tick - unload.start_tick, int(rates.unload_base_ticks) + inbound * int(rates.unload_ticks_per_bag), "unload time comes from the bags")
-	assert_eq(load.start_tick, unload.finish_tick, "loading starts once the hold is empty")
+	var opens := D - int(sim.config.turnaround.tasks.filter(func(t): return t.type == "baggage_load")[0].opens_before_departure_ticks)
+	assert_eq(load.start_tick, maxi(unload.finish_tick, opens), "loading starts once the hold is empty and the loading window is open")
 	assert_eq(load.started_after, Turnaround.BAGGAGE_UNLOAD)
 	assert_true(load.finish_tick >= f.bag_finalized_tick and f.bag_finalized_tick >= f.gate_closed_tick, "finalized after the gate closed")
 	assert_true(f.gate_release_tick >= load.finish_tick, "no pushback before the baggage is loaded")
@@ -305,8 +306,8 @@ func test_transfer_bag_follows_connector_as_same_object() -> void:
 	assert_eq(bag.kind, "transfer")
 	assert_eq(bag.legs, ["FA", "FB"])
 	var states := bag_states(sim, bag, func(): return sim.airport.flights.FB.status == "departed")
-	# FB's loader is already open, so the bag goes straight from ready to loading.
-	assert_eq(states, ["on_aircraft", "unloading", "in_transit@transfer_sortation", "sorting@transfer_sortation", "loading", "on_aircraft", "departed"])
+	# FB's loading opens at D-35 (M8), so the sorted bag waits ready until then.
+	assert_eq(states, ["on_aircraft", "unloading", "in_transit@transfer_sortation", "sorting@transfer_sortation", "ready_for_flight", "loading", "on_aircraft", "departed"])
 	assert_true(bag.ready_tick > bag.unloaded_tick and bag.loaded_tick > bag.ready_tick)
 	assert_eq(bag.current_flight_id, "FB")
 	assert_eq(bag.leg_index, 1)
@@ -452,11 +453,11 @@ func test_save_while_bags_are_mid_stage_is_validated() -> void:
 	var twice: Dictionary = loading.duplicate(true)
 	twice.airport.flights.F002.bag_load_queue.append(twice.airport.flights.F002.bag_loader_current)
 	assert_true(AirportSimulation.from_snapshot(twice) == null, "rejected: loader loads a bag twice")
-	assert_eq(int(good.version), 7)
+	assert_eq(int(good.version), AirportSimulation.SAVE_VERSION)
 	assert_true(AirportSimulation.from_snapshot(good.duplicate(true)) != null, "a valid mid-flow save loads")
 	var old := good.duplicate(true)
-	old.version = 6
-	assert_true(AirportSimulation.from_snapshot(old) == null, "v6 is rejected")
+	old.version = AirportSimulation.SAVE_VERSION - 1
+	assert_true(AirportSimulation.from_snapshot(old) == null, "the previous schema is rejected")
 	var mutations := {
 		"bag state without its event": func(d):
 			for id in d.airport.bags:

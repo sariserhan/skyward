@@ -4,6 +4,7 @@ func fixture(count: int = 3) -> AirportSimulation:
 	var config := JsonUtil.load_file(AirportSimulation.CONFIG_PATH)
 	config.erase("passenger_flow")
 	config.erase("baggage")
+	config.erase("resources")
 	config.start_tick = 0
 	config.landing_ticks = 7
 	config.takeoff_ticks = 5

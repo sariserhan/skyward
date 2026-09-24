@@ -92,6 +92,8 @@ var bag_cutoff_passed: bool = false
 ## Gate closed and cutoff passed: not-boarded passengers' bags are held.
 var bag_load_finalized: bool = false
 var bag_finalized_tick: int = -1
+## M8: turnaround service priority when competing for resources: low, normal, high.
+var service_priority: String = "normal"
 var bag_unload_due_tick: int = -1
 ## Loader: ready bag ids waiting to be loaded (or offloaded, prefixed "-").
 var bag_load_queue: Array = []

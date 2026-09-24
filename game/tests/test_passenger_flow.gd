@@ -11,9 +11,11 @@ func fixture(count: int = 12, lanes: int = 2) -> AirportSimulation:
 	config.aircraft_types.A220.seats = count
 	var flow: Dictionary = config.passenger_flow
 	# Earlier-milestone fixtures: no connecting itineraries (M6 tests opt in)
-	# and no checked-baggage model (M7 tests opt in).
+	# no checked-baggage model (M7 tests opt in) and no operational resource
+	# limits (M8 tests opt in).
 	flow.erase("connections")
 	config.erase("baggage")
+	config.erase("resources")
 	flow.load_permille = 1000
 	flow.staff_pool = 6
 	# Exact manifest sizes: use the flat load, not the scenario's load ranges.
