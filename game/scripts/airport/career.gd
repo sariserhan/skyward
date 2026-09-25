@@ -32,6 +32,8 @@ var settled_days: Array = []
 var sim: AirportSimulation
 var finished: AirportSimulation
 var _ledger_ids: Dictionary = {}
+## M11: the airport as built. Changed only between days.
+var layout := AirportLayout.new()
 
 
 func new_career(path := "", seed := -1) -> void:
@@ -52,6 +54,9 @@ func new_career(path := "", seed := -1) -> void:
 	settled_days = []
 	sim = null
 	finished = null
+	layout = AirportLayout.new()
+	layout.bind(base)
+	layout.import_initial()
 
 
 # --- money ------------------------------------------------------------------------
@@ -80,18 +85,35 @@ func minimum_plan() -> Dictionary:
 	return out
 
 
-## Next-day capacity, only between days and within the configured range.
+## Most units of a resource the built facilities support (M11).
+func maximum_units(type: String) -> int:
+	return layout.resource_max(type) if layout.catalog.size() > 0 else 1 << 20
+
+
+## Next-day capacity, only between days, from the configured minimum up to what
+## the built facilities support.
 func set_units(type: String, units: int) -> bool:
 	if phase != "planning" or not resource_plan.has(type): return false
 	var limits: Dictionary = base.economy.resources.get(type, {})
-	if units < int(limits.get("min", 0)) or units > int(limits.get("max", units)): return false
+	if units < int(limits.get("min", 0)) or units > maximum_units(type): return false
 	resource_plan[type] = units
 	return true
 
 
-## The day's committed cost must be covered before it starts.
+## The day's committed cost must be covered and the airport must be valid.
 func can_start() -> bool:
-	return phase == "planning" and settled_cash_cents() >= committed_cost_cents()
+	return phase == "planning" and settled_cash_cents() >= committed_cost_cents() and start_errors().is_empty()
+
+
+## Why the next day cannot start (airport and schedule), in plain words.
+func start_errors() -> Array:
+	var errors: Array = []
+	var config := day_config()
+	errors.append_array(config.get("_errors", []))
+	for type in resource_plan:
+		if int(resource_plan[type]) > maximum_units(type):
+			errors.append("%s planned: %d, but the built facilities support %d." % [str(base.economy.resources[type].label), resource_plan[type], maximum_units(type)])
+	return errors
 
 
 ## Not even the minimum plan can be paid for: the career cannot continue.
@@ -122,8 +144,9 @@ func next_request(airline: String) -> Dictionary:
 	return {}
 
 
-## The base scenario plus everything the career has decided.
-func day_config() -> Dictionary:
+## The base scenario plus everything the career has decided (and, unless
+## asked not to, the airport as built with the schedule assigned to it).
+func day_config(with_layout := true) -> Dictionary:
 	var c: Dictionary = base.duplicate(true)
 	c.seed = day_seed(day)
 	for airline in c.get("airline_relations", {}).get("profiles", {}):
@@ -142,6 +165,10 @@ func day_config() -> Dictionary:
 		if not request.is_empty(): profile.request = request.duplicate(true)
 	c.economy.day = day
 	c.economy.opening_cash_cents = settled_cash_cents()
+	# The airport as built, then the schedule assigned to its gates (M11).
+	if with_layout and layout.catalog.size() > 0:
+		c = layout.apply(c)
+		c["_errors"] = layout.validate(c)
 	return c
 
 
@@ -149,8 +176,11 @@ func start_day() -> bool:
 	if not can_start(): return false
 	for id in request_status:
 		if request_status[id] == "accepted": request_status[id] = "activated"
+	var config := day_config()
+	config.erase("_errors")
+	layout.session_ids = []
 	sim = AirportSimulation.new()
-	sim.setup(day_config())
+	sim.setup(config)
 	sim.economy.charge_day_start(resource_plan, security_staff(), sim.clock.tick)
 	phase = "operating"
 	finished = null
@@ -220,7 +250,7 @@ func _report() -> Dictionary:
 		contracts[airline] = {"contract": e.contract.label, "status": e.contract.status, "relationship": e.relationship}
 	return {"day": day, "opening_cents": summary.opening_cents, "by_category": summary.by_category, "by_airline": summary.by_airline,
 		"revenue_cents": summary.revenue_cents, "cost_cents": summary.cost_cents, "net_cents": summary.net_cents,
-		"closing_cents": settled_cash_cents(), "flights": sim.flight_order.size(), "passengers": passengers,
+		"capital_cents": capital_cents(day), "closing_cents": settled_cash_cents(), "flights": sim.flight_order.size(), "passengers": passengers,
 		"mean_delay_min": snappedf(delay / 600.0 / maxi(1, sim.flight_order.size()), 0.1), "missed_connections": int(connections.missed),
 		"missed_bags": int(bags.transfer_missed) + int(bags.missed_flight), "contracts": contracts}
 
@@ -230,6 +260,73 @@ func expected_flights() -> int:
 	return day_config().flights.size()
 
 
+# --- construction (M11) -----------------------------------------------------------------
+
+## Build between days: charged at once, from cash (no borrowing).
+func build(type: String, site: String, slot := -1) -> Dictionary:
+	if phase != "planning": return {"error": "Construction only happens between days."}
+	var item: Dictionary = layout.catalog.get(type, {})
+	if item.is_empty(): return {"error": "Unknown item."}
+	if slot < 0: slot = layout.free_slot(type, site)
+	var reason := layout.placement_error(type, site, slot)
+	if not reason.is_empty(): return {"error": reason}
+	var cost := int(item.cost_cents)
+	if settled_cash_cents() < cost: return {"error": "Costs %s; cash is %s." % [AirportEconomy.money(cost), AirportEconomy.money(settled_cash_cents())]}
+	var o := layout.place(type, site, slot)
+	_post_capital("D%d:BUILD:%s" % [day, o.id], -cost, "Day %d · %s built (%s)" % [day, item.label, layout.sites[site].get("label", site)], o.id)
+	return o
+
+
+## Demolish between days. Refused if it would break the airport or strand the
+## plan; refunds in full for something built this planning session (undo),
+## otherwise the configured share.
+func demolish(id: String) -> Dictionary:
+	if phase != "planning": return {"error": "Demolition only happens between days."}
+	var o := layout.find(id)
+	if o.is_empty(): return {"error": "Nothing with id " + id}
+	var before := start_errors()
+	var saved := layout.snapshot()
+	var undo: bool = id in layout.session_ids
+	layout.remove(id)
+	var after := start_errors()
+	var new_errors: Array = after.filter(func(e): return not e in before)
+	if not new_errors.is_empty():
+		layout.restore(saved)
+		return {"error": "Cannot demolish: " + new_errors[0]}
+	var item: Dictionary = layout.catalog[o.type]
+	var refund := int(item.cost_cents) if undo else int(item.cost_cents) * int(base.construction.get("refund_permille", 0)) / 1000
+	_post_capital("D%d:DEMOLISH:%s" % [day, id], refund, "Day %d · %s demolished (%s refund)" % [day, item.label, "full, same session" if undo else "partial"], id)
+	return {"id": id, "refund_cents": refund}
+
+
+## Would a request tier's flights fit the airport as built? Empty when they
+## do; otherwise what is missing (for the airline detail and planning screen).
+func tier_capacity(tier: Dictionary) -> Array:
+	var config := day_config()
+	var numbers: Array = []
+	for flight in tier.get("flights", []):
+		if config.flights.any(func(f): return f.id == flight.id): continue
+		config.flights.append(flight.duplicate(true))
+		numbers.append(flight.flight_number)
+	if layout.catalog.is_empty(): return []
+	var errors := AirportLayout.assign_gates(config)
+	return errors.filter(func(e): return numbers.any(func(n): return e.begins_with(n)))
+
+
+func _post_capital(id: String, amount: int, reason: String, ref: String) -> void:
+	if _ledger_ids.has(id): return
+	ledger.append({"id": id, "day": day, "tick": -1, "amount_cents": amount, "category": "capital", "airline": "", "flight_id": "", "ref": ref, "reason": reason})
+	_ledger_ids[id] = true
+
+
+## Capital spent (net of refunds) for a day, from the ledger.
+func capital_cents(for_day: int) -> int:
+	var total := 0
+	for tx in ledger:
+		if int(tx.day) == for_day and tx.category == "capital": total += int(tx.amount_cents)
+	return total
+
+
 # --- persistence ----------------------------------------------------------------------
 
 func snapshot() -> Dictionary:
@@ -237,7 +334,8 @@ func snapshot() -> Dictionary:
 		"career": {"scenario_path": scenario_path, "base": base.duplicate(true), "career_seed": career_seed, "day": day, "phase": phase,
 			"starting_cash_cents": starting_cash_cents, "cash_cents": settled_cash_cents(), "ledger": ledger.duplicate(true),
 			"relationships": relationships.duplicate(), "request_status": request_status.duplicate(), "resource_plan": resource_plan.duplicate(),
-			"contract_history": contract_history.duplicate(true), "reports": reports.duplicate(true), "settled_days": settled_days.duplicate()},
+			"contract_history": contract_history.duplicate(true), "reports": reports.duplicate(true), "settled_days": settled_days.duplicate(),
+			"layout": layout.snapshot()},
 		"day": sim.snapshot() if sim != null else null})
 
 
@@ -247,22 +345,33 @@ static func from_snapshot(data: Dictionary) -> AirportCareer:
 	var c = data.get("career")
 	if not c is Dictionary: return null
 	for key in ["scenario_path", "base", "career_seed", "day", "phase", "starting_cash_cents", "cash_cents", "ledger", "relationships",
-			"request_status", "resource_plan", "contract_history", "reports", "settled_days"]:
+			"request_status", "resource_plan", "contract_history", "reports", "settled_days", "layout"]:
 		if not c.has(key): return null
 	if not c.phase in PHASES or not c.day is int or c.day < 1 or not c.settled_days is Array: return null
 	# Settled days are exactly 1 .. day-1, and the ledger never runs ahead.
 	if c.settled_days.size() != c.day - 1: return null
 	for i in c.settled_days.size():
 		if int(c.settled_days[i]) != i + 1: return null
-	if not AirportEconomy.valid_transactions(c.ledger, c.day - 1): return null
+	# Operating days are settled up to yesterday; capital may belong to the day being planned or run.
+	if not AirportEconomy.valid_transactions(c.ledger, c.day): return null
+	for tx in c.ledger:
+		if int(tx.day) == c.day and tx.category != "capital": return null
 	# Cash reconciles to the cent.
 	if int(c.cash_cents) != int(c.starting_cash_cents) + AirportEconomy.total(c.ledger): return null
 	for id in c.request_status:
 		if not c.request_status[id] in ["accepted", "declined", "activated"]: return null
+	var layout := AirportLayout.new()
+	layout.bind(c.base)
+	var l = c.layout
+	if not l is Dictionary or not l.get("objects") is Array or not l.get("revision") is int or not l.get("next_id") is int or not l.get("session_ids") is Array: return null
+	layout.restore(l)
+	if not layout.valid_structure(): return null
 	var limits: Dictionary = c.base.get("economy", {}).get("resources", {})
 	for type in c.resource_plan:
-		if not limits.has(type) or int(c.resource_plan[type]) < int(limits[type].get("min", 0)) or int(c.resource_plan[type]) > int(limits[type].get("max", 1 << 30)): return null
+		var most := layout.resource_max(type) if layout.catalog.size() > 0 else 1 << 30
+		if not limits.has(type) or int(c.resource_plan[type]) < int(limits[type].get("min", 0)) or int(c.resource_plan[type]) > most: return null
 	var career := AirportCareer.new()
+	career.layout = layout
 	career.scenario_path = c.scenario_path
 	career.base = c.base
 	career.career_seed = c.career_seed
@@ -282,6 +391,8 @@ static func from_snapshot(data: Dictionary) -> AirportCareer:
 		career.sim = AirportSimulation.from_snapshot(data.day)
 		if career.sim == null or career.sim.economy.day != c.day: return null
 		if career.sim.economy.opening_cash_cents != career.settled_cash_cents(): return null
+		# The day runs on the airport as it was built when it started.
+		if int(career.sim.config.get("layout_revision", 0)) != layout.revision: return null
 		for tx in career.sim.economy.transactions:
 			if career._ledger_ids.has(tx.id): return null
 	elif data.get("day") != null: return null

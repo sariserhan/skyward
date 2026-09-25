@@ -16,7 +16,8 @@ func _label(at: Vector2, text: String, color: Color = INK, font_size: int = 13) 
 	draw_string(ThemeDB.fallback_font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, color)
 
 func gate_position(index: int) -> Vector2:
-	return Vector2(60 + index * (size.x - 120) / 7, size.y * 0.67)
+	# Spread however many gates are built along the apron (M11).
+	return Vector2(60 + index * (size.x - 120) / maxi(1, sim.airport.gates.size() - 1), size.y * 0.67)
 
 func _draw() -> void:
 	draw_style_box(_background(), Rect2(Vector2.ZERO, size))

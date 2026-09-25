@@ -6,11 +6,17 @@ var edges: Dictionary = {}
 ## Routes are pure functions of the fixed graph: cache them. Copies are returned
 ## because callers consume their routes.
 var _routes: Dictionary = {}
+## M11: the layout revision this graph (and every cached route) belongs to.
+## Routes are only ever cached against the revision they were computed for.
+var revision: int = 0
+var _routes_revision: int = 0
 
 func setup(data: Dictionary) -> void:
 	nodes = data.get("nodes", {}).duplicate(true)
 	edges = {}
 	_routes = {}
+	revision = int(data.get("layout_revision", 0))
+	_routes_revision = revision
 	for id in nodes: edges[id] = []
 	for edge in data.get("edges", []):
 		edges[edge.from].append({"to": edge.to, "ticks": int(edge.walking_ticks)})
@@ -18,6 +24,9 @@ func setup(data: Dictionary) -> void:
 			edges[edge.to].append({"to": edge.from, "ticks": int(edge.walking_ticks)})
 
 func route(start: String, goal: String, airside_only: bool = false) -> Array:
+	if _routes_revision != revision:
+		_routes = {}
+		_routes_revision = revision
 	var key := "%s>%s>%s" % [start, goal, airside_only]
 	if not _routes.has(key): _routes[key] = _find_route(start, goal, airside_only)
 	return _routes[key].duplicate()

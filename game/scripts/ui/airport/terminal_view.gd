@@ -15,7 +15,10 @@ func _ready() -> void:
 
 func position_of(node: String) -> Vector2:
 	var data: Dictionary = sim.passenger_flow.graph.nodes.get(node, {"x": 500, "y": 900})
-	return Vector2(24 + int(data.x) * (size.x - 48) / 1000.0, 18 + int(data.y) * (size.y - 40) / 1000.0)
+	# Scale to the built terminal's extent (an east pier reaches past x = 1000).
+	var width := 1000.0
+	for other in sim.passenger_flow.graph.nodes: width = maxf(width, float(sim.passenger_flow.graph.nodes[other].x) + 40.0)
+	return Vector2(24 + int(data.x) * (size.x - 48) / width, 18 + int(data.y) * (size.y - 40) / 1000.0)
 
 func refresh_population() -> void:
 	display_ids = []

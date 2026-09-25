@@ -1,4 +1,4 @@
-# Airport architecture — M0 to M10
+# Airport architecture — M0 to M11
 
 The airport is now the default Godot scene. The existing boarding scene remains
 available at `res://scenes/main.tscn`; its simulation algorithm is unchanged.
@@ -162,6 +162,38 @@ alongside the conflict check.
 - A compact turnaround summary sits under it.
 - A **Turnaround** tab holds the full task table.
 - After takeoff, the additive delay breakdown is shown.
+
+## M11 construction
+
+**Ownership.** `airport_layout.gd` (`AirportLayout`) is owned by the career:
+
+- `bind()` loads the catalog and sites, plus a pad per base gate.
+- `import_initial()` turns the scenario's infrastructure into objects.
+- `placement_error()`, `free_slot()`, `place()` and `remove()` edit the
+  layout.
+- **`apply(config)`** writes the normalized infrastructure into a day's
+  config.
+- **`validate(config)`** checks connectivity with `TerminalGraph`, then runs
+  `assign_gates()`.
+
+**Career.**
+
+- `day_config()` applies the layout.
+- `start_errors()` gathers validation and plan-versus-maximum errors.
+- `build()` and `demolish()` post capital ledger transactions.
+- `maximum_units()` comes from the facilities.
+- `tier_capacity()` tells whether a request's flights fit the airport.
+
+**The simulation is unchanged.** It reads only the normalized config at
+setup: gates, graph (with `layout_revision`), checkpoint `max_lanes` and stage
+`servers`.
+
+**`TerminalGraph`** keeps its route cache for one revision.
+
+**UI.** The planning panel gains a **Build** tab, capital lines, and
+validation errors beside START DAY; the airline detail shows gate capacity.
+The map and terminal view scale to the built gates, and a new day's
+simulation rebuilds the gate dropdown and board.
 
 ## M10 economy and careers
 

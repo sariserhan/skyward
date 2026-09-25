@@ -6,11 +6,11 @@ extends RefCounted
 ## second call). Revenue comes from real operations at takeoff; costs are the
 ## day's committed capacity; contracts settle once at the day's end.
 
-const CATEGORIES := ["aircraft", "passengers", "baggage", "contract_bonus", "resources", "security", "fixed", "contract_penalty"]
+const CATEGORIES := ["aircraft", "passengers", "baggage", "contract_bonus", "resources", "security", "fixed", "contract_penalty", "capital"]
 const REVENUE := ["aircraft", "passengers", "baggage", "contract_bonus"]
 const LABELS := {"aircraft": "Aircraft and gate service", "passengers": "Passenger service", "baggage": "Baggage handling",
 	"contract_bonus": "Contract bonuses", "resources": "Turnaround resources", "security": "Security staff",
-	"fixed": "Airport operations", "contract_penalty": "Contract penalties"}
+	"fixed": "Airport operations", "contract_penalty": "Contract penalties", "capital": "Construction (capital)"}
 
 var config: Dictionary = {}
 var day: int = 1
@@ -120,6 +120,8 @@ func summary() -> Dictionary:
 	var costs := 0
 	for tx in transactions:
 		by_category[tx.category] += int(tx.amount_cents)
+		# Capital is not part of the operating result (M11).
+		if tx.category == "capital": continue
 		if tx.category in REVENUE and int(tx.amount_cents) > 0:
 			revenue += int(tx.amount_cents)
 			if not str(tx.airline).is_empty(): by_airline[tx.airline] = int(by_airline.get(tx.airline, 0)) + int(tx.amount_cents)

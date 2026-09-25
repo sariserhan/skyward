@@ -66,9 +66,18 @@ it is kept as historical context. The original boarding roadmap remains at
   solvency; Finance tab and end-of-day report; save schema v10. Plan
   [m10-plan.md](m10-plan.md), report [m10-status.md](m10-status.md).
   Decisions D-044–D-047.
-- **M11 next, not started:** construction and expansion.
+- **M11 implemented:** construction and persistent layout. The airport as
+  built is career state on predefined sites (gate pads, terminal pieces,
+  security lanes, baggage modules, service facilities); Riverdale is imported
+  as the initial layout (unchanged day 1 = M10 to the cent); days are built
+  from the layout (gates, terminal graph with revisioned routes, lanes,
+  servers, resource maxima); validation blocks days that cannot run;
+  construction and refunds are capital in the ledger; requests can require
+  building; Build tab; save schema v11. Plan [m11-plan.md](m11-plan.md),
+  report [m11-status.md](m11-status.md). Decisions D-048–D-051.
+- **M12 next, not started:** airside construction (runways, taxiways).
 
 The order after M3 follows D-020: the turnaround task framework comes before any
 individual turnaround activity.
 
-M10 stopped here for review. Do not begin M11 until requested.
+M11 stopped here for review. Do not begin M12 until requested.

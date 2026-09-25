@@ -3,7 +3,7 @@ extends RefCounted
 ## One world, one clock. Turnaround is a task graph (M4); cabin flights deboard
 ## (M5) and board (M3) through cabin engines as tasks of it; widebodies use the
 ## widebody deboarding and boarding abstractions (D-022, D-029).
-const SAVE_VERSION := 10
+const SAVE_VERSION := 11
 const CONFIG_PATH := "res://configs/airports/riverdale.json"
 const STATES := ["scheduled", "approaching", "landed", "taxiing_in", "at_gate",
 	"turnaround", "boarding", "ready_for_pushback", "taxiing_out", "departed"]

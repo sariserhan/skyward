@@ -107,6 +107,45 @@ The scripted version asserts the same sequence and writes screenshots:
 tools/ui_tests.sh tests/m3_demo.gd
 ```
 
+### M11 walkthrough: building Riverdale
+
+Launch `godot --path game -- --scenario=res://configs/airports/riverdale_expansion.json`.
+
+1. Around 08:10 Global Airways asks for GA 431 (787) and GA 439 (A220) at
+   midday. Its details read *Gate capacity: INSUFFICIENT · GA 431 has no
+   compatible available gate (widebody)…* Accept anyway: it is a promise to
+   build.
+2. At the day's end the plan says **CANNOT START DAY 2**, naming both
+   flights. Open **Build**:
+   - **Terminal → East pier** ($35,000)
+   - **Gates → Narrowbody gate** on *Pad A9*: the preview shows the walk from
+     security and to reclaim over the real terminal graph
+   - **Gates → Widebody gate** on *Pad A10*
+
+   Each shows cash, cost and cash after. Building A9 before the pier shows
+   *Gate A9 has no passenger path from security* until the pier is built.
+3. START DAY 2: ten gates on the airfield, the pier and A9/A10 on the
+   Terminal tab.
+   - GA 431 docks at A10. Its passengers walk the pier to arrivals and
+     reclaim, and it boards, handles bags, turns around with the same crews,
+     and earns its fees.
+   - Watch East security: the extra midday passengers back it up. Building
+     more lanes (and staffing them) is the next decision.
+4. **Plan** shows each resource as *used/max*. Building a fuel bay raises the
+   maximum; paying for the units is still a daily choice.
+5. The day's report shows construction as capital before the starting cash,
+   separate from the operating result.
+
+Also try:
+
+- `riverdale_baggage_crunch.json`: four transfer sorters ($36,000) cut the
+  peak transfer queue from 124 to 8 and missed transfer bags from 120 to 10,
+  and the day goes from −$7.0k to +$18.3k.
+- Overbuilding: the pier, two gates, two lanes and a sorter ($183,000) change
+  nothing that day, except cash.
+
+Scripted: `tools/ui_tests.sh tests/m11_demo.gd`.
+
 ### M10 walkthrough: running the airport as a business
 
 1. The top bar shows **DAY 1 · $292,…**: the day's committed capacity, security

@@ -226,6 +226,39 @@ A day ends when its last flight departs. It is settled once, then planned;
 the next day is a fresh simulation from the scenario plus the career's
 decisions.
 
+**Construction (D-048 to D-051).** Between days only. The day is rebuilt from
+the airport as built:
+
+- **Gates:** pads A1–A8, plus A9 (narrowbody) and A10 (widebody) on the east
+  pier.
+- **Terminal graph:** the east pier and the central connector add nodes and
+  edges; routes are cached per layout revision.
+- **Checkpoint lanes:** up to 6 per hall.
+- **Baggage stage servers:** up to 8 outbound, 6 transfer, 6 reclaim.
+- **Resource maxima:** from service facilities.
+
+A flight keeps its configured gate when that gate is built and compatible.
+Otherwise it gets the first compatible gate whose scheduled use (with buffer)
+is clear, or the day cannot start.
+
+**Capital costs:**
+
+| Item | Cost |
+| --- | --- |
+| Narrowbody gate | $45,000 |
+| Widebody gate | $70,000 |
+| East pier | $35,000 |
+| Connector | $25,000 |
+| Security lane | $12,000 |
+| Sorter module | $9,000 |
+| Reclaim belt | $8,000 |
+| Cleaning or catering base | $6,000 |
+| Fuel bay | $15,000 |
+| Baggage equipment | $12,000 |
+| Tug bay | $5,000 |
+
+Refunds are 50% (100% for an undo in the same planning session).
+
 **Departure delay breakdown (D-026).** At takeoff, the lateness is split into:
 
 - runway queue

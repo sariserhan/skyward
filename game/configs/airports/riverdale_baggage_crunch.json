@@ -1,0 +1,7 @@
+{
+  "extends": "riverdale.json",
+  "id": "riverdale_baggage_crunch",
+  "name": "Riverdale International (transfer baggage crunch)",
+  "passenger_flow": {"connections": {"default_permille": 250, "airline_permille": {"GA": 350, "NS": 250, "AW": 250, "SJ": 200}}},
+  "baggage": {"stages": {"transfer_sortation": {"servers": 2, "service_ticks": 450, "transit_ticks": 1800}}}
+}

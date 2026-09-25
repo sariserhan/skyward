@@ -1282,3 +1282,128 @@ with its economy) or null between days. Validation checks that:
   settled transaction
 
 v9 is rejected.
+
+
+## D-048 — The airport as built is persistent career state on predefined sites
+
+**Date:** 2026-09-25
+**Status:** Accepted (M11)
+
+`AirportLayout` holds build objects `{id, type, site, slot}` with stable ids
+(imported objects `G-A1`, `L-west-1`, … and new builds `B0001`, …), a revision,
+and the id counter.
+
+- **Catalog.** `construction.catalog` lists label, category, cost, site kind
+  and effect.
+- **Sites.** `construction.sites` lists gate pads, terminal pieces, security
+  lane rows, baggage module rows and the service yard. One object per slot.
+- **Placement is on predefined sites, not free.** The fixed apron and taxi
+  system can only reach known positions. Riverdale adds two expansion pads
+  (A9 narrowbody, A10 widebody) on an east pier that must itself be built,
+  and a central connector walkway.
+- **Fixed until M12:** runway, taxiways and the terminal core.
+
+**Import.** Riverdale's existing infrastructure is imported as the initial
+objects:
+
+- its 8 gates become pads with gates (their node and edges come from the base
+  graph)
+- 4 + 4 security lanes
+- 4 / 2 / 3 baggage modules
+- service facilities
+
+**Normalized infrastructure.** Each day's config is rebuilt from the layout:
+
+- gates: built base gates in scenario order, then new ones
+- terminal graph: base edges whose ends exist, then expansion edges
+- checkpoint `max_lanes`
+- stage servers
+- `layout_revision`
+
+Values are written only when they change, so an unexpanded airport produces
+the scenario's own arrays. Day 1 is the M10 day to the cent (tested).
+
+The simulation never reads build objects, only the normalized config at
+setup: zero per-tick cost.
+
+
+## D-049 — Construction commits at once; capital is not operating cost
+
+**Date:** 2026-09-25
+**Status:** Accepted (M11)
+
+- **When.** Construction happens only in planning, between days.
+- **Building** charges the item's cost at once: a ledger transaction in
+  category `capital`, id `D{day}:BUILD:{id}`, dated to the day being planned.
+  Cash after the build must stay at or above zero; there is no borrowing.
+- **Demolishing** posts `D{day}:DEMOLISH:{id}`: a full refund for something
+  built in the same planning session (undo), otherwise
+  `construction.refund_permille` (50%).
+- **Refused demolitions:** any that would add a validation error (for
+  example, a gate whose committed flights have nowhere else to go), or leave
+  the resource plan above what remains built.
+- **Reporting.** Capital appears apart from the operating result (the day
+  report and the Finance tab). Nothing built earns anything by itself.
+
+**Validation** runs before START DAY and never repairs anything:
+
+- the entrance reaches check-in
+- each checkpoint has lanes and is reachable
+- each baggage stage has capacity
+- each gate is reachable airside from security, and reaches reclaim and the
+  exit
+- the schedule fits the gates
+
+**Gate assignment.** A flight keeps its configured gate when that gate is
+built and compatible; the scenario's tight turns are operational (M1). A
+flight without one gets the first compatible gate, in gate order, whose
+scheduled use (with buffer) is clear. Otherwise the day cannot start: *GA 431
+has no compatible available gate (widebody).*
+
+
+## D-050 — Built capacity bounds operated capacity
+
+**Date:** 2026-09-25
+**Status:** Accepted (M11)
+
+| Built | Bounds |
+| --- | --- |
+| Security lanes | the lanes that can be opened; M2 staffing still chooses within them and the staff pool |
+| Baggage modules | the parallel servers of their stage; service times unchanged |
+| Service facilities (cleaning or catering base: 2 crews; fuel bay: 2 units; baggage equipment: 5 crews; tug bay: 1 tug) | each resource's maximum in the M10 plan |
+
+The plan still chooses how many units to pay for (min up to the built
+maximum): build capacity, then decide whether to operate it.
+
+**Navigation.** `TerminalGraph` carries the layout revision. A route cached
+for one revision is never served for another. Each day builds its graph once
+from its layout; there is no per-tick rebuilding.
+
+
+## D-051 — Requests can require construction; save schema v11
+
+**Date:** 2026-09-25
+**Status:** Accepted (M11)
+
+- **Open gates.** A request tier may leave its flights' gates open and skip
+  the in-day gate check (`check_gates: false`). The airline detail shows the
+  tier's gate capacity (SUFFICIENT, or INSUFFICIENT with the missing gate
+  type).
+- **Conditional accept.** Accepting is conditional: the accepted flights
+  enter the next day's schedule, and START DAY stays disabled until they have
+  compatible gates.
+- **`riverdale_expansion.json`:** Global Airways' midday 787 and A220 need
+  the east pier, A9 and A10.
+
+**Save schema v11.** The career gains `layout` (objects, revision, next id,
+session ids). Capital transactions may belong to the day being planned or run.
+Validation checks:
+
+- unique ids
+- known items on compatible sites and free slots
+- the id counter
+- the plan within built maxima
+- the ledger (capital included) reconciling to cash
+- an operating day's `layout_revision` equal to the layout's
+
+v10 is rejected.

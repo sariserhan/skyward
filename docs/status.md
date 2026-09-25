@@ -1,13 +1,14 @@
-# Current status — M0 through M10 implemented
+# Current status — M0 through M11 implemented
 
-M10 turns Riverdale into a tycoon loop. Each day earns fees from real
-operations and pays for the capacity the player planned. Contracts pay or
-charge. Every cent is a traceable ledger transaction. The end-of-day report
-leads into planning the next day, and accepted airline requests fly from the
-following day. Save schema v10 (career with an optional operating day). See
-the [M10 completion report](m10-status.md). M11 construction has not started.
+M11 makes Riverdale something the player builds between days: gates on new
+pads and an east pier, a terminal connector, security lanes, baggage modules
+and service facilities. Construction changes the real gates, terminal routes,
+screening lanes, baggage servers and resource maxima of the next day. It is
+paid as capital from the ledger, and the next day is validated before it can
+start. Save schema v11. See the [M11 completion report](m11-status.md). M12
+airside construction has not started.
 
-Earlier reports: [M9](m9-status.md), [M8](m8-status.md), [M7](m7-status.md), [M6](m6-status.md), [M5](m5-status.md), [M4](m4-status.md), [M3](m3-status.md), [M2](m2-status.md), and the M0/M1 report below. Their
+Earlier reports: [M10](m10-status.md), [M9](m9-status.md), [M8](m8-status.md), [M7](m7-status.md), [M6](m6-status.md), [M5](m5-status.md), [M4](m4-status.md), [M3](m3-status.md), [M2](m2-status.md), and the M0/M1 report below. Their
 limitations and timings are historical; M3 changed the timetable, scenario start,
 security defaults, loads, cabin timings and save schema (D-021, D-023, D-024).
 

@@ -1,0 +1,44 @@
+{
+  "extends": "riverdale.json",
+  "id": "riverdale_expansion",
+  "name": "Riverdale International (room to grow)",
+  "airline_relations": {
+    "profiles": {
+      "GA": {
+        "requests": [
+          {
+            "id": "GA_MIDDAY_BANK",
+            "label": "Global Airways midday bank",
+            "min_relationship": 78,
+            "min_flights_operated": 4,
+            "check_gates": false,
+            "flights": [
+              {
+                "id": "GA431",
+                "airline_id": "GA",
+                "flight_number": "GA 431",
+                "origin": "Seabrook",
+                "destination": "Eastmere",
+                "aircraft_type": "787",
+                "scheduled_arrival": 258000,
+                "scheduled_departure": 291000,
+                "assigned_gate_id": ""
+              },
+              {
+                "id": "GA439",
+                "airline_id": "GA",
+                "flight_number": "GA 439",
+                "origin": "Seabrook",
+                "destination": "Eastmere",
+                "aircraft_type": "A220",
+                "scheduled_arrival": 264000,
+                "scheduled_departure": 294000,
+                "assigned_gate_id": ""
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

@@ -512,32 +512,27 @@
       "cleaning_crew": {
         "label": "Cleaning crews",
         "daily_cents": 180000,
-        "min": 1,
-        "max": 8
+        "min": 1
       },
       "catering_crew": {
         "label": "Catering crews",
         "daily_cents": 180000,
-        "min": 1,
-        "max": 8
+        "min": 1
       },
       "fuel_unit": {
         "label": "Fuel units",
         "daily_cents": 400000,
-        "min": 1,
-        "max": 8
+        "min": 1
       },
       "baggage_crew": {
         "label": "Baggage crews",
         "daily_cents": 240000,
-        "min": 2,
-        "max": 12
+        "min": 2
       },
       "pushback_tug": {
         "label": "Pushback tugs",
         "daily_cents": 150000,
-        "min": 1,
-        "max": 6
+        "min": 1
       }
     },
     "costs": {
@@ -1209,5 +1204,263 @@
         "bags": 1
       }
     ]
+  },
+  "construction": {
+    "refund_permille": 500,
+    "catalog": {
+      "gate_narrow": {
+        "label": "Narrowbody gate",
+        "category": "gates",
+        "site_kind": "gate_pad",
+        "cost_cents": 4500000,
+        "effect": "A contact gate for A220, 737 and A321",
+        "gate": {
+          "type": "narrow",
+          "supported_aircraft_classes": [
+            "narrow"
+          ]
+        }
+      },
+      "gate_wide": {
+        "label": "Widebody gate",
+        "category": "gates",
+        "site_kind": "gate_pad",
+        "cost_cents": 7000000,
+        "effect": "A contact gate for any aircraft, including the 787",
+        "pad_class": "wide",
+        "gate": {
+          "type": "wide",
+          "supported_aircraft_classes": [
+            "narrow",
+            "wide"
+          ]
+        }
+      },
+      "east_pier": {
+        "label": "East pier",
+        "category": "terminal",
+        "site_kind": "terminal",
+        "cost_cents": 3500000,
+        "effect": "Airside walkway from the east concourse to pads A9 and A10, with a path to arrivals"
+      },
+      "central_connector": {
+        "label": "Central connector",
+        "category": "terminal",
+        "site_kind": "terminal",
+        "cost_cents": 2500000,
+        "effect": "A shorter airside walk between the west and east concourses"
+      },
+      "security_lane": {
+        "label": "Security lane",
+        "category": "security",
+        "site_kind": "security",
+        "cost_cents": 1200000,
+        "effect": "One more screening lane (open it by assigning staff)"
+      },
+      "outbound_sorter": {
+        "label": "Outbound sortation module",
+        "category": "baggage",
+        "site_kind": "baggage",
+        "cost_cents": 900000,
+        "effect": "One more outbound sortation server",
+        "stage": "outbound_sortation"
+      },
+      "transfer_sorter": {
+        "label": "Transfer sortation module",
+        "category": "baggage",
+        "site_kind": "baggage",
+        "cost_cents": 900000,
+        "effect": "One more transfer sortation server",
+        "stage": "transfer_sortation"
+      },
+      "reclaim_belt": {
+        "label": "Reclaim belt",
+        "category": "baggage",
+        "site_kind": "baggage",
+        "cost_cents": 800000,
+        "effect": "One more reclaim delivery server",
+        "stage": "reclaim"
+      },
+      "cleaning_base": {
+        "label": "Cleaning base",
+        "category": "operations",
+        "site_kind": "service",
+        "cost_cents": 600000,
+        "effect": "Room for 2 more cleaning crews",
+        "resource": "cleaning_crew",
+        "units": 2
+      },
+      "catering_base": {
+        "label": "Catering base",
+        "category": "operations",
+        "site_kind": "service",
+        "cost_cents": 600000,
+        "effect": "Room for 2 more catering crews",
+        "resource": "catering_crew",
+        "units": 2
+      },
+      "fuel_bay": {
+        "label": "Fuel service bay",
+        "category": "operations",
+        "site_kind": "service",
+        "cost_cents": 1500000,
+        "effect": "Room for 2 more fuel units",
+        "resource": "fuel_unit",
+        "units": 2
+      },
+      "baggage_equipment": {
+        "label": "Baggage equipment set",
+        "category": "operations",
+        "site_kind": "service",
+        "cost_cents": 1200000,
+        "effect": "Room for 5 more baggage crews",
+        "resource": "baggage_crew",
+        "units": 5
+      },
+      "tug_bay": {
+        "label": "Tug bay",
+        "category": "operations",
+        "site_kind": "service",
+        "cost_cents": 500000,
+        "effect": "Room for 1 more pushback tug",
+        "resource": "pushback_tug",
+        "units": 1
+      }
+    },
+    "sites": {
+      "east_pier": {
+        "kind": "terminal",
+        "item": "east_pier",
+        "label": "East pier",
+        "nodes": {
+          "east_pier": {
+            "label": "EAST PIER",
+            "x": 1100,
+            "y": 310,
+            "airside": true
+          }
+        },
+        "edges": [
+          {
+            "from": "east_hall",
+            "to": "east_pier",
+            "walking_ticks": 1200
+          },
+          {
+            "from": "east_pier",
+            "to": "arrivals_hall",
+            "walking_ticks": 900,
+            "bidirectional": false
+          }
+        ]
+      },
+      "central_connector": {
+        "kind": "terminal",
+        "item": "central_connector",
+        "label": "Central connector",
+        "nodes": {
+          "central_link": {
+            "label": "CONNECTOR",
+            "x": 500,
+            "y": 220,
+            "airside": true
+          }
+        },
+        "edges": [
+          {
+            "from": "west_hall",
+            "to": "central_link",
+            "walking_ticks": 500
+          },
+          {
+            "from": "central_link",
+            "to": "east_hall",
+            "walking_ticks": 500
+          }
+        ]
+      },
+      "pad_A9": {
+        "kind": "gate_pad",
+        "pad_class": "narrow",
+        "gate_id": "A9",
+        "label": "Pad A9 (east pier)",
+        "node": {
+          "label": "A9",
+          "x": 1040,
+          "y": 100,
+          "airside": true
+        },
+        "edges": [
+          {
+            "from": "east_pier",
+            "to": "A9",
+            "walking_ticks": 600
+          }
+        ]
+      },
+      "pad_A10": {
+        "kind": "gate_pad",
+        "pad_class": "wide",
+        "gate_id": "A10",
+        "label": "Pad A10 (east pier, widebody)",
+        "node": {
+          "label": "A10",
+          "x": 1160,
+          "y": 100,
+          "airside": true
+        },
+        "edges": [
+          {
+            "from": "east_pier",
+            "to": "A10",
+            "walking_ticks": 900
+          }
+        ]
+      },
+      "security_west": {
+        "kind": "security",
+        "checkpoint": "west",
+        "label": "West security hall",
+        "slots": 6
+      },
+      "security_east": {
+        "kind": "security",
+        "checkpoint": "east",
+        "label": "East security hall",
+        "slots": 6
+      },
+      "baggage_outbound_sortation": {
+        "kind": "baggage",
+        "stage": "outbound_sortation",
+        "label": "Outbound sortation hall",
+        "slots": 8
+      },
+      "baggage_transfer_sortation": {
+        "kind": "baggage",
+        "stage": "transfer_sortation",
+        "label": "Transfer sortation hall",
+        "slots": 6
+      },
+      "baggage_reclaim": {
+        "kind": "baggage",
+        "stage": "reclaim",
+        "label": "Reclaim hall",
+        "slots": 6
+      },
+      "service_yard": {
+        "kind": "service",
+        "label": "Service yard",
+        "slots": 20
+      }
+    },
+    "initial": {
+      "facilities": {
+        "baggage_equipment": 2,
+        "catering_base": 3,
+        "cleaning_base": 3,
+        "fuel_bay": 3,
+        "tug_bay": 3
+      }
+    }
   }
 }

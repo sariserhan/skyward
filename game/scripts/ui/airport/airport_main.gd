@@ -34,6 +34,19 @@ var day_report: RichTextLabel
 var plan_rows: Dictionary = {}
 var plan_total: Label
 var start_day_button: Button
+## M11: the Build tab (between days).
+var build_category: OptionButton
+var build_items: ItemList
+var build_item_ids: Array = []
+var build_sites: OptionButton
+var build_site_ids: Array = []
+var build_info: Label
+var build_button: Button
+var built_list: ItemList
+var built_ids: Array = []
+var day_tabs: TabContainer
+var demolish_button: Button
+const BUILD_CATEGORIES := ["gates", "terminal", "security", "baggage", "operations"]
 var bag_metrics_second: int = -1
 var pause_button: Button
 var debug_panel: VBoxContainer
@@ -363,7 +376,7 @@ func _refresh() -> void:
 	var bags := "" if bag_metrics.bags == 0 else "   |   Bags %d missed · %d at reclaim" % [bag_metrics.transfer_missed + bag_metrics.missed_flight, bag_metrics.at_reclaim]
 	for type in sim.resources.order:
 		if sim.resources.pools[type].queue.size() >= 2: security_alert_count += 1
-	metrics_label.text = "DAY %d · %s   |" % [career.day if career.phase == "operating" else career.day - 1, AirportEconomy.money(career.cash_cents())] + "   %d× %s   |   Gates %d / 8   |   Departed %d / %d   |   On time %s   |   Connections %d made · %d missed%s   |   Alerts %d" % [sim.clock.speed, "PAUSED" if sim.clock.paused else "LIVE", metrics.occupied, metrics.departed, sim.airport.flights.size(), punctuality, connections.made, connections.missed, bags, sim.conflicts.size() + security_alert_count]
+	metrics_label.text = "DAY %d · %s   |" % [career.day if career.phase == "operating" else career.day - 1, AirportEconomy.money(career.cash_cents())] + "   %d× %s   |   Gates %d / %d   |   Departed %d / %d   |   On time %s   |   Connections %d made · %d missed%s   |   Alerts %d" % [sim.clock.speed, "PAUSED" if sim.clock.paused else "LIVE", metrics.occupied, sim.airport.gates.size(), metrics.departed, sim.airport.flights.size(), punctuality, connections.made, connections.missed, bags, sim.conflicts.size() + security_alert_count]
 	for f: AirportFlight in sim.airport.flights.values():
 		var values := [f.flight_number, f.origin + " → " + f.destination, f.assigned_gate_id,
 			AirportClock.display(f.scheduled_departure).left(5), AirportClock.display(f.estimated_departure).left(5), f.status.replace("_", " ").capitalize()]
@@ -491,6 +504,9 @@ func _adopt(day_sim: AirportSimulation) -> void:
 	terminal_view.sim = sim
 	boarding_overlay.visible = false
 	selected_passenger_id = -1
+	# The day's gates can differ from yesterday's (M11 construction).
+	gate_choice.clear()
+	for key in sim.airport.gates: gate_choice.add_item(key)
 	_rebuild_board()
 	_select(sim.flight_order[0].id)
 
@@ -1003,6 +1019,10 @@ func _request_text(airline: String, e: Dictionary) -> String:
 	var names: Array = []
 	for flight in request.flights: names.append(flight.flight_number)
 	var text := "\n\n[b]REQUEST[/b]  +%d daily flights (%s)" % [names.size(), ", ".join(names)]
+	# M11: can the airport as built take them?
+	if sim.airlines.state[airline].request in ["", "offered"]:
+		var missing := career.tier_capacity(request)
+		text += "\n  Gate capacity: " + ("[color=#70dec0]SUFFICIENT[/color]" if missing.is_empty() else "[color=#e5484d]INSUFFICIENT[/color] · %s Build the capacity before starting the next day." % " ".join(missing))
 	match sim.airlines.state[airline].request:
 		"offered": return text + "\n  [url=accept:%s][color=#70dec0]ACCEPT[/color][/url]    [url=decline:%s][color=#ffc078]DECLINE[/color][/url]" % [airline, airline]
 		"accepted": return text + "\n  Accepted: committed to tomorrow's schedule"
@@ -1046,7 +1066,14 @@ func _refresh_finance() -> void:
 		item.set_metadata(0, category)
 		item.collapsed = collapsed.get(category, true)
 		for tx in txs: add.call(item, tx.reason, int(tx.amount_cents))
-	add.call(root, "Revenue %s · costs %s" % [AirportEconomy.money(summary.revenue_cents), AirportEconomy.money(summary.cost_cents)], summary.net_cents, "ffffff")
+	add.call(root, "Operating result: revenue %s · costs %s" % [AirportEconomy.money(summary.revenue_cents), AirportEconomy.money(summary.cost_cents)], summary.net_cents, "ffffff")
+	# Capital spent before the day (M11): shown apart from operations.
+	var capital: Array = career.ledger.filter(func(tx): return int(tx.day) == sim.economy.day and tx.category == "capital")
+	if not capital.is_empty():
+		var item: TreeItem = add.call(root, "Construction for this day (capital, %d)" % capital.size(), career.capital_cents(sim.economy.day), "ffc078")
+		item.set_metadata(0, "capital")
+		item.collapsed = collapsed.get("capital", true)
+		for tx in capital: add.call(item, tx.reason, int(tx.amount_cents))
 	var airlines: Array = summary.by_airline.keys()
 	airlines.sort()
 	var by := add.call(root, "Revenue by airline (shared costs stay shared)", 0) as TreeItem
@@ -1077,10 +1104,15 @@ func _build_day_panel() -> void:
 	day_report.add_theme_font_size_override("bold_font_size", 15)
 	day_report.add_theme_font_size_override("mono_font_size", 15)
 	columns.add_child(day_report)
+	var tabs := TabContainer.new()
+	day_tabs = tabs
+	tabs.custom_minimum_size.x = 470
+	columns.add_child(tabs)
 	var plan := VBoxContainer.new()
-	plan.custom_minimum_size.x = 440
+	plan.name = "Plan"
 	plan.add_theme_constant_override("separation", 10)
-	columns.add_child(plan)
+	tabs.add_child(plan)
+	_build_build_tab(tabs)
 	_label(plan, "NEXT DAY OPERATIONS", 18)
 	_label(plan, "Capacity is paid for by the day, whether it is busy or not.", 13).modulate = Color("a7becd")
 	for type in career.resource_plan:
@@ -1118,16 +1150,21 @@ func _show_day_panel() -> void:
 	for type in plan_rows:
 		var units := int(career.resource_plan[type])
 		var each := int(economy.resources[type].daily_cents)
-		plan_rows[type][0].text = str(units)
+		plan_rows[type][0].text = "%d/%d" % [units, career.maximum_units(type)]
 		plan_rows[type][1].text = "%s each · %s" % [AirportEconomy.money(each), AirportEconomy.money(each * units)]
 	var security := int(economy.costs.security_staff_daily_cents) * career.security_staff()
 	var committed := career.committed_cost_cents()
 	var text := "Security staff × %d   %s\nAirport operations   %s\n\nCommitted daily cost   %s\nCash available   %s\nExpected flights: %d" % [career.security_staff(),
 		AirportEconomy.money(security), AirportEconomy.money(int(economy.costs.fixed_daily_cents)), AirportEconomy.money(committed),
 		AirportEconomy.money(career.settled_cash_cents()), career.expected_flights()]
+	var capital := career.capital_cents(career.day)
+	if capital != 0: text += "\nCapital spent for day %d: %s (not a daily cost)" % [career.day, AirportEconomy.money(capital)]
+	var errors := career.start_errors()
 	if career.insolvent(): text += "\n\nINSOLVENT: even the minimum plan costs more than the cash available."
+	elif not errors.is_empty(): text += "\n\nCANNOT START DAY %d\n" % career.day + "\n".join(errors.slice(0, 4))
 	elif not career.can_start(): text += "\n\nThis plan costs more than the cash available: reduce capacity."
 	plan_total.text = text
+	_refresh_build_tab()
 	start_day_button.text = "START DAY %d" % career.day
 	start_day_button.disabled = not career.can_start()
 
@@ -1138,6 +1175,10 @@ func _day_report_text(r: Dictionary) -> String:
 		var close := "[/%s]" % style.get_slice("=", 0) if not style.is_empty() else ""
 		return "[cell]%s%s%s[/cell][cell][p align=right]%s%s%s[/p][/cell]" % [open, label, close, open, amount, close]
 	var t := "[font_size=26][b]RIVERDALE — DAY %d[/b][/font_size]\n\n[table=2]" % int(r.day)
+	# Construction is paid before the day starts: already out of the starting cash.
+	if int(r.get("capital_cents", 0)) != 0:
+		t += row.call("Cash after yesterday", AirportEconomy.money(int(r.opening_cents) - int(r.capital_cents)))
+		t += row.call("Construction (capital)", AirportEconomy.money(int(r.capital_cents)))
 	t += row.call("Starting cash", AirportEconomy.money(int(r.opening_cents)))
 	t += row.call(" ", " ") + row.call("REVENUE", "", "b")
 	for c in ["aircraft", "passengers", "baggage", "contract_bonus"]: t += row.call(AirportEconomy.LABELS[c], AirportEconomy.money(int(r.by_category[c])))
@@ -1156,3 +1197,129 @@ func _day_report_text(r: Dictionary) -> String:
 		t += "\n%s · %d · %s [color=#%s]%s[/color] · revenue %s" % [career.base.airlines.get(airline, airline), int(c.relationship), c.contract,
 			STATUS_COLORS.get(c.status, "a7becd"), c.status, AirportEconomy.money(int(r.by_airline.get(airline, 0)))]
 	return t
+
+
+# --- build mode (M11) -------------------------------------------------------------------
+
+func _build_build_tab(tabs: TabContainer) -> void:
+	var build := VBoxContainer.new()
+	build.name = "Build"
+	build.add_theme_constant_override("separation", 6)
+	tabs.add_child(build)
+	build_category = OptionButton.new()
+	for c in BUILD_CATEGORIES: build_category.add_item(c.capitalize())
+	build_category.item_selected.connect(func(_i): _refresh_build_tab())
+	build.add_child(build_category)
+	build_items = ItemList.new()
+	build_items.custom_minimum_size.y = 110
+	build_items.item_selected.connect(func(_i): _refresh_build_sites())
+	build.add_child(build_items)
+	build_sites = OptionButton.new()
+	build_sites.item_selected.connect(func(_i): _refresh_build_info())
+	build.add_child(build_sites)
+	build_info = _label(build, "", 13)
+	build_info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	build_info.custom_minimum_size.y = 74
+	build_button = _button(build, "BUILD", func():
+		var item: String = build_item_ids[build_items.get_selected_items()[0]]
+		var site: String = build_site_ids[build_sites.selected]
+		var result := career.build(item, site)
+		status_label.text = result.get("error", "Built %s (%s)" % [career.layout.catalog[item].label, result.get("id", "")])
+		_show_day_panel())
+	_label(build, "BUILT", 14)
+	built_list = ItemList.new()
+	built_list.custom_minimum_size.y = 120
+	built_list.item_selected.connect(func(_i): _refresh_demolish())
+	build.add_child(built_list)
+	demolish_button = _button(build, "DEMOLISH", func():
+		var result := career.demolish(built_ids[built_list.get_selected_items()[0]])
+		status_label.text = result.get("error", "Demolished · refund %s" % AirportEconomy.money(int(result.get("refund_cents", 0))))
+		_show_day_panel())
+
+func _refresh_build_tab() -> void:
+	if build_items == null: return
+	var category: String = BUILD_CATEGORIES[maxi(0, build_category.selected)]
+	var selected := build_items.get_selected_items()
+	var keep: String = build_item_ids[selected[0]] if not selected.is_empty() and selected[0] < build_item_ids.size() else ""
+	build_items.clear()
+	build_item_ids = []
+	for type in AirportLayout._sorted(career.layout.catalog.keys()):
+		var item: Dictionary = career.layout.catalog[type]
+		if item.category != category: continue
+		build_items.add_item("%s · %s" % [item.label, AirportEconomy.money(int(item.cost_cents))])
+		build_item_ids.append(type)
+		if type == keep: build_items.select(build_items.item_count - 1)
+	if build_items.get_selected_items().is_empty() and build_items.item_count > 0: build_items.select(0)
+	_refresh_build_sites()
+	built_list.clear()
+	built_ids = []
+	for o in career.layout.objects:
+		var item: Dictionary = career.layout.catalog[o.type]
+		built_list.add_item("%s · %s%s" % [item.label, career.layout.sites[o.site].get("label", o.site.replace("_", " ")), " (new)" if o.id in career.layout.session_ids else ""])
+		built_ids.append(o.id)
+	_refresh_demolish()
+
+func _refresh_build_sites() -> void:
+	build_sites.clear()
+	build_site_ids = []
+	var selected := build_items.get_selected_items()
+	if selected.is_empty():
+		_refresh_build_info()
+		return
+	var type: String = build_item_ids[selected[0]]
+	for site_id in AirportLayout._sorted(career.layout.sites.keys()):
+		var site: Dictionary = career.layout.sites[site_id]
+		if site.kind != career.layout.catalog[type].site_kind: continue
+		var slot := career.layout.free_slot(type, site_id)
+		var reason := "full" if slot < 0 else ""
+		if slot < 0 and site.kind in ["gate_pad", "terminal"]: reason = career.layout.placement_error(type, site_id, 0)
+		build_sites.add_item("%s%s" % [site.get("label", site_id.replace("_", " ")), "" if reason.is_empty() else " · " + reason])
+		build_site_ids.append(site_id)
+		if not reason.is_empty(): build_sites.set_item_disabled(build_sites.item_count - 1, true)
+	for i in build_sites.item_count:
+		if not build_sites.is_item_disabled(i):
+			build_sites.select(i)
+			break
+	_refresh_build_info()
+
+## Cost and cash before committing; for a gate, its real walks from the
+## terminal graph as it would be.
+func _refresh_build_info() -> void:
+	var selected := build_items.get_selected_items()
+	build_button.disabled = true
+	if selected.is_empty() or build_sites.item_count == 0 or build_sites.is_item_disabled(maxi(0, build_sites.selected)):
+		build_info.text = "Nowhere free to build this."
+		return
+	var type: String = build_item_ids[selected[0]]
+	var site: String = build_site_ids[build_sites.selected]
+	var item: Dictionary = career.layout.catalog[type]
+	var cost := int(item.cost_cents)
+	var cash := career.settled_cash_cents()
+	var text := "%s\nCash %s · cost %s · after %s" % [item.effect, AirportEconomy.money(cash), AirportEconomy.money(cost), AirportEconomy.money(cash - cost)]
+	if item.site_kind == "gate_pad":
+		var trial := AirportLayout.new()
+		trial.bind(career.base)
+		trial.restore(career.layout.snapshot())
+		trial.place(type, site, 0)
+		var config := trial.apply(career.day_config(false))
+		var graph := TerminalGraph.new()
+		graph.setup(config.passenger_flow.graph)
+		var gate: String = career.layout.sites[site].gate_id
+		var walk := -1
+		for cp in config.passenger_flow.checkpoints:
+			var path := graph.route(cp.node_id, gate, true)
+			if not path.is_empty(): walk = graph.route_ticks(path) if walk < 0 else mini(walk, graph.route_ticks(path))
+		text += "\n" + ("No passenger path yet: build the terminal piece that reaches this pad first." if walk < 0 else "Walk from security: %.1f min · to reclaim: %.1f min" % [walk / 600.0, graph.route_ticks(graph.route(gate, "baggage_reclaim")) / 600.0])
+	build_info.text = text
+	build_button.disabled = cash < cost
+
+func _refresh_demolish() -> void:
+	var selected := built_list.get_selected_items()
+	demolish_button.disabled = selected.is_empty()
+	if selected.is_empty():
+		demolish_button.text = "DEMOLISH"
+		return
+	var o := career.layout.find(built_ids[selected[0]])
+	var cost := int(career.layout.catalog[o.type].cost_cents)
+	var refund := cost if o.id in career.layout.session_ids else cost * int(career.base.construction.get("refund_permille", 0)) / 1000
+	demolish_button.text = "DEMOLISH · refund %s" % AirportEconomy.money(refund)

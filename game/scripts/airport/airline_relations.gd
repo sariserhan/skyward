@@ -133,8 +133,10 @@ func _request_ready(airline: String, e: Dictionary, gate_free: Callable) -> bool
 	if e.relationship < int(request.get("min_relationship", 101)): return false
 	if e.metrics.flights < int(request.get("min_flights_operated", 0)): return false
 	if e.contract.status in ["FAILING", "FAILED"]: return false
-	for flight in request.get("flights", []):
-		if not gate_free.call(flight): return false
+	# A tier may rely on capacity the player still has to build (M11).
+	if bool(request.get("check_gates", true)):
+		for flight in request.get("flights", []):
+			if not gate_free.call(flight): return false
 	return true
 
 
