@@ -36,7 +36,7 @@ export LD_LIBRARY_PATH
 
 cd "$ROOT/game"
 godot --headless --path . --import >/dev/null 2>&1 || true
-scripts=${*:-"tests/airport_ui_smoke.gd tests/terminal_ui_smoke.gd tests/m3_demo.gd tests/m4_demo.gd tests/m5_demo.gd tests/m6_demo.gd tests/m7_demo.gd tests/m8_demo.gd tests/m9_demo.gd tests/m10_demo.gd tests/m11_demo.gd tests/m12_demo.gd"}
+scripts=${*:-"tests/airport_ui_smoke.gd tests/terminal_ui_smoke.gd tests/m3_demo.gd tests/m4_demo.gd tests/m5_demo.gd tests/m6_demo.gd tests/m7_demo.gd tests/m8_demo.gd tests/m9_demo.gd tests/m10_demo.gd tests/m11_demo.gd tests/m12_demo.gd tests/m13_demo.gd"}
 failed=0
 for script in $scripts; do
 	echo "== $script"

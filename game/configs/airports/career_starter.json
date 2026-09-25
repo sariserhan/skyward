@@ -1,0 +1,1683 @@
+{
+  "id": "career_starter",
+  "name": "Harbor Field Regional",
+  "seed": 5313,
+  "start_tick": 210000,
+  "landing_ticks": 700,
+  "takeoff_ticks": 550,
+  "separation_ticks": 400,
+  "taxi_in_ticks": 1800,
+  "taxi_out_ticks": 1800,
+  "approach_ticks": 1200,
+  "gate_buffer_ticks": 1200,
+  "aircraft_types": {
+    "A220": {
+      "class": "narrow",
+      "seats": 130,
+      "cabin": "a220_26"
+    },
+    "737": {
+      "class": "narrow",
+      "seats": 180,
+      "cabin": "narrowbody_30"
+    },
+    "A321": {
+      "class": "narrow",
+      "seats": 220,
+      "cabin": "a321_37"
+    },
+    "787": {
+      "class": "wide",
+      "seats": 276
+    }
+  },
+  "boarding": {
+    "open_before_departure_ticks": 18000,
+    "gate_close_before_departure_ticks": 6000,
+    "close_warning_ticks": 1800,
+    "hold_increment_ticks": 3000,
+    "max_hold_ticks": 9000,
+    "default_strategy": "random",
+    "boarding_ticks_per_airport_tick": 3,
+    "sim_config_overrides": {
+      "entry_interval_ticks": 100,
+      "walk_ticks_per_cell": 54,
+      "stow_base_ticks": 240,
+      "stow_per_bag_ticks": 300,
+      "stow_variation_ticks": 90,
+      "seat_per_obstructer_ticks": 330
+    }
+  },
+  "deboarding": {
+    "seat_exit_ticks": 60,
+    "aisle_entry_ticks": 30,
+    "retrieve_base_ticks": 120,
+    "retrieve_per_bag_ticks": 150,
+    "walk_ticks_per_cell": 40,
+    "door_interval_ticks": 45
+  },
+  "turnaround": {
+    "variation_permille": 150,
+    "tasks": [
+      {
+        "type": "arrival_secured",
+        "label": "Arrival secured",
+        "durations": {
+          "*": 600
+        }
+      },
+      {
+        "type": "deboarding",
+        "label": "Deboarding",
+        "kind": "deboarding",
+        "after": [
+          "arrival_secured"
+        ],
+        "durations": {
+          "A220": 3600,
+          "737": 4800,
+          "A321": 5700,
+          "787": 7200
+        }
+      },
+      {
+        "type": "cleaning",
+        "label": "Cleaning",
+        "after": [
+          "deboarding"
+        ],
+        "durations": {
+          "A220": 3000,
+          "737": 3600,
+          "A321": 4200,
+          "787": 4800
+        },
+        "resource": "cleaning_crew"
+      },
+      {
+        "type": "catering",
+        "label": "Catering",
+        "after": [
+          "deboarding"
+        ],
+        "durations": {
+          "A220": 2400,
+          "737": 3000,
+          "A321": 3600,
+          "787": 4200
+        },
+        "resource": "catering_crew"
+      },
+      {
+        "type": "fueling",
+        "label": "Fueling",
+        "after": [
+          "arrival_secured"
+        ],
+        "exclusive_with": [
+          "boarding"
+        ],
+        "durations": {
+          "A220": 6000,
+          "737": 8400,
+          "A321": 9600,
+          "787": 10800
+        },
+        "resource": "fuel_unit"
+      },
+      {
+        "type": "baggage_unload",
+        "label": "Baggage unload",
+        "kind": "baggage_unload",
+        "after": [
+          "arrival_secured"
+        ],
+        "durations": {
+          "A220": 4200,
+          "737": 6600,
+          "A321": 7800,
+          "787": 9000
+        },
+        "resource": "baggage_crew"
+      },
+      {
+        "type": "baggage_load",
+        "label": "Baggage load",
+        "kind": "baggage_load",
+        "after": [
+          "baggage_unload"
+        ],
+        "durations": {
+          "A220": 4200,
+          "737": 6600,
+          "A321": 7800,
+          "787": 9000
+        },
+        "resource": "baggage_crew",
+        "opens_before_departure_ticks": 21000
+      },
+      {
+        "type": "boarding",
+        "label": "Boarding",
+        "kind": "boarding",
+        "after": [
+          "cleaning",
+          "catering"
+        ]
+      },
+      {
+        "type": "pushback_ready",
+        "label": "Pushback readiness",
+        "kind": "milestone",
+        "after": [
+          "boarding",
+          "fueling",
+          "baggage_load"
+        ]
+      },
+      {
+        "type": "pushback",
+        "label": "Pushback",
+        "kind": "pushback",
+        "after": [
+          "pushback_ready"
+        ],
+        "resource": "pushback_tug",
+        "durations": {
+          "*": 1200
+        }
+      }
+    ]
+  },
+  "resources": {
+    "cleaning_crew": {
+      "label": "Cleaning crews",
+      "units": 1
+    },
+    "catering_crew": {
+      "label": "Catering crews",
+      "units": 1
+    },
+    "fuel_unit": {
+      "label": "Fuel units",
+      "units": 1
+    },
+    "baggage_crew": {
+      "label": "Baggage crews",
+      "units": 3
+    },
+    "pushback_tug": {
+      "label": "Pushback tugs",
+      "units": 1
+    }
+  },
+  "airline_relations": {
+    "scoring": {
+      "on_time_grace_ticks": 1800,
+      "credibility_flights": 3,
+      "contract_passed_points": 5,
+      "contract_failed_points": -10,
+      "request_declined_points": -3
+    },
+    "contracts": {
+      "starter_service": {
+        "label": "Service Agreement",
+        "terms": [
+          {
+            "metric": "on_time_rate",
+            "label": "On-time departures",
+            "min": 0.5,
+            "risk": 0.1
+          },
+          {
+            "metric": "mean_delay_min",
+            "label": "Mean departure delay",
+            "max": 8,
+            "risk": 2
+          }
+        ],
+        "bonus_cents": 150000,
+        "penalty_cents": 150000
+      },
+      "starter_turnaround": {
+        "label": "Turnaround Agreement",
+        "terms": [
+          {
+            "metric": "turnaround_delay_min",
+            "label": "Turnaround-caused delay per flight",
+            "max": 5,
+            "risk": 1.5
+          },
+          {
+            "metric": "mean_delay_min",
+            "label": "Mean departure delay",
+            "max": 8,
+            "risk": 2
+          }
+        ],
+        "bonus_cents": 150000,
+        "penalty_cents": 150000
+      },
+      "starter_connections": {
+        "label": "Connection Agreement",
+        "terms": [
+          {
+            "metric": "connection_rate",
+            "label": "Connection success",
+            "min": 0.9,
+            "risk": 0.05
+          },
+          {
+            "metric": "transfer_bag_rate",
+            "label": "Transfer baggage success",
+            "min": 0.9,
+            "risk": 0.05
+          },
+          {
+            "metric": "mean_delay_min",
+            "label": "Mean departure delay",
+            "max": 10,
+            "risk": 2
+          }
+        ],
+        "bonus_cents": 200000,
+        "penalty_cents": 200000
+      }
+    },
+    "profiles": {
+      "NS": {
+        "starting_relationship": 70,
+        "weights": {
+          "punctuality": 35,
+          "connections": 10,
+          "baggage": 30,
+          "turnaround": 20,
+          "gates": 5
+        },
+        "preferred_gates": [
+          "B1"
+        ],
+        "contract": "starter_service",
+        "requests": [
+          {
+            "id": "NS_ROTATION",
+            "label": "Northstar second morning rotation",
+            "min_relationship": 72,
+            "min_flights_operated": 2,
+            "check_gates": false,
+            "flights": [
+              {
+                "id": "NS105",
+                "airline_id": "NS",
+                "flight_number": "NS 105",
+                "origin": "Pinehaven",
+                "destination": "Ashford",
+                "aircraft_type": "A220",
+                "scheduled_arrival": 237600,
+                "scheduled_departure": 265200,
+                "assigned_gate_id": ""
+              }
+            ]
+          },
+          {
+            "id": "NS_LATE",
+            "label": "Northstar late rotation",
+            "min_relationship": 78,
+            "min_flights_operated": 3,
+            "check_gates": false,
+            "flights": [
+              {
+                "id": "NS107",
+                "airline_id": "NS",
+                "flight_number": "NS 107",
+                "origin": "Pinehaven",
+                "destination": "Ashford",
+                "aircraft_type": "737",
+                "scheduled_arrival": 279600,
+                "scheduled_departure": 309600,
+                "assigned_gate_id": ""
+              }
+            ]
+          }
+        ]
+      },
+      "SJ": {
+        "starting_relationship": 70,
+        "weights": {
+          "punctuality": 45,
+          "connections": 5,
+          "baggage": 10,
+          "turnaround": 40,
+          "gates": 0
+        },
+        "preferred_gates": [],
+        "contract": "starter_turnaround",
+        "requests": [
+          {
+            "id": "SJ_ROTATION",
+            "label": "SunJet extra A321",
+            "min_relationship": 72,
+            "min_flights_operated": 2,
+            "check_gates": false,
+            "flights": [
+              {
+                "id": "SJ205",
+                "airline_id": "SJ",
+                "flight_number": "SJ 205",
+                "origin": "Westbridge",
+                "destination": "Fairview",
+                "aircraft_type": "A321",
+                "scheduled_arrival": 242400,
+                "scheduled_departure": 274800,
+                "assigned_gate_id": ""
+              }
+            ]
+          },
+          {
+            "id": "SJ_BANK",
+            "label": "SunJet late bank",
+            "min_relationship": 80,
+            "min_flights_operated": 3,
+            "check_gates": false,
+            "flights": [
+              {
+                "id": "SJ207",
+                "airline_id": "SJ",
+                "flight_number": "SJ 207",
+                "origin": "Westbridge",
+                "destination": "Fairview",
+                "aircraft_type": "737",
+                "scheduled_arrival": 285600,
+                "scheduled_departure": 314400,
+                "assigned_gate_id": ""
+              },
+              {
+                "id": "SJ209",
+                "airline_id": "SJ",
+                "flight_number": "SJ 209",
+                "origin": "Westbridge",
+                "destination": "Fairview",
+                "aircraft_type": "A321",
+                "scheduled_arrival": 290400,
+                "scheduled_departure": 321600,
+                "assigned_gate_id": ""
+              }
+            ]
+          }
+        ]
+      },
+      "GA": {
+        "starting_relationship": 70,
+        "weights": {
+          "punctuality": 20,
+          "connections": 35,
+          "baggage": 25,
+          "turnaround": 10,
+          "gates": 10
+        },
+        "preferred_gates": [
+          "B3"
+        ],
+        "contract": "starter_connections",
+        "requests": [
+          {
+            "id": "GA_CONNECT",
+            "label": "Global Airways connection bank",
+            "min_relationship": 70,
+            "min_flights_operated": 2,
+            "check_gates": false,
+            "flights": [
+              {
+                "id": "GA305",
+                "airline_id": "GA",
+                "flight_number": "GA 305",
+                "origin": "Seabrook",
+                "destination": "Eastmere",
+                "aircraft_type": "A321",
+                "scheduled_arrival": 246000,
+                "scheduled_departure": 278400,
+                "assigned_gate_id": ""
+              },
+              {
+                "id": "GA307",
+                "airline_id": "GA",
+                "flight_number": "GA 307",
+                "origin": "Seabrook",
+                "destination": "Eastmere",
+                "aircraft_type": "A220",
+                "scheduled_arrival": 273600,
+                "scheduled_departure": 303600,
+                "assigned_gate_id": ""
+              }
+            ]
+          },
+          {
+            "id": "GA_LONGHAUL",
+            "label": "Global Airways 787 long-haul",
+            "min_relationship": 76,
+            "min_flights_operated": 3,
+            "check_gates": false,
+            "flights": [
+              {
+                "id": "GA901",
+                "airline_id": "GA",
+                "flight_number": "GA 901",
+                "origin": "Seabrook",
+                "destination": "Eastmere",
+                "aircraft_type": "787",
+                "scheduled_arrival": 252000,
+                "scheduled_departure": 294000,
+                "assigned_gate_id": ""
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "economy": {
+    "starting_cash_cents": 15000000,
+    "fees": {
+      "aircraft_cents": {
+        "A220": 90000,
+        "737": 120000,
+        "A321": 140000,
+        "787": 260000
+      },
+      "gate_cents": {
+        "A220": 40000,
+        "737": 50000,
+        "A321": 60000,
+        "787": 100000
+      },
+      "passenger_cents": 1200,
+      "bag_handling_cents": 250
+    },
+    "resources": {
+      "cleaning_crew": {
+        "label": "Cleaning crews",
+        "daily_cents": 180000,
+        "min": 1
+      },
+      "catering_crew": {
+        "label": "Catering crews",
+        "daily_cents": 180000,
+        "min": 1
+      },
+      "fuel_unit": {
+        "label": "Fuel units",
+        "daily_cents": 400000,
+        "min": 1
+      },
+      "baggage_crew": {
+        "label": "Baggage crews",
+        "daily_cents": 240000,
+        "min": 2
+      },
+      "pushback_tug": {
+        "label": "Pushback tugs",
+        "daily_cents": 150000,
+        "min": 1
+      }
+    },
+    "costs": {
+      "security_staff_daily_cents": 90000,
+      "fixed_daily_cents": 300000
+    }
+  },
+  "airlines": {
+    "NS": "Northstar Air",
+    "SJ": "SunJet",
+    "GA": "Global Airways"
+  },
+  "gates": [
+    {
+      "id": "B1",
+      "type": "narrow",
+      "supported_aircraft_classes": [
+        "narrow"
+      ]
+    },
+    {
+      "id": "B2",
+      "type": "narrow",
+      "supported_aircraft_classes": [
+        "narrow"
+      ]
+    },
+    {
+      "id": "B3",
+      "type": "narrow",
+      "supported_aircraft_classes": [
+        "narrow"
+      ]
+    }
+  ],
+  "airside": {
+    "taxi_speed_mps": 10,
+    "headway_ticks": 150,
+    "node_ticks": 50,
+    "min_runway_length_m": {
+      "A220": 1500,
+      "737": 1800,
+      "A321": 2000,
+      "787": 2800
+    },
+    "terminal_zone": {
+      "x0": 0,
+      "y0": 700,
+      "x1": 3300,
+      "y1": 1100
+    },
+    "zones": [
+      {
+        "x0": 0,
+        "y0": -700,
+        "x1": 3300,
+        "y1": 650
+      }
+    ],
+    "grid_m": 300,
+    "nodes": {
+      "R1_A": {
+        "x": 400,
+        "y": 150,
+        "kind": "runway_end",
+        "label": "R1 09"
+      },
+      "R1_B": {
+        "x": 2800,
+        "y": 150,
+        "kind": "runway_end",
+        "label": "R1 27"
+      },
+      "R1_EXIT": {
+        "x": 2800,
+        "y": 300,
+        "kind": "exit",
+        "label": "R1 exit"
+      },
+      "R1_HOLD": {
+        "x": 400,
+        "y": 300,
+        "kind": "hold",
+        "label": "R1 hold"
+      },
+      "P_MID": {
+        "x": 1300,
+        "y": 300,
+        "kind": "taxi",
+        "label": "Taxiway P"
+      },
+      "AP_1": {
+        "x": 700,
+        "y": 450,
+        "kind": "taxi"
+      },
+      "AP_2": {
+        "x": 1000,
+        "y": 450,
+        "kind": "taxi"
+      },
+      "AP_3": {
+        "x": 1300,
+        "y": 450,
+        "kind": "taxi"
+      },
+      "AP_4": {
+        "x": 1600,
+        "y": 450,
+        "kind": "taxi"
+      },
+      "AP_5": {
+        "x": 1900,
+        "y": 450,
+        "kind": "taxi"
+      },
+      "AP_6": {
+        "x": 2200,
+        "y": 450,
+        "kind": "taxi"
+      },
+      "AP_7": {
+        "x": 2500,
+        "y": 450,
+        "kind": "taxi"
+      },
+      "AP_8": {
+        "x": 2800,
+        "y": 450,
+        "kind": "taxi"
+      },
+      "STAND_B1": {
+        "x": 700,
+        "y": 600,
+        "kind": "stand",
+        "label": "B1"
+      },
+      "STAND_B2": {
+        "x": 1000,
+        "y": 600,
+        "kind": "stand",
+        "label": "B2"
+      },
+      "STAND_B3": {
+        "x": 1300,
+        "y": 600,
+        "kind": "stand",
+        "label": "B3"
+      }
+    },
+    "edges": [
+      {
+        "id": "R1_OUT",
+        "from": "R1_B",
+        "to": "R1_EXIT",
+        "length_m": 150,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "runway_exit"
+      },
+      {
+        "id": "P_EAST",
+        "from": "P_MID",
+        "to": "R1_EXIT",
+        "length_m": 1500,
+        "oneway": false,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "P_WEST",
+        "from": "R1_HOLD",
+        "to": "P_MID",
+        "length_m": 900,
+        "oneway": false,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "CONNECTOR",
+        "from": "P_MID",
+        "to": "AP_3",
+        "length_m": 150,
+        "oneway": false,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "AP_1_2",
+        "from": "AP_1",
+        "to": "AP_2",
+        "length_m": 300,
+        "oneway": false,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "AP_2_3",
+        "from": "AP_2",
+        "to": "AP_3",
+        "length_m": 300,
+        "oneway": false,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "AP_3_4",
+        "from": "AP_3",
+        "to": "AP_4",
+        "length_m": 300,
+        "oneway": false,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "AP_4_5",
+        "from": "AP_4",
+        "to": "AP_5",
+        "length_m": 300,
+        "oneway": false,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "AP_5_6",
+        "from": "AP_5",
+        "to": "AP_6",
+        "length_m": 300,
+        "oneway": false,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "AP_6_7",
+        "from": "AP_6",
+        "to": "AP_7",
+        "length_m": 300,
+        "oneway": false,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "AP_7_8",
+        "from": "AP_7",
+        "to": "AP_8",
+        "length_m": 300,
+        "oneway": false,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "STUB_B1",
+        "from": "AP_1",
+        "to": "STAND_B1",
+        "length_m": 150,
+        "oneway": false,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "stand"
+      },
+      {
+        "id": "STUB_B2",
+        "from": "AP_2",
+        "to": "STAND_B2",
+        "length_m": 150,
+        "oneway": false,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "stand"
+      },
+      {
+        "id": "STUB_B3",
+        "from": "AP_3",
+        "to": "STAND_B3",
+        "length_m": 150,
+        "oneway": false,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "stand"
+      },
+      {
+        "id": "R1_IN",
+        "from": "R1_HOLD",
+        "to": "R1_A",
+        "length_m": 150,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "runway_entry"
+      }
+    ],
+    "runways": [
+      {
+        "id": "R1",
+        "label": "09/27",
+        "a": "R1_A",
+        "b": "R1_B",
+        "length_m": 2400,
+        "status": "open"
+      }
+    ],
+    "stands": {
+      "B1": "STAND_B1",
+      "B2": "STAND_B2",
+      "B3": "STAND_B3"
+    }
+  },
+  "flights": [
+    {
+      "id": "NS101",
+      "airline_id": "NS",
+      "flight_number": "NS 101",
+      "origin": "Pinehaven",
+      "destination": "Ashford",
+      "aircraft_type": "A220",
+      "scheduled_arrival": 219600,
+      "scheduled_departure": 248400,
+      "assigned_gate_id": "B1"
+    },
+    {
+      "id": "SJ201",
+      "airline_id": "SJ",
+      "flight_number": "SJ 201",
+      "origin": "Westbridge",
+      "destination": "Fairview",
+      "aircraft_type": "737",
+      "scheduled_arrival": 223200,
+      "scheduled_departure": 254400,
+      "assigned_gate_id": "B2"
+    },
+    {
+      "id": "GA301",
+      "airline_id": "GA",
+      "flight_number": "GA 301",
+      "origin": "Seabrook",
+      "destination": "Eastmere",
+      "aircraft_type": "A321",
+      "scheduled_arrival": 228000,
+      "scheduled_departure": 260400,
+      "assigned_gate_id": "B3"
+    },
+    {
+      "id": "NS103",
+      "airline_id": "NS",
+      "flight_number": "NS 103",
+      "origin": "Pinehaven",
+      "destination": "Ashford",
+      "aircraft_type": "A220",
+      "scheduled_arrival": 255600,
+      "scheduled_departure": 284400,
+      "assigned_gate_id": "B1"
+    },
+    {
+      "id": "SJ203",
+      "airline_id": "SJ",
+      "flight_number": "SJ 203",
+      "origin": "Westbridge",
+      "destination": "Fairview",
+      "aircraft_type": "737",
+      "scheduled_arrival": 261600,
+      "scheduled_departure": 291600,
+      "assigned_gate_id": "B2"
+    },
+    {
+      "id": "GA303",
+      "airline_id": "GA",
+      "flight_number": "GA 303",
+      "origin": "Seabrook",
+      "destination": "Eastmere",
+      "aircraft_type": "A321",
+      "scheduled_arrival": 267600,
+      "scheduled_departure": 298800,
+      "assigned_gate_id": "B3"
+    }
+  ],
+  "passenger_flow": {
+    "load_permille": 700,
+    "load_permille_range": [
+      600,
+      800
+    ],
+    "airline_load_permille_ranges": {
+      "NS": [
+        600,
+        780
+      ],
+      "SJ": [
+        660,
+        820
+      ],
+      "GA": [
+        600,
+        780
+      ]
+    },
+    "arrival_lead_min_ticks": 15000,
+    "arrival_lead_max_ticks": 36000,
+    "gate_target_buffer_ticks": 12000,
+    "check_in_ticks": 200,
+    "staff_pool": 2,
+    "graph": {
+      "nodes": {
+        "entrance": {
+          "label": "ENTRANCE",
+          "x": 500,
+          "y": 920,
+          "airside": false
+        },
+        "check_in": {
+          "label": "CHECK-IN",
+          "x": 500,
+          "y": 740,
+          "airside": false
+        },
+        "security_main": {
+          "label": "SECURITY",
+          "x": 500,
+          "y": 530,
+          "airside": true
+        },
+        "concourse": {
+          "label": "CONCOURSE",
+          "x": 500,
+          "y": 310,
+          "airside": true
+        },
+        "B1": {
+          "label": "B1",
+          "x": 260,
+          "y": 100,
+          "airside": true
+        },
+        "B2": {
+          "label": "B2",
+          "x": 380,
+          "y": 100,
+          "airside": true
+        },
+        "B3": {
+          "label": "B3",
+          "x": 500,
+          "y": 100,
+          "airside": true
+        },
+        "arrivals_hall": {
+          "label": "ARRIVALS",
+          "x": 150,
+          "y": 310,
+          "airside": false
+        },
+        "baggage_reclaim": {
+          "label": "RECLAIM",
+          "x": 150,
+          "y": 615,
+          "airside": false
+        },
+        "airport_exit": {
+          "label": "EXIT",
+          "x": 150,
+          "y": 920,
+          "airside": false
+        }
+      },
+      "edges": [
+        {
+          "from": "entrance",
+          "to": "check_in",
+          "walking_ticks": 300
+        },
+        {
+          "from": "check_in",
+          "to": "security_main",
+          "walking_ticks": 500
+        },
+        {
+          "from": "security_main",
+          "to": "concourse",
+          "walking_ticks": 300
+        },
+        {
+          "from": "concourse",
+          "to": "B1",
+          "walking_ticks": 600
+        },
+        {
+          "from": "concourse",
+          "to": "B2",
+          "walking_ticks": 450
+        },
+        {
+          "from": "concourse",
+          "to": "B3",
+          "walking_ticks": 400
+        },
+        {
+          "from": "concourse",
+          "to": "arrivals_hall",
+          "walking_ticks": 900,
+          "bidirectional": false
+        },
+        {
+          "from": "arrivals_hall",
+          "to": "baggage_reclaim",
+          "walking_ticks": 400,
+          "bidirectional": false
+        },
+        {
+          "from": "baggage_reclaim",
+          "to": "airport_exit",
+          "walking_ticks": 400,
+          "bidirectional": false
+        }
+      ]
+    },
+    "checkpoints": [
+      {
+        "id": "main",
+        "node_id": "security_main",
+        "max_lanes": 2,
+        "open_lanes": 1,
+        "staff": 1,
+        "service_ticks": 120
+      }
+    ],
+    "exit_node": "airport_exit",
+    "connections": {
+      "default_permille": 30,
+      "airline_permille": {
+        "GA": 90,
+        "NS": 30,
+        "SJ": 20
+      },
+      "max_connection_ticks": 60000
+    },
+    "reclaim_node": "baggage_reclaim"
+  },
+  "baggage": {
+    "checked_permille": 450,
+    "airline_checked_permille": {
+      "NS": 450,
+      "SJ": 300,
+      "GA": 600
+    },
+    "second_bag_permille": 120,
+    "bag_cutoff_before_departure_ticks": 9000,
+    "aircraft": {
+      "unload_base_ticks": 1800,
+      "unload_ticks_per_bag": 60,
+      "load_ticks_per_bag": 60,
+      "offload_ticks_per_bag": 150
+    },
+    "aircraft_types": {
+      "787": {
+        "unload_ticks_per_bag": 30,
+        "load_ticks_per_bag": 30
+      }
+    },
+    "stages": {
+      "outbound_sortation": {
+        "servers": 1,
+        "service_ticks": 100,
+        "transit_ticks": 1200
+      },
+      "transfer_sortation": {
+        "servers": 1,
+        "service_ticks": 150,
+        "transit_ticks": 1800
+      },
+      "reclaim": {
+        "servers": 1,
+        "service_ticks": 50,
+        "transit_ticks": 1800
+      }
+    }
+  },
+  "career": {
+    "difficulty": {
+      "relaxed": {
+        "starting_cash_permille": 1500,
+        "resource_cost_permille": 850,
+        "contract_slack": 1,
+        "request_offset": -4
+      },
+      "standard": {
+        "starting_cash_permille": 1000,
+        "resource_cost_permille": 1000,
+        "contract_slack": 0,
+        "request_offset": 0
+      },
+      "challenging": {
+        "starting_cash_permille": 700,
+        "resource_cost_permille": 1150,
+        "contract_slack": -1,
+        "request_offset": 4
+      }
+    },
+    "chapters": [
+      {
+        "id": "operate",
+        "title": "Operate",
+        "intro": "Six flights, three gates, one security hall. Keep them moving.",
+        "primary": {
+          "id": "op_flights",
+          "text": "Handle a full day of flights",
+          "kind": "departures_min",
+          "min": 6
+        },
+        "optional": [
+          {
+            "id": "op_delay",
+            "text": "Mean departure delay under 5 minutes",
+            "kind": "mean_delay_max",
+            "max": 5
+          },
+          {
+            "id": "op_profit",
+            "text": "Finish a day with a profit",
+            "kind": "net_min",
+            "min": 0
+          },
+          {
+            "id": "op_connections",
+            "text": "No missed connections in a day",
+            "kind": "missed_connections_max",
+            "max": 0
+          }
+        ]
+      },
+      {
+        "id": "improve",
+        "title": "Improve",
+        "intro": "The airlines are watching: each has a contract and its own priorities.",
+        "primary": {
+          "id": "imp_contracts",
+          "text": "Pass every airline's contract in one day",
+          "kind": "all_contracts_passed"
+        },
+        "optional": [
+          {
+            "id": "imp_relationship",
+            "text": "Reach a relationship of 80 with an airline",
+            "kind": "relationship_min_any",
+            "min": 80
+          },
+          {
+            "id": "imp_request",
+            "text": "Accept an airline's request for more flights",
+            "kind": "request_accepted"
+          }
+        ]
+      },
+      {
+        "id": "grow",
+        "title": "Grow",
+        "intro": "More flights need more gates, and more passengers need more screening.",
+        "primary": {
+          "id": "grow_departures",
+          "text": "Operate 9 departures in one day",
+          "kind": "departures_min",
+          "min": 9
+        },
+        "optional": [
+          {
+            "id": "grow_gate",
+            "text": "Build a fourth gate",
+            "kind": "gates_min",
+            "min": 4
+          },
+          {
+            "id": "grow_lanes",
+            "text": "Build a third security lane",
+            "kind": "lanes_min",
+            "min": 3
+          },
+          {
+            "id": "grow_profit",
+            "text": "Earn $5,000 in one day",
+            "kind": "net_min",
+            "min": 500000
+          }
+        ]
+      },
+      {
+        "id": "airside",
+        "title": "Expand airside",
+        "intro": "Widebody service needs a widebody gate and a runway of 2,800 m or more.",
+        "primary": {
+          "id": "air_widebody",
+          "text": "Serve your first 787",
+          "kind": "widebody_departed"
+        },
+        "optional": [
+          {
+            "id": "air_runway",
+            "text": "Build a runway of 2,800 m or longer",
+            "kind": "runway_length_min",
+            "min": 2800
+          },
+          {
+            "id": "air_wide_gate",
+            "text": "Build a widebody gate",
+            "kind": "wide_gates_min",
+            "min": 1
+          },
+          {
+            "id": "air_taxi",
+            "text": "Keep taxi waits under 10 minutes in a day",
+            "kind": "taxi_wait_max",
+            "max": 10
+          }
+        ]
+      }
+    ],
+    "milestone": {
+      "id": "regional_hub",
+      "text": "Regional hub: 14 departures in a day, profitable, every airline at 60 or better, and a 787 served",
+      "kind": "all",
+      "of": [
+        {
+          "kind": "departures_min",
+          "min": 14
+        },
+        {
+          "kind": "net_min",
+          "min": 0
+        },
+        {
+          "kind": "relationship_min_all",
+          "min": 60
+        },
+        {
+          "kind": "widebody_departed"
+        }
+      ]
+    }
+  },
+  "construction": {
+    "refund_permille": 500,
+    "catalog": {
+      "gate_narrow": {
+        "label": "Narrowbody gate",
+        "category": "gates",
+        "site_kind": "gate_pad",
+        "cost_cents": 4500000,
+        "effect": "Adds one contact gate and stand for A220, 737 and A321",
+        "gate": {
+          "type": "narrow",
+          "supported_aircraft_classes": [
+            "narrow"
+          ]
+        }
+      },
+      "gate_wide": {
+        "label": "Widebody gate",
+        "category": "gates",
+        "site_kind": "gate_pad",
+        "cost_cents": 7000000,
+        "effect": "Adds one contact gate and stand for any aircraft, including the 787 (widebody pads only)",
+        "pad_class": "wide",
+        "gate": {
+          "type": "wide",
+          "supported_aircraft_classes": [
+            "narrow",
+            "wide"
+          ]
+        }
+      },
+      "security_lane": {
+        "label": "Security lane",
+        "category": "security",
+        "site_kind": "security",
+        "cost_cents": 1200000,
+        "effect": "Adds one physical screening lane; it opens when staff are assigned"
+      },
+      "outbound_sorter": {
+        "label": "Outbound sortation module",
+        "category": "baggage",
+        "site_kind": "baggage",
+        "cost_cents": 900000,
+        "effect": "Adds one parallel outbound-bag sortation server",
+        "stage": "outbound_sortation"
+      },
+      "transfer_sorter": {
+        "label": "Transfer sortation module",
+        "category": "baggage",
+        "site_kind": "baggage",
+        "cost_cents": 900000,
+        "effect": "Adds one parallel transfer-bag sortation server",
+        "stage": "transfer_sortation"
+      },
+      "reclaim_belt": {
+        "label": "Reclaim belt",
+        "category": "baggage",
+        "site_kind": "baggage",
+        "cost_cents": 800000,
+        "effect": "Adds one parallel reclaim delivery server",
+        "stage": "reclaim"
+      },
+      "cleaning_base": {
+        "label": "Cleaning base",
+        "category": "operations",
+        "site_kind": "service",
+        "cost_cents": 600000,
+        "effect": "Room for 2 more cleaning crews (you still pay per crew per day)",
+        "resource": "cleaning_crew",
+        "units": 2
+      },
+      "catering_base": {
+        "label": "Catering base",
+        "category": "operations",
+        "site_kind": "service",
+        "cost_cents": 600000,
+        "effect": "Room for 2 more catering crews (you still pay per crew per day)",
+        "resource": "catering_crew",
+        "units": 2
+      },
+      "fuel_bay": {
+        "label": "Fuel service bay",
+        "category": "operations",
+        "site_kind": "service",
+        "cost_cents": 1500000,
+        "effect": "Room for 2 more fuel units (you still pay per unit per day)",
+        "resource": "fuel_unit",
+        "units": 2
+      },
+      "baggage_equipment": {
+        "label": "Baggage equipment set",
+        "category": "operations",
+        "site_kind": "service",
+        "cost_cents": 1200000,
+        "effect": "Room for 5 more baggage crews (you still pay per crew per day)",
+        "resource": "baggage_crew",
+        "units": 5
+      },
+      "tug_bay": {
+        "label": "Tug bay",
+        "category": "operations",
+        "site_kind": "service",
+        "cost_cents": 500000,
+        "effect": "Room for 1 more pushback tug (you still pay per tug per day)",
+        "resource": "pushback_tug",
+        "units": 1
+      },
+      "taxiway": {
+        "label": "Taxiway",
+        "category": "airside",
+        "site_kind": "airside",
+        "cost_cents": 0,
+        "cost_per_m_cents": 3000,
+        "effect": "Adds an aircraft movement route between two points; its length sets cost and taxi time"
+      },
+      "runway": {
+        "label": "Runway",
+        "category": "airside",
+        "site_kind": "airside",
+        "cost_cents": 0,
+        "cost_per_m_cents": 3000,
+        "lengths_m": [
+          2000,
+          2400,
+          2800,
+          3200
+        ],
+        "effect": "Adds a runway; its length decides which aircraft it can serve"
+      },
+      "south_pier": {
+        "label": "East pier",
+        "category": "terminal",
+        "site_kind": "terminal",
+        "cost_cents": 3000000,
+        "effect": "A walkway from the concourse to pads B6 (widebody), B7 and B8, with a path to arrivals"
+      },
+      "legacy_taxiway": {
+        "label": "Taxiway",
+        "category": "airside",
+        "site_kind": "legacy",
+        "cost_cents": 0,
+        "cost_per_m_cents": 3000,
+        "effect": "Imported Riverdale taxiway"
+      },
+      "legacy_runway": {
+        "label": "Runway",
+        "category": "airside",
+        "site_kind": "legacy",
+        "cost_cents": 0,
+        "cost_per_m_cents": 6000,
+        "effect": "Imported Riverdale runway"
+      }
+    },
+    "sites": {
+      "south_pier": {
+        "kind": "terminal",
+        "item": "south_pier",
+        "label": "East pier",
+        "nodes": {
+          "south_pier": {
+            "label": "EAST PIER",
+            "x": 800,
+            "y": 310,
+            "airside": true
+          }
+        },
+        "edges": [
+          {
+            "from": "concourse",
+            "to": "south_pier",
+            "walking_ticks": 900
+          },
+          {
+            "from": "south_pier",
+            "to": "arrivals_hall",
+            "walking_ticks": 1500,
+            "bidirectional": false
+          }
+        ]
+      },
+      "pad_B4": {
+        "kind": "gate_pad",
+        "pad_class": "narrow",
+        "gate_id": "B4",
+        "label": "Pad B4",
+        "node": {
+          "label": "B4",
+          "x": 620,
+          "y": 100,
+          "airside": true
+        },
+        "edges": [
+          {
+            "from": "concourse",
+            "to": "B4",
+            "walking_ticks": 500
+          }
+        ],
+        "stand": {
+          "node": "STAND_B4",
+          "x": 1600,
+          "y": 600
+        },
+        "airside_edges": [
+          {
+            "id": "STUB_B4",
+            "from": "AP_4",
+            "to": "STAND_B4",
+            "oneway": false,
+            "kind": "stand"
+          }
+        ]
+      },
+      "pad_B5": {
+        "kind": "gate_pad",
+        "pad_class": "narrow",
+        "gate_id": "B5",
+        "label": "Pad B5",
+        "node": {
+          "label": "B5",
+          "x": 740,
+          "y": 100,
+          "airside": true
+        },
+        "edges": [
+          {
+            "from": "concourse",
+            "to": "B5",
+            "walking_ticks": 650
+          }
+        ],
+        "stand": {
+          "node": "STAND_B5",
+          "x": 1900,
+          "y": 600
+        },
+        "airside_edges": [
+          {
+            "id": "STUB_B5",
+            "from": "AP_5",
+            "to": "STAND_B5",
+            "oneway": false,
+            "kind": "stand"
+          }
+        ]
+      },
+      "pad_B6": {
+        "kind": "gate_pad",
+        "pad_class": "wide",
+        "gate_id": "B6",
+        "label": "Pad B6 (east pier, widebody)",
+        "node": {
+          "label": "B6",
+          "x": 900,
+          "y": 100,
+          "airside": true
+        },
+        "edges": [
+          {
+            "from": "south_pier",
+            "to": "B6",
+            "walking_ticks": 500
+          }
+        ],
+        "stand": {
+          "node": "STAND_B6",
+          "x": 2200,
+          "y": 600
+        },
+        "airside_edges": [
+          {
+            "id": "STUB_B6",
+            "from": "AP_6",
+            "to": "STAND_B6",
+            "oneway": false,
+            "kind": "stand"
+          }
+        ]
+      },
+      "pad_B7": {
+        "kind": "gate_pad",
+        "pad_class": "narrow",
+        "gate_id": "B7",
+        "label": "Pad B7 (east pier)",
+        "node": {
+          "label": "B7",
+          "x": 1020,
+          "y": 100,
+          "airside": true
+        },
+        "edges": [
+          {
+            "from": "south_pier",
+            "to": "B7",
+            "walking_ticks": 650
+          }
+        ],
+        "stand": {
+          "node": "STAND_B7",
+          "x": 2500,
+          "y": 600
+        },
+        "airside_edges": [
+          {
+            "id": "STUB_B7",
+            "from": "AP_7",
+            "to": "STAND_B7",
+            "oneway": false,
+            "kind": "stand"
+          }
+        ]
+      },
+      "pad_B8": {
+        "kind": "gate_pad",
+        "pad_class": "narrow",
+        "gate_id": "B8",
+        "label": "Pad B8 (east pier)",
+        "node": {
+          "label": "B8",
+          "x": 1140,
+          "y": 100,
+          "airside": true
+        },
+        "edges": [
+          {
+            "from": "south_pier",
+            "to": "B8",
+            "walking_ticks": 800
+          }
+        ],
+        "stand": {
+          "node": "STAND_B8",
+          "x": 2800,
+          "y": 600
+        },
+        "airside_edges": [
+          {
+            "id": "STUB_B8",
+            "from": "AP_8",
+            "to": "STAND_B8",
+            "oneway": false,
+            "kind": "stand"
+          }
+        ]
+      },
+      "security_main": {
+        "kind": "security",
+        "checkpoint": "main",
+        "label": "Security hall",
+        "slots": 5
+      },
+      "baggage_outbound_sortation": {
+        "kind": "baggage",
+        "stage": "outbound_sortation",
+        "label": "Outbound sortation hall",
+        "slots": 4
+      },
+      "baggage_transfer_sortation": {
+        "kind": "baggage",
+        "stage": "transfer_sortation",
+        "label": "Transfer sortation hall",
+        "slots": 4
+      },
+      "baggage_reclaim": {
+        "kind": "baggage",
+        "stage": "reclaim",
+        "label": "Reclaim hall",
+        "slots": 4
+      },
+      "service_yard": {
+        "kind": "service",
+        "label": "Service yard",
+        "slots": 12
+      }
+    },
+    "initial": {
+      "facilities": {
+        "cleaning_base": 1,
+        "catering_base": 1,
+        "fuel_bay": 1,
+        "baggage_equipment": 1,
+        "tug_bay": 1
+      }
+    }
+  }
+}

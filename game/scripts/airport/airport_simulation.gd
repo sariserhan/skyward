@@ -3,7 +3,7 @@ extends RefCounted
 ## One world, one clock. Turnaround is a task graph (M4); cabin flights deboard
 ## (M5) and board (M3) through cabin engines as tasks of it; widebodies use the
 ## widebody deboarding and boarding abstractions (D-022, D-029).
-const SAVE_VERSION := 12
+const SAVE_VERSION := 13
 const CONFIG_PATH := "res://configs/airports/riverdale.json"
 const STATES := ["scheduled", "approaching", "landed", "taxiing_in", "at_gate",
 	"turnaround", "boarding", "ready_for_pushback", "taxiing_out", "departed"]
@@ -1639,9 +1639,16 @@ func _advance_taxi(f: AirportFlight) -> bool:
 			var gate: AirportGate = airport.gates[f.assigned_gate_id]
 			if not gate.occupied_by_flight_id.is_empty() or clock.tick < gate.available_from:
 				f.taxi_blocker = "gate %s occupied" % gate.id
+				# Waiting for the gate is a gate wait (M1), not taxi congestion.
+				if f.taxi_hold_tick != clock.tick:
+					f.taxi_hold_tick = clock.tick
+					f.taxi_gate_hold_ticks += 1
+					_add_delay(f, "gate_wait", 1)
 				return false
 		if not airside.try_start(f.taxi_route):
-			f.taxi_blocker = "opposing traffic on " + airside.start_blocker(f.taxi_route)
+			var blocked := airside.start_blocker(f.taxi_route)
+			f.taxi_blocker = "opposing traffic on " + blocked
+			_taxi_wait_on(f, blocked + ":1")
 			return false
 		f.taxi_state = "moving"
 	while true:
@@ -1649,6 +1656,7 @@ func _advance_taxi(f: AirportFlight) -> bool:
 		# Nobody passes: the aircraft ahead on this edge leaves first.
 		if f.taxi_leg >= 0 and not airside.is_front(f.taxi_route[f.taxi_leg], f.id):
 			f.taxi_blocker = "taxiway"
+			_taxi_wait_on(f, f.taxi_route[f.taxi_leg])
 			return false
 		var next := f.taxi_leg + 1
 		if next >= f.taxi_route.size():
@@ -1658,6 +1666,7 @@ func _advance_taxi(f: AirportFlight) -> bool:
 		var exit_tick := airside.try_enter(f.taxi_route[next], clock.tick, f.id)
 		if exit_tick < 0:
 			f.taxi_blocker = airside.enter_blocker(f.taxi_route[next], clock.tick)
+			_taxi_wait_on(f, f.taxi_route[next])
 			return false
 		if f.taxi_leg >= 0: airside.leave(f.taxi_route[f.taxi_leg], f.id)
 		f.taxi_leg = next
@@ -1717,6 +1726,13 @@ func _reroute_taxi(f: AirportFlight, gate_id: String, apply: bool) -> String:
 	events.record(clock.tick, "TAXI_REROUTED", f.id, {"gate_id": gate_id, "from": from})
 	return ""
 
+## One tick of an aircraft waiting for an edge (counted once per tick per aircraft).
+func _taxi_wait_on(f: AirportFlight, leg: String) -> void:
+	if f.taxi_hold_tick == clock.tick: return
+	f.taxi_hold_tick = clock.tick
+	var st: Dictionary = airside.edge_state[AirsideNetwork.leg_edge(leg)]
+	st["wait_ticks"] = int(st.get("wait_ticks", 0)) + 1
+
 func _has_two_way(legs: Array) -> bool:
 	for leg in legs:
 		if not bool(airside.edges[AirsideNetwork.leg_edge(leg)].get("oneway", false)): return true
@@ -1726,7 +1742,8 @@ func _finish_taxi(f: AirportFlight) -> void:
 	f.taxi_state = "done"
 	f.taxi_blocker = ""
 	var actual := clock.tick - f.taxi_start_tick
-	var waited := maxi(0, actual - f.taxi_free_ticks)
+	var waited := maxi(0, actual - f.taxi_free_ticks - f.taxi_gate_hold_ticks)
+	f.taxi_gate_hold_ticks = 0
 	# Inbound taxi may come in parts (a reroute from a held stand): they add up.
 	if f.status == "taxiing_in":
 		f.taxi_in_ticks_actual = maxi(0, f.taxi_in_ticks_actual) + actual

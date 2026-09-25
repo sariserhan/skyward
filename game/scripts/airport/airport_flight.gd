@@ -106,6 +106,9 @@ var taxi_blocker: String = ""
 var taxi_start_tick: int = -1
 var taxi_free_ticks: int = 0
 var taxi_in_wait_ticks: int = 0
+## Held before starting because the gate was occupied (gate wait, not taxi wait).
+var taxi_gate_hold_ticks: int = 0
+var taxi_hold_tick: int = -1
 var taxi_out_wait_ticks: int = 0
 var taxi_in_ticks_actual: int = -1
 var taxi_out_ticks_actual: int = -1

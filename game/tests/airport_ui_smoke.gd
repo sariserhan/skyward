@@ -58,7 +58,7 @@ func _process(_delta: float) -> bool:
 			main.hold_button.pressed.emit()
 			check(f.hold_ticks == 3000, "hold button holds the flight")
 			main._save()
-			check(main.status_label.text == "Airport saved locally", "saving works during boarding")
+			check(main.status_label.text == "Saved", "saving works during boarding")
 			main.view_boarding_button.pressed.emit()
 			check(main.boarding_overlay.visible and main.boarding_overlay.view.sim == main.sim.boarding_sessions.F002.engine, "overlay observes the live engine")
 		8:

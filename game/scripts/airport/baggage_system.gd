@@ -27,7 +27,7 @@ func bind(state: AirportState, event_bus: AirportEvents, flow: PassengerFlow, se
 	stages = {}
 	for id in config.get("stages", {}):
 		var s: Dictionary = config.stages[id]
-		stages[id] = {"servers": int(s.servers), "service_ticks": int(s.service_ticks), "transit_ticks": int(s.transit_ticks), "queue": [], "busy": {}}
+		stages[id] = {"servers": int(s.servers), "service_ticks": int(s.service_ticks), "transit_ticks": int(s.transit_ticks), "queue": [], "busy": {}, "peak_queue": 0}
 
 
 func enabled() -> bool:
@@ -116,6 +116,7 @@ func _send(bag: AirportBag, stage_id: String, now: int) -> void:
 func _enqueue(bag: AirportBag, now: int) -> void:
 	bag.state = "queued"
 	stages[bag.stage].queue.append(bag.id)
+	stages[bag.stage].peak_queue = maxi(int(stages[bag.stage].peak_queue), stages[bag.stage].queue.size())
 	_dispatch(bag.stage, now)
 
 
@@ -401,7 +402,7 @@ func _pop() -> Dictionary:
 
 func snapshot() -> Dictionary:
 	var out_stages := {}
-	for id in stages: out_stages[id] = {"queue": stages[id].queue.duplicate(), "busy": stages[id].busy.duplicate()}
+	for id in stages: out_stages[id] = {"queue": stages[id].queue.duplicate(), "busy": stages[id].busy.duplicate(), "peak_queue": int(stages[id].peak_queue)}
 	return {"pending": pending.duplicate(true), "sequence": sequence, "stages": out_stages}
 
 
@@ -411,6 +412,7 @@ func restore(data: Dictionary) -> void:
 	for id in data.stages:
 		stages[id].queue = data.stages[id].queue.duplicate()
 		stages[id].busy = data.stages[id].busy.duplicate()
+		stages[id].peak_queue = int(data.stages[id].get("peak_queue", 0))
 
 
 ## Cross-check saved bags, stage queues, the event heap and flight loaders.

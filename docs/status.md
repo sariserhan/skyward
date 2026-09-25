@@ -1,14 +1,15 @@
-# Current status — M0 through M12 implemented
+# Current status — M0 through M12, and M13 part 1
 
-M12 gives Riverdale a real airside. Aircraft land on a runway, taxi a
-deterministic route over one airside graph, queue behind each other, hold for
-opposing traffic on two-way taxiways, and take off from the runway chosen for
-them. Between days the player builds taxiways and runways, redirects or
-closes them, and a runway's length decides which aircraft it can serve. Taxi
-congestion is an exact delay cause that reaches connections, airlines and
-money. Save schema v12. See the [M12 completion report](m12-status.md).
+M13 part 1 turns the simulation into a game a stranger can start: a main menu,
+a small starter airport (Harbor Field Regional), chapters of objectives judged
+on real results, tips that appear when their situation first happens,
+severity-ranked alerts, a Today bottleneck summary, an end-of-day story,
+autosaves, and a playtest bundle. Riverdale International is the sandbox and
+the unchanged regression baseline. Human playtests (M13 rounds 1 and 2) are
+next and are run by the project owner; see the
+[M13 part 1 report](m13-status.md). Save schema v13.
 
-Earlier reports: [M11](m11-status.md), [M10](m10-status.md), [M9](m9-status.md), [M8](m8-status.md), [M7](m7-status.md), [M6](m6-status.md), [M5](m5-status.md), [M4](m4-status.md), [M3](m3-status.md), [M2](m2-status.md), and the M0/M1 report below. Their
+Earlier reports: [M12](m12-status.md), [M11](m11-status.md), [M10](m10-status.md), [M9](m9-status.md), [M8](m8-status.md), [M7](m7-status.md), [M6](m6-status.md), [M5](m5-status.md), [M4](m4-status.md), [M3](m3-status.md), [M2](m2-status.md), and the M0/M1 report below. Their
 limitations and timings are historical; M3 changed the timetable, scenario start,
 security defaults, loads, cabin timings and save schema (D-021, D-023, D-024).
 

@@ -34,11 +34,30 @@ var finished: AirportSimulation
 var _ledger_ids: Dictionary = {}
 ## M11: the airport as built. Changed only between days.
 var layout := AirportLayout.new()
+## M13: what kind of game this is and the player's choices at creation.
+const MODES := ["career", "sandbox"]
+const DIFFICULTIES := ["relaxed", "standard", "challenging"]
+var mode := "career"
+var airport_name := ""
+var difficulty := "standard"
+## Stable id for this career's save folder (set at creation).
+var career_id := ""
+## Objectives (CareerProgress) and contextual tips already shown.
+var progress: Dictionary = CareerProgress.fresh()
+var tutorial_done: Array = []
 
 
-func new_career(path := "", seed := -1) -> void:
+## options (M13): name, difficulty, mode ("career" / "sandbox"), id.
+func new_career(path := "", seed := -1, options := {}) -> void:
 	scenario_path = path if not path.is_empty() else AirportSimulation.CONFIG_PATH
 	base = AirportSimulation.load_config(scenario_path)
+	mode = str(options.get("mode", "career" if base.has("career") else "sandbox"))
+	difficulty = str(options.get("difficulty", "standard"))
+	airport_name = str(options.get("name", base.get("name", "Airport")))
+	career_id = str(options.get("id", ""))
+	progress = CareerProgress.fresh()
+	tutorial_done = []
+	apply_difficulty(base, difficulty)
 	career_seed = int(base.seed) if seed < 0 else seed
 	day = 1
 	phase = "planning"
@@ -57,6 +76,32 @@ func new_career(path := "", seed := -1) -> void:
 	layout = AirportLayout.new()
 	layout.bind(base)
 	layout.import_initial()
+
+
+## Difficulty changes economics and traffic pressure only (D-060): starting
+## cash, daily resource costs, contract thresholds and growth thresholds. The
+## simulation itself is identical. Applied once, to the career's base.
+static func apply_difficulty(config: Dictionary, preset: String) -> void:
+	var presets: Dictionary = config.get("career", {}).get("difficulty", {})
+	if not presets.has(preset): return
+	var d: Dictionary = presets[preset]
+	var economy: Dictionary = config.get("economy", {})
+	if economy.has("starting_cash_cents"):
+		economy.starting_cash_cents = int(economy.starting_cash_cents) * int(d.get("starting_cash_permille", 1000)) / 1000
+	for type in economy.get("resources", {}):
+		var r: Dictionary = economy.resources[type]
+		r.daily_cents = int(r.daily_cents) * int(d.get("resource_cost_permille", 1000)) / 1000
+	# Contract slack: positive loosens every term (rates by 5 points, minutes by 1).
+	var slack := int(d.get("contract_slack", 0))
+	for id in config.get("airline_relations", {}).get("contracts", {}):
+		for term in config.airline_relations.contracts[id].get("terms", []):
+			if term.metric == "scheduled": continue
+			if term.has("min"): term.min = snappedf(float(term.min) - 0.05 * slack, 0.001) if str(term.metric).ends_with("_rate") else float(term.min) - slack
+			if term.has("max"): term.max = float(term.max) + slack
+	var offset := int(d.get("request_offset", 0))
+	for airline in config.get("airline_relations", {}).get("profiles", {}):
+		for tier in config.airline_relations.profiles[airline].get("requests", []):
+			tier.min_relationship = int(tier.get("min_relationship", 101)) + offset
 
 
 # --- money ------------------------------------------------------------------------
@@ -217,6 +262,9 @@ func settle_day() -> bool:
 				if tx.id == tx_id: amount = int(tx.amount_cents)
 			contract_history.append({"day": day, "airline": airline, "contract": c.id, "status": c.status, "amount_cents": amount})
 	reports.append(_report())
+	# M13: today's objectives, from the report just settled.
+	reports[-1]["chapters_completed"] = CareerProgress.advance(self, reports[-1])
+	reports[-1]["objectives"] = progress.results.duplicate(true)
 	settled_days.append(day)
 	finished = sim
 	sim = null
@@ -252,7 +300,48 @@ func _report() -> Dictionary:
 		"revenue_cents": summary.revenue_cents, "cost_cents": summary.cost_cents, "net_cents": summary.net_cents,
 		"capital_cents": capital_cents(day), "closing_cents": settled_cash_cents(), "flights": sim.flight_order.size(), "passengers": passengers,
 		"mean_delay_min": snappedf(delay / 600.0 / maxi(1, sim.flight_order.size()), 0.1), "missed_connections": int(connections.missed),
-		"missed_bags": int(bags.transfer_missed) + int(bags.missed_flight), "contracts": contracts}
+		"missed_bags": int(bags.transfer_missed) + int(bags.missed_flight), "contracts": contracts, "story": CareerProgress.story(sim)}
+
+
+## M13: construction never spends the cash tomorrow's minimum plan needs, so
+## a single build cannot make the career insolvent (only operating losses can).
+func construction_error(cost: int) -> String:
+	var cash := settled_cash_cents()
+	if cash < cost: return "Costs %s; cash is %s." % [AirportEconomy.money(cost), AirportEconomy.money(cash)]
+	var reserve := committed_cost_cents(minimum_plan())
+	if cash - cost < reserve:
+		return "Costs %s; that would leave %s, less than the %s tomorrow's minimum operation needs." % [AirportEconomy.money(cost), AirportEconomy.money(cash - cost), AirportEconomy.money(reserve)]
+	return ""
+
+
+## M13: an accepted request that cannot be served yet (the airport cannot be
+## built in time, or the cash is not there) can be withdrawn between days. The
+## airline remembers (its relationship drops), but may ask again later once
+## performance earns it: a promise the player could not keep yet is not the end
+## of that airline's growth (declining an offer still is, as in M10).
+const WITHDRAW_POINTS := -10
+
+func withdraw_request(tier_id: String) -> bool:
+	if phase != "planning" or request_status.get(tier_id, "") != "accepted": return false
+	for airline in base.get("airline_relations", {}).get("profiles", {}):
+		for tier in expansion_tiers(airline):
+			if tier.id != tier_id: continue
+			request_status.erase(tier_id)
+			var current := int(relationships.get(airline, base.airline_relations.profiles[airline].get("starting_relationship", 70)))
+			relationships[airline] = clampi(current + int(base.airline_relations.get("scoring", {}).get("request_withdrawn_points", WITHDRAW_POINTS)), 0, 100)
+			return true
+	return false
+
+
+## Accepted requests whose flights keep tomorrow from starting.
+func blocking_requests() -> Array:
+	var errors := " ".join(start_errors())
+	var out: Array = []
+	for airline in base.get("airline_relations", {}).get("profiles", {}):
+		for tier in expansion_tiers(airline):
+			if request_status.get(tier.id, "") != "accepted": continue
+			if tier.flights.any(func(f): return errors.contains(f.flight_number)): out.append({"id": tier.id, "label": tier.get("label", tier.id), "airline": airline})
+	return out
 
 
 ## The flights tomorrow will operate (base schedule plus activated growth).
@@ -271,9 +360,11 @@ func build(type: String, site: String, slot := -1) -> Dictionary:
 	var reason := layout.placement_error(type, site, slot)
 	if not reason.is_empty(): return {"error": reason}
 	var cost := int(item.cost_cents)
-	if settled_cash_cents() < cost: return {"error": "Costs %s; cash is %s." % [AirportEconomy.money(cost), AirportEconomy.money(settled_cash_cents())]}
+	var afford := construction_error(cost)
+	if not afford.is_empty(): return {"error": afford}
 	var o := layout.place(type, site, slot)
 	_post_capital("D%d:BUILD:%s" % [day, o.id], -cost, "Day %d · %s built (%s)" % [day, item.label, layout.sites[site].get("label", site)], o.id)
+	CareerProgress.check_state(self)
 	return o
 
 
@@ -320,9 +411,11 @@ func build_taxiway(from: String, to: String, direction := 0) -> Dictionary:
 	var reason := layout.taxiway_error(from, to)
 	if not reason.is_empty(): return {"error": reason}
 	var cost := layout.taxiway_cost(from, to)
-	if settled_cash_cents() < cost: return {"error": "Costs %s; cash is %s." % [AirportEconomy.money(cost), AirportEconomy.money(settled_cash_cents())]}
+	var afford := construction_error(cost)
+	if not afford.is_empty(): return {"error": afford}
 	var o := layout.place_airside({"type": "taxiway", "from": from, "to": to, "direction": direction})
 	_post_capital("D%d:BUILD:%s" % [day, o.id], -cost, "Day %d · %s built" % [day, _object_label(o)], o.id)
+	CareerProgress.check_state(self)
 	return o
 
 
@@ -332,9 +425,11 @@ func build_runway(start: String, heading: String, length_m: int) -> Dictionary:
 	var reason := layout.runway_error(start, heading, length_m)
 	if not reason.is_empty(): return {"error": reason}
 	var cost := layout.runway_cost(length_m)
-	if settled_cash_cents() < cost: return {"error": "Costs %s; cash is %s." % [AirportEconomy.money(cost), AirportEconomy.money(settled_cash_cents())]}
+	var afford := construction_error(cost)
+	if not afford.is_empty(): return {"error": afford}
 	var o := layout.place_airside({"type": "runway", "start": start, "heading": heading, "length_m": length_m, "status": "open"})
 	_post_capital("D%d:BUILD:%s" % [day, o.id], -cost, "Day %d · %s built" % [day, _object_label(o)], o.id)
+	CareerProgress.check_state(self)
 	return o
 
 
@@ -396,7 +491,8 @@ func snapshot() -> Dictionary:
 			"starting_cash_cents": starting_cash_cents, "cash_cents": settled_cash_cents(), "ledger": ledger.duplicate(true),
 			"relationships": relationships.duplicate(), "request_status": request_status.duplicate(), "resource_plan": resource_plan.duplicate(),
 			"contract_history": contract_history.duplicate(true), "reports": reports.duplicate(true), "settled_days": settled_days.duplicate(),
-			"layout": layout.snapshot()},
+			"layout": layout.snapshot(), "mode": mode, "airport_name": airport_name, "difficulty": difficulty, "career_id": career_id,
+			"progress": progress.duplicate(true), "tutorial_done": tutorial_done.duplicate()},
 		"day": sim.snapshot() if sim != null else null})
 
 
@@ -406,8 +502,11 @@ static func from_snapshot(data: Dictionary) -> AirportCareer:
 	var c = data.get("career")
 	if not c is Dictionary: return null
 	for key in ["scenario_path", "base", "career_seed", "day", "phase", "starting_cash_cents", "cash_cents", "ledger", "relationships",
-			"request_status", "resource_plan", "contract_history", "reports", "settled_days", "layout"]:
+			"request_status", "resource_plan", "contract_history", "reports", "settled_days", "layout",
+			"mode", "airport_name", "difficulty", "career_id", "progress", "tutorial_done"]:
 		if not c.has(key): return null
+	if not c.mode in MODES or not c.difficulty in DIFFICULTIES or not c.airport_name is String or not c.career_id is String: return null
+	if not c.tutorial_done is Array or not CareerProgress.valid(c.progress, c.base): return null
 	if not c.phase in PHASES or not c.day is int or c.day < 1 or not c.settled_days is Array: return null
 	# Settled days are exactly 1 .. day-1, and the ledger never runs ahead.
 	if c.settled_days.size() != c.day - 1: return null
@@ -447,6 +546,12 @@ static func from_snapshot(data: Dictionary) -> AirportCareer:
 	career.contract_history = c.contract_history
 	career.reports = c.reports
 	career.settled_days = c.settled_days
+	career.mode = c.mode
+	career.airport_name = c.airport_name
+	career.difficulty = c.difficulty
+	career.career_id = c.career_id
+	career.progress = c.progress
+	career.tutorial_done = c.tutorial_done
 	if c.phase == "operating":
 		if not data.get("day") is Dictionary: return null
 		career.sim = AirportSimulation.from_snapshot(data.day)

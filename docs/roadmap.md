@@ -86,11 +86,22 @@ it is kept as historical context. The original boarding roadmap remains at
   requests can need runway capability; the airfield drawn from the graph with
   an Airside overlay; save schema v12. Plan [m12-plan.md](m12-plan.md),
   report [m12-status.md](m12-status.md). Decisions D-052–D-056.
-- **Next, not started:** anything beyond M12 (retail, parking, hotels,
-  multiple terminals, maintenance, weather, detailed ATC) waits for a new
-  milestone.
+- **M13 part 1 implemented (human playtests pending):** the playable career.
+  A main menu (continue, new career with name, seed and difficulty, sandbox,
+  load, settings); the Harbor Field Regional starter airport built from real
+  construction objects; four chapters of objectives on real metrics and a
+  milestone; eleven contextual tips that never repeat; severity-ranked,
+  grouped alerts that can slow the game; a Today bottleneck summary and an
+  end-of-day story (what went well, what hurt, objectives, legible contract
+  results); build facts; help; map zoom and pan; autosaves; withdrawing an
+  unkept promise; a playtest bundle and report tool; a web export; save
+  schema v13. Plan [m13-plan.md](m13-plan.md), report
+  [m13-status.md](m13-status.md). Decisions D-057–D-064.
+- **Next:** M13 human playtest rounds 1 and 2 (run by the project owner with
+  first-time players; kit in [PLAYTEST.md](PLAYTEST.md)), then fixes, then the
+  M13 commit. No new simulation systems before that.
 
 The order after M3 follows D-020: the turnaround task framework comes before any
 individual turnaround activity.
 
-M12 stopped here for review. Do not expand scope further until requested.
+M13 part 1 stopped here for human playtesting. Do not add simulation systems until the playtest questions are answered.

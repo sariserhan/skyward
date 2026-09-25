@@ -70,21 +70,52 @@ var refresh_timer: float = 0
 var rows: Dictionary = {}
 var alert_ids: Array = []
 var save_path: String = "user://riverdale_airport.json"
+## M13: objectives, Today summary, tips, help, the in-game menu, autosave.
+var objective_label: Label
+var title_label: Label
+var today_text: RichTextLabel
+var today_second := -1
+var alert_items: Array = []
+var seen_critical: Dictionary = {}
+var tutorial: TutorialDirector
+var help: HelpOverlay
+var game_menu: PanelContainer
+var autosave_due := -1.0
+var perf_timer := 0.0
+var perf_frames := 0
+var logged_first_landing := false
+var report_shot_day := -1
+var goals_text: RichTextLabel
+var day_goals: RichTextLabel
+var insolvent_row: HBoxContainer
+var withdraw_box: VBoxContainer
 
 ## Optional scenario file (M8 variants), set before the scene enters the tree
 ## or passed as --scenario=res://configs/airports/riverdale_shortage.json.
 var scenario_path := ""
 
 func _ready() -> void:
+	GameSettings.apply(get_tree())
 	for arg in OS.get_cmdline_user_args() + OS.get_cmdline_args():
 		if arg.begins_with("--scenario="): scenario_path = arg.trim_prefix("--scenario=")
-	career.new_career(scenario_path)
-	career.start_day()
-	sim = career.sim
+	if AirportLaunch.career != null:
+		# From the main menu (M13): a new career, a sandbox, or a loaded save.
+		career = AirportLaunch.career
+		AirportLaunch.career = null
+	else:
+		career.new_career(scenario_path)
+		career.start_day()
+	if career.sim != null: sim = career.sim
+	else:
+		# Between days: the planning screen covers the airport; show its base layout behind it.
+		sim = AirportSimulation.new()
+		sim.setup(career.base.duplicate(true), career.career_seed)
 	# Scenario variants may not include the default first flight.
 	if not sim.airport.flights.has(selected_id): selected_id = sim.flight_order[0].id
 	_build()
 	_refresh()
+	if career.phase == "planning": _show_day_panel()
+	AirportPlaytestLog.log_event("airport_open", {"mode": career.mode, "day": career.day, "phase": career.phase, "seed": career.career_seed, "difficulty": career.difficulty})
 
 func _button(parent: Node, text: String, action: Callable) -> Button:
 	var button := Button.new()
@@ -116,16 +147,19 @@ func _build() -> void:
 	var header := HBoxContainer.new()
 	header.add_theme_constant_override("separation", 12)
 	layout.add_child(header)
-	var title := _label(header, "RIVERDALE\nAirport operations", 22)
-	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title_label = _label(header, "%s\n%s" % [career.airport_name.to_upper(), "Sandbox" if career.mode == "sandbox" else "Airport operations"], 22)
+	title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	clock_label = _label(header, "06:00:00", 25)
 	pause_button = _button(header, "Pause", _toggle_pause)
 	for speed in [1, 2, 4]:
-		_button(header, "%d×" % speed, func(): sim.clock.set_speed(speed); _refresh())
+		_button(header, "%d×" % speed, func(): _set_speed(speed))
 	_button(header, "Save", _save)
-	_button(header, "Load", _load_save)
+	_button(header, "?", func(): help.toggle()).tooltip_text = "Help (H)"
+	_button(header, "Menu", _toggle_menu).tooltip_text = "Menu (Esc)"
 	metrics_label = _label(layout, "", 15)
 	metrics_label.modulate = Color("70dec0")
+	objective_label = _label(layout, "", 15)
+	objective_label.modulate = Color("ffc078")
 	var content := HBoxContainer.new()
 	content.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	content.add_theme_constant_override("separation", 18)
@@ -140,6 +174,7 @@ func _build() -> void:
 	map = AirportMap.new()
 	map.name = "Airfield"
 	map.sim = sim
+	map.airport_name = career.airport_name
 	map.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	map.flight_selected.connect(_select)
 	view_tabs.add_child(map)
@@ -228,6 +263,20 @@ func _build() -> void:
 	finance_tree.set_column_expand(1, false)
 	finance_tree.set_column_custom_minimum_width(1, 140)
 	operations_tabs.add_child(finance_tree)
+	today_text = RichTextLabel.new()
+	today_text.name = "Today"
+	today_text.bbcode_enabled = true
+	today_text.add_theme_font_size_override("normal_font_size", 13)
+	today_text.add_theme_font_size_override("bold_font_size", 13)
+	operations_tabs.add_child(today_text)
+	goals_text = RichTextLabel.new()
+	goals_text.name = "Goals"
+	goals_text.bbcode_enabled = true
+	goals_text.add_theme_font_size_override("normal_font_size", 13)
+	goals_text.add_theme_font_size_override("bold_font_size", 13)
+	operations_tabs.add_child(goals_text)
+	operations_tabs.tab_changed.connect(func(i): AirportPlaytestLog.log_event("tab", {"tab": operations_tabs.get_tab_title(i)}))
+	view_tabs.tab_changed.connect(func(i): AirportPlaytestLog.log_event("tab", {"tab": view_tabs.get_tab_title(i)}))
 	_rebuild_board()
 	var right := VBoxContainer.new()
 	right.custom_minimum_size.x = 320
@@ -240,6 +289,7 @@ func _build() -> void:
 	detail.meta_clicked.connect(func(meta):
 		var parts := str(meta).split(":")
 		if parts.size() == 2 and sim.answer_airline_request(parts[1], parts[0] == "accept"):
+			AirportPlaytestLog.log_event("request_" + parts[0], {"airline": parts[1], "day": career.day})
 			status_label.text = "%s request %s" % [sim.airport.airlines[parts[1]], "accepted: flights added to tomorrow's schedule" if parts[0] == "accept" else "declined"]
 		_refresh())
 	detail.custom_minimum_size.y = 214
@@ -268,10 +318,14 @@ func _build() -> void:
 	var gate_actions := HBoxContainer.new()
 	right.add_child(gate_actions)
 	hold_button = _button(gate_actions, "HOLD +5 MIN", func():
-		status_label.text = "Flight held: gate stays open 5 more minutes" if sim.hold_flight(selected_id) else "Cannot hold: gate not open or maximum hold reached"
+		var held := sim.hold_flight(selected_id)
+		if held: AirportPlaytestLog.log_event("hold", {"flight": selected_id})
+		status_label.text = "Flight held: gate stays open 5 more minutes" if held else "Cannot hold: gate not open or maximum hold reached"
 		_refresh())
 	close_gate_button = _button(gate_actions, "CLOSE GATE", func():
-		status_label.text = "Gate closed" if sim.close_gate(selected_id) else "Gate is not open"
+		var closed := sim.close_gate(selected_id)
+		if closed: AirportPlaytestLog.log_event("close_gate", {"flight": selected_id})
+		status_label.text = "Gate closed" if closed else "Gate is not open"
 		_refresh())
 	for button in [hold_button, close_gate_button]: button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var priority_row := HBoxContainer.new()
@@ -282,6 +336,7 @@ func _build() -> void:
 	for level in ["low", "normal", "high"]:
 		var button := _button(priority_row, level.to_upper(), func():
 			if sim.set_service_priority(selected_id, level):
+				AirportPlaytestLog.log_event("priority", {"flight": selected_id, "level": level})
 				status_label.text = "%s service priority %s" % [sim.airport.flights[selected_id].flight_number, level.to_upper()]
 			_refresh())
 		button.toggle_mode = true
@@ -297,6 +352,12 @@ func _build() -> void:
 	alerts = ItemList.new()
 	alerts.custom_minimum_size.y = 105
 	alerts.item_selected.connect(func(index):
+		if index >= alert_ids.size(): return
+		AirportPlaytestLog.log_event("alert_selected", {"target": str(alert_ids[index])})
+		if str(alert_ids[index]) == "taxi":
+			map.overlay = true
+			view_tabs.current_tab = 0
+			return
 		if str(alert_ids[index]).begins_with("security:"):
 			view_tabs.current_tab = 1
 			operations_tabs.current_tab = 1
@@ -321,12 +382,25 @@ func _build() -> void:
 	_button(debug_actions, "+Delay", func():
 		status_label.text = "10 minute hold added" if sim.force_delay(selected_id) else "Flight cannot be held now"
 		_refresh())
-	status_label = _label(layout, "Space: pause  ·  1 / 2 / 4: speed  ·  O: airside overlay  ·  F3: debug   |   Select a flight or aircraft to inspect", 12)
+	status_label = _label(layout, "Space: pause  ·  1 / 2 / 4: speed  ·  O: airside overlay  ·  H: help  ·  Esc: menu   |   Select a flight or aircraft to inspect", 12)
 	status_label.modulate = Color("a7becd")
 	boarding_overlay = BoardingOverlay.new()
 	boarding_overlay.visible = false
 	boarding_overlay.closed.connect(func(): boarding_overlay.visible = false)
 	add_child(boarding_overlay)
+	tutorial = TutorialDirector.new()
+	tutorial.setup(self)
+	# Bottom-left, above the status line, growing upwards.
+	tutorial.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	tutorial.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	tutorial.offset_left = 24
+	tutorial.offset_right = 24
+	tutorial.offset_top = -44
+	tutorial.offset_bottom = -44
+	add_child(tutorial)
+	help = HelpOverlay.new()
+	add_child(help)
+	_build_game_menu()
 
 func _rebuild_board() -> void:
 	board.clear()
@@ -338,12 +412,27 @@ func _rebuild_board() -> void:
 		rows[flight.id] = row
 
 func _process(delta: float) -> void:
+	_performance_sample(delta)
+	if autosave_due >= 0.0:
+		autosave_due -= delta
+		if autosave_due < 0.0: _autosave("planning change")
 	if day_panel != null and day_panel.visible: return
+	if game_menu != null and game_menu.visible: return
 	sim.advance(sim.clock.frame_steps(delta))
+	if not logged_first_landing:
+		for f: AirportFlight in sim.flight_order:
+			if f.actual_arrival >= 0:
+				logged_first_landing = true
+				AirportPlaytestLog.log_event("first_landing", {"flight": f.id, "day": career.day})
+				break
 	# The last departure ends the day: settle once, then plan the next.
 	if career.day_complete():
 		career.settle_day()
 		sim.clock.paused = true
+		var r: Dictionary = career.reports[-1]
+		AirportPlaytestLog.log_event("day_end", {"day": int(r.day), "net_cents": int(r.net_cents), "flights": int(r.flights), "mean_delay_min": float(r.mean_delay_min),
+			"missed_connections": int(r.missed_connections), "objectives": r.get("objectives", []).filter(func(o): return o.met).map(func(o): return o.id)})
+		_autosave("day end")
 		_show_day_panel()
 	map.queue_redraw()
 	if terminal_view.is_visible_in_tree(): terminal_view.queue_redraw()
@@ -353,6 +442,7 @@ func _process(delta: float) -> void:
 		_refresh()
 
 func _select(id: String) -> void:
+	if id != selected_id: AirportPlaytestLog.log_event("select_flight", {"flight": id})
 	selected_id = id
 	selected_airline = ""
 	selected_passenger_id = -1
@@ -391,8 +481,12 @@ func _refresh() -> void:
 		rows[f.id].set_custom_color(4, Color("ffc078") if f.estimated_departure > f.scheduled_departure else Color("70dec0"))
 	var flight: AirportFlight = sim.airport.flights[selected_id]
 	var aircraft: AirportAircraft = sim.airport.aircraft[flight.aircraft_id]
-	var text := "[font_size=23][b]%s[/b][/font_size]  ·  %s\n%s\n%s → %s\n\nGate %s  ·  %s\nArrival  %s  /  %s\nDeparture  %s\nEstimated  %s" % [flight.flight_number, aircraft.aircraft_type_id, sim.airport.airlines[flight.airline_id], flight.origin, flight.destination, flight.assigned_gate_id, flight.status.replace("_", " "), AirportClock.display(flight.scheduled_arrival), "pending" if flight.actual_arrival < 0 else AirportClock.display(flight.actual_arrival), AirportClock.display(flight.scheduled_departure), AirportClock.display(flight.estimated_departure)]
-	text += _taxi_text(flight) + _holding_text(flight) + _delay_text(flight) + _turnaround_text(flight) + _baggage_text(flight) + _boarding_text(flight) + "\n"
+	# M13: identity in two lines, then what it is doing, then times; the delay and its causes right after.
+	var text := "[font_size=23][b]%s[/b][/font_size]  ·  %s  ·  %s\n%s → %s  ·  Gate %s\n[b]%s[/b]\nArrival %s (%s)  ·  Departure %s (est. %s)" % [flight.flight_number, aircraft.aircraft_type_id,
+		sim.airport.airlines[flight.airline_id], flight.origin, flight.destination, flight.assigned_gate_id, flight.status.replace("_", " ").to_upper(),
+		AirportClock.display(flight.scheduled_arrival).left(5), "not yet" if flight.actual_arrival < 0 else "landed " + AirportClock.display(flight.actual_arrival).left(5),
+		AirportClock.display(flight.scheduled_departure).left(5), AirportClock.display(flight.estimated_departure).left(5)]
+	text += _delay_text(flight) + _taxi_text(flight) + _holding_text(flight) + _turnaround_text(flight) + _baggage_text(flight) + _boarding_text(flight) + "\n"
 	text += "\n\n[b]Passengers at gate[/b]  %d / %d" % [int(sim.passenger_flow.ready_by_flight.get(flight.id, 0)), flight.passenger_ids.size()]
 	detail.text = text
 	_refresh_turnaround_tree(flight)
@@ -401,58 +495,115 @@ func _refresh() -> void:
 	_refresh_finance()
 	_refresh_terminal()
 	_refresh_warnings()
-	alerts.clear()
-	alert_ids.clear()
-	var ordered: Array = sim.conflicts.values()
-	ordered.sort_custom(func(a, b): return a.severity == "critical" and b.severity != "critical")
-	for conflict in ordered:
-		var incoming: AirportFlight = sim.airport.flights[conflict.flight_id]
-		var blocker: AirportFlight = sim.airport.flights[conflict.blocker_id]
-		alerts.add_item("%s · %s needs gate" % [conflict.gate_id, incoming.flight_number])
-		alerts.set_item_tooltip(alerts.item_count - 1, "Occupied by %s. Select to inspect and reassign %s." % [blocker.flight_number, incoming.flight_number])
-		alert_ids.append(incoming.id)
-	for cp: SecurityCheckpoint in sim.airport.security_checkpoints.values():
-		var current := sim.passenger_flow.checkpoint_metrics(cp, sim.clock.tick)
-		if current.oldest_wait >= 6000 or (cp.capacity() == 0 and not cp.queue.is_empty()):
-			alerts.add_item("%s security · %d waiting" % [cp.id.capitalize(), cp.queue.size()])
-			alert_ids.append("security:" + cp.id)
-	for airline in sim.airlines.airline_ids:
-		var e: Dictionary = sim.airlines.evaluations[airline]
-		if e.contract.status in ["AT RISK", "FAILING"]:
-			alerts.add_item("%s · %s %s" % [airline, e.contract.label, e.contract.status])
-			alerts.set_item_tooltip(alerts.item_count - 1, "Select to see which terms are at risk and why.")
-			alert_ids.append("airline:" + airline)
-		if sim.airlines.state[airline].request == "offered":
-			alerts.add_item("%s requests +%d daily flights" % [sim.airport.airlines[airline], sim.airlines.request_of(airline).flights.size()])
-			alert_ids.append("airline:" + airline)
-	for type in sim.resources.order:
-		var queue: Array = sim.resource_queue(type)
-		if queue.size() >= 2:
-			alerts.add_item("%s · %d flights waiting" % [str(sim.resources.pools[type].label), queue.size()])
-			alerts.set_item_tooltip(alerts.item_count - 1, "All %s are busy. Select to see the queue; raise a flight's service priority to move it up." % str(sim.resources.pools[type].label).to_lower())
-			alert_ids.append("resources:" + type)
-		for t: TurnaroundTask in queue:
-			if t.kind == "pushback" and sim.clock.tick - t.ready_tick >= 1200:
-				alerts.add_item("Pushback · %s waiting %d min for tug" % [sim.airport.flights[t.flight_id].flight_number, (sim.clock.tick - t.ready_tick) / 600])
-				alert_ids.append(t.flight_id)
-	for stage_id in sim.baggage.stages:
-		var queued: int = sim.baggage.stages[stage_id].queue.size()
-		if queued >= int(sim.config.get("baggage", {}).get("backlog_alert_bags", 25)):
-			alerts.add_item("%s · %d bags queued" % [stage_id.capitalize(), queued])
-			alerts.set_item_tooltip(alerts.item_count - 1, "A baggage backlog: bags that are not sorted by their flight's bag cutoff will miss it.")
-			alert_ids.append("baggage:" + stage_id)
-	for alert in sim.boarding_alerts():
-		var held: AirportFlight = sim.airport.flights[alert.flight_id]
-		var connecting := " (%d connecting)" % alert.connecting if alert.connecting > 0 else ""
-		alerts.add_item("%s · %d missing%s · gate closes in %d min" % [held.flight_number, alert.missing, connecting, ceili(alert.closes_in / 600.0)])
-		alerts.set_item_tooltip(alerts.item_count - 1, "Select to hold the flight or close the gate. It closes automatically if you do nothing.")
-		alert_ids.append(held.id)
-	if alert_ids.is_empty():
-		alerts.add_item("No active operations alerts")
-		alerts.set_item_disabled(0, true)
+	_refresh_alerts()
+	objective_label.text = CareerText.objective_line(career, sim)
+	objective_label.visible = not objective_label.text.is_empty()
+	if operations_tabs.current_tab == today_text.get_index() and sim.clock.tick / 20 != today_second:
+		today_second = sim.clock.tick / 20
+		today_text.text = CareerText.today_text(sim, CareerProgress.story(sim))
+	if operations_tabs.current_tab == goals_text.get_index(): goals_text.text = CareerText.objectives_text(career)
+	tutorial.check()
 	var queued := 0
 	for r: AirportRunway in sim.airport.runways.values(): queued += r.queue.size()
 	debug_label.text = "DEBUG · seed %d · tick %d\n%d active flights · %d runway queued · %d cached routes\n%d events · %d FPS · last tick %d µs" % [sim.seed_value, sim.clock.tick, sim.airport.flights.size() - metrics.departed, queued, sim.airside._routes.size(), sim.events.history.size(), Engine.get_frames_per_second(), sim.last_tick_usec]
+
+# --- M13: speed, alerts, autosave, menu -------------------------------------------------------
+
+func _set_speed(speed: int) -> void:
+	sim.clock.set_speed(speed)
+	AirportPlaytestLog.log_event("speed", {"speed": speed, "tick": sim.clock.tick})
+	_refresh()
+
+
+## Alerts by severity, grouped (CareerText.alerts). A new critical alert can
+## slow or pause the game (settings), so it stays actionable at 4×.
+func _refresh_alerts() -> void:
+	alert_items = CareerText.alerts(sim)
+	alerts.clear()
+	alert_ids.clear()
+	var colors := {"critical": Color("ff6b6b"), "important": Color("ffc078"), "info": Color("a7becd")}
+	var marks := {"critical": "!! ", "important": "! ", "info": "· "}
+	var fresh_critical := false
+	for item in alert_items:
+		alerts.add_item(marks[item.severity] + item.text)
+		alerts.set_item_custom_fg_color(alerts.item_count - 1, colors[item.severity])
+		alerts.set_item_tooltip(alerts.item_count - 1, item.tooltip)
+		alert_ids.append(item.target)
+		if item.severity == "critical" and not seen_critical.has(item.key):
+			seen_critical[item.key] = true
+			fresh_critical = true
+			AirportPlaytestLog.log_event("critical_alert", {"key": item.key, "text": item.text})
+	if fresh_critical and not sim.clock.paused:
+		if bool(GameSettings.get_value("pause_on_critical")): sim.clock.paused = true
+		elif bool(GameSettings.get_value("slow_on_critical")) and sim.clock.speed > 1: sim.clock.set_speed(1)
+		status_label.text = "Critical: " + alert_items[0].text
+	if alert_ids.is_empty():
+		alerts.add_item("Nothing needs you right now")
+		alerts.set_item_disabled(0, true)
+
+
+func _autosave(reason: String) -> void:
+	autosave_due = -1.0
+	var error := CareerSaves.autosave(career, reason)
+	if error != OK: status_label.text = "Autosave failed: " + error_string(error)
+
+
+## Planning changes are autosaved shortly after the last one.
+func _schedule_autosave() -> void:
+	autosave_due = 1.5
+
+
+func _performance_sample(delta: float) -> void:
+	perf_timer += delta
+	perf_frames += 1
+	if perf_timer >= 60.0:
+		AirportPlaytestLog.log_event("perf", {"fps": roundi(perf_frames / perf_timer), "tick_usec": sim.last_tick_usec, "speed": sim.clock.speed, "day": career.day})
+		perf_timer = 0.0
+		perf_frames = 0
+
+
+func _build_game_menu() -> void:
+	game_menu = PanelContainer.new()
+	game_menu.visible = false
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.05, 0.1, 0.14, 0.96)
+	style.set_corner_radius_all(10)
+	style.content_margin_left = 28
+	style.content_margin_right = 28
+	style.content_margin_top = 20
+	style.content_margin_bottom = 20
+	game_menu.add_theme_stylebox_override("panel", style)
+	add_child(game_menu)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 10)
+	game_menu.add_child(box)
+	_label(box, "PAUSED", 22)
+	for entry in [["RESUME", _toggle_menu], ["SAVE", _save], ["HELP", func(): _toggle_menu(); help.toggle()],
+			["EXPORT PLAYTEST BUNDLE", func(): status_label.text = "Playtest bundle: " + ProjectSettings.globalize_path(AirportPlaytestLog.export_bundle(career, get_viewport()))],
+			["MAIN MENU", func():
+				_autosave("left to menu")
+				AirportPlaytestLog.log_event("to_menu", {"day": career.day})
+				get_tree().change_scene_to_file(AirportLaunch.MENU_SCENE)],
+			["QUIT", func():
+				_autosave("quit")
+				AirportPlaytestLog.log_event("quit", {"day": career.day})
+				get_tree().quit()]]:
+		var b := _button(box, entry[0], entry[1])
+		b.custom_minimum_size = Vector2(300, 40)
+	for pair in [["tips", "Tips"], ["slow_on_critical", "Drop to 1× on a critical alert"], ["pause_on_critical", "Pause on a critical alert"]]:
+		var check := CheckBox.new()
+		check.text = pair[1]
+		check.button_pressed = bool(GameSettings.get_value(pair[0]))
+		check.toggled.connect(func(on): GameSettings.set_value(pair[0], on))
+		box.add_child(check)
+
+
+func _toggle_menu() -> void:
+	game_menu.visible = not game_menu.visible
+	if game_menu.visible:
+		game_menu.move_to_front()
+		game_menu.set_anchors_and_offsets_preset(Control.PRESET_CENTER, Control.PRESET_MODE_MINSIZE)
+
 
 func _refresh_warnings() -> void:
 	var gate_id := gate_choice.get_item_text(gate_choice.selected)
@@ -475,11 +626,13 @@ func _refresh_warnings() -> void:
 
 func _assign() -> void:
 	var result := sim.assign_gate(selected_id, gate_choice.get_item_text(gate_choice.selected))
+	AirportPlaytestLog.log_event("gate_assign", {"flight": selected_id, "gate": gate_choice.get_item_text(gate_choice.selected), "ok": result.ok})
 	status_label.text = "Gate assignment updated" if result.ok else "Assignment rejected: " + ", ".join(result.warnings)
 	_refresh()
 
 func _toggle_pause() -> void:
 	sim.clock.paused = not sim.clock.paused
+	AirportPlaytestLog.log_event("pause", {"paused": sim.clock.paused, "tick": sim.clock.tick})
 	_refresh()
 
 func _skip() -> void:
@@ -488,11 +641,12 @@ func _skip() -> void:
 		_refresh()
 
 func _save() -> void:
-	var error := career.save_file(save_path)
-	status_label.text = "Airport saved locally" if error == OK else "Save failed: " + error_string(error)
+	var error := CareerSaves.save_manual(career)
+	AirportPlaytestLog.log_event("save", {"day": career.day, "phase": career.phase})
+	status_label.text = "Saved" if error == OK else "Save failed: " + error_string(error)
 
 func _load_save() -> void:
-	var loaded := AirportCareer.load_file(save_path)
+	var loaded := CareerSaves.load_path(CareerSaves.latest())
 	if loaded == null:
 		status_label.text = "No compatible local airport save found"
 		return
@@ -523,14 +677,20 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo: return
 	match event.keycode:
 		KEY_SPACE: _toggle_pause()
-		KEY_1: sim.clock.set_speed(1)
-		KEY_2: sim.clock.set_speed(2)
-		KEY_4: sim.clock.set_speed(4)
+		KEY_1: _set_speed(1)
+		KEY_2: _set_speed(2)
+		KEY_4: _set_speed(4)
+		KEY_H: help.toggle()
+		KEY_ESCAPE: _toggle_menu()
+		KEY_F9: status_label.text = "Playtest bundle: " + ProjectSettings.globalize_path(AirportPlaytestLog.export_bundle(career, get_viewport()))
+		KEY_F12: status_label.text = "Screenshot: " + ProjectSettings.globalize_path(AirportPlaytestLog.screenshot(get_viewport(), "manual-%d" % Time.get_ticks_msec()))
 		KEY_F3:
 			if OS.is_debug_build():
 				debug_panel.visible = not debug_panel.visible
 				map.debug = debug_panel.visible
-		KEY_O: map.overlay = not map.overlay
+		KEY_O:
+			map.overlay = not map.overlay
+			AirportPlaytestLog.log_event("overlay", {"on": map.overlay})
 	_refresh()
 
 
@@ -546,19 +706,19 @@ func _build_security_panel() -> void:
 		var info := _label(row, "", 13)
 		info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		security_labels[checkpoint_id] = info
+		# One action per lane: a lane opens with its staff member, and closes with them.
 		var buttons := []
-		buttons.append(_button(row, "− lane", func(): _adjust_security(checkpoint_id, -1, 0)))
-		buttons.append(_button(row, "+ lane", func(): _adjust_security(checkpoint_id, 1, 0)))
-		buttons.append(_button(row, "− staff", func(): _adjust_security(checkpoint_id, 0, -1)))
-		buttons.append(_button(row, "+ staff", func(): _adjust_security(checkpoint_id, 0, 1)))
+		buttons.append(_button(row, "CLOSE A LANE", func(): _adjust_security(checkpoint_id, -1, -1)))
+		buttons.append(_button(row, "OPEN A LANE", func(): _adjust_security(checkpoint_id, 1, 1)))
 		security_buttons[checkpoint_id] = buttons
-	var help := _label(panel, "Each active lane needs one staff member. Closing lanes lets current screenings finish.\nOpen lanes and assign staff to reduce queues. Select Terminal to watch passenger movement.", 12)
-	help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var hint := _label(panel, "Each open lane needs one staff member from the pool. A closing lane finishes its current screenings.\nMore physical lanes are built between days. Select Terminal to watch passengers move.", 12)
+	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
 func _adjust_security(id: String, lane_delta: int, staff_delta: int) -> void:
 	var cp: SecurityCheckpoint = sim.airport.security_checkpoints[id]
 	var changed := sim.set_security(id, cp.open_lanes + lane_delta, cp.staff + staff_delta)
-	status_label.text = "Security capacity updated" if changed else "Cannot change capacity: check lane limits and available staff"
+	if changed: AirportPlaytestLog.log_event("security_change", {"checkpoint": id, "open_lanes": cp.open_lanes, "staff": cp.staff})
+	status_label.text = "Security: %d lane%s open" % [cp.open_lanes, "" if cp.open_lanes == 1 else "s"] if changed else "Cannot change: every physical lane is open, or no staff member is free (the pool is set per airport)"
 	_refresh()
 
 func _select_passenger(id: int) -> void:
@@ -580,10 +740,8 @@ func _refresh_terminal() -> void:
 		var stats := sim.passenger_flow.checkpoint_metrics(cp, sim.clock.tick)
 		security_labels[id].text = "%s  ·  Lanes %d/%d  ·  Staff %d\nQueue %d  ·  Oldest %.1fm  ·  Avg %.1fm" % [id.capitalize(), cp.open_lanes, cp.max_lanes, cp.staff, cp.queue.size(), stats.oldest_wait / 600.0, stats.average_wait / 600.0]
 		var buttons: Array = security_buttons[id]
-		buttons[0].disabled = cp.open_lanes <= 0
-		buttons[1].disabled = cp.open_lanes >= cp.max_lanes
-		buttons[2].disabled = cp.staff <= 0
-		buttons[3].disabled = cp.staff >= cp.max_lanes or assigned >= int(sim.passenger_flow.config.staff_pool)
+		buttons[0].disabled = cp.open_lanes <= 0 or cp.staff <= 0
+		buttons[1].disabled = cp.open_lanes >= cp.max_lanes or cp.staff >= cp.max_lanes or assigned >= int(sim.passenger_flow.config.staff_pool)
 	var flight: AirportFlight = sim.airport.flights[selected_id]
 	# Arriving passengers first (they are on the aircraft now), then departing.
 	var ids: Array = flight.inbound_passenger_ids + flight.passenger_ids
@@ -666,21 +824,24 @@ func _delay_text(f: AirportFlight) -> String:
 	if f.status == "departed":
 		var late := f.actual_departure - f.scheduled_departure
 		if late <= 0: return "\n[color=#70dec0]Departed on time[/color]"
-		var parts: Array = []
-		for cause in f.departure_delay_breakdown:
-			parts.append("%s %.1f" % [_cause_label(f, cause), int(f.departure_delay_breakdown[cause]) / 600.0])
-		return "\n[color=#ffc078]Departed +%.1f min: %s[/color]" % [late / 600.0, " · ".join(parts)]
+		# Biggest cause first: that is where to look.
+		var causes: Array = f.departure_delay_breakdown.keys().filter(func(c): return int(f.departure_delay_breakdown[c]) > 0)
+		causes.sort_custom(func(a, b): return int(f.departure_delay_breakdown[a]) > int(f.departure_delay_breakdown[b]) or (f.departure_delay_breakdown[a] == f.departure_delay_breakdown[b] and a < b))
+		var text := "\n[color=#ffc078][b]Departed +%.1f min late[/b][/color]" % (late / 600.0)
+		for cause in causes: text += "\n[color=#ffc078]   %s  +%.1f min[/color]" % [_cause_label(f, cause), int(f.departure_delay_breakdown[cause]) / 600.0]
+		return text
+	var reasons: Array = f.delay_reasons.keys().filter(func(r): return int(f.delay_reasons[r]) > 0)
+	reasons.sort_custom(func(a, b): return int(f.delay_reasons[a]) > int(f.delay_reasons[b]) or (f.delay_reasons[a] == f.delay_reasons[b] and a < b))
 	var text := ""
-	for reason in f.delay_reasons:
-		if int(f.delay_reasons[reason]) > 0:
-			text += "\n[color=#ffc078]%s: %.1f min[/color]" % [reason.replace("_", " ").capitalize(), int(f.delay_reasons[reason]) / 600.0]
+	for reason in reasons: text += "\n[color=#ffc078]%s: %.1f min so far[/color]" % [_cause_label(f, reason), int(f.delay_reasons[reason]) / 600.0]
 	return text
 
 func _cause_label(f: AirportFlight, cause: String) -> String:
 	if cause.begins_with("wait:"): return "Waiting for " + sim.resources.unit_name(cause.substr(5))
 	var t: TurnaroundTask = sim.turnaround.task(f, cause)
 	if t != null: return t.label
-	return {"late_inbound": "Late inbound", "passenger_hold": "Passenger hold", "runway_takeoff_queue": "Runway queue", "taxi_congestion": "Taxi congestion"}.get(cause, cause.capitalize())
+	return {"late_inbound": "Late inbound aircraft", "passenger_hold": "Held for passengers", "runway_takeoff_queue": "Runway queue (takeoff)",
+		"runway_landing_queue": "Runway queue (landing)", "taxi_congestion": "Taxi congestion", "gate_wait": "Waiting for a gate"}.get(cause, cause.replace("_", " ").capitalize())
 
 ## One line near the top: what is holding departure now.
 func _holding_text(f: AirportFlight) -> String:
@@ -1141,6 +1302,15 @@ func _build_day_panel() -> void:
 	plan.add_theme_constant_override("separation", 10)
 	tabs.add_child(plan)
 	_build_build_tab(tabs)
+	day_goals = RichTextLabel.new()
+	day_goals.name = "Goals"
+	day_goals.bbcode_enabled = true
+	day_goals.add_theme_font_size_override("normal_font_size", 15)
+	day_goals.add_theme_font_size_override("bold_font_size", 15)
+	tabs.add_child(day_goals)
+	tabs.tab_changed.connect(func(i):
+		AirportPlaytestLog.log_event("tab", {"tab": tabs.get_tab_title(i)})
+		tutorial.check())
 	_label(plan, "NEXT DAY OPERATIONS", 18)
 	_label(plan, "Capacity is paid for by the day, whether it is busy or not.", 13).modulate = Color("a7becd")
 	for type in career.resource_plan:
@@ -1149,23 +1319,40 @@ func _build_day_panel() -> void:
 		var name_label := _label(row, str(career.base.economy.resources[type].label), 15)
 		name_label.custom_minimum_size.x = 150
 		_button(row, "−", func():
-			career.set_units(type, int(career.resource_plan[type]) - 1)
+			if career.set_units(type, int(career.resource_plan[type]) - 1):
+				AirportPlaytestLog.log_event("plan_change", {"resource": type, "units": career.resource_plan[type]})
+				_schedule_autosave()
 			_show_day_panel())
 		var count := _label(row, "", 15)
 		count.custom_minimum_size.x = 36
 		count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_button(row, "+", func():
-			career.set_units(type, int(career.resource_plan[type]) + 1)
+			if career.set_units(type, int(career.resource_plan[type]) + 1):
+				AirportPlaytestLog.log_event("plan_change", {"resource": type, "units": career.resource_plan[type]})
+				_schedule_autosave()
 			_show_day_panel())
 		var cost := _label(row, "", 15)
 		cost.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		cost.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		plan_rows[type] = [count, cost]
 	plan_total = _label(plan, "", 15)
+	withdraw_box = VBoxContainer.new()
+	plan.add_child(withdraw_box)
+	insolvent_row = HBoxContainer.new()
+	insolvent_row.visible = false
+	plan.add_child(insolvent_row)
+	_button(insolvent_row, "RESTART CAREER", func():
+		AirportPlaytestLog.log_event("restart_career", {"day": career.day})
+		AirportLaunch.open(get_tree(), AirportLaunch.start_new(career.scenario_path, career.career_seed, {"mode": career.mode, "name": career.airport_name, "difficulty": career.difficulty})))
+	_button(insolvent_row, "MAIN MENU", func(): get_tree().change_scene_to_file(AirportLaunch.MENU_SCENE))
 	start_day_button = _button(plan, "START DAY", func():
 		if not career.start_day(): return
 		day_panel.visible = false
 		_adopt(career.sim)
+		logged_first_landing = false
+		seen_critical = {}
+		AirportPlaytestLog.log_event("day_start", {"day": career.day, "flights": career.sim.flight_order.size(), "plan": career.resource_plan.duplicate()})
+		_autosave("day start")
 		status_label.text = "Day %d started" % career.day)
 	start_day_button.custom_minimum_size.y = 44
 
@@ -1173,7 +1360,25 @@ func _build_day_panel() -> void:
 func _show_day_panel() -> void:
 	if day_panel == null: _build_day_panel()
 	day_panel.visible = true
-	day_report.text = _day_report_text(career.reports[-1]) if not career.reports.is_empty() else "[font_size=26][b]RIVERDALE[/b][/font_size]\n\nNo day settled yet."
+	if career.reports.is_empty():
+		day_report.text = "[font_size=26][b]%s[/b][/font_size]\n\nDay %d has not started yet. Check the plan on the right, then start the day." % [career.airport_name.to_upper(), career.day]
+	else:
+		var r: Dictionary = career.reports[-1]
+		day_report.text = CareerText.report_text(career, r) + "\n\n" + _day_report_text(r)
+		if report_shot_day != int(r.day):
+			report_shot_day = int(r.day)
+			_report_screenshot(int(r.day))
+	day_goals.text = CareerText.objectives_text(career)
+	insolvent_row.visible = career.insolvent()
+	# M13: a promise that cannot be kept can be withdrawn (the airline remembers).
+	for child in withdraw_box.get_children(): child.queue_free()
+	for req in career.blocking_requests():
+		var b := _button(withdraw_box, "WITHDRAW: %s (%d relationship with %s; they may ask again)" % [req.label, AirportCareer.WITHDRAW_POINTS, career.base.airlines.get(req.airline, req.airline)], func():
+			if career.withdraw_request(req.id):
+				AirportPlaytestLog.log_event("request_withdrawn", {"request": req.id, "day": career.day})
+				_schedule_autosave()
+			_show_day_panel())
+		b.add_theme_font_size_override("font_size", 13)
 	var economy: Dictionary = career.base.economy
 	for type in plan_rows:
 		var units := int(career.resource_plan[type])
@@ -1196,13 +1401,21 @@ func _show_day_panel() -> void:
 	start_day_button.text = "START DAY %d" % career.day
 	start_day_button.disabled = not career.can_start()
 
+func _report_screenshot(day_number: int) -> void:
+	AirportPlaytestLog.log_event("report_viewed", {"day": day_number})
+	await get_tree().process_frame
+	await get_tree().process_frame
+	AirportPlaytestLog.screenshot(get_viewport(), "day%d-report" % day_number)
+	tutorial.check()
+
+
 func _day_report_text(r: Dictionary) -> String:
 	# Two columns, amounts right-aligned.
 	var row := func(label: String, amount: String, style := "") -> String:
 		var open := "[%s]" % style if not style.is_empty() else ""
 		var close := "[/%s]" % style.get_slice("=", 0) if not style.is_empty() else ""
 		return "[cell]%s%s%s[/cell][cell][p align=right]%s%s%s[/p][/cell]" % [open, label, close, open, amount, close]
-	var t := "[font_size=26][b]RIVERDALE — DAY %d[/b][/font_size]\n\n[table=2]" % int(r.day)
+	var t := "[b]MONEY[/b]\n[table=2]"
 	# Construction is paid before the day starts: already out of the starting cash.
 	if int(r.get("capital_cents", 0)) != 0:
 		t += row.call("Cash after yesterday", AirportEconomy.money(int(r.opening_cents) - int(r.capital_cents)))
@@ -1216,7 +1429,7 @@ func _day_report_text(r: Dictionary) -> String:
 	t += row.call("Total costs", AirportEconomy.money(int(r.cost_cents)), "b")
 	t += row.call(" ", " ") + row.call("NET", AirportEconomy.money(int(r.net_cents), true), "color=#%s" % ("70dec0" if int(r.net_cents) >= 0 else "e5484d"))
 	t += row.call("ENDING CASH", AirportEconomy.money(int(r.closing_cents)), "b") + "[/table]\n\n"
-	t += "[b]OPERATIONS[/b]\n%d flights · %d passengers departed · mean delay %.1f min · %d missed connections · %d missed bags\n\n[b]AIRLINES[/b]" % [
+	t += "[b]OPERATIONS[/b]\n%d flights · %d passengers departed · mean delay %.1f min · %d missed connections · %d missed bags\n\n[b]AIRLINES[/b] (relationship · contract)" % [
 		int(r.flights), int(r.passengers), float(r.mean_delay_min), int(r.missed_connections), int(r.missed_bags)]
 	var airlines: Array = r.contracts.keys()
 	airlines.sort()
@@ -1278,6 +1491,9 @@ func _build_build_tab(tabs: TabContainer) -> void:
 			result = career.build_runway(airside_map.picks[0], _airside_heading(), _airside_length())
 		else: result = career.build(item, build_site_ids[build_sites.selected])
 		status_label.text = result.get("error", "Built %s (%s)" % [career.layout.catalog[item].label, result.get("id", "")])
+		if not result.has("error"):
+			AirportPlaytestLog.log_event("build", {"item": item, "id": result.get("id", ""), "day": career.day, "cash_cents": career.settled_cash_cents()})
+			_schedule_autosave()
 		airside_map.reset()
 		_show_day_panel())
 	_label(build, "BUILT", 14)
@@ -1291,10 +1507,16 @@ func _build_build_tab(tabs: TabContainer) -> void:
 		if o.type in ["runway", "legacy_runway"]: result = career.set_airside(o.id, "status", "closed" if o.status == "open" else "open")
 		else: result = career.set_airside(o.id, "direction", {0: 1, 1: -1, -1: 0}[int(o.get("direction", 0))])
 		status_label.text = result.get("error", "Changed " + career._object_label(career.layout.find(o.id)))
+		if not result.has("error"):
+			AirportPlaytestLog.log_event("airside_change", {"id": o.id})
+			_schedule_autosave()
 		_show_day_panel())
 	airside_toggle.visible = false
 	demolish_button = _button(build, "DEMOLISH", func():
 		var result := career.demolish(built_ids[built_list.get_selected_items()[0]])
+		if not result.has("error"):
+			AirportPlaytestLog.log_event("demolish", {"id": result.id, "refund_cents": result.refund_cents})
+			_schedule_autosave()
 		status_label.text = result.get("error", "Demolished · refund %s" % AirportEconomy.money(int(result.get("refund_cents", 0))))
 		_show_day_panel())
 
@@ -1389,8 +1611,34 @@ func _refresh_build_info() -> void:
 			var path := graph.route(cp.node_id, gate, true)
 			if not path.is_empty(): walk = graph.route_ticks(path) if walk < 0 else mini(walk, graph.route_ticks(path))
 		text += "\n" + ("No passenger path yet: build the terminal piece that reaches this pad first." if walk < 0 else "Walk from security: %.1f min · to reclaim: %.1f min" % [walk / 600.0, graph.route_ticks(graph.route(gate, "baggage_reclaim")) / 600.0])
-	build_info.text = text
-	build_button.disabled = cash < cost
+	build_info.text = text + _build_facts(item.category)
+	var afford := career.construction_error(cost)
+	build_button.disabled = not afford.is_empty()
+	if not afford.is_empty(): build_info.text += "\n[cannot build] " + afford
+
+## Yesterday's facts behind a build category (information, never advice).
+func _build_facts(category: String) -> String:
+	if career.reports.is_empty(): return ""
+	var story: Dictionary = career.reports[-1].get("story", {})
+	var facts: Array = []
+	match category:
+		"security":
+			for id in story.get("security", {}):
+				var sec: Dictionary = story.security[id]
+				facts.append("%s security: peak queue %d · worst wait %s · %d of %d physical lanes open" % [str(id).capitalize(), sec.peak_queue, CareerText.minutes(sec.max_wait_ticks), sec.open_lanes, sec.physical_lanes])
+		"baggage":
+			for id in story.get("baggage", {}):
+				facts.append("%s: peak queue %d bags · %d servers" % [str(id).replace("_", " ").capitalize(), story.baggage[id].peak_queue, story.baggage[id].servers])
+		"operations":
+			for type in story.get("resources", {}):
+				var res: Dictionary = story.resources[type]
+				facts.append("%s: %d%% busy · %d flights waited (%s)" % [res.label, roundi(100.0 * res.utilization), res.flights_waited, CareerText.minutes(res.wait_ticks)])
+		"gates", "terminal":
+			facts.append("%d flights yesterday on %d gates · %d tomorrow" % [int(career.reports[-1].flights), career.layout.built_gate_ids().size(), career.expected_flights()])
+		"airside":
+			for w in story.get("taxiways", []): facts.append("Taxiway %s: %s of aircraft waiting" % [w.id, CareerText.minutes(w.wait_ticks)])
+			facts.append("Runway queues: %s in total" % CareerText.minutes(int(story.get("runway_queue_ticks", 0))))
+	return "" if facts.is_empty() else "\nYesterday · " + "\nYesterday · ".join(facts)
 
 func _refresh_demolish() -> void:
 	var selected := built_list.get_selected_items()
@@ -1468,5 +1716,7 @@ func _refresh_airside_info(type: String) -> void:
 	var config := trial.apply(career.day_config(false))
 	var errors := trial.validate(config)
 	text += "\n" + ("Airport valid with it." if errors.is_empty() else "Next day would still need: " + str(errors[0]))
-	build_info.text = text
-	build_button.disabled = cash < cost
+	build_info.text = text + _build_facts("airside")
+	var afford := career.construction_error(cost)
+	build_button.disabled = not afford.is_empty()
+	if not afford.is_empty(): build_info.text += "\n[cannot build] " + afford

@@ -1,0 +1,12 @@
+FreeSans.ttf — GNU FreeFont (https://www.gnu.org/software/freefont/)
+Copied from the Debian/Ubuntu package fonts-freefont-ttf.
+
+License: GNU General Public License v3 or later, with the font exception:
+"As a special exception, if you create a document which uses this font, and
+embed this font or unaltered portions of this font into the document, this
+font does not by itself cause the resulting document to be covered by the GNU
+General Public License. This exception does not however invalidate any other
+reasons why the document might be covered by the GNU General Public License."
+
+Used only as a fallback for symbols (→ ✓ ✗ ≤ ≥ −) that the default UI font
+lacks, so they render in the web build, which has no system fonts.

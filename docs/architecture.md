@@ -1,4 +1,4 @@
-# Airport architecture — M0 to M12
+# Airport architecture — M0 to M13
 
 The airport is now the default Godot scene. The existing boarding scene remains
 available at `res://scenes/main.tscn`; its simulation algorithm is unchanged.
@@ -162,6 +162,64 @@ alongside the conflict check.
 - A compact turnaround summary sits under it.
 - A **Turnaround** tab holds the full task table.
 - After takeoff, the additive delay breakdown is shown.
+
+## M13 career layer (no new simulation systems)
+
+**Scenes.** `scenes/menu.tscn` (`scripts/ui/menu.gd`) is the main scene. It
+hands a career to `scenes/airport.tscn` through `AirportLaunch.career`
+(`scripts/ui/airport_launch.gd`, which also holds `start_new()`). Opened
+without one (tests, `--scenario=`), the airport scene starts a career itself,
+as before.
+
+**The career** (`career.gd`) gains:
+
+- fields: mode, airport name, difficulty, career id, `progress`,
+  `tutorial_done`
+- `new_career(path, seed, options)`, which calls the static
+  `apply_difficulty()`
+- `withdraw_request()` and `blocking_requests()`
+- a `story` in each report (`CareerProgress.story()`), and today's
+  objectives (`CareerProgress.advance()`) after settlement
+- `CareerProgress.check_state()` after construction
+
+**`career_progress.gd` (`CareerProgress`)** is static:
+
+- chapters and the milestone from `config.career`
+- `check()`: the objective predicates
+- `advance()` and `check_state()`
+- `valid()` for saves
+- `story()`: the day's facts (late flights with the biggest cause, resource
+  waits by flight, security, baggage, the worst inbound flight for missed
+  connections, the worst taxiways, contract terms against targets)
+
+**`career_saves.gd` (`CareerSaves`)** handles the slots, rotating autosaves,
+`meta.json`, `list()`, `latest()` and `load_path()`.
+
+**UI helpers** (`scripts/ui/airport/`):
+
+- `career_text.gd`: objective line, objectives panel, Today summary, story
+  report, alerts with severity
+- `tutorial_director.gd`: tips, checked on the UI refresh
+- `help_overlay.gd`: help pages
+- `airport_main.gd`:
+  - hosts them, with the header's objective line, the Today and Goals tabs
+    and the Esc menu
+  - autosave hooks, playtest logging, critical-alert slow or pause
+  - build facts, withdraw and insolvency buttons
+- the map gains wheel zoom and drag pan
+
+**Settings and logging.** `game_settings.gd` (`GameSettings`, in
+`user://settings.json`) holds tips, critical-alert behaviour, UI scale and the
+fallback font. `airport_playtest_log.gd` (`AirportPlaytestLog`) holds the
+session log, screenshots, checklist and bundle zip.
+
+**Simulation additions** (saved, v13; metrics only, no behaviour change):
+
+- `SecurityCheckpoint.peak_queue`
+- baggage stage `peak_queue`
+- airside edge `wait_ticks` (from `_taxi_wait_on()`)
+- `AirportFlight.taxi_gate_hold_ticks`, so a gate hold at the runway exit
+  counts as `gate_wait`, not taxi congestion
 
 ## M12 airside
 

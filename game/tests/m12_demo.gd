@@ -278,11 +278,17 @@ func _consequence() -> void:
 		if q == null or p.journey_direction != "connecting" or p.connection_status != "missed" or q.connection_status != "made": continue
 		var inbound: AirportFlight = bs.airport.flights[p.itinerary_legs[0]]
 		var inbound_good: AirportFlight = gs.airport.flights[p.itinerary_legs[0]]
-		if inbound.taxi_in_wait_ticks <= 0: continue
+		# Landing to docking: taxi waits, and (M13 attribution) holding for a gate still occupied.
+		var to_gate := inbound.gate_arrival_tick - inbound.actual_arrival
+		var to_gate_good := inbound_good.gate_arrival_tick - inbound_good.actual_arrival
+		if to_gate <= to_gate_good: continue
 		var outbound: AirportFlight = bs.airport.flights[p.itinerary_legs[-1]]
 		report.append("    P%04d, %s → %s:" % [p.id, inbound.flight_number, outbound.flight_number])
-		report.append("      %s landed %s (Riverdale %s); taxi-in %.1f min incl. %.1f min held (Riverdale %.1f min)" % [inbound.flight_number, AirportClock.display(inbound.actual_arrival).left(5), AirportClock.display(inbound_good.actual_arrival).left(5),
-			inbound.taxi_in_ticks_actual / 600.0, inbound.taxi_in_wait_ticks / 600.0, inbound_good.taxi_in_ticks_actual / 600.0])
+		var hold := int(inbound.delay_reasons.get("gate_wait", 0))
+		var hold_good := int(inbound_good.delay_reasons.get("gate_wait", 0))
+		report.append("      %s landed %s (Riverdale %s); landing to gate %.1f min (Riverdale %.1f): taxiing %.1f min (Riverdale %.1f, of which %.1f waiting on taxiways), holding for its gate %.1f min (Riverdale %.1f)" % [
+			inbound.flight_number, AirportClock.display(inbound.actual_arrival).left(5), AirportClock.display(inbound_good.actual_arrival).left(5), to_gate / 600.0, to_gate_good / 600.0,
+			(to_gate - hold) / 600.0, (to_gate_good - hold_good) / 600.0, inbound.taxi_in_wait_ticks / 600.0, hold / 600.0, hold_good / 600.0])
 		report.append("      off the aircraft %s (Riverdale %s) → connection %s (Riverdale %s)" % [AirportClock.display(p.deplaned_airport_tick).left(8), AirportClock.display(q.deplaned_airport_tick).left(8), p.connection_status.to_upper(), q.connection_status.to_upper()])
 		traced = true
 		break

@@ -341,6 +341,7 @@ func _continue_walk(p: Passenger, now: int) -> void:
 				_set_state(p, "security_queue")
 				p.security_queue_enter_tick = now
 				cp.queue.append(p.id)
+				cp.peak_queue = maxi(cp.peak_queue, cp.queue.size())
 				_emit(now, "PASSENGER_SECURITY_ENTER", p, {"checkpoint": cp.id})
 				_dispatch(cp, now)
 			"walking_to_reclaim":

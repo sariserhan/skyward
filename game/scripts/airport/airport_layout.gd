@@ -560,10 +560,18 @@ static func assign_gates(config: Dictionary) -> Array:
 		if by_id.has(gate_id) and compatible.call(by_id[gate_id], f):
 			busy[gate_id].append([int(f.scheduled_arrival) + taxi, int(f.scheduled_departure)])
 		else: unplaced.append(f)
+	# M13: widebodies first (they have the fewest gates), and every flight takes
+	# the least capable gate that fits, so narrowbodies do not use up the
+	# widebody gates a 787 needs. Stable: then arrival, then id; gates in order.
+	var is_wide := func(f: Dictionary) -> bool: return classes.get(f.aircraft_type, "") == "wide"
+	unplaced.sort_custom(func(a, b):
+		if is_wide.call(a) != is_wide.call(b): return is_wide.call(a)
+		return int(a.scheduled_arrival) < int(b.scheduled_arrival) or (int(a.scheduled_arrival) == int(b.scheduled_arrival) and a.id < b.id))
+	var by_capability: Array = gates.filter(func(g): return not "wide" in g.supported_aircraft_classes) + gates.filter(func(g): return "wide" in g.supported_aircraft_classes)
 	for f in unplaced:
 		var start := int(f.scheduled_arrival) + taxi
 		var chosen := ""
-		for gate in gates:
+		for gate in by_capability:
 			if not compatible.call(gate, f): continue
 			var clear := true
 			for window in busy[gate.id]:

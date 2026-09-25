@@ -9,6 +9,12 @@ var overlay := false
 var debug := false
 var _origin := Vector2.ZERO
 var _scale := 1.0
+## M13: mouse-wheel zoom around the cursor, right/middle-drag pan (airside map).
+var zoom := 1.0
+var pan := Vector2.ZERO
+var _dragging := false
+## The airport's name for the terminal label (set by the scene).
+var airport_name := ""
 const INK := Color("a7becd")
 const MINT := Color("70dec0")
 const AMBER := Color("ffc078")
@@ -43,7 +49,7 @@ func _draw() -> void:
 	draw_line(Vector2(50, runway_y + 20), Vector2(50, taxi_y), Color("617161"), 3)
 	draw_line(Vector2(size.x - 50, runway_y + 20), Vector2(size.x - 50, taxi_y), Color("617161"), 3)
 	draw_rect(Rect2(28, size.y * 0.76, size.x - 56, size.y * 0.18), Color("233b49"))
-	_label(Vector2(44, size.y * 0.89), "RIVERDALE  /  CONCOURSE A", INK, 14)
+	_label(Vector2(44, size.y * 0.89), airport_name.to_upper() + "  /  TERMINAL", INK, 14)
 	var keys := sim.airport.gates.keys()
 	for i in keys.size():
 		var gate: AirportGate = sim.airport.gates[keys[i]]
@@ -102,7 +108,8 @@ func _fit() -> void:
 	_origin = Vector2(40, 50) + (area - span * _scale) / 2.0 - lo * _scale
 
 func _screen(world: Vector2) -> Vector2:
-	return _origin + world * _scale
+	var fitted := _origin + world * _scale
+	return size / 2.0 + (fitted - size / 2.0) * zoom + pan
 
 func _node(id: String) -> Vector2:
 	return _screen(sim.airside.node_position(id))
@@ -112,14 +119,14 @@ func _draw_airside() -> void:
 	var net := sim.airside
 	var open := 0
 	for r: AirportRunway in sim.airport.runways.values(): open += 1 if r.status == "open" else 0
-	_label(Vector2(20, 28), "AIRFIELD  /  TERMINAL A", MINT, 13)
+	_label(Vector2(20, 28), "AIRFIELD" + ("" if is_equal_approx(zoom, 1.0) else "  ·  ZOOM %d%% (middle-click resets)" % roundi(zoom * 100)), MINT, 13)
 	var header := "%d RUNWAY%s  ·  %d TAXI EDGES%s" % [open, "" if open == 1 else "S", net.edges.size(), "  ·  OVERLAY" if overlay else ""]
 	_label(Vector2(size.x - 20 - ThemeDB.fallback_font.get_string_size(header, HORIZONTAL_ALIGNMENT_LEFT, -1, 13).x, 28), header)
 	var zone: Dictionary = net.config.get("terminal_zone", {})
 	if not zone.is_empty():
 		var top := _screen(Vector2(float(zone.x0), float(zone.y0)))
 		draw_rect(Rect2(Vector2(28, top.y), Vector2(size.x - 56, size.y - top.y - 14)), Color("233b49"))
-		_label(Vector2(44, size.y - 24), "RIVERDALE  /  CONCOURSE A", INK, 14)
+		_label(Vector2(44, size.y - 24), airport_name.to_upper() + "  /  TERMINAL", INK, 14)
 	for r in net.runways():
 		var a := _node(r.a)
 		var b := _node(r.b)
@@ -229,6 +236,30 @@ func _plane(at: Vector2, color: Color) -> void:
 	draw_colored_polygon(PackedVector2Array([at + Vector2(0, -14), at + Vector2(3, -3), at + Vector2(14, 5), at + Vector2(3, 3), at + Vector2(3, 10), at + Vector2(7, 13), at + Vector2(-7, 13), at + Vector2(-3, 10), at + Vector2(-3, 3), at + Vector2(-14, 5), at + Vector2(-3, -3)]), color)
 
 func _gui_input(event: InputEvent) -> void:
+	if sim != null and sim.airside.enabled():
+		if event is InputEventMouseButton and event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
+			var before := zoom
+			zoom = clampf(zoom * (1.15 if event.button_index == MOUSE_BUTTON_WHEEL_UP else 1.0 / 1.15), 1.0, 4.0)
+			# Keep the point under the cursor where it is.
+			var c := size / 2.0
+			pan = event.position - c - (event.position - c - pan) * (zoom / before)
+			if is_equal_approx(zoom, 1.0): pan = Vector2.ZERO
+			queue_redraw()
+			accept_event()
+			return
+		if event is InputEventMouseButton and event.button_index in [MOUSE_BUTTON_RIGHT, MOUSE_BUTTON_MIDDLE]:
+			_dragging = event.pressed and event.button_index == MOUSE_BUTTON_RIGHT
+			if event.pressed and event.button_index == MOUSE_BUTTON_MIDDLE:
+				zoom = 1.0
+				pan = Vector2.ZERO
+				queue_redraw()
+			accept_event()
+			return
+		if event is InputEventMouseMotion and _dragging:
+			pan += event.relative
+			queue_redraw()
+			accept_event()
+			return
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		for id in hits:
 			if event.position.distance_to(hits[id]) < (25 if not sim.airside.enabled() else 16):

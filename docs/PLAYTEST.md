@@ -1,5 +1,102 @@
 # Playtest Guide
 
+## M13 human playtest kit (first-time players)
+
+M13 needs evidence from **genuine first-time players** (spec §34–37). Scripted
+demos are not evidence. Run round 1 with at least five people who have never
+seen the project; fix what they hit; then run round 2 with fresh people.
+
+### Before each tester
+
+1. Give them a build:
+   - **Linux:** `dist/linux/boarding.x86_64`
+   - **Windows / macOS:** the matching export
+   - **Web:** host `dist/web/` on any static server
+     (`python3 -m http.server` in that folder) and open `index.html` in
+     Chrome or Firefox.
+2. On a machine that has run the game before, open **SETTINGS → RESET
+   PLAYTEST DATA**, so the log holds only this tester.
+3. Say one sentence, and nothing more: **"Start a new career and run the
+   airport."** Do not explain the UI. Step in only if they are completely
+   stuck for more than two minutes, and note it (`stuck_where`).
+4. Sit behind them. Take notes, and don't help.
+
+### While they play: what to watch (spec §35)
+
+The game logs most of this itself. The observer adds what a log cannot see.
+
+| Metric | From the log | Observer |
+| --- | --- | --- |
+| Reached the first flight | `first_landing` | — |
+| Found the time controls | `speed` / `pause` | how (keys, buttons, never) |
+| Opened flight details | `select_flight` | — |
+| Changed security staffing | `security_change` | prompted by the tip, or on their own? |
+| Noticed resource contention | Resources tab, `priority` | did they say it out loud? |
+| Understood hold/close | `hold` / `close_gate` | **ask after:** "what happens if you hold?" |
+| Understood why flights were late | — | **ask after:** point at a late flight, "why was it late?" |
+| Completed day 1 | `day_end` day 1 | — |
+| Understood the report | `report_viewed` | **ask after:** "what would you change tomorrow?" |
+| Made a next-day plan | `plan_change` | — |
+| Built something | `build` | did they know what to build, and why? |
+| Started day 2 | `day_start` day 2 | — |
+| Session length | play time | — |
+| Continued voluntarily | — | after 30 minutes say "you can stop now". Did they keep playing? |
+
+Also note:
+- the first action they took
+- the first real decision
+- where they got stuck
+- what they ignored
+- anything they misunderstood
+
+Use their words.
+
+### After they play
+
+1. In the game: **Menu → EXPORT PLAYTEST BUNDLE** (or F9). On web the zip
+   downloads; on desktop it is written to the game's user folder
+   (`~/.local/share/godot/app_userdata/BOARDING/playtest/` on Linux,
+   `%APPDATA%\Godot\app_userdata\BOARDING\playtest\` on Windows).
+   The bundle holds:
+   - the save
+   - the session log (decisions, tips, speeds, day results, timings)
+   - screenshots of each day's report
+   - a summary
+2. Ask the three questions from the table (delay causes, hold, "what would
+   you change tomorrow?").
+3. Write one row per tester in `observer.csv` with the columns:
+   - `tester` (the zip file name)
+   - `understood_delay_causes`, `understood_hold_close`, `understood_report`
+   - `knew_what_to_build`
+   - `voluntarily_continued`
+   - `stuck_where`
+   - `notes`
+4. Classify each finding (spec §36):
+   - **BLOCKER:** cannot proceed or understand a core interaction
+   - **MAJOR:** proceeds but misunderstands a core system
+   - **MINOR:** friction
+   - **COSMETIC**
+
+### Summarise a round
+
+```sh
+python3 tools/airport_playtest_report.py bundles/ --observer observer.csv
+```
+
+It prints, per tester:
+- the checklist
+- first landing, first decision, end of day 1 and start of day 2, in minutes
+  of play
+- time spent at each speed
+- each day's result
+- the tips seen and the decisions taken
+
+It then prints the totals. Send the bundles, `observer.csv` and the findings
+list back for the fixes round. Day 1's wall-clock length is the first thing
+to check: in automated runs it is about 2 h 28 min of simulated time, roughly
+40–45 minutes at 2×/4×.
+
+
 There are two things to playtest, and they ship differently.
 
 - **Riverdale airport**, the default game. Exported builds launch straight into

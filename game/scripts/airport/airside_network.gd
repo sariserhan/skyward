@@ -27,7 +27,8 @@ var speed_mps: float = 10.0
 var headway_ticks: int = 150
 var node_ticks: int = 50
 ## Occupancy (saved): edge id -> {"last_entry", "last_exit", "lock_dir", "locks",
-## "occupants" (front first), "last_who" (the last to enter, for "X ahead")};
+## "occupants" (front first), "last_who" (the last to enter, for "X ahead"),
+## "wait_ticks" (aircraft-ticks spent waiting to use or leave it: M13 summary)};
 ## node id -> busy-until tick.
 var edge_state: Dictionary = {}
 var node_busy: Dictionary = {}
@@ -53,7 +54,7 @@ func setup(data: Dictionary) -> void:
 		if not bool(edge.get("oneway", false)): _out[edge.to].append([edge.id, -1, edge.from])
 	for id in _out: _out[id].sort_custom(func(a, b): return a[0] < b[0] or (a[0] == b[0] and a[1] > b[1]))
 	edge_state = {}
-	for id in edges: edge_state[id] = {"last_entry": -1073741824, "last_exit": -1073741824, "lock_dir": 0, "locks": 0, "occupants": [], "last_who": ""}
+	for id in edges: edge_state[id] = {"last_entry": -1073741824, "last_exit": -1073741824, "lock_dir": 0, "locks": 0, "occupants": [], "last_who": "", "wait_ticks": 0}
 	node_busy = {}
 	_routes = {}
 	_routes_revision = revision

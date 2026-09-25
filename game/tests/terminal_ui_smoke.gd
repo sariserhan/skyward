@@ -24,10 +24,10 @@ func _process(_delta: float) -> bool:
 			main.view_tabs.current_tab = 1
 			main.operations_tabs.current_tab = 1
 			main._refresh()
-			main.security_buttons.east[3].pressed.emit()
+			# M13: one press opens a lane with its staff member.
 			main.security_buttons.east[1].pressed.emit()
-			check(east.staff == before[0] + 1, "staff button assigns staff")
-			check(east.open_lanes == before[1] + 1, "lane button opens lane")
+			check(east.staff == before[0] + 1, "opening a lane assigns staff")
+			check(east.open_lanes == before[1] + 1, "opening a lane opens it")
 			for _i in main.sim.airport.security_checkpoints.west.max_lanes:
 				main.security_buttons.west[0].pressed.emit()
 			check(main.sim.airport.security_checkpoints.west.open_lanes == 0, "lane controls can close checkpoint")

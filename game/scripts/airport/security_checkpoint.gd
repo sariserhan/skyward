@@ -12,6 +12,8 @@ var active: Dictionary = {}
 var processed: int = 0
 var total_wait_ticks: int = 0
 var max_wait_ticks: int = 0
+## M13: the longest the queue got today (bottleneck summary and report).
+var peak_queue: int = 0
 
 func capacity() -> int:
 	return mini(open_lanes, staff)
