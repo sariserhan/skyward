@@ -330,11 +330,14 @@ func _released_by(f: AirportFlight, t: TurnaroundTask) -> String:
 ## path from pushback readiness. Each task on it is blamed first for its own
 ## overrun beyond plan; the rest passes to whatever released it. Lateness that
 ## reaches the gate is late_inbound.
-func attribute(f: AirportFlight, planned_pushback: int, takeoff_wait: int) -> Dictionary:
+func attribute(f: AirportFlight, planned_pushback: int, takeoff_wait: int, taxi_wait := 0) -> Dictionary:
 	var out := {}
 	var lateness := f.actual_departure - f.scheduled_departure
 	if lateness <= 0: return out
-	_add(out, "runway_takeoff_queue", mini(takeoff_wait, lateness))
+	var runway := mini(takeoff_wait, lateness)
+	_add(out, "runway_takeoff_queue", runway)
+	# M12: waiting on the taxiways between pushback and the runway queue.
+	_add(out, "taxi_congestion", clampi(taxi_wait, 0, lateness - runway))
 	var pushback_late := f.gate_release_tick - planned_pushback
 	var hold := clampi(pushback_late, 0, f.hold_ticks)
 	_add(out, "passenger_hold", hold)
@@ -348,6 +351,13 @@ func attribute(f: AirportFlight, planned_pushback: int, takeoff_wait: int) -> Di
 	var milestone := task(f, PUSHBACK)
 	if milestone == null: _add(out, "late_inbound", rest)
 	else: _blame(f, milestone, rest, out)
+	# A late arrival at the gate that came from waiting on the taxiways (M12).
+	var inbound := int(out.get("late_inbound", 0))
+	var taxi_in := mini(inbound, f.taxi_in_wait_ticks)
+	if taxi_in > 0:
+		out.late_inbound = inbound - taxi_in
+		if int(out.late_inbound) == 0: out.erase("late_inbound")
+		_add(out, "taxi_congestion", taxi_in)
 	return out
 
 

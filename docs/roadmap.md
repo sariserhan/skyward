@@ -75,9 +75,22 @@ it is kept as historical context. The original boarding roadmap remains at
   construction and refunds are capital in the ledger; requests can require
   building; Build tab; save schema v11. Plan [m11-plan.md](m11-plan.md),
   report [m11-status.md](m11-status.md). Decisions D-048–D-051.
-- **M12 next, not started:** airside construction (runways, taxiways).
+- **M12 implemented:** airside construction and aircraft routing. One airside
+  graph (runways, taxiways, hold-shorts, stands) is the only thing aircraft
+  move on; Riverdale's airside is imported as a calibrated schematic
+  (unchanged day 1 = M11 to the cent); deterministic routes, headway and
+  no-passing, intersection reservations and deadlock-free two-way direction
+  locks; several runways with length-based compatibility and deterministic
+  selection; taxi congestion as an exact delay cause; taxiways and runways
+  built, redirected, closed or demolished between days with validation;
+  requests can need runway capability; the airfield drawn from the graph with
+  an Airside overlay; save schema v12. Plan [m12-plan.md](m12-plan.md),
+  report [m12-status.md](m12-status.md). Decisions D-052–D-056.
+- **Next, not started:** anything beyond M12 (retail, parking, hotels,
+  multiple terminals, maintenance, weather, detailed ATC) waits for a new
+  milestone.
 
 The order after M3 follows D-020: the turnaround task framework comes before any
 individual turnaround activity.
 
-M11 stopped here for review. Do not begin M12 until requested.
+M12 stopped here for review. Do not expand scope further until requested.

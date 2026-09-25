@@ -5,6 +5,8 @@ func fixture(count: int = 3) -> AirportSimulation:
 	config.erase("passenger_flow")
 	config.erase("baggage")
 	config.erase("resources")
+	# Scaled taxi timers (M1 fixture), not the M12 airside network.
+	config.erase("airside")
 	config.start_tick = 0
 	config.landing_ticks = 7
 	config.takeoff_ticks = 5

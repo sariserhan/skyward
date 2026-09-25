@@ -294,9 +294,68 @@ func demolish(id: String) -> Dictionary:
 		layout.restore(saved)
 		return {"error": "Cannot demolish: " + new_errors[0]}
 	var item: Dictionary = layout.catalog[o.type]
-	var refund := int(item.cost_cents) if undo else int(item.cost_cents) * int(base.construction.get("refund_permille", 0)) / 1000
-	_post_capital("D%d:DEMOLISH:%s" % [day, id], refund, "Day %d · %s demolished (%s refund)" % [day, item.label, "full, same session" if undo else "partial"], id)
+	var value := layout.object_cost(o) if o.type in AirportLayout.AIRSIDE_TYPES else int(item.cost_cents)
+	var refund := value if undo else value * int(base.construction.get("refund_permille", 0)) / 1000
+	_post_capital("D%d:DEMOLISH:%s" % [day, id], refund, "Day %d · %s demolished (%s refund)" % [day, _object_label(o), "full, same session" if undo else "partial"], id)
 	return {"id": id, "refund_cents": refund}
+
+
+## "Taxiway B0003 (G_300_-300 → R1_A)", "Runway R2 (3,000 m)", "Narrow-body gate".
+func _object_label(o: Dictionary) -> String:
+	var item: Dictionary = layout.catalog.get(o.type, {})
+	match o.type:
+		"taxiway": return "Taxiway %s (%s → %s)" % [o.id, o.from, o.to]
+		"runway": return "Runway %s (%d m)" % [o.id, int(o.length_m)]
+		"legacy_taxiway": return "Taxiway " + o.edge
+		"legacy_runway": return "Runway " + o.runway
+	return str(item.get("label", o.type))
+
+
+# --- airside construction (M12) -----------------------------------------------------------
+
+## A taxiway between two points (network nodes or grid anchors "G_x_y").
+## direction: 0 two-way, 1 one-way from→to, -1 one-way to→from.
+func build_taxiway(from: String, to: String, direction := 0) -> Dictionary:
+	if phase != "planning": return {"error": "Construction only happens between days."}
+	var reason := layout.taxiway_error(from, to)
+	if not reason.is_empty(): return {"error": reason}
+	var cost := layout.taxiway_cost(from, to)
+	if settled_cash_cents() < cost: return {"error": "Costs %s; cash is %s." % [AirportEconomy.money(cost), AirportEconomy.money(settled_cash_cents())]}
+	var o := layout.place_airside({"type": "taxiway", "from": from, "to": to, "direction": direction})
+	_post_capital("D%d:BUILD:%s" % [day, o.id], -cost, "Day %d · %s built" % [day, _object_label(o)], o.id)
+	return o
+
+
+## A runway from a grid anchor in a heading (E/W/N/S) with an offered length.
+func build_runway(start: String, heading: String, length_m: int) -> Dictionary:
+	if phase != "planning": return {"error": "Construction only happens between days."}
+	var reason := layout.runway_error(start, heading, length_m)
+	if not reason.is_empty(): return {"error": reason}
+	var cost := layout.runway_cost(length_m)
+	if settled_cash_cents() < cost: return {"error": "Costs %s; cash is %s." % [AirportEconomy.money(cost), AirportEconomy.money(settled_cash_cents())]}
+	var o := layout.place_airside({"type": "runway", "start": start, "heading": heading, "length_m": length_m, "status": "open"})
+	_post_capital("D%d:BUILD:%s" % [day, o.id], -cost, "Day %d · %s built" % [day, _object_label(o)], o.id)
+	return o
+
+
+## Free between days: a taxiway's direction, or a runway open/closed. Refused
+## (and undone) if it would stop the next day from starting.
+func set_airside(id: String, field: String, value) -> Dictionary:
+	if phase != "planning": return {"error": "Changes only happen between days."}
+	var o := layout.find(id)
+	if o.is_empty(): return {"error": "Nothing with id " + id}
+	var allowed := {"taxiway": "direction", "legacy_taxiway": "direction", "runway": "status", "legacy_runway": "status"}
+	if allowed.get(o.type, "") != field: return {"error": "%s cannot change %s." % [_object_label(o), field]}
+	if field == "direction" and not int(value) in [-1, 0, 1]: return {"error": "Unknown direction."}
+	if field == "status" and not value in ["open", "closed"]: return {"error": "Unknown status."}
+	var before := start_errors()
+	var saved := layout.snapshot()
+	layout.set_field(id, field, value)
+	var new_errors: Array = start_errors().filter(func(e): return not e in before)
+	if not new_errors.is_empty():
+		layout.restore(saved)
+		return {"error": "Cannot change: " + new_errors[0]}
+	return layout.find(id)
 
 
 ## Would a request tier's flights fit the airport as built? Empty when they
@@ -310,6 +369,8 @@ func tier_capacity(tier: Dictionary) -> Array:
 		numbers.append(flight.flight_number)
 	if layout.catalog.is_empty(): return []
 	var errors := AirportLayout.assign_gates(config)
+	# M12: a long-enough, reachable runway for each new flight's aircraft.
+	if config.has("airside"): errors.append_array(AirportLayout.validate_airside(config))
 	return errors.filter(func(e): return numbers.any(func(n): return e.begins_with(n)))
 
 

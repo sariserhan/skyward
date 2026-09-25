@@ -3,7 +3,7 @@ extends RefCounted
 ## One world, one clock. Turnaround is a task graph (M4); cabin flights deboard
 ## (M5) and board (M3) through cabin engines as tasks of it; widebodies use the
 ## widebody deboarding and boarding abstractions (D-022, D-029).
-const SAVE_VERSION := 11
+const SAVE_VERSION := 12
 const CONFIG_PATH := "res://configs/airports/riverdale.json"
 const STATES := ["scheduled", "approaching", "landed", "taxiing_in", "at_gate",
 	"turnaround", "boarding", "ready_for_pushback", "taxiing_out", "departed"]
@@ -30,6 +30,9 @@ var baggage := BaggageSystem.new()
 var resources := AirportResources.new()
 var airlines := AirlineRelations.new()
 var economy := AirportEconomy.new()
+## M12: the aircraft movement network (empty when a scenario has no airside).
+var airside := AirsideNetwork.new()
+var _taxi_plan: Dictionary = {}
 ## Built once: what the turnaround calls to release boarding and start driven work.
 var _release := Callable(self, "_release_boarding")
 var _starters := {"deboarding": Callable(self, "_start_deboarding"), "baggage_unload": Callable(self, "_start_baggage_unload"),
@@ -72,6 +75,10 @@ static func load_config(path: String) -> Dictionary:
 	data.erase("include_flights")
 	var task_overrides: Dictionary = data.get("task_overrides", {})
 	data.erase("task_overrides")
+	# Top-level keys a variant replaces whole instead of merging (M12: a different airside).
+	var replace: Array = data.get("replace", [])
+	data.erase("replace")
+	for key in replace: base.erase(key)
 	var merged := _merged(base, data)
 	# A variant may keep just part of the schedule.
 	if not only.is_empty(): merged.flights = merged.flights.filter(func(flight): return flight.id in only)
@@ -111,6 +118,7 @@ func setup(scenario: Dictionary = {}, seed_override: int = -1) -> void:
 		var gate := AirportGate.new()
 		gate.restore(data)
 		airport.gates[gate.id] = gate
+	_setup_airside()
 	for data in config.flights:
 		var flight := AirportFlight.new()
 		flight.restore(data)
@@ -132,7 +140,7 @@ func setup(scenario: Dictionary = {}, seed_override: int = -1) -> void:
 		airport.flights[flight.id] = flight
 		flight_order.append(flight)
 		# Turnaround tasks with seeded durations and a planned schedule (M4).
-		turnaround.create(flight, data.aircraft_type, rng, flight.scheduled_arrival + int(config.taxi_in_ticks),
+		turnaround.create(flight, data.aircraft_type, rng, flight.scheduled_arrival + _taxi_in_plan(flight),
 			flight.scheduled_departure - int(_boarding("open_before_departure_ticks")), _scheduled_pushback(flight))
 	_bind_resources()
 	events.record(clock.tick, "SCENARIO_STARTED", "", {"seed": seed_value, "scenario": config.id})
@@ -220,17 +228,21 @@ func _update_flight(f: AirportFlight) -> void:
 			if clock.tick >= f.scheduled_arrival + f.inbound_delay_ticks - int(config.landing_ticks):
 				_request_runway(f, "landing")
 		"landed":
-			_transition(f, "taxiing_in", int(config.taxi_in_ticks))
+			if airside.enabled(): _begin_taxi(f, "in")
+			else: _transition(f, "taxiing_in", int(config.taxi_in_ticks))
 		"taxiing_in":
-			if clock.tick >= f.due_tick:
+			var arrived := _advance_taxi(f) if airside.enabled() else clock.tick >= f.due_tick
+			if arrived:
 				var gate: AirportGate = airport.gates[f.assigned_gate_id]
 				if gate.occupied_by_flight_id.is_empty() and clock.tick >= gate.available_from:
 					gate.occupied_by_flight_id = f.id
+					f.taxi_blocker = ""
 					f.gate_arrival_tick = clock.tick
 					_transition(f, "at_gate")
 					events.record(clock.tick, "FLIGHT_GATE_ARRIVAL", f.id, {"gate_id": gate.id})
 				else:
 					_add_delay(f, "gate_wait", 1)
+					if airside.enabled(): f.taxi_blocker = "gate %s occupied" % gate.id
 		"at_gate":
 			_transition(f, "turnaround")
 			_update_turnaround(f)
@@ -240,8 +252,8 @@ func _update_flight(f: AirportFlight) -> void:
 			_try_pushback(f)
 		"taxiing_out":
 			_finish_pushback(f)
-			if clock.tick >= f.due_tick:
-				_request_runway(f, "takeoff")
+			var at_hold := _advance_taxi(f) if airside.enabled() else clock.tick >= f.due_tick
+			if at_hold: _request_runway(f, "takeoff")
 	# Estimates refresh once per simulated second, with the conflict check that
 	# reads them; commands refresh immediately. Timing never depends on frames.
 	if f.status != "departed" and clock.tick % AirportClock.TICKS_PER_SECOND == 0:
@@ -265,7 +277,7 @@ func _release_boarding(f: AirportFlight) -> void:
 	_transition(f, "boarding")
 
 func _scheduled_pushback(f: AirportFlight) -> int:
-	return f.scheduled_departure - int(config.taxi_out_ticks) - int(config.takeoff_ticks)
+	return f.scheduled_departure - _taxi_out_plan(f) - int(config.takeoff_ticks)
 
 func _add_delay(f: AirportFlight, reason: String, ticks: int) -> void:
 	f.delay_reasons[reason] = int(f.delay_reasons.get(reason, 0)) + ticks
@@ -273,43 +285,61 @@ func _add_delay(f: AirportFlight, reason: String, ticks: int) -> void:
 func _request_runway(f: AirportFlight, operation: String) -> void:
 	if f.runway_requested:
 		return
+	# Arrivals pick their runway when they ask to land; departures at pushback.
+	if operation == "landing" or f.runway_id.is_empty() or not airport.runways.has(f.runway_id): f.runway_id = _choose_runway(f, operation)
+	var runway: AirportRunway = airport.runways[f.runway_id]
 	f.runway_requested = true
-	airport.runway.queue.append({"flight_id": f.id, "operation": operation, "requested_at": clock.tick})
-	events.record(clock.tick, "RUNWAY_QUEUED", f.id, {"operation": operation})
+	runway.queue.append({"flight_id": f.id, "operation": operation, "requested_at": clock.tick, "runway": runway.id})
+	runway.peak_queue = maxi(runway.peak_queue, runway.queue.size())
+	events.record(clock.tick, "RUNWAY_QUEUED", f.id, {"operation": operation, "runway": runway.id})
 
+## Runways in id order: each is an independent FIFO resource.
 func _start_runway() -> void:
-	var runway := airport.runway
-	if not runway.active_operation.is_empty() or clock.tick < runway.occupied_until or runway.queue.is_empty():
-		return
-	# FIFO; ties use immutable scenario insertion order.
-	var operation: Dictionary = runway.queue.pop_front()
-	var duration := int(config.landing_ticks if operation.operation == "landing" else config.takeoff_ticks)
-	operation["started_at"] = clock.tick
-	operation["end_tick"] = clock.tick + duration
-	runway.active_operation = operation
-	runway.occupied_until = clock.tick + duration + int(config.separation_ticks)
-	runway.busy_ticks += duration
-	var flight: AirportFlight = airport.flights[operation.flight_id]
-	_add_delay(flight, "runway_" + operation.operation + "_queue", clock.tick - int(operation.requested_at))
-	if operation.operation == "takeoff": flight.takeoff_wait_ticks = clock.tick - int(operation.requested_at)
-	events.record(clock.tick, "RUNWAY_STARTED", flight.id, operation)
+	for id in _runway_ids():
+		var runway: AirportRunway = airport.runways[id]
+		if not runway.active_operation.is_empty() or clock.tick < runway.occupied_until or runway.queue.is_empty():
+			continue
+		# FIFO; ties use immutable scenario insertion order.
+		var operation: Dictionary = runway.queue.pop_front()
+		var duration := int(config.landing_ticks if operation.operation == "landing" else config.takeoff_ticks)
+		operation["started_at"] = clock.tick
+		operation["end_tick"] = clock.tick + duration
+		runway.active_operation = operation
+		runway.occupied_until = clock.tick + duration + int(config.separation_ticks)
+		runway.busy_ticks += duration
+		runway.movements += 1
+		var flight: AirportFlight = airport.flights[operation.flight_id]
+		_add_delay(flight, "runway_" + operation.operation + "_queue", clock.tick - int(operation.requested_at))
+		if operation.operation == "takeoff": flight.takeoff_wait_ticks = clock.tick - int(operation.requested_at)
+		events.record(clock.tick, "RUNWAY_STARTED", flight.id, operation)
 
 func _complete_runway() -> void:
-	var runway := airport.runway
-	if runway.active_operation.is_empty() or clock.tick < int(runway.active_operation.end_tick):
-		return
-	var operation: Dictionary = runway.active_operation
-	var f: AirportFlight = airport.flights[operation.flight_id]
-	runway.active_operation = {}
-	f.runway_requested = false
-	events.record(clock.tick, "RUNWAY_COMPLETED", f.id, operation)
+	for id in _runway_ids():
+		var runway: AirportRunway = airport.runways[id]
+		if runway.active_operation.is_empty() or clock.tick < int(runway.active_operation.end_tick):
+			continue
+		var operation: Dictionary = runway.active_operation
+		var f: AirportFlight = airport.flights[operation.flight_id]
+		runway.active_operation = {}
+		f.runway_requested = false
+		events.record(clock.tick, "RUNWAY_COMPLETED", f.id, operation)
+		_runway_done(f, operation)
+
+func _runway_ids() -> Array:
+	var ids: Array = airport.runways.keys()
+	ids.sort()
+	return ids
+
+func _runway_done(f: AirportFlight, operation: Dictionary) -> void:
 	if operation.operation == "landing":
 		f.actual_arrival = clock.tick
 		_transition(f, "landed")
 	else:
 		f.actual_departure = clock.tick
 		f.estimated_departure = clock.tick
-		f.departure_delay_breakdown = turnaround.attribute(f, _scheduled_pushback(f), f.takeoff_wait_ticks)
+		# Taxi beyond the planned (best free-flow) time: waits, or a longer runway route.
+		var taxi_extra := maxi(0, f.taxi_out_ticks_actual - _taxi_out_plan(f)) if f.taxi_out_ticks_actual >= 0 else 0
+		f.departure_delay_breakdown = turnaround.attribute(f, _scheduled_pushback(f), f.takeoff_wait_ticks, taxi_extra)
 		baggage.depart(f)
 		# A tug time longer than taxi-out still ends by takeoff.
 		var op := turnaround.task(f, Turnaround.PUSHBACK_OP)
@@ -330,13 +360,13 @@ func _complete_runway() -> void:
 			airline_usec += Time.get_ticks_usec() - airline_started
 
 func _estimate_departure(f: AirportFlight) -> int:
-	var exit_time := int(config.taxi_out_ticks) + int(config.takeoff_ticks)
+	var exit_time := _taxi_out_plan(f) + int(config.takeoff_ticks)
 	var dock := -1
 	var earliest := f.scheduled_departure
 	match f.status:
-		"scheduled": dock = f.scheduled_arrival + f.inbound_delay_ticks + int(config.taxi_in_ticks) + 3
-		"approaching": dock = maxi(clock.tick, f.scheduled_arrival + f.inbound_delay_ticks) + int(config.taxi_in_ticks) + 2
-		"landed": dock = clock.tick + int(config.taxi_in_ticks) + 2
+		"scheduled": dock = f.scheduled_arrival + f.inbound_delay_ticks + _taxi_in_plan(f) + 3
+		"approaching": dock = maxi(clock.tick, f.scheduled_arrival + f.inbound_delay_ticks) + _taxi_in_plan(f) + 2
+		"landed": dock = clock.tick + _taxi_in_plan(f) + 2
 		"taxiing_in": dock = maxi(clock.tick, f.due_tick) + 2
 		"at_gate", "turnaround", "boarding": dock = clock.tick
 		"ready_for_pushback":
@@ -345,7 +375,7 @@ func _estimate_departure(f: AirportFlight) -> int:
 			if op != null and op.status == TurnaroundTask.WAITING: earliest = maxi(earliest, resources.expected_start(op, clock.tick) + exit_time)
 		"taxiing_out":
 			earliest = maxi(clock.tick, f.due_tick) + int(config.takeoff_ticks)
-			var operation := airport.runway.active_operation
+			var operation: Dictionary = airport.runways[f.runway_id].active_operation if airport.runways.has(f.runway_id) else {}
 			if operation.get("flight_id", "") == f.id:
 				earliest = int(operation.end_tick)
 	if dock >= 0: earliest = _estimate_pushback(f, dock) + exit_time
@@ -393,7 +423,7 @@ func _estimate_pushback(f: AirportFlight, dock: int) -> int:
 	return pushback
 
 func _release_estimate(f: AirportFlight) -> int:
-	return f.estimated_departure - int(config.taxi_out_ticks) - int(config.takeoff_ticks)
+	return f.estimated_departure - _taxi_out_plan(f) - int(config.takeoff_ticks)
 
 func assignment_warnings(flight_id: String, gate_id: String) -> Array:
 	var warnings: Array = []
@@ -406,14 +436,14 @@ func assignment_warnings(flight_id: String, gate_id: String) -> Array:
 		warnings.append("Aircraft incompatibility")
 	if f.terminal != gate.terminal:
 		warnings.append("Terminal constraint")
-	var arrival := maxi(clock.tick, f.scheduled_arrival + int(config.taxi_in_ticks))
-	var release := maxi(arrival + turnaround.planned_gate_ticks(f, f.scheduled_arrival + int(config.taxi_in_ticks)), _release_estimate(f))
+	var arrival := maxi(clock.tick, f.scheduled_arrival + _taxi_in_plan(f))
+	var release := maxi(arrival + turnaround.planned_gate_ticks(f, f.scheduled_arrival + _taxi_in_plan(f)), _release_estimate(f))
 	if arrival < gate.available_from or release > gate.available_until:
 		warnings.append("Gate outside availability window")
 	for other: AirportFlight in flight_order:
 		if other.id == f.id or other.assigned_gate_id != gate_id or other.status in ["taxiing_out", "departed"]:
 			continue
-		var other_arrival := other.scheduled_arrival + int(config.taxi_in_ticks)
+		var other_arrival := other.scheduled_arrival + _taxi_in_plan(other)
 		var other_release := _release_estimate(other)
 		if arrival < other_release and release > other_arrival:
 			warnings.append("Time overlap with " + other.flight_number)
@@ -430,6 +460,11 @@ func assign_gate(flight_id: String, gate_id: String) -> Dictionary:
 	if not f.status in ["scheduled", "approaching", "landed", "taxiing_in"]:
 		return {"ok": false, "warnings": ["Gate locked after docking" if f.status != "boarding" else "Gate locked during boarding"]}
 	var old_gate := f.assigned_gate_id
+	# M12: a taxiing aircraft needs a physical route to the new gate from where it is.
+	if f.status == "taxiing_in" and airside.enabled() and old_gate != gate_id:
+		var reason := _reroute_taxi(f, gate_id, false)
+		if not reason.is_empty(): return {"ok": false, "warnings": warnings + [reason]}
+		_reroute_taxi(f, gate_id, true)
 	f.assigned_gate_id = gate_id
 	if old_gate != gate_id: passenger_flow.reroute(f, clock.tick)
 	decisions.append({"tick": clock.tick, "type": "assign_gate", "flight_id": flight_id, "gate_id": gate_id})
@@ -446,7 +481,7 @@ func _update_conflicts() -> void:
 		if gate.occupied_by_flight_id.is_empty():
 			continue
 		var blocker: AirportFlight = airport.flights[gate.occupied_by_flight_id]
-		var arrival := f.scheduled_arrival + int(config.taxi_in_ticks)
+		var arrival := f.scheduled_arrival + _taxi_in_plan(f)
 		if arrival - clock.tick <= 6000 and _release_estimate(blocker) >= arrival:
 			var key := f.id + ":" + blocker.id
 			current[key] = {"gate_id": gate.id, "flight_id": f.id, "blocker_id": blocker.id,
@@ -514,7 +549,7 @@ func snapshot() -> Dictionary:
 		"seed": seed_value, "clock": clock.to_dict(), "rng": rng.snapshot(), "airport": airport.to_dict(),
 		"events": events.history.duplicate(true), "decisions": decisions.duplicate(true), "conflicts": conflicts.duplicate(true), "passenger_flow": passenger_flow.snapshot(),
 		"boarding": _boarding_snapshot(), "deboarding": _deboarding_snapshot(), "baggage": baggage.snapshot(), "resources": resources.snapshot(),
-		"airline_relations": airlines.snapshot(), "economy": economy.snapshot()})
+		"airline_relations": airlines.snapshot(), "economy": economy.snapshot(), "airside": airside.snapshot()})
 
 ## Active cabin sessions (D-021). Passenger cabin fields are already inside
 ## airport.passengers through Passenger.snapshot().
@@ -527,7 +562,7 @@ static func from_snapshot(data: Dictionary) -> AirportSimulation:
 	data = _integer_json(data)
 	if int(data.get("version", -1)) != SAVE_VERSION or data.get("engine", "") != Engine.get_version_info().string:
 		return null
-	for key in ["scenario", "clock", "rng", "airport", "conflicts", "passenger_flow", "boarding", "deboarding", "baggage", "resources", "airline_relations", "economy"]:
+	for key in ["scenario", "clock", "rng", "airport", "conflicts", "passenger_flow", "boarding", "deboarding", "baggage", "resources", "airline_relations", "economy", "airside"]:
 		if not data.get(key) is Dictionary: return null
 	for key in ["events", "decisions"]:
 		if not data.get(key) is Array: return null
@@ -538,6 +573,7 @@ static func from_snapshot(data: Dictionary) -> AirportSimulation:
 	if not AirportResources.valid_snapshot(data): return null
 	if not AirlineRelations.valid_snapshot(data): return null
 	if not AirportEconomy.valid_snapshot(data): return null
+	if not _valid_airside(data): return null
 	var sim := AirportSimulation.new()
 	sim.config = data.scenario.duplicate(true)
 	sim._load_cabins()
@@ -546,6 +582,11 @@ static func from_snapshot(data: Dictionary) -> AirportSimulation:
 	sim.clock.restore(data.clock)
 	sim.rng.restore(data.rng)
 	sim.airport.restore(data.airport)
+	# The day's airside network (M12), then its occupancy.
+	var runways_saved: Dictionary = sim.airport.runways.duplicate()
+	sim._setup_airside()
+	sim.airport.runways = runways_saved
+	sim.airside.restore(data.airside)
 	for flight in sim.config.flights:
 		sim.flight_order.append(sim.airport.flights[flight.id])
 	sim.events.history = data.events.duplicate(true)
@@ -656,7 +697,9 @@ static func _valid_snapshot(data: Dictionary) -> bool:
 		if not data.airport.get(key) is Dictionary: return false
 	var state: Dictionary = data.airport
 	if state.flights.is_empty() or state.gates.is_empty(): return false
-	if not _entity_shape(state.get("runway"), AirportRunway.new()): return false
+	if not state.get("runways") is Dictionary or state.runways.is_empty(): return false
+	for key in state.runways:
+		if not _entity_shape(state.runways[key], AirportRunway.new()) or state.runways[key].id != key: return false
 	for key in state.gates:
 		var gate = state.gates[key]
 		if not _entity_shape(gate, AirportGate.new()) or gate.id != key: return false
@@ -688,12 +731,18 @@ static func _valid_snapshot(data: Dictionary) -> bool:
 		ids.append(flight.id)
 	if ids.size() != state.flights.size(): return false
 	var queued: Array = []
-	var operations: Array = state.runway.queue.duplicate()
-	if not state.runway.active_operation.is_empty():
-		var active: Dictionary = state.runway.active_operation
-		for key in ["started_at", "end_tick"]:
-			if not active.get(key) is int: return false
-		operations.append(active)
+	var operations: Array = []
+	for key in state.runways:
+		var runway: Dictionary = state.runways[key]
+		for operation in runway.queue:
+			if not operation is Dictionary or operation.get("runway", key) != key: return false
+			operations.append(operation)
+		if not runway.active_operation.is_empty():
+			var active: Dictionary = runway.active_operation
+			for field in ["started_at", "end_tick"]:
+				if not active.get(field) is int: return false
+			if active.get("runway", key) != key: return false
+			operations.append(active)
 	for operation in operations:
 		if not operation is Dictionary or not state.flights.has(operation.get("flight_id", "")): return false
 		if not operation.get("requested_at") is int or not operation.get("operation") in ["landing", "takeoff"]: return false
@@ -701,6 +750,7 @@ static func _valid_snapshot(data: Dictionary) -> bool:
 		queued.append(operation.flight_id)
 		var f = state.flights[operation.flight_id]
 		if not f.runway_requested: return false
+		if data.scenario.has("airside") and f.runway_id != str(operation.get("runway", "")): return false
 		if f.status != ("approaching" if operation.operation == "landing" else "taxiing_out"): return false
 	for flight in state.flights.values():
 		if flight.runway_requested != (flight.id in queued): return false
@@ -795,11 +845,14 @@ func _release_gate(f: AirportFlight) -> void:
 	f.gate_release_tick = clock.tick
 	_attribute_boarding_delay(f)
 	_finalize_boarding(f)
-	_transition(f, "taxiing_out", int(config.taxi_out_ticks))
-	events.record(clock.tick, "FLIGHT_PUSHBACK", f.id, {"gate_id": gate.id})
+	if airside.enabled():
+		f.runway_id = _choose_runway(f, "takeoff")
+		_begin_taxi(f, "out")
+	else: _transition(f, "taxiing_out", int(config.taxi_out_ticks))
+	events.record(clock.tick, "FLIGHT_PUSHBACK", f.id, {"gate_id": gate.id, "runway": f.runway_id})
 
 func _pushback_floor(f: AirportFlight) -> int:
-	return f.scheduled_departure + f.hold_ticks - int(config.taxi_out_ticks) - int(config.takeoff_ticks)
+	return f.scheduled_departure + f.hold_ticks - _taxi_out_plan(f) - int(config.takeoff_ticks)
 
 func _open_boarding(f: AirportFlight) -> void:
 	f.boarding_phase = "open"
@@ -905,7 +958,7 @@ func _finalize_boarding(f: AirportFlight) -> void:
 ## A gate kept open for missing passengers in a late aircraft's shifted window is
 ## explained by the upstream causes (gate wait, landing queue, variation).
 func _attribute_boarding_delay(f: AirportFlight) -> void:
-	var planned := f.scheduled_departure - int(config.taxi_out_ticks) - int(config.takeoff_ticks)
+	var planned := f.scheduled_departure - _taxi_out_plan(f) - int(config.takeoff_ticks)
 	var hold := clampi(clock.tick - planned, 0, f.hold_ticks)
 	if hold > 0: _add_delay(f, "passenger_hold", hold)
 	var boarding := clock.tick - maxi(_pushback_floor(f), f.gate_closed_tick)
@@ -1078,7 +1131,7 @@ func connection_report(p: Passenger) -> Dictionary:
 	var ideal_walk := graph.route_ticks(graph.route(a.assigned_gate_id, b.assigned_gate_id, true))
 	var report := {
 		"from": a.id, "to": b.id, "status": p.connection_status,
-		"inbound_late": -1 if a.gate_arrival_tick < 0 else maxi(0, a.gate_arrival_tick - (a.scheduled_arrival + int(config.taxi_in_ticks))),
+		"inbound_late": -1 if a.gate_arrival_tick < 0 else maxi(0, a.gate_arrival_tick - (a.scheduled_arrival + _taxi_in_plan(a))),
 		"deboarding": -1 if p.deplaned_airport_tick < 0 or deboarding == null else p.deplaned_airport_tick - deboarding.start_tick,
 		"walk": -1 if p.gate_arrival_time < 0 or p.deplaned_airport_tick < 0 else p.gate_arrival_time - p.deplaned_airport_tick,
 		"ideal_walk": ideal_walk, "reached_gate": p.gate_arrival_time,
@@ -1142,7 +1195,7 @@ func connector_eta(p: Passenger, f: AirportFlight) -> Dictionary:
 		return {"status": "walking to gate %s" % f.assigned_gate_id, "eta": leg_end + maxi(0, remaining)}
 	if p.airport_state == "deboarding":
 		return {"status": "deboarding %s at %s" % [a.flight_number, a.assigned_gate_id], "eta": clock.tick + walk}
-	var dock := a.gate_arrival_tick if a.gate_arrival_tick >= 0 else a.scheduled_arrival + a.inbound_delay_ticks + int(config.taxi_in_ticks)
+	var dock := a.gate_arrival_tick if a.gate_arrival_tick >= 0 else a.scheduled_arrival + a.inbound_delay_ticks + _taxi_in_plan(a)
 	return {"status": "on %s (%s)" % [a.flight_number, a.status.replace("_", " ")], "eta": maxi(dock, clock.tick) + walk}
 
 
@@ -1257,7 +1310,7 @@ func bag_ready_estimate(bag: AirportBag) -> int:
 		"on_aircraft":
 			if bag.leg_index != 0 or bag.kind != "transfer": return -1
 			var a: AirportFlight = airport.flights[bag.legs[0]]
-			var dock := a.gate_arrival_tick if a.gate_arrival_tick >= 0 else a.scheduled_arrival + a.inbound_delay_ticks + int(config.taxi_in_ticks)
+			var dock := a.gate_arrival_tick if a.gate_arrival_tick >= 0 else a.scheduled_arrival + a.inbound_delay_ticks + _taxi_in_plan(a)
 			var secured: TurnaroundTask = turnaround.task(a, "arrival_secured")
 			var rates := baggage._rates(a)
 			var rank := 1
@@ -1355,7 +1408,7 @@ func _airline_record(f: AirportFlight) -> Dictionary:
 		if ticks > cause_ticks:
 			cause = key
 			cause_ticks = ticks
-		if key in ["runway_takeoff_queue", "passenger_hold", "late_inbound"]: continue
+		if key in ["runway_takeoff_queue", "taxi_congestion", "passenger_hold", "late_inbound"]: continue
 		turnaround_delay += ticks
 		if str(key).begins_with("wait:"): resource_delay += ticks
 		if key in ["baggage_load", "baggage_unload", "wait:baggage_crew"]: baggage_delay += ticks
@@ -1478,3 +1531,311 @@ func _post_flight_revenue(f: AirportFlight) -> void:
 
 func _contract_settled(airline: String, contract: Dictionary, passed: bool, now: int) -> void:
 	economy.contract_settled(airline, str(airport.airlines.get(airline, airline)), contract, passed, now)
+
+
+
+# --- airside movement (M12) -----------------------------------------------------------
+
+func _setup_airside() -> void:
+	airport.runways = {}
+	_taxi_plan = {}
+	airside = AirsideNetwork.new()
+	if not config.has("airside"):
+		# Scenarios without an airside keep the single timer-based runway.
+		var legacy := AirportRunway.new()
+		airport.runways[legacy.id] = legacy
+		return
+	var data: Dictionary = config.airside.duplicate(true)
+	data["layout_revision"] = int(config.get("layout_revision", 0))
+	airside.setup(data)
+	for r in airside.runways():
+		var runway := AirportRunway.new()
+		runway.id = r.id
+		runway.label = str(r.get("label", r.id))
+		runway.length_m = int(r.length_m)
+		runway.status = str(r.get("status", "open"))
+		runway.a = r.a
+		runway.b = r.b
+		airport.runways[runway.id] = runway
+
+func _aircraft_type(f: AirportFlight) -> String:
+	return airport.aircraft[f.aircraft_id].aircraft_type_id
+
+func _aircraft_class(f: AirportFlight) -> String:
+	return airport.aircraft[f.aircraft_id].required_gate_type
+
+func _stand(f: AirportFlight) -> String:
+	return str(config.airside.get("stands", {}).get(f.assigned_gate_id, ""))
+
+## The taxi legs for a flight between its stand and a runway.
+func _taxi_route(f: AirportFlight, runway: AirportRunway, direction: String) -> Array:
+	if direction == "in": return airside.route(runway.b, _stand(f), _aircraft_class(f))
+	return airside.route(_stand(f), runway.a, _aircraft_class(f))
+
+## Deterministic runway choice among open runways long enough for the type with
+## a route to or from the stand: lowest estimated time (free-flow taxi + queue
+## length × operation time), then runway id.
+func _choose_runway(f: AirportFlight, operation: String) -> String:
+	if not airside.enabled(): return _runway_ids()[0]
+	var best := ""
+	var best_cost := 1 << 60
+	var op_ticks := int(config.landing_ticks if operation == "landing" else config.takeoff_ticks) + int(config.separation_ticks)
+	for id in _runway_ids():
+		var runway: AirportRunway = airport.runways[id]
+		if not airside.runway_serves(airside.runway(id), _aircraft_type(f)): continue
+		var legs := _taxi_route(f, runway, "in" if operation == "landing" else "out")
+		if legs.is_empty(): continue
+		var cost := airside.free_ticks(legs) + (runway.queue.size() + (0 if runway.active_operation.is_empty() else 1)) * op_ticks
+		if cost < best_cost:
+			best = id
+			best_cost = cost
+	return best if not best.is_empty() else _runway_ids()[0]
+
+## Free-flow taxi time for planning (queue-free best runway); the scenario's
+## constants when there is no airside.
+func _taxi_in_plan(f: AirportFlight) -> int:
+	return _plan_ticks(f, "in", int(config.taxi_in_ticks))
+
+func _taxi_out_plan(f: AirportFlight) -> int:
+	return _plan_ticks(f, "out", int(config.taxi_out_ticks))
+
+func _plan_ticks(f: AirportFlight, direction: String, fallback: int) -> int:
+	if not airside.enabled(): return fallback
+	var key := "%s:%s:%s" % [f.assigned_gate_id, _aircraft_type(f), direction]
+	if not _taxi_plan.has(key):
+		var best := -1
+		for id in _runway_ids():
+			if not airside.runway_serves(airside.runway(id), _aircraft_type(f)): continue
+			var legs := _taxi_route(f, airport.runways[id], direction)
+			if legs.is_empty(): continue
+			var ticks := airside.free_ticks(legs)
+			if best < 0 or ticks < best: best = ticks
+		_taxi_plan[key] = best if best >= 0 else fallback
+	return int(_taxi_plan[key])
+
+## A taxi route begins (after landing, or at pushback).
+func _begin_taxi(f: AirportFlight, direction: String) -> void:
+	var runway: AirportRunway = airport.runways[f.runway_id]
+	f.taxi_route = _taxi_route(f, runway, direction)
+	f.taxi_leg = -1
+	f.leg_enter_tick = -1
+	f.leg_exit_tick = -1
+	f.taxi_start_tick = clock.tick
+	f.taxi_free_ticks = airside.free_ticks(f.taxi_route)
+	f.taxi_state = "starting"
+	f.taxi_blocker = ""
+	_transition(f, "taxiing_in" if direction == "in" else "taxiing_out", f.taxi_free_ticks)
+	_advance_taxi(f)
+
+## Move a taxiing aircraft on: start the route (direction locks), then enter
+## each next leg when it is free. True once the route is complete (at the stand,
+## or at the runway hold). Waiting is only ever for same-direction traffic, a
+## node being crossed, or (before starting) opposing traffic or an occupied gate.
+func _advance_taxi(f: AirportFlight) -> bool:
+	if f.taxi_state == "done": return true
+	if f.taxi_state == "starting":
+		var inbound := f.status == "taxiing_in"
+		if inbound and _has_two_way(f.taxi_route):
+			var gate: AirportGate = airport.gates[f.assigned_gate_id]
+			if not gate.occupied_by_flight_id.is_empty() or clock.tick < gate.available_from:
+				f.taxi_blocker = "gate %s occupied" % gate.id
+				return false
+		if not airside.try_start(f.taxi_route):
+			f.taxi_blocker = "opposing traffic on " + airside.start_blocker(f.taxi_route)
+			return false
+		f.taxi_state = "moving"
+	while true:
+		if f.taxi_leg >= 0 and clock.tick < f.leg_exit_tick: return false
+		# Nobody passes: the aircraft ahead on this edge leaves first.
+		if f.taxi_leg >= 0 and not airside.is_front(f.taxi_route[f.taxi_leg], f.id):
+			f.taxi_blocker = "taxiway"
+			return false
+		var next := f.taxi_leg + 1
+		if next >= f.taxi_route.size():
+			if f.taxi_leg >= 0: airside.leave(f.taxi_route[f.taxi_leg], f.id)
+			_finish_taxi(f)
+			return true
+		var exit_tick := airside.try_enter(f.taxi_route[next], clock.tick, f.id)
+		if exit_tick < 0:
+			f.taxi_blocker = airside.enter_blocker(f.taxi_route[next], clock.tick)
+			return false
+		if f.taxi_leg >= 0: airside.leave(f.taxi_route[f.taxi_leg], f.id)
+		f.taxi_leg = next
+		f.leg_enter_tick = clock.tick
+		f.leg_exit_tick = exit_tick
+		f.taxi_blocker = ""
+	return false
+
+## Gate reassignment while taxiing in. The new route starts where the aircraft
+## is: its route start (still holding there), the end of its current edge
+## (moving), or the stand it holds at (the old gate was occupied). Refused, with
+## the reason, if there is no route or opposing traffic owns it right now.
+## With apply = false nothing changes.
+func _reroute_taxi(f: AirportFlight, gate_id: String, apply: bool) -> String:
+	var stand := str(config.airside.get("stands", {}).get(gate_id, ""))
+	var from := ""
+	var kept: Array = []
+	var rest: Array = []
+	match f.taxi_state:
+		"starting": from = airside.leg_from(f.taxi_route[0])
+		"moving":
+			from = airside.leg_to(f.taxi_route[f.taxi_leg]) if f.taxi_leg >= 0 else airside.leg_from(f.taxi_route[0])
+			kept = f.taxi_route.slice(0, f.taxi_leg + 1)
+			rest = f.taxi_route.slice(f.taxi_leg + 1)
+		_: from = airside.leg_to(f.taxi_route[-1])
+	var legs := airside.route(from, stand, _aircraft_class(f))
+	if legs.is_empty(): return "No taxi route from %s to gate %s" % [str(airside.nodes[from].get("label", from)), gate_id]
+	if f.taxi_state == "starting":
+		if apply:
+			f.taxi_route = legs
+			f.taxi_free_ticks = airside.free_ticks(legs)
+			events.record(clock.tick, "TAXI_REROUTED", f.id, {"gate_id": gate_id, "from": from})
+		return ""
+	# Swap the direction locks of the rest of the route for the new one's.
+	airside.release_route(rest)
+	if not airside.try_start(legs):
+		var blocker := airside.start_blocker(legs)
+		airside.try_start(rest)
+		return "Taxiing: opposing traffic on %s; try again shortly" % blocker
+	if not apply:
+		airside.release_route(legs)
+		airside.try_start(rest)
+		return ""
+	if f.taxi_state == "moving":
+		f.taxi_route = kept + legs
+		f.taxi_free_ticks = airside.free_ticks(kept) + airside.free_ticks(legs)
+	else:
+		# Holding at the old stand: a new taxi from there.
+		f.taxi_route = legs
+		f.taxi_leg = -1
+		f.leg_enter_tick = -1
+		f.leg_exit_tick = -1
+		f.taxi_state = "moving"
+		f.taxi_start_tick = clock.tick
+		f.taxi_free_ticks = airside.free_ticks(legs)
+		f.taxi_blocker = ""
+	events.record(clock.tick, "TAXI_REROUTED", f.id, {"gate_id": gate_id, "from": from})
+	return ""
+
+func _has_two_way(legs: Array) -> bool:
+	for leg in legs:
+		if not bool(airside.edges[AirsideNetwork.leg_edge(leg)].get("oneway", false)): return true
+	return false
+
+func _finish_taxi(f: AirportFlight) -> void:
+	f.taxi_state = "done"
+	f.taxi_blocker = ""
+	var actual := clock.tick - f.taxi_start_tick
+	var waited := maxi(0, actual - f.taxi_free_ticks)
+	# Inbound taxi may come in parts (a reroute from a held stand): they add up.
+	if f.status == "taxiing_in":
+		f.taxi_in_ticks_actual = maxi(0, f.taxi_in_ticks_actual) + actual
+		f.taxi_in_wait_ticks += waited
+	else:
+		f.taxi_out_ticks_actual = actual
+		f.taxi_out_wait_ticks = waited
+	if waited > 0: _add_delay(f, "taxi_congestion", waited)
+	events.record(clock.tick, "TAXI_COMPLETED", f.id, {"direction": "in" if f.status == "taxiing_in" else "out", "ticks": actual, "waited": waited, "runway": f.runway_id})
+
+## What a taxiing aircraft is doing, for the flight detail.
+func taxi_status(f: AirportFlight) -> Dictionary:
+	if not airside.enabled() or f.taxi_route.is_empty() or not f.status in ["taxiing_in", "taxiing_out"]: return {}
+	var names: Array = []
+	for leg in f.taxi_route:
+		var node := airside.leg_to(leg)
+		var label := str(airside.nodes[node].get("label", ""))
+		if not label.is_empty() and not label in names: names.append(label)
+	var ahead := ""
+	var blocker := f.taxi_blocker
+	# Held back on an edge by the aircraft ahead (past its free-flow time on it).
+	if blocker.is_empty() and f.taxi_state == "moving" and f.taxi_leg >= 0 and clock.tick >= f.leg_enter_tick + int(airside.edges[AirsideNetwork.leg_edge(f.taxi_route[f.taxi_leg])].ticks) and clock.tick < f.leg_exit_tick:
+		blocker = "taxiway"
+	if blocker == "taxiway":
+		var leg: String = f.taxi_route[f.taxi_leg] if f.taxi_leg >= 0 else f.taxi_route[0]
+		var other := airside.front(leg)
+		# Refused entry to the next edge: whoever entered it last is ahead.
+		if (other == f.id or f.taxi_leg < 0) and f.taxi_leg + 1 < f.taxi_route.size():
+			other = str(airside.edge_state[AirsideNetwork.leg_edge(f.taxi_route[f.taxi_leg + 1])].get("last_who", ""))
+		if airport.flights.has(other) and other != f.id: ahead = airport.flights[other].flight_number
+	return {"direction": "in" if f.status == "taxiing_in" else "out", "runway": airport.runways[f.runway_id].label if airport.runways.has(f.runway_id) else "",
+		"route": names, "state": f.taxi_state, "blocker": blocker, "ahead": ahead}
+
+## Where an aircraft is on the airside, in world metres (or empty).
+func aircraft_position(f: AirportFlight) -> Dictionary:
+	if not airside.enabled(): return {}
+	if f.status in ["taxiing_in", "taxiing_out"] and not f.taxi_route.is_empty():
+		if f.taxi_leg < 0:
+			var start := airside.leg_from(f.taxi_route[0])
+			return {"pos": airside.node_position(start)}
+		var leg: String = f.taxi_route[f.taxi_leg]
+		return {"pos": airside.position_on(leg, f.leg_enter_tick, f.leg_exit_tick, clock.tick)}
+	return {}
+
+## Airside summary: per runway movements, utilization and queue; taxi times.
+func airside_metrics() -> Dictionary:
+	var runways := {}
+	for id in _runway_ids():
+		var r: AirportRunway = airport.runways[id]
+		var span := maxi(1, clock.tick - int(config.start_tick))
+		runways[id] = {"label": r.label, "movements": r.movements, "utilization": float(r.busy_ticks) / span, "queue": r.queue.size(), "peak_queue": r.peak_queue, "length_m": r.length_m, "status": r.status}
+	var taxi_in := 0
+	var taxi_out := 0
+	var waits := 0
+	var count_in := 0
+	var count_out := 0
+	for f: AirportFlight in flight_order:
+		if f.taxi_in_ticks_actual >= 0:
+			taxi_in += f.taxi_in_ticks_actual
+			count_in += 1
+		if f.taxi_out_ticks_actual >= 0:
+			taxi_out += f.taxi_out_ticks_actual
+			count_out += 1
+		waits += f.taxi_in_wait_ticks + f.taxi_out_wait_ticks
+	return {"runways": runways, "mean_taxi_in_ticks": 0 if count_in == 0 else taxi_in / count_in, "mean_taxi_out_ticks": 0 if count_out == 0 else taxi_out / count_out,
+		"taxi_wait_ticks": waits, "routes": airside._routes.size()}
+
+
+## M12: the saved airside occupancy agrees with the network and the aircraft on it.
+static func _valid_airside(data: Dictionary) -> bool:
+	var state: Dictionary = data.airport
+	var saved = data.get("airside")
+	if not saved is Dictionary: return false
+	if not data.scenario.has("airside"):
+		return saved.get("edge_state", {}).is_empty() and state.runways.size() == 1
+	var airside: Dictionary = data.scenario.airside
+	if not AirsideNetwork.valid_definition(airside): return false
+	if not saved.get("edge_state") is Dictionary or not saved.get("node_busy") is Dictionary: return false
+	var edges := {}
+	for e in airside.edges: edges[e.id] = e
+	if saved.edge_state.size() != edges.size(): return false
+	var runway_ids := {}
+	for r in airside.runways: runway_ids[r.id] = r
+	if state.runways.size() != runway_ids.size(): return false
+	var locks := {}
+	for key in state.flights:
+		var f: Dictionary = state.flights[key]
+		if not f.runway_id.is_empty() and not runway_ids.has(f.runway_id): return false
+		if not f.status in ["taxiing_in", "taxiing_out"] or f.taxi_route.is_empty(): continue
+		if f.taxi_leg < -1 or f.taxi_leg >= f.taxi_route.size(): return false
+		if not f.taxi_state in ["starting", "moving", "done"]: return false
+		for leg in f.taxi_route:
+			if not leg is String or not edges.has(AirsideNetwork.leg_edge(leg)) or not AirsideNetwork.leg_dir(leg) in [1, -1]: return false
+		# Two-way locks held: every two-way leg from the current one on, once moving.
+		if f.taxi_state != "moving": continue
+		for i in range(maxi(0, f.taxi_leg), f.taxi_route.size()):
+			var leg: String = f.taxi_route[i]
+			var e: Dictionary = edges[AirsideNetwork.leg_edge(leg)]
+			if bool(e.get("oneway", false)): continue
+			var held: Array = locks.get(e.id, [0, 0])
+			if held[0] > 0 and held[1] != AirsideNetwork.leg_dir(leg): return false
+			locks[e.id] = [held[0] + 1, AirsideNetwork.leg_dir(leg)]
+	for id in saved.edge_state:
+		var st = saved.edge_state[id]
+		if not edges.has(id) or not st is Dictionary or not st.get("occupants") is Array: return false
+		for who in st.occupants:
+			var f = state.flights.get(who)
+			if f == null or f.taxi_leg < 0 or f.taxi_leg >= f.taxi_route.size() or AirsideNetwork.leg_edge(f.taxi_route[f.taxi_leg]) != id: return false
+		var held: Array = locks.get(id, [0, 0])
+		if int(st.get("locks", -1)) != held[0]: return false
+		if held[0] > 0 and int(st.get("lock_dir", 0)) != held[1]: return false
+	return true

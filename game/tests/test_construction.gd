@@ -274,7 +274,7 @@ func test_corrupt_layouts_are_rejected() -> void:
 	var c := career()
 	c.build("security_lane", "security_west")
 	var good: Dictionary = JSON.parse_string(JSON.stringify(c.snapshot()))
-	assert_eq(int(good.version), 11)
+	assert_eq(int(good.version), AirportSimulation.SAVE_VERSION)
 	var mutations := {
 		"duplicate build id": func(d): d.career.layout.objects.append(d.career.layout.objects[0].duplicate()),
 		"two objects in one slot": func(d):
@@ -286,6 +286,7 @@ func test_corrupt_layouts_are_rejected() -> void:
 		"gate on a security site": func(d): d.career.layout.objects[0].site = "security_west",
 		"plan above built capacity": func(d): d.career.resource_plan.fuel_unit = 7,
 		"v10": func(d): d.version = 10,
+		"v11": func(d): d.version = 11,
 	}
 	for label in mutations:
 		var bad: Dictionary = good.duplicate(true)

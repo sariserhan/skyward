@@ -1407,3 +1407,172 @@ Validation checks:
 - an operating day's `layout_revision` equal to the layout's
 
 v10 is rejected.
+
+
+## D-052 — One airside graph; Riverdale's airside imported as a calibrated schematic
+
+**Date:** 2026-09-25
+**Status:** Accepted (M12)
+
+- **One graph.** `config.airside` defines the airside:
+  - nodes `{x, y, kind, label}` in metres
+  - edges `{id, from, to, length_m, oneway, classes, kind}`
+  - runways `{id, label, a, b, length_m, status}`
+  - a stand node per gate
+
+  `AirsideNetwork` is built from it once per day. It is the only thing
+  aircraft move on. The map draws its geometry and interpolates aircraft
+  along their current edge, so the animation follows the simulation.
+- **The conflict, and how it is resolved.** An unchanged Riverdale must
+  reproduce M11 exactly (spec §4), but taxi time should come from geometry
+  (§45).
+  - Riverdale's existing airside is imported as a schematic network: one-way
+    inbound and outbound apron lanes, gate stubs, a runway exit and a hold.
+  - Its edge lengths are calibrated so every gate route is exactly the old
+    1,800 m = 180 s in and out.
+  - A recirculation taxiway (hold → exit, one-way east, 3,000 m) lets an
+    aircraft get from any stand back to the in-lane. No shortest runway route
+    can use it, so it changes nothing unless a gate is reassigned.
+  - Everything the player builds takes its length from geometry: A9/A10 stand
+    links, taxiways and runways.
+  - Unchanged day 1 therefore keeps the M11 timeline and money to the cent
+    (+$18,415.50). New construction is geometric.
+- **Overlays can replace.** A scenario overlay may list top-level keys under
+  `replace`, to swap a whole section instead of merging it.
+  `riverdale_single_taxiway.json` uses this for its own airside.
+
+
+## D-053 — Taxiway occupancy that cannot deadlock
+
+**Date:** 2026-09-25
+**Status:** Accepted (M12)
+
+Routes are deterministic Dijkstra over free-flow ticks
+(`ceil(length ÷ taxi speed × 10)`), with one-way edges, aircraft class and
+lexical node tie-breaks. They are computed only at events: after landing
+(runway exit → stand) and at pushback (stand → runway entry). They are cached
+per `layout_revision`.
+
+- **Same direction.** An aircraft enters an edge no sooner than
+  `headway_ticks` (15 s) after the previous entry. Its exit is never before
+  the leader's exit + headway. Only the aircraft at the front of an edge may
+  leave it, so nobody passes.
+- **Intersections.** Entering an edge from a node reserves that node for
+  `node_ticks` (5 s).
+- **Opposing traffic.** Before moving, an aircraft locks the direction of
+  every two-way edge on its whole route; otherwise it waits where it is. An
+  arrival whose route uses two-way edges starts only when its gate is free.
+  A departure has already released its gate at pushback, and waits on the
+  pushback position.
+- **Why it cannot deadlock.** Once moving, an aircraft waits only for
+  same-direction leaders or a node crossing, and both always clear. Waits at
+  the ends (the gate, the runway queue) never depend on followers.
+
+Deadlock sweeps (randomized compressed mornings on the one-lane airport)
+check this. Occupancy is saved: per-edge last entry and exit, lock direction
+and count, occupants and last entrant, plus node busy times.
+
+**Stands are ends, never a way through.** An arrival whose gate is still
+occupied finishes its route at the stand and holds there, holding no taxiway
+or locks. That keeps the M11 gate wait, and the flight detail says *HOLDING ·
+gate A3 occupied*.
+
+**Reassigning a taxiing aircraft reroutes it from where it is:** its route
+start, the end of its current edge, or the stand it holds at. It is refused,
+with the reason, if no route exists (a gate already passed on a one-way lane)
+or opposing traffic owns the new route. Waits across parts add up; nothing
+teleports.
+
+
+## D-054 — Runways as resources: length, selection, ends-only access
+
+**Date:** 2026-09-25
+**Status:** Accepted (M12)
+
+- **Runways.** `AirportState.runways` holds one `AirportRunway` per runway,
+  each with its own FIFO queue, active operation, separation, busy time,
+  movements and peak queue. Operations run in the runway's heading: land from
+  end A and exit at B; take off at A.
+- **Compatibility.** An aircraft type needs a minimum length (A220 1,500 m,
+  737 1,800 m, A321 2,000 m, 787 2,800 m) and an open runway.
+- **Selection** is deterministic among compatible, open runways with a route:
+  the lowest free-flow taxi ticks plus queue length × (operation +
+  separation), then runway id. Arrivals choose when requesting landing;
+  departures at pushback.
+- **Independence.** Runways are independent: M12 has no crossing runways.
+- **Ends only.** Taxiways may touch a runway only at its end nodes and may
+  not cross it (the simpler safe rule).
+- **Planning** uses the best free-flow taxi time per gate and aircraft type
+  in place of the fixed `taxi_in_ticks` / `taxi_out_ticks`. Scenarios
+  without an airside keep the timers.
+
+
+## D-055 — Taxi delay is its own cause, exactly attributed
+
+**Date:** 2026-09-25
+**Status:** Accepted (M12)
+
+- **Taxi-out.** Time beyond the planned (best free-flow) taxi-out becomes
+  `taxi_congestion` in the departure breakdown, between the runway queue and
+  the pushback chain. That time is waits, or a longer route to a less busy
+  runway.
+- **Taxi-in.** Waits are split out of `late_inbound` into `taxi_congestion`,
+  and the inbound root keeps the rest.
+- **Exactness.** The breakdown still sums to the delay exactly (tested on
+  every flight of congested days).
+- **Airlines.** M9 airline records count taxi congestion as airside, not
+  turnaround.
+- **Riverdale's out-lanes.** Merging departures on Riverdale's out-lanes now
+  show 15 s of taxi congestion (148 ticks on the default day) that M11 called
+  runway queue. The takeoff times are identical.
+
+
+## D-056 — Airside construction; save schema v12
+
+**Date:** 2026-09-25
+**Status:** Accepted (M12)
+
+**Imported pieces.** Riverdale's airside becomes 38 `legacy_taxiway` objects
+(`AT-<edge>`) and one `legacy_runway` (`AR-R1`), so it can be changed within
+the rules.
+
+**New objects.**
+
+- **Taxiway** `{from, to, direction}`, where each end is a network node or a
+  free grid anchor `G_x_y` (300 m grid inside `airside.zones`). It is
+  refused if it:
+  - does not touch the network
+  - crosses an edge or passes through a node without a junction
+  - enters the terminal zone
+  - crosses a runway (it may touch a runway only at its ends)
+  - duplicates a link
+
+  Cost: $30 per metre.
+- **Runway** `{start anchor, heading E/W/N/S, length 2,000/2,400/2,800/3,200 m}`.
+  It must stay inside the zones, at least 300 m from other runways, and clear
+  of taxiways and nodes. Cost: $60 per metre, so a 2,800 m runway is $168,000.
+  It needs taxiways to its ends before a day can start.
+- **Changes** between days are free: a taxiway's direction (two-way, one-way
+  either way) and a runway's status (open/closed).
+- **Pads A9/A10** gain stand nodes and geometric one-way links to the apron
+  lanes.
+
+**Validation.** Every gate must have a route from and to an open runway,
+every open runway must be connected, and every flight's aircraft type must
+have a long-enough reachable runway. Demolition and changes that break this
+are refused and undone. A request tier's capacity check includes runway
+capability, so a 787 request on a 2,400 m runway reads INSUFFICIENT until a
+longer runway exists.
+
+**Save schema v12.**
+
+- **Career:** airside layout objects are validated (known imported edges and
+  runways, direction values, offered lengths, headings, anchors), and the
+  applied airside must be a well-formed network.
+- **Day:** the runways dict, flight taxi state (route, leg, enter/exit ticks,
+  waits, runway), edge occupancy and node reservations.
+- **Validation:** edges reference nodes, routes reference edges, lock counts
+  match the aircraft holding them, occupants are on the edge of their current
+  leg, and runway ids exist.
+
+v11 is rejected.

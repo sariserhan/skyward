@@ -46,7 +46,14 @@ var built_list: ItemList
 var built_ids: Array = []
 var day_tabs: TabContainer
 var demolish_button: Button
-const BUILD_CATEGORIES := ["gates", "terminal", "security", "baggage", "operations"]
+const BUILD_CATEGORIES := ["gates", "terminal", "security", "baggage", "operations", "airside"]
+## M12 airside tool: mini map, taxiway direction, runway heading and length.
+var airside_box: VBoxContainer
+var airside_map: AirsideBuildMap
+var airside_direction: OptionButton
+var airside_heading: OptionButton
+var airside_length: OptionButton
+var airside_toggle: Button
 var bag_metrics_second: int = -1
 var pause_button: Button
 var debug_panel: VBoxContainer
@@ -314,7 +321,7 @@ func _build() -> void:
 	_button(debug_actions, "+Delay", func():
 		status_label.text = "10 minute hold added" if sim.force_delay(selected_id) else "Flight cannot be held now"
 		_refresh())
-	status_label = _label(layout, "Space: pause  ·  1 / 2 / 4: speed  ·  F3: debug   |   Select a flight or aircraft to inspect", 12)
+	status_label = _label(layout, "Space: pause  ·  1 / 2 / 4: speed  ·  O: airside overlay  ·  F3: debug   |   Select a flight or aircraft to inspect", 12)
 	status_label.modulate = Color("a7becd")
 	boarding_overlay = BoardingOverlay.new()
 	boarding_overlay.visible = false
@@ -385,7 +392,7 @@ func _refresh() -> void:
 	var flight: AirportFlight = sim.airport.flights[selected_id]
 	var aircraft: AirportAircraft = sim.airport.aircraft[flight.aircraft_id]
 	var text := "[font_size=23][b]%s[/b][/font_size]  ·  %s\n%s\n%s → %s\n\nGate %s  ·  %s\nArrival  %s  /  %s\nDeparture  %s\nEstimated  %s" % [flight.flight_number, aircraft.aircraft_type_id, sim.airport.airlines[flight.airline_id], flight.origin, flight.destination, flight.assigned_gate_id, flight.status.replace("_", " "), AirportClock.display(flight.scheduled_arrival), "pending" if flight.actual_arrival < 0 else AirportClock.display(flight.actual_arrival), AirportClock.display(flight.scheduled_departure), AirportClock.display(flight.estimated_departure)]
-	text += _holding_text(flight) + _delay_text(flight) + _turnaround_text(flight) + _baggage_text(flight) + _boarding_text(flight) + "\n"
+	text += _taxi_text(flight) + _holding_text(flight) + _delay_text(flight) + _turnaround_text(flight) + _baggage_text(flight) + _boarding_text(flight) + "\n"
 	text += "\n\n[b]Passengers at gate[/b]  %d / %d" % [int(sim.passenger_flow.ready_by_flight.get(flight.id, 0)), flight.passenger_ids.size()]
 	detail.text = text
 	_refresh_turnaround_tree(flight)
@@ -443,7 +450,9 @@ func _refresh() -> void:
 	if alert_ids.is_empty():
 		alerts.add_item("No active operations alerts")
 		alerts.set_item_disabled(0, true)
-	debug_label.text = "DEBUG · seed %d · tick %d\n%d active flights · %d runway queued\n%d events · %d FPS · last tick %d µs" % [sim.seed_value, sim.clock.tick, sim.airport.flights.size() - metrics.departed, sim.airport.runway.queue.size(), sim.events.history.size(), Engine.get_frames_per_second(), sim.last_tick_usec]
+	var queued := 0
+	for r: AirportRunway in sim.airport.runways.values(): queued += r.queue.size()
+	debug_label.text = "DEBUG · seed %d · tick %d\n%d active flights · %d runway queued · %d cached routes\n%d events · %d FPS · last tick %d µs" % [sim.seed_value, sim.clock.tick, sim.airport.flights.size() - metrics.departed, queued, sim.airside._routes.size(), sim.events.history.size(), Engine.get_frames_per_second(), sim.last_tick_usec]
 
 func _refresh_warnings() -> void:
 	var gate_id := gate_choice.get_item_text(gate_choice.selected)
@@ -518,7 +527,10 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		KEY_2: sim.clock.set_speed(2)
 		KEY_4: sim.clock.set_speed(4)
 		KEY_F3:
-			if OS.is_debug_build(): debug_panel.visible = not debug_panel.visible
+			if OS.is_debug_build():
+				debug_panel.visible = not debug_panel.visible
+				map.debug = debug_panel.visible
+		KEY_O: map.overlay = not map.overlay
 	_refresh()
 
 
@@ -634,6 +646,22 @@ func _cabin_text(p: Passenger, f: AirportFlight) -> String:
 	return text
 
 ## Additive departure-delay split once the flight has left; live causes before.
+## M12: where a taxiing aircraft is going and what it is waiting for.
+func _taxi_text(f: AirportFlight) -> String:
+	var t := sim.taxi_status(f)
+	if t.is_empty(): return ""
+	var where := ("TAXIING TO %s" % t.runway) if t.direction == "out" else ("TAXIING TO GATE %s" % f.assigned_gate_id)
+	var line := "\n[color=#70dec0][b]%s[/b][/color]" % where
+	if not t.route.is_empty(): line += "  ·  via " + " → ".join(t.route)
+	match t.blocker:
+		"": pass
+		"taxiway": line += "\n[color=#ffc078]WAITING FOR TAXIWAY%s[/color]" % ("" if t.ahead.is_empty() else " · %s ahead" % t.ahead)
+		"intersection": line += "\n[color=#ffc078]WAITING AT INTERSECTION[/color]"
+		_: line += "\n[color=#ffc078]HOLDING · %s[/color]" % t.blocker
+	var waited := f.taxi_in_wait_ticks if t.direction == "in" else f.taxi_out_wait_ticks
+	if f.taxi_state == "done" and waited > 0: line += "  ·  waited %s" % _mmss(waited)
+	return line
+
 func _delay_text(f: AirportFlight) -> String:
 	if f.status == "departed":
 		var late := f.actual_departure - f.scheduled_departure
@@ -652,7 +680,7 @@ func _cause_label(f: AirportFlight, cause: String) -> String:
 	if cause.begins_with("wait:"): return "Waiting for " + sim.resources.unit_name(cause.substr(5))
 	var t: TurnaroundTask = sim.turnaround.task(f, cause)
 	if t != null: return t.label
-	return {"late_inbound": "Late inbound", "passenger_hold": "Passenger hold", "runway_takeoff_queue": "Runway queue"}.get(cause, cause.capitalize())
+	return {"late_inbound": "Late inbound", "passenger_hold": "Passenger hold", "runway_takeoff_queue": "Runway queue", "taxi_congestion": "Taxi congestion"}.get(cause, cause.capitalize())
 
 ## One line near the top: what is holding departure now.
 func _holding_text(f: AirportFlight) -> String:
@@ -1022,7 +1050,7 @@ func _request_text(airline: String, e: Dictionary) -> String:
 	# M11: can the airport as built take them?
 	if sim.airlines.state[airline].request in ["", "offered"]:
 		var missing := career.tier_capacity(request)
-		text += "\n  Gate capacity: " + ("[color=#70dec0]SUFFICIENT[/color]" if missing.is_empty() else "[color=#e5484d]INSUFFICIENT[/color] · %s Build the capacity before starting the next day." % " ".join(missing))
+		text += "\n  Capacity (gates, runway): " + ("[color=#70dec0]SUFFICIENT[/color]" if missing.is_empty() else "[color=#e5484d]INSUFFICIENT[/color] · %s Build the capacity before starting the next day." % " ".join(missing))
 	match sim.airlines.state[airline].request:
 		"offered": return text + "\n  [url=accept:%s][color=#70dec0]ACCEPT[/color][/url]    [url=decline:%s][color=#ffc078]DECLINE[/color][/url]" % [airline, airline]
 		"accepted": return text + "\n  Accepted: committed to tomorrow's schedule"
@@ -1217,20 +1245,54 @@ func _build_build_tab(tabs: TabContainer) -> void:
 	build_sites = OptionButton.new()
 	build_sites.item_selected.connect(func(_i): _refresh_build_info())
 	build.add_child(build_sites)
+	airside_box = VBoxContainer.new()
+	airside_box.visible = false
+	build.add_child(airside_box)
+	airside_map = AirsideBuildMap.new()
+	airside_map.layout = career.layout
+	airside_map.picked.connect(_refresh_build_info)
+	airside_box.add_child(airside_map)
+	var options := HBoxContainer.new()
+	airside_box.add_child(options)
+	airside_direction = OptionButton.new()
+	for label in ["Two-way", "One-way →", "One-way ←"]: airside_direction.add_item(label)
+	airside_direction.item_selected.connect(func(_i): _refresh_build_info())
+	options.add_child(airside_direction)
+	airside_heading = OptionButton.new()
+	for h in ["E", "W", "N", "S"]: airside_heading.add_item("Heading " + h)
+	airside_heading.item_selected.connect(func(_i): _refresh_build_info())
+	options.add_child(airside_heading)
+	airside_length = OptionButton.new()
+	for m in career.layout.catalog.get("runway", {}).get("lengths_m", []): airside_length.add_item("%d m" % int(m))
+	airside_length.item_selected.connect(func(_i): _refresh_build_info())
+	options.add_child(airside_length)
 	build_info = _label(build, "", 13)
 	build_info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	build_info.custom_minimum_size.y = 74
 	build_button = _button(build, "BUILD", func():
 		var item: String = build_item_ids[build_items.get_selected_items()[0]]
-		var site: String = build_site_ids[build_sites.selected]
-		var result := career.build(item, site)
+		var result: Dictionary
+		if item == "taxiway":
+			result = career.build_taxiway(airside_map.picks[0], airside_map.picks[1], [0, 1, -1][airside_direction.selected])
+		elif item == "runway":
+			result = career.build_runway(airside_map.picks[0], _airside_heading(), _airside_length())
+		else: result = career.build(item, build_site_ids[build_sites.selected])
 		status_label.text = result.get("error", "Built %s (%s)" % [career.layout.catalog[item].label, result.get("id", "")])
+		airside_map.reset()
 		_show_day_panel())
 	_label(build, "BUILT", 14)
 	built_list = ItemList.new()
 	built_list.custom_minimum_size.y = 120
 	built_list.item_selected.connect(func(_i): _refresh_demolish())
 	build.add_child(built_list)
+	airside_toggle = _button(build, "", func():
+		var o := career.layout.find(built_ids[built_list.get_selected_items()[0]])
+		var result: Dictionary
+		if o.type in ["runway", "legacy_runway"]: result = career.set_airside(o.id, "status", "closed" if o.status == "open" else "open")
+		else: result = career.set_airside(o.id, "direction", {0: 1, 1: -1, -1: 0}[int(o.get("direction", 0))])
+		status_label.text = result.get("error", "Changed " + career._object_label(career.layout.find(o.id)))
+		_show_day_panel())
+	airside_toggle.visible = false
 	demolish_button = _button(build, "DEMOLISH", func():
 		var result := career.demolish(built_ids[built_list.get_selected_items()[0]])
 		status_label.text = result.get("error", "Demolished · refund %s" % AirportEconomy.money(int(result.get("refund_cents", 0))))
@@ -1245,8 +1307,9 @@ func _refresh_build_tab() -> void:
 	build_item_ids = []
 	for type in AirportLayout._sorted(career.layout.catalog.keys()):
 		var item: Dictionary = career.layout.catalog[type]
-		if item.category != category: continue
-		build_items.add_item("%s · %s" % [item.label, AirportEconomy.money(int(item.cost_cents))])
+		if item.category != category or item.site_kind == "legacy": continue
+		var price := AirportEconomy.money(int(item.cost_cents)) if not item.has("cost_per_m_cents") else AirportEconomy.money(int(item.cost_per_m_cents)) + " per metre"
+		build_items.add_item("%s · %s" % [item.label, price])
 		build_item_ids.append(type)
 		if type == keep: build_items.select(build_items.item_count - 1)
 	if build_items.get_selected_items().is_empty() and build_items.item_count > 0: build_items.select(0)
@@ -1255,7 +1318,9 @@ func _refresh_build_tab() -> void:
 	built_ids = []
 	for o in career.layout.objects:
 		var item: Dictionary = career.layout.catalog[o.type]
-		built_list.add_item("%s · %s%s" % [item.label, career.layout.sites[o.site].get("label", o.site.replace("_", " ")), " (new)" if o.id in career.layout.session_ids else ""])
+		if (item.category == "airside") != (category == "airside"): continue
+		var where: String = career._object_label(o) + _airside_state(o) if item.category == "airside" else "%s · %s" % [item.label, career.layout.sites[o.site].get("label", o.site.replace("_", " "))]
+		built_list.add_item("%s%s" % [where, " (new)" if o.id in career.layout.session_ids else ""])
 		built_ids.append(o.id)
 	_refresh_demolish()
 
@@ -1267,6 +1332,17 @@ func _refresh_build_sites() -> void:
 		_refresh_build_info()
 		return
 	var type: String = build_item_ids[selected[0]]
+	var airside: bool = career.layout.catalog[type].category == "airside"
+	build_sites.visible = not airside
+	airside_box.visible = airside
+	if airside:
+		airside_map.mode = type
+		airside_map.reset()
+		airside_direction.visible = type == "taxiway"
+		airside_heading.visible = type == "runway"
+		airside_length.visible = type == "runway"
+		_refresh_build_info()
+		return
 	for site_id in AirportLayout._sorted(career.layout.sites.keys()):
 		var site: Dictionary = career.layout.sites[site_id]
 		if site.kind != career.layout.catalog[type].site_kind: continue
@@ -1287,6 +1363,9 @@ func _refresh_build_sites() -> void:
 func _refresh_build_info() -> void:
 	var selected := build_items.get_selected_items()
 	build_button.disabled = true
+	if not selected.is_empty() and career.layout.catalog[build_item_ids[selected[0]]].category == "airside":
+		_refresh_airside_info(build_item_ids[selected[0]])
+		return
 	if selected.is_empty() or build_sites.item_count == 0 or build_sites.is_item_disabled(maxi(0, build_sites.selected)):
 		build_info.text = "Nowhere free to build this."
 		return
@@ -1316,10 +1395,78 @@ func _refresh_build_info() -> void:
 func _refresh_demolish() -> void:
 	var selected := built_list.get_selected_items()
 	demolish_button.disabled = selected.is_empty()
+	airside_toggle.visible = false
 	if selected.is_empty():
 		demolish_button.text = "DEMOLISH"
 		return
 	var o := career.layout.find(built_ids[selected[0]])
-	var cost := int(career.layout.catalog[o.type].cost_cents)
+	if o.type in AirportLayout.AIRSIDE_TYPES:
+		airside_toggle.visible = true
+		if o.type in ["runway", "legacy_runway"]: airside_toggle.text = "CLOSE RUNWAY" if o.status == "open" else "OPEN RUNWAY"
+		else: airside_toggle.text = {0: "MAKE ONE-WAY →", 1: "MAKE ONE-WAY ←", -1: "MAKE TWO-WAY"}[int(o.get("direction", 0))]
+	var cost := career.layout.object_cost(o) if o.type in AirportLayout.AIRSIDE_TYPES else int(career.layout.catalog[o.type].cost_cents)
 	var refund := cost if o.id in career.layout.session_ids else cost * int(career.base.construction.get("refund_permille", 0)) / 1000
 	demolish_button.text = "DEMOLISH · refund %s" % AirportEconomy.money(refund)
+
+
+# --- airside tool (M12) ------------------------------------------------------------------
+
+func _airside_heading() -> String:
+	return ["E", "W", "N", "S"][maxi(0, airside_heading.selected)]
+
+func _airside_length() -> int:
+	var lengths: Array = career.layout.catalog.get("runway", {}).get("lengths_m", [3000])
+	return int(lengths[clampi(airside_length.selected, 0, lengths.size() - 1)])
+
+func _airside_state(o: Dictionary) -> String:
+	match o.type:
+		"runway", "legacy_runway": return "" if o.status == "open" else " · CLOSED"
+		_:
+			return {0: " · two-way", 1: " · one-way", -1: " · one-way (reversed)"}[int(o.get("direction", 0))]
+
+## Preview: length, cost, validity, what it serves, and what the day would say.
+func _refresh_airside_info(type: String) -> void:
+	airside_map.heading = _airside_heading()
+	airside_map.length_m = _airside_length()
+	airside_map.queue_redraw()
+	var picks: Array = airside_map.picks
+	var cash := career.settled_cash_cents()
+	var layout := career.layout
+	var reason := ""
+	var cost := 0
+	var text := ""
+	if type == "taxiway":
+		if picks.size() < 2:
+			build_info.text = "Click two points on the map: an existing taxiway node, runway end or hold, and another node or a free grid point. Taxiways may not cross each other or a runway except at shared points, nor enter the terminal."
+			return
+		reason = layout.taxiway_error(picks[0], picks[1])
+		var a := layout.current_airside()
+		var length := roundi(AirportLayout._pos(a, picks[0]).distance_to(AirportLayout._pos(a, picks[1])))
+		cost = layout.taxiway_cost(picks[0], picks[1])
+		text = "Taxiway %s → %s · %d m · %.0f s at taxi speed · narrow and wide" % [picks[0], picks[1], length, length / float(a.get("taxi_speed_mps", 10))]
+	else:
+		if picks.is_empty():
+			build_info.text = "Click a free grid point for the runway's start, then pick its heading and length. Runways must keep 300 m from other runways and stay clear of taxiways; connect taxiways to its two ends afterwards."
+			return
+		reason = layout.runway_error(picks[0], _airside_heading(), _airside_length())
+		cost = layout.runway_cost(_airside_length())
+		var serves: Array = []
+		var minimums: Dictionary = layout.base.airside.get("min_runway_length_m", {})
+		for t in AirportLayout._sorted(minimums.keys()):
+			if _airside_length() >= int(minimums[t]): serves.append(t)
+		text = "Runway %s · %d m heading %s · serves %s" % [layout.next_runway_id(), _airside_length(), _airside_heading(), ", ".join(serves) if not serves.is_empty() else "nothing"]
+	text += "\nCash %s · cost %s · after %s" % [AirportEconomy.money(cash), AirportEconomy.money(cost), AirportEconomy.money(cash - cost)]
+	if not reason.is_empty():
+		build_info.text = text + "\n[cannot build] " + reason
+		return
+	# What the next day would say with it in place (connectivity, gates, runways).
+	var trial := AirportLayout.new()
+	trial.bind(career.base)
+	trial.restore(layout.snapshot())
+	if type == "taxiway": trial.place_airside({"type": "taxiway", "from": picks[0], "to": picks[1], "direction": [0, 1, -1][airside_direction.selected]})
+	else: trial.place_airside({"type": "runway", "start": picks[0], "heading": _airside_heading(), "length_m": _airside_length(), "status": "open"})
+	var config := trial.apply(career.day_config(false))
+	var errors := trial.validate(config)
+	text += "\n" + ("Airport valid with it." if errors.is_empty() else "Next day would still need: " + str(errors[0]))
+	build_info.text = text
+	build_button.disabled = cash < cost

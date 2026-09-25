@@ -14,13 +14,15 @@ var bags: Dictionary = {}
 var security_checkpoints: Dictionary = {}
 var airlines: Dictionary = {}
 var resources: Dictionary = {}
-var runway := AirportRunway.new()
+## Runway id -> AirportRunway (M12: several may be built).
+var runways: Dictionary = {}
 var turnaround_tasks: Dictionary = {}
 
 func to_dict() -> Dictionary:
 	var result := {"id": id, "name": name, "money": money, "reputation": reputation,
 		"airlines": airlines.duplicate(true), "resources": resources.duplicate(true),
-		"runway": runway.to_dict()}
+		"runways": {}}
+	for key in runways: result.runways[key] = runways[key].to_dict()
 	for registry in ["gates", "aircraft", "flights", "passengers", "bags", "security_checkpoints", "turnaround_tasks"]:
 		result[registry] = {}
 		for key in get(registry):
@@ -34,7 +36,11 @@ func restore(data: Dictionary) -> void:
 	reputation = int(data.reputation)
 	airlines = data.airlines.duplicate(true)
 	resources = data.resources.duplicate(true)
-	runway.restore(data.runway)
+	runways.clear()
+	for key in data.runways:
+		var r := AirportRunway.new()
+		r.restore(data.runways[key])
+		runways[key] = r
 	for registry in ["gates", "aircraft", "flights", "bags", "security_checkpoints", "turnaround_tasks"]:
 		get(registry).clear()
 		for key in data[registry]:

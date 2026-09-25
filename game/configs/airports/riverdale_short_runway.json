@@ -1,0 +1,74 @@
+{
+  "extends": "riverdale.json",
+  "id": "riverdale_short_runway",
+  "name": "Riverdale International (short runway)",
+  "include_flights": [
+    "F001",
+    "F002",
+    "F003",
+    "F004",
+    "F005",
+    "F006",
+    "F009",
+    "F010",
+    "F011",
+    "F012",
+    "F013",
+    "F014",
+    "F017",
+    "F018",
+    "F019",
+    "F020",
+    "F021",
+    "F022"
+  ],
+  "airside": {
+    "nodes": {
+      "R1_B": {
+        "x": 2800,
+        "y": 150,
+        "kind": "runway_end",
+        "label": "R1 27"
+      }
+    },
+    "runways": [
+      {
+        "id": "R1",
+        "label": "09/27",
+        "a": "R1_A",
+        "b": "R1_B",
+        "length_m": 2400,
+        "status": "open"
+      }
+    ]
+  },
+  "airline_relations": {
+    "profiles": {
+      "GA": {
+        "requests": [
+          {
+            "id": "GA_LONGHAUL",
+            "label": "Global Airways long-haul 787",
+            "min_relationship": 0,
+            "min_flights_operated": 2,
+            "check_gates": false,
+            "flights": [
+              {
+                "id": "GA901",
+                "airline_id": "GA",
+                "flight_number": "GA 901",
+                "origin": "Seabrook",
+                "destination": "Farport",
+                "aircraft_type": "787",
+                "scheduled_arrival": 260400,
+                "scheduled_departure": 294150,
+                "assigned_gate_id": ""
+              }
+            ]
+          }
+        ],
+        "contract": "basic_service"
+      }
+    }
+  }
+}

@@ -92,6 +92,23 @@ var bag_cutoff_passed: bool = false
 ## Gate closed and cutoff passed: not-boarded passengers' bags are held.
 var bag_load_finalized: bool = false
 var bag_finalized_tick: int = -1
+## M12: movement on the airside graph. The runway used (landing, then
+## takeoff), the current taxi route as legs "edge:+1/-1", the leg being
+## travelled and its enter/exit ticks, when the route started, its free-flow
+## time, and the waits (beyond free flow) of the taxi in and out.
+var runway_id: String = ""
+var taxi_route: Array = []
+var taxi_leg: int = -1
+var leg_enter_tick: int = -1
+var leg_exit_tick: int = -1
+var taxi_state: String = ""
+var taxi_blocker: String = ""
+var taxi_start_tick: int = -1
+var taxi_free_ticks: int = 0
+var taxi_in_wait_ticks: int = 0
+var taxi_out_wait_ticks: int = 0
+var taxi_in_ticks_actual: int = -1
+var taxi_out_ticks_actual: int = -1
 ## M8: turnaround service priority when competing for resources: low, normal, high.
 var service_priority: String = "normal"
 var bag_unload_due_tick: int = -1

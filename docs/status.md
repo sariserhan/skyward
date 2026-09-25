@@ -1,14 +1,14 @@
-# Current status — M0 through M11 implemented
+# Current status — M0 through M12 implemented
 
-M11 makes Riverdale something the player builds between days: gates on new
-pads and an east pier, a terminal connector, security lanes, baggage modules
-and service facilities. Construction changes the real gates, terminal routes,
-screening lanes, baggage servers and resource maxima of the next day. It is
-paid as capital from the ledger, and the next day is validated before it can
-start. Save schema v11. See the [M11 completion report](m11-status.md). M12
-airside construction has not started.
+M12 gives Riverdale a real airside. Aircraft land on a runway, taxi a
+deterministic route over one airside graph, queue behind each other, hold for
+opposing traffic on two-way taxiways, and take off from the runway chosen for
+them. Between days the player builds taxiways and runways, redirects or
+closes them, and a runway's length decides which aircraft it can serve. Taxi
+congestion is an exact delay cause that reaches connections, airlines and
+money. Save schema v12. See the [M12 completion report](m12-status.md).
 
-Earlier reports: [M10](m10-status.md), [M9](m9-status.md), [M8](m8-status.md), [M7](m7-status.md), [M6](m6-status.md), [M5](m5-status.md), [M4](m4-status.md), [M3](m3-status.md), [M2](m2-status.md), and the M0/M1 report below. Their
+Earlier reports: [M11](m11-status.md), [M10](m10-status.md), [M9](m9-status.md), [M8](m8-status.md), [M7](m7-status.md), [M6](m6-status.md), [M5](m5-status.md), [M4](m4-status.md), [M3](m3-status.md), [M2](m2-status.md), and the M0/M1 report below. Their
 limitations and timings are historical; M3 changed the timetable, scenario start,
 security defaults, loads, cabin timings and save schema (D-021, D-023, D-024).
 

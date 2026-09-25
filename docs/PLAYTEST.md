@@ -107,6 +107,44 @@ The scripted version asserts the same sequence and writes screenshots:
 tools/ui_tests.sh tests/m3_demo.gd
 ```
 
+### M12 walkthrough: taxiways and runways
+
+Launch `godot --path game -- --scenario=res://configs/airports/riverdale_single_taxiway.json`.
+
+1. The airfield is drawn from the airside graph: one runway, a parallel
+   taxiway P, a single connector down to a two-way apron lane, and stubs to
+   A1–A8. Press **O** for the Airside overlay: amber edges are occupied,
+   green ones are locked for one direction.
+2. Around 07:07 select SJ 291 (taxiing in). The detail reads *TAXIING TO GATE
+   A3 · via R1 exit → Taxiway P → A3* and *HOLDING · opposing traffic on
+   CONNECTOR*: departures own the connector. The one-lane day ends at −$15.9k,
+   with 31 missed connections and three failed contracts.
+3. At the day's end, open **Build → Airside → Taxiway**. The mini map shows
+   every node and free grid point.
+   - Click *R1_EXIT* then *AP_8*, and choose **One-way →**. The preview shows
+     618 m, $18,540, *Airport valid with it.* Press BUILD.
+   - Do the same with *AP_1* → *R1_HOLD*.
+   - In **BUILT**, select each *Taxiway AP_i_j* and press the toggle twice
+     (*one-way (reversed)*): the apron now flows west.
+4. Day 2: arrivals come straight off the exit and down the apron, departures
+   leave from its west end, and nobody meets head-on. Press **F3** for node
+   and edge ids.
+
+Also try:
+
+- **Riverdale, Build → Airside → Runway:** click *G_300_-300*, heading E,
+  3,200 m ($192,000), then one-way taxiways *R2_B → R1_EXIT* and *R1_HOLD →
+  R2_A*. Runway queues fall by more than half.
+- `riverdale_short_runway.json`: R1 is 2,400 m. Global Airways asks for a
+  787, and its details read *Capacity (gates, runway): INSUFFICIENT · GA 901
+  (787) has no open runway long enough (needs 2800 m)*. A 2,800 m R2 unlocks
+  it.
+- Demolish *Taxiway EXIT_LANE* on plain Riverdale: refused, because the gates
+  would lose their route from the runway. Build a detour first and it
+  becomes a valid but poor design.
+
+Scripted: `tools/ui_tests.sh tests/m12_demo.gd`.
+
 ### M11 walkthrough: building Riverdale
 
 Launch `godot --path game -- --scenario=res://configs/airports/riverdale_expansion.json`.

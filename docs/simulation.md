@@ -308,6 +308,38 @@ operating procedure. Service before boarding is A220 12, 737 15, A321 17 and
 of 48–56 minutes (D-023). Gate reuse stays tight, so late aircraft and holds
 still cascade.
 
+## Airside movement (M12)
+
+With `airside` in the scenario (Riverdale and its variants), taxiing is
+movement on a graph, not a timer.
+
+- **Arrival.** A flight requests landing on its chosen runway, lands from end
+  A to end B, then taxis the route from B to its gate's stand.
+- **Departure.** It pushes back (M8 tug), then taxis from the stand to end A
+  and joins that runway's queue.
+
+The taxi rules:
+
+- **Routes** are deterministic shortest free-flow paths (10 m/s), computed at
+  those two events only.
+- **Occupancy.**
+  - Aircraft enter an edge at least 15 s apart and never overtake.
+  - Entering from a node reserves it for 5 s.
+  - On two-way edges an aircraft first locks the direction of its whole
+    route, or holds where it is.
+  - Two-way arrivals start only when their gate is free.
+- **Runways.** Each runway is its own FIFO with separation. A runway serves a
+  type only if it is open and at least that type's minimum length (A220
+  1,500 m, 737 1,800 m, A321 2,000 m, 787 2,800 m). Selection:
+  compatibility, a route, then the lowest taxi + queue estimate, then id.
+- **Planning** (scheduled pushback, estimates, turnaround and gate windows)
+  uses each gate's best free-flow taxi times.
+- **Delay.** Taxi time beyond plan becomes `taxi_congestion`. The breakdown
+  stays exact.
+
+Riverdale's imported lanes are calibrated to 180 s, so an unchanged airport
+reproduces the M11 timeline (D-052).
+
 ## Gates, estimates and delay causes
 
 Assignment warnings inspect aircraft class, terminal, availability window,

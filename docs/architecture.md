@@ -1,4 +1,4 @@
-# Airport architecture — M0 to M11
+# Airport architecture — M0 to M12
 
 The airport is now the default Godot scene. The existing boarding scene remains
 available at `res://scenes/main.tscn`; its simulation algorithm is unchanged.
@@ -162,6 +162,70 @@ alongside the conflict check.
 - A compact turnaround summary sits under it.
 - A **Turnaround** tab holds the full task table.
 - After takeoff, the additive delay breakdown is shown.
+
+## M12 airside
+
+**Network.** `airside_network.gd` (`AirsideNetwork`) is built by
+`AirportSimulation._setup_airside()` from `config.airside`, once per day.
+
+- **Graph:** nodes, edges (with free-flow `ticks`), and sorted adjacency.
+- **Routing:** `route(from, to, class)` is Dijkstra with lexical tie-breaks,
+  cached per `layout_revision`. Legs are `"edge:+1"` / `"edge:-1"`.
+- **Occupancy:**
+  - `try_start()` locks a route's two-way edges
+  - `try_enter()` applies headway and node reservations, and returns the exit
+    tick
+  - `is_front()` enforces no passing
+  - `leave()` releases the edge
+- **Geometry:** `node_position()` and `position_on()`.
+- **Persistence:** `snapshot()` / `restore()`, and static
+  `valid_definition()`.
+
+**Runways.** `AirportState.runways` is a dict of `AirportRunway`s.
+`_request_runway()`, `_start_runway()` and `_complete_runway()` loop over
+them in id order. `_runway_done()` holds the landing and takeoff
+consequences. `_choose_runway()` picks by length, route, queue and id.
+
+**Movement.** A flight's taxi state lives on `AirportFlight`: `runway_id`,
+`taxi_route`, `taxi_leg`, the leg enter/exit ticks, `taxi_state`,
+`taxi_blocker`, and waits and actual times.
+
+- `_begin_taxi()` runs after landing and at pushback.
+- `_advance_taxi()` runs each tick while taxiing.
+- `_finish_taxi()` records waits, adds the `taxi_congestion` cause, and emits
+  `TAXI_COMPLETED`.
+- Planning uses `_taxi_in_plan()` / `_taxi_out_plan()`, the best free-flow
+  times, cached per gate and type.
+- Scenarios without `airside` keep the M1 timers and a single legacy runway.
+
+**Read-only views.** `taxi_status()` (route labels, blocker, who is ahead),
+`aircraft_position()` and `airside_metrics()`.
+
+**Layout.** `AirportLayout` imports the airside as `legacy_taxiway` /
+`legacy_runway` objects and adds `taxiway` and `runway` objects.
+
+- `apply_airside()` writes the built network: imported pieces with their
+  direction or status, pad stand links with geometric lengths, new taxiways
+  and anchors, new runways and their end nodes.
+- Placement checks: `taxiway_error()` and `runway_error()`.
+- Costs: `taxiway_cost()`, `runway_cost()`, `object_cost()`.
+- `validate_airside()` checks gates to and from runways, connected runways,
+  and each flight type against a reachable long-enough runway.
+
+**Career.** `build_taxiway()`, `build_runway()`, `set_airside()` (direction
+or status, refused and undone if it breaks the next day), and `demolish()`
+with length-based refunds. `tier_capacity()` includes runway capability.
+
+**UI.**
+
+- `airport_map.gd` draws the airfield from the graph, with aircraft on their
+  edges. **O** is the Airside overlay (occupied and locked edges, runway
+  queues); **F3** adds node and edge ids and reserved nodes.
+- The flight detail shows *TAXIING TO…*, *WAITING FOR TAXIWAY · X ahead*,
+  *WAITING AT INTERSECTION* and *HOLDING · …*.
+- The Build tab's **Airside** category uses `AirsideBuildMap`: click nodes or
+  grid anchors, preview the length, cost, classes, validity and the next
+  day's verdict, and toggle direction or status on built pieces.
 
 ## M11 construction
 

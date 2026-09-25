@@ -606,6 +606,679 @@
       ]
     }
   ],
+  "airside": {
+    "taxi_speed_mps": 10,
+    "headway_ticks": 150,
+    "node_ticks": 50,
+    "min_runway_length_m": {
+      "A220": 1500,
+      "737": 1800,
+      "A321": 2000,
+      "787": 2800
+    },
+    "terminal_zone": {
+      "x0": 0,
+      "y0": 820,
+      "x1": 4000,
+      "y1": 1200
+    },
+    "zones": [
+      {
+        "x0": 0,
+        "y0": -700,
+        "x1": 4000,
+        "y1": 800
+      }
+    ],
+    "grid_m": 300,
+    "nodes": {
+      "R1_A": {
+        "x": 400,
+        "y": 150,
+        "kind": "runway_end",
+        "label": "R1 09"
+      },
+      "R1_B": {
+        "x": 3400,
+        "y": 150,
+        "kind": "runway_end",
+        "label": "R1 27"
+      },
+      "R1_EXIT": {
+        "x": 3400,
+        "y": 330,
+        "kind": "exit",
+        "label": "R1 exit"
+      },
+      "R1_HOLD": {
+        "x": 400,
+        "y": 330,
+        "kind": "hold",
+        "label": "R1 hold"
+      },
+      "LI_E": {
+        "x": 3400,
+        "y": 450,
+        "kind": "taxi"
+      },
+      "LI_A8": {
+        "x": 2800,
+        "y": 450,
+        "kind": "taxi"
+      },
+      "LI_A7": {
+        "x": 2500,
+        "y": 450,
+        "kind": "taxi"
+      },
+      "LI_A6": {
+        "x": 2200,
+        "y": 450,
+        "kind": "taxi"
+      },
+      "LI_A5": {
+        "x": 1900,
+        "y": 450,
+        "kind": "taxi"
+      },
+      "LI_A4": {
+        "x": 1600,
+        "y": 450,
+        "kind": "taxi"
+      },
+      "LI_A3": {
+        "x": 1300,
+        "y": 450,
+        "kind": "taxi"
+      },
+      "LI_A2": {
+        "x": 1000,
+        "y": 450,
+        "kind": "taxi"
+      },
+      "LI_A1": {
+        "x": 700,
+        "y": 450,
+        "kind": "taxi"
+      },
+      "STAND_A1": {
+        "x": 700,
+        "y": 600,
+        "kind": "stand",
+        "label": "A1"
+      },
+      "STAND_A2": {
+        "x": 1000,
+        "y": 600,
+        "kind": "stand",
+        "label": "A2"
+      },
+      "STAND_A3": {
+        "x": 1300,
+        "y": 600,
+        "kind": "stand",
+        "label": "A3"
+      },
+      "STAND_A4": {
+        "x": 1600,
+        "y": 600,
+        "kind": "stand",
+        "label": "A4"
+      },
+      "STAND_A5": {
+        "x": 1900,
+        "y": 600,
+        "kind": "stand",
+        "label": "A5"
+      },
+      "STAND_A6": {
+        "x": 2200,
+        "y": 600,
+        "kind": "stand",
+        "label": "A6"
+      },
+      "STAND_A7": {
+        "x": 2500,
+        "y": 600,
+        "kind": "stand",
+        "label": "A7"
+      },
+      "STAND_A8": {
+        "x": 2800,
+        "y": 600,
+        "kind": "stand",
+        "label": "A8"
+      },
+      "LO_E": {
+        "x": 3400,
+        "y": 750,
+        "kind": "taxi"
+      },
+      "LO_A8": {
+        "x": 2800,
+        "y": 750,
+        "kind": "taxi"
+      },
+      "LO_A7": {
+        "x": 2500,
+        "y": 750,
+        "kind": "taxi"
+      },
+      "LO_A6": {
+        "x": 2200,
+        "y": 750,
+        "kind": "taxi"
+      },
+      "LO_A5": {
+        "x": 1900,
+        "y": 750,
+        "kind": "taxi"
+      },
+      "LO_A4": {
+        "x": 1600,
+        "y": 750,
+        "kind": "taxi"
+      },
+      "LO_A3": {
+        "x": 1300,
+        "y": 750,
+        "kind": "taxi"
+      },
+      "LO_A2": {
+        "x": 1000,
+        "y": 750,
+        "kind": "taxi"
+      },
+      "LO_A1": {
+        "x": 700,
+        "y": 750,
+        "kind": "taxi"
+      },
+      "LO_W": {
+        "x": 400,
+        "y": 750,
+        "kind": "taxi"
+      }
+    },
+    "edges": [
+      {
+        "id": "R1_OUT",
+        "from": "R1_B",
+        "to": "R1_EXIT",
+        "length_m": 200,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "runway_exit"
+      },
+      {
+        "id": "EXIT_LANE",
+        "from": "R1_EXIT",
+        "to": "LI_E",
+        "length_m": 100,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "LI_8",
+        "from": "LI_E",
+        "to": "LI_A8",
+        "length_m": 30,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "LI_7",
+        "from": "LI_A8",
+        "to": "LI_A7",
+        "length_m": 30,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "LI_6",
+        "from": "LI_A7",
+        "to": "LI_A6",
+        "length_m": 30,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "LI_5",
+        "from": "LI_A6",
+        "to": "LI_A5",
+        "length_m": 30,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "LI_4",
+        "from": "LI_A5",
+        "to": "LI_A4",
+        "length_m": 30,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "LI_3",
+        "from": "LI_A4",
+        "to": "LI_A3",
+        "length_m": 30,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "LI_2",
+        "from": "LI_A3",
+        "to": "LI_A2",
+        "length_m": 30,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "LI_1",
+        "from": "LI_A2",
+        "to": "LI_A1",
+        "length_m": 30,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "IN_A1",
+        "from": "LI_A1",
+        "to": "STAND_A1",
+        "length_m": 1260,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "stand"
+      },
+      {
+        "id": "IN_A2",
+        "from": "LI_A2",
+        "to": "STAND_A2",
+        "length_m": 1290,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "stand"
+      },
+      {
+        "id": "IN_A3",
+        "from": "LI_A3",
+        "to": "STAND_A3",
+        "length_m": 1320,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "stand"
+      },
+      {
+        "id": "IN_A4",
+        "from": "LI_A4",
+        "to": "STAND_A4",
+        "length_m": 1350,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "stand"
+      },
+      {
+        "id": "IN_A5",
+        "from": "LI_A5",
+        "to": "STAND_A5",
+        "length_m": 1380,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "stand"
+      },
+      {
+        "id": "IN_A6",
+        "from": "LI_A6",
+        "to": "STAND_A6",
+        "length_m": 1410,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "stand"
+      },
+      {
+        "id": "IN_A7",
+        "from": "LI_A7",
+        "to": "STAND_A7",
+        "length_m": 1440,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "stand"
+      },
+      {
+        "id": "IN_A8",
+        "from": "LI_A8",
+        "to": "STAND_A8",
+        "length_m": 1470,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "stand"
+      },
+      {
+        "id": "OUT_A1",
+        "from": "STAND_A1",
+        "to": "LO_A1",
+        "length_m": 1470,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "stand"
+      },
+      {
+        "id": "OUT_A2",
+        "from": "STAND_A2",
+        "to": "LO_A2",
+        "length_m": 1440,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "stand"
+      },
+      {
+        "id": "OUT_A3",
+        "from": "STAND_A3",
+        "to": "LO_A3",
+        "length_m": 1410,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "stand"
+      },
+      {
+        "id": "OUT_A4",
+        "from": "STAND_A4",
+        "to": "LO_A4",
+        "length_m": 1380,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "stand"
+      },
+      {
+        "id": "OUT_A5",
+        "from": "STAND_A5",
+        "to": "LO_A5",
+        "length_m": 1350,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "stand"
+      },
+      {
+        "id": "OUT_A6",
+        "from": "STAND_A6",
+        "to": "LO_A6",
+        "length_m": 1320,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "stand"
+      },
+      {
+        "id": "OUT_A7",
+        "from": "STAND_A7",
+        "to": "LO_A7",
+        "length_m": 1290,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "stand"
+      },
+      {
+        "id": "OUT_A8",
+        "from": "STAND_A8",
+        "to": "LO_A8",
+        "length_m": 1260,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "stand"
+      },
+      {
+        "id": "LO_8",
+        "from": "LO_E",
+        "to": "LO_A8",
+        "length_m": 30,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "LO_7",
+        "from": "LO_A8",
+        "to": "LO_A7",
+        "length_m": 30,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "LO_6",
+        "from": "LO_A7",
+        "to": "LO_A6",
+        "length_m": 30,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "LO_5",
+        "from": "LO_A6",
+        "to": "LO_A5",
+        "length_m": 30,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "LO_4",
+        "from": "LO_A5",
+        "to": "LO_A4",
+        "length_m": 30,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "LO_3",
+        "from": "LO_A4",
+        "to": "LO_A3",
+        "length_m": 30,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "LO_2",
+        "from": "LO_A3",
+        "to": "LO_A2",
+        "length_m": 30,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "LO_1",
+        "from": "LO_A2",
+        "to": "LO_A1",
+        "length_m": 30,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "LO_WEST",
+        "from": "LO_A1",
+        "to": "LO_W",
+        "length_m": 30,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "HOLD_LANE",
+        "from": "LO_W",
+        "to": "R1_HOLD",
+        "length_m": 100,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      },
+      {
+        "id": "R1_IN",
+        "from": "R1_HOLD",
+        "to": "R1_A",
+        "length_m": 200,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "runway_entry"
+      },
+      {
+        "id": "RECIRC",
+        "from": "R1_HOLD",
+        "to": "R1_EXIT",
+        "length_m": 3000,
+        "oneway": true,
+        "classes": [
+          "narrow",
+          "wide"
+        ],
+        "kind": "taxiway"
+      }
+    ],
+    "runways": [
+      {
+        "id": "R1",
+        "label": "09/27",
+        "a": "R1_A",
+        "b": "R1_B",
+        "length_m": 3000,
+        "status": "open"
+      }
+    ],
+    "stands": {
+      "A1": "STAND_A1",
+      "A2": "STAND_A2",
+      "A3": "STAND_A3",
+      "A4": "STAND_A4",
+      "A5": "STAND_A5",
+      "A6": "STAND_A6",
+      "A7": "STAND_A7",
+      "A8": "STAND_A8"
+    }
+  },
   "flights": [
     {
       "id": "F001",
@@ -1325,6 +1998,44 @@
         "effect": "Room for 1 more pushback tug",
         "resource": "pushback_tug",
         "units": 1
+      },
+      "taxiway": {
+        "label": "Taxiway",
+        "category": "airside",
+        "site_kind": "airside",
+        "cost_cents": 0,
+        "cost_per_m_cents": 3000,
+        "effect": "A taxiway between two points (length sets cost and taxi time)"
+      },
+      "runway": {
+        "label": "Runway",
+        "category": "airside",
+        "site_kind": "airside",
+        "cost_cents": 0,
+        "cost_per_m_cents": 6000,
+        "lengths_m": [
+          2000,
+          2400,
+          2800,
+          3200
+        ],
+        "effect": "A runway (its length decides which aircraft it serves)"
+      },
+      "legacy_taxiway": {
+        "label": "Existing taxiway",
+        "category": "airside",
+        "site_kind": "legacy",
+        "cost_cents": 0,
+        "cost_per_m_cents": 3000,
+        "effect": "Imported Riverdale taxiway"
+      },
+      "legacy_runway": {
+        "label": "Existing runway",
+        "category": "airside",
+        "site_kind": "legacy",
+        "cost_cents": 0,
+        "cost_per_m_cents": 6000,
+        "effect": "Imported Riverdale runway"
       }
     },
     "sites": {
@@ -1396,6 +2107,27 @@
             "to": "A9",
             "walking_ticks": 600
           }
+        ],
+        "stand": {
+          "node": "STAND_A9",
+          "x": 3100,
+          "y": 600
+        },
+        "airside_edges": [
+          {
+            "id": "IN_A9",
+            "from": "LI_E",
+            "to": "STAND_A9",
+            "oneway": true,
+            "kind": "stand"
+          },
+          {
+            "id": "OUT_A9",
+            "from": "STAND_A9",
+            "to": "LO_E",
+            "oneway": true,
+            "kind": "stand"
+          }
         ]
       },
       "pad_A10": {
@@ -1414,6 +2146,27 @@
             "from": "east_pier",
             "to": "A10",
             "walking_ticks": 900
+          }
+        ],
+        "stand": {
+          "node": "STAND_A10",
+          "x": 3400,
+          "y": 600
+        },
+        "airside_edges": [
+          {
+            "id": "IN_A10",
+            "from": "LI_E",
+            "to": "STAND_A10",
+            "oneway": true,
+            "kind": "stand"
+          },
+          {
+            "id": "OUT_A10",
+            "from": "STAND_A10",
+            "to": "LO_E",
+            "oneway": true,
+            "kind": "stand"
           }
         ]
       },

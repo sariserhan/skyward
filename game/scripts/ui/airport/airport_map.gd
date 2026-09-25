@@ -4,6 +4,11 @@ signal flight_selected(flight_id: String)
 var sim: AirportSimulation
 var selected_id: String = ""
 var hits: Dictionary = {}
+## M12: colour edges by occupancy and show queues (O); ids and reservations (F3).
+var overlay := false
+var debug := false
+var _origin := Vector2.ZERO
+var _scale := 1.0
 const INK := Color("a7becd")
 const MINT := Color("70dec0")
 const AMBER := Color("ffc078")
@@ -23,6 +28,9 @@ func _draw() -> void:
 	draw_style_box(_background(), Rect2(Vector2.ZERO, size))
 	if sim == null: return
 	hits.clear()
+	if sim.airside.enabled():
+		_draw_airside()
+		return
 	_label(Vector2(20, 28), "AIRFIELD  /  TERMINAL A", MINT, 13)
 	_label(Vector2(size.x - 218, 28), "09 / 27   •   SINGLE RUNWAY")
 	var runway_y := size.y * 0.25
@@ -64,7 +72,7 @@ func _draw() -> void:
 				position = _route(Vector2(size.x - 50, taxi_y), Vector2(gate_pos.x, taxi_y), gate_pos - Vector2(0, 34), progress)
 			"taxiing_out":
 				position = _route(gate_pos, Vector2(gate_pos.x, taxi_y), Vector2(50, taxi_y), progress)
-		var operation := sim.airport.runway.active_operation
+		var operation: Dictionary = sim.airport.runways.values()[0].active_operation
 		if operation.get("flight_id", "") == flight.id:
 			var runway_progress := clampf(float(sim.clock.tick - int(operation.started_at)) / (int(operation.end_tick) - int(operation.started_at)), 0, 1)
 			position = Vector2(70 + runway_progress * (size.x - 140), runway_y)
@@ -75,6 +83,138 @@ func _draw() -> void:
 		if flight.boarding_phase == "open": _label(position + Vector2(-23, 27), "BOARDING", MINT, 9)
 		elif flight.boarding_phase == "closed": _label(position + Vector2(-23, 27), "DOORS CLOSING", AMBER, 9)
 		hits[flight.id] = position
+
+# --- airside (M12): everything below is drawn from the simulation's graph -------------
+
+## World metres -> screen, fitted to the network's extent.
+func _fit() -> void:
+	var lo := Vector2(INF, INF)
+	var hi := Vector2(-INF, -INF)
+	for id in sim.airside.nodes:
+		var p := sim.airside.node_position(id)
+		lo = lo.min(p)
+		hi = hi.max(p)
+	var zone: Dictionary = sim.airside.config.get("terminal_zone", {})
+	if not zone.is_empty(): hi.y = maxf(hi.y, float(zone.y0) + 250.0)
+	var span := (hi - lo).max(Vector2(1, 1))
+	var area := size - Vector2(80, 90)
+	_scale = minf(area.x / span.x, area.y / span.y)
+	_origin = Vector2(40, 50) + (area - span * _scale) / 2.0 - lo * _scale
+
+func _screen(world: Vector2) -> Vector2:
+	return _origin + world * _scale
+
+func _node(id: String) -> Vector2:
+	return _screen(sim.airside.node_position(id))
+
+func _draw_airside() -> void:
+	_fit()
+	var net := sim.airside
+	var open := 0
+	for r: AirportRunway in sim.airport.runways.values(): open += 1 if r.status == "open" else 0
+	_label(Vector2(20, 28), "AIRFIELD  /  TERMINAL A", MINT, 13)
+	var header := "%d RUNWAY%s  ·  %d TAXI EDGES%s" % [open, "" if open == 1 else "S", net.edges.size(), "  ·  OVERLAY" if overlay else ""]
+	_label(Vector2(size.x - 20 - ThemeDB.fallback_font.get_string_size(header, HORIZONTAL_ALIGNMENT_LEFT, -1, 13).x, 28), header)
+	var zone: Dictionary = net.config.get("terminal_zone", {})
+	if not zone.is_empty():
+		var top := _screen(Vector2(float(zone.x0), float(zone.y0)))
+		draw_rect(Rect2(Vector2(28, top.y), Vector2(size.x - 56, size.y - top.y - 14)), Color("233b49"))
+		_label(Vector2(44, size.y - 24), "RIVERDALE  /  CONCOURSE A", INK, 14)
+	for r in net.runways():
+		var a := _node(r.a)
+		var b := _node(r.b)
+		var closed := str(r.get("status", "open")) != "open"
+		var width := maxf(10.0, 45.0 * _scale)
+		draw_line(a, b, Color("2a353c") if closed else Color("344753"), width)
+		var along := (b - a).normalized()
+		var dash := 0.0
+		while dash < a.distance_to(b) - 30:
+			draw_line(a + along * (dash + 20), a + along * (dash + 34), Color("9cabb3") if not closed else Color("5b6870"), 2)
+			dash += 36
+		_label(a + Vector2(-6, -width / 2 - 6), "%s%s" % [r.get("label", r.id), "  CLOSED" if closed else ""], Color.WHITE if not closed else AMBER, 11)
+		if overlay and sim.airport.runways.has(r.id):
+			var rr: AirportRunway = sim.airport.runways[r.id]
+			if rr.queue.size() > 0: _label(a + Vector2(40, -width / 2 - 6), "QUEUE %d" % rr.queue.size(), AMBER, 11)
+	for id in net.edges:
+		var e: Dictionary = net.edges[id]
+		var a := _node(e.from)
+		var b := _node(e.to)
+		var st: Dictionary = net.edge_state[id]
+		var color := Color("617161")
+		if overlay:
+			if not st.occupants.is_empty(): color = AMBER
+			elif int(st.locks) > 0: color = MINT.darkened(0.3)
+		draw_line(a, b, color, 3 if e.get("kind", "taxiway") == "taxiway" else 2)
+		if bool(e.get("oneway", false)) and a.distance_to(b) > 24:
+			var mid := (a + b) / 2.0
+			var d := (b - a).normalized()
+			draw_colored_polygon(PackedVector2Array([mid + d * 5, mid - d * 4 + d.orthogonal() * 4, mid - d * 4 - d.orthogonal() * 4]), color.lightened(0.25))
+		if debug: _label((a + b) / 2.0 + Vector2(3, -3), id, Color("8ea0ab"), 8)
+	if debug:
+		for id in net.nodes:
+			var busy := int(net.node_busy.get(id, -1)) > sim.clock.tick
+			draw_circle(_node(id), 3, AMBER if busy else Color("8ea0ab"))
+	# The selected flight's route.
+	if sim.airport.flights.has(selected_id):
+		var sf: AirportFlight = sim.airport.flights[selected_id]
+		if sf.status in ["taxiing_in", "taxiing_out"]:
+			for i in range(maxi(0, sf.taxi_leg), sf.taxi_route.size()):
+				draw_line(_node(net.leg_from(sf.taxi_route[i])), _node(net.leg_to(sf.taxi_route[i])), Color(1, 0.75, 0.47, 0.8), 5)
+	var stands: Dictionary = net.config.get("stands", {})
+	for gate_id in sim.airport.gates:
+		var gate: AirportGate = sim.airport.gates[gate_id]
+		if not stands.has(gate_id): continue
+		var pos := _node(stands[gate_id])
+		var color := MINT if not gate.occupied_by_flight_id.is_empty() else INK
+		for conflict in sim.conflicts.values():
+			if conflict.gate_id == gate.id: color = AMBER
+		draw_circle(pos, 13, Color("2c414d"))
+		draw_arc(pos, 13, 0, TAU, 24, color, 2)
+		if sim.airport.flights.has(selected_id) and sim.airport.flights[selected_id].assigned_gate_id == gate.id:
+			draw_arc(pos, 18, 0, TAU, 32, AMBER, 2)
+		_label(pos + Vector2(-9, 30), gate.id, color, 12)
+		if gate.type == "wide": _label(pos + Vector2(-13, 42), "WIDE", INK, 9)
+	var approaching := 0
+	for flight: AirportFlight in sim.airport.flights.values():
+		if flight.status in ["scheduled", "departed"]: continue
+		var world := _aircraft_world(flight)
+		var position: Vector2
+		if world.x == INF:
+			# Approaching: stacked off the arrival end of the runway it will use.
+			var start: Vector2 = _node(net.runways()[0].a) if not net.runways().is_empty() else Vector2(60, 60)
+			position = start + Vector2(-10 - (approaching % 3) * 30, -30 - (approaching / 3) * 22)
+			approaching += 1
+		else: position = _screen(world)
+		# Holding for an occupied stand: beside it, not on top of the aircraft parked there.
+		if flight.status == "taxiing_in" and flight.taxi_state == "done": position += Vector2(-18, -20)
+		var color := MINT if flight.id != selected_id else Color.WHITE
+		if flight.taxi_blocker != "" and flight.status in ["taxiing_in", "taxiing_out"]: color = AMBER if flight.id != selected_id else Color.WHITE
+		if flight.id == selected_id: draw_arc(position, 16, 0, TAU, 32, AMBER, 2)
+		_plane_small(position, color)
+		_label(position + Vector2(-20, -13), flight.flight_number, color, 9)
+		hits[flight.id] = position
+
+## World position (metres) of an aircraft, or (INF, INF) while still in the air.
+func _aircraft_world(f: AirportFlight) -> Vector2:
+	var net := sim.airside
+	for r: AirportRunway in sim.airport.runways.values():
+		var op := r.active_operation
+		if op.get("flight_id", "") == f.id and net.nodes.has(r.a):
+			var t := clampf(float(sim.clock.tick - int(op.started_at)) / maxf(1, int(op.end_tick) - int(op.started_at)), 0, 1)
+			return net.node_position(r.a).lerp(net.node_position(r.b), t)
+	var at: Dictionary = sim.aircraft_position(f)
+	if not at.is_empty(): return at.pos
+	match f.status:
+		"approaching": return Vector2(INF, INF)
+		"landed":
+			if sim.airport.runways.has(f.runway_id): return net.node_position(sim.airport.runways[f.runway_id].b)
+			return Vector2(INF, INF)
+	var stand := str(net.config.get("stands", {}).get(f.assigned_gate_id, ""))
+	return net.node_position(stand) if net.nodes.has(stand) else Vector2(INF, INF)
+
+func _plane_small(at: Vector2, color: Color) -> void:
+	var k := 0.7
+	draw_colored_polygon(PackedVector2Array([at + Vector2(0, -14) * k, at + Vector2(3, -3) * k, at + Vector2(14, 5) * k, at + Vector2(3, 3) * k, at + Vector2(3, 10) * k, at + Vector2(7, 13) * k, at + Vector2(-7, 13) * k, at + Vector2(-3, 10) * k, at + Vector2(-3, 3) * k, at + Vector2(-14, 5) * k, at + Vector2(-3, -3) * k]), color)
 
 func _background() -> StyleBoxFlat:
 	var box := StyleBoxFlat.new()
@@ -91,7 +231,7 @@ func _plane(at: Vector2, color: Color) -> void:
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		for id in hits:
-			if event.position.distance_to(hits[id]) < 25:
+			if event.position.distance_to(hits[id]) < (25 if not sim.airside.enabled() else 16):
 				flight_selected.emit(id)
 				accept_event()
 				return
