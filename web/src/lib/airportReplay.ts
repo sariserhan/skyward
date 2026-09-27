@@ -1,0 +1,7 @@
+import {AIRPORTS} from './airportCatalog.ts';
+import {contiguous,trackDistance} from './positionQuality.ts';
+import type {Recording} from './sessionRecording.ts';
+import type {TrailPoint} from '../types';
+export type AirportReplayFilter='all'|'approaching'|'departing'|'ground';
+export function airportTrend(points:TrailPoint[],home:{lat:number;lon:number}){let toward=0,away=0;for(let i=2;i<points.length;i++){const a=points[i-2],b=points[i-1],c=points[i];if(!contiguous(a,b)||!contiguous(b,c)||c.time-a.time<20000)continue;const da=trackDistance(home,a),db=trackDistance(home,b),dc=trackDistance(home,c);if(da-dc>.5&&da>=db&&db>=dc)toward++;if(dc-da>.5&&da<=db&&db<=dc)away++;}return {approaching:toward>0,departing:away>0,ground:points.some(p=>p.ground)};}
+export function airportReplay(r:Recording,airport:string,radius:number,filter:AirportReplayFilter):Recording{const home=AIRPORTS[airport];if(!home||![5,10,25,50].includes(radius))throw Error('Choose a supported airport and radius.');const tracks=r.tracks.flatMap(t=>{let previous=-2;const points=t.points.flatMap((point,i)=>{if(trackDistance(home,point)>radius)return [];const value={...point,breakBefore:point.breakBefore||i!==previous+1};previous=i;return [value];});if(!points.length)return [];const trend=airportTrend(points,home);if(filter!=='all'&&!trend[filter])return [];return [{...t,points}];});return {...r,name:`${airport} · ${filter} · ${r.name}`.slice(0,80),tracks};}

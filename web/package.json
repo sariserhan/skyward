@@ -1,0 +1,39 @@
+{
+  "dependencies": {
+    "cesium": "1.145.0",
+    "lucide-react": "1.48.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.3",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.1",
+    "typescript": "7.0.2",
+    "vite": "8.3.1"
+  },
+  "name": "skyward-observatory",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "prepare:assets": "node scripts/copy-cesium.mjs",
+    "predev": "npm run prepare:assets",
+    "dev": "vite --host 0.0.0.0",
+    "build": "npm run prepare:assets && node scripts/prepare-coverage.mjs && tsc -b && vite build",
+    "start": "node server/index.mjs",
+    "test": "node --test server/*.test.mjs",
+    "prepare:fleet": "python3 scripts/make-aircraft.py",
+    "import:aircraft": "node scripts/import-aircraft-models.mjs",
+    "prepare:branding": "node scripts/brand-aircraft-tails.mjs",
+    "import:liveries": "node scripts/import-liveries.mjs",
+    "test:browser": "npm run build && node scripts/browser-tests.mjs",
+    "test:soak": "npm run build && node scripts/browser-tests.mjs --soak",
+    "import:max": "python3 scripts/import-max-models.py",
+    "import:flightairmap": "node scripts/import-flightairmap-models.mjs",
+    "import:business": "python3 scripts/import-business-models.py",
+    "prepare:aircraft-lights": "node scripts/prepare-aircraft-lights.mjs",
+    "import:airport-elevations": "python3 scripts/import-airport-elevations.py"
+  }
+}

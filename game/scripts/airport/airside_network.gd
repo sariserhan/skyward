@@ -237,6 +237,21 @@ func position_on(leg: String, enter: int, exit_tick: int, now: int) -> Vector2:
 	var a := node_position(leg_from(leg))
 	var b := node_position(leg_to(leg))
 	var t := 1.0 if exit_tick <= enter else clampf(float(now - enter) / float(exit_tick - enter), 0.0, 1.0)
+	var edge: Dictionary = edges[leg_edge(leg)]
+	var points: Array = edge.get("points", [])
+	if points.size() >= 2:
+		# Source bend points describe geometry, not additional traffic junctions.
+		var total := 0.0
+		for i in range(1, points.size()):
+			total += Vector2(points[i - 1][0], points[i - 1][1]).distance_to(Vector2(points[i][0], points[i][1]))
+		var remaining := total * (t if leg_dir(leg) > 0 else 1.0 - t)
+		for i in range(1, points.size()):
+			var p := Vector2(points[i - 1][0], points[i - 1][1])
+			var q := Vector2(points[i][0], points[i][1])
+			var length := p.distance_to(q)
+			if remaining <= length: return p.lerp(q, remaining / maxf(length, 0.001))
+			remaining -= length
+		return Vector2(points[-1][0], points[-1][1])
 	return a.lerp(b, t)
 
 

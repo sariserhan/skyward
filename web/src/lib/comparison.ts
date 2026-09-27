@@ -1,0 +1,2 @@
+import type {Aircraft} from '../types';
+export function compareFlights(a:Aircraft|undefined,b:Aircraft|undefined){if(!a||!b||a.hex===b.hex)return null;return {altitude:a.altitude!==null&&b.altitude!==null&&!a.ground&&!b.ground?a.altitude-b.altitude:null,speed:a.groundSpeed!==null&&b.groundSpeed!==null?a.groundSpeed-b.groundSpeed:null,skew:a.observedAt!==null&&b.observedAt!==null?Math.abs(a.observedAt-b.observedAt)/1000:null};}

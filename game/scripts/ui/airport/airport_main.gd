@@ -147,12 +147,20 @@ func _build() -> void:
 	var header := HBoxContainer.new()
 	header.add_theme_constant_override("separation", 12)
 	layout.add_child(header)
-	title_label = _label(header, "%s\n%s" % [career.airport_name.to_upper(), "Sandbox" if career.mode == "sandbox" else "Airport operations"], 22)
+	title_label = _label(header, "%s\n%s" % [career.airport_name.to_upper(), str(career.base.get("real_world", {}).get("label", "Sandbox" if career.mode == "sandbox" else "Airport operations"))], 22)
 	title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	clock_label = _label(header, "06:00:00", 25)
 	pause_button = _button(header, "Pause", _toggle_pause)
 	for speed in [1, 2, 4]:
 		_button(header, "%d×" % speed, func(): _set_speed(speed))
+	if sim.airside.config.get("geographic", false):
+		var map_button := _button(header, "Map", func():
+			var expanded := operations_tabs.visible
+			operations_tabs.visible = not expanded
+			detail_heading.get_parent().visible = not expanded
+			view_tabs.current_tab = 0
+			map.queue_redraw())
+		map_button.tooltip_text = "Expand airport map / restore operation panels"
 	_button(header, "Save", _save)
 	_button(header, "?", func(): help.toggle()).tooltip_text = "Help (H)"
 	_button(header, "Menu", _toggle_menu).tooltip_text = "Menu (Esc)"

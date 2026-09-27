@@ -1,0 +1,8 @@
+{
+  "sourceUrl": "https://overpass-api.de/api/interpreter",
+  "query": "[out:json][timeout:35];area[\"aeroway\"=\"aerodrome\"][\"icao\"=\"EGLL\"]->.airport;(way(area.airport)[\"building\"];way(area.airport)[\"aeroway\"~\"^(terminal|hangar|apron|taxiway|parking_position)$\"];node(area.airport)[\"aeroway\"=\"gate\"];relation(area.airport)[\"building\"];relation(area.airport)[\"aeroway\"=\"terminal\"];);out geom;",
+  "retrievedAt": "2026-09-27T02:44:17.525157+00:00",
+  "sha256": "38bc8c7c90f49158a2cc310264e58e04a5e1ed275f905f1164547ff49cbd0b62",
+  "license": "ODbL-1.0; OpenStreetMap contributors",
+  "osmBase": "2026-09-27T02:42:21Z"
+}

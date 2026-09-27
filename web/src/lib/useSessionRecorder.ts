@@ -1,0 +1,11 @@
+import {useCallback,useEffect,useRef,useState} from 'react';
+import type {Aircraft} from '../types';
+import {SESSION_LIMITS,type Recording,type RecordedAircraft} from './sessionRecording';
+export function useSessionRecorder(rows:Aircraft[]){
+ const [recording,setRecording]=useState(false),[count,setCount]=useState(0),[notice,setNotice]=useState(''),[saved,setSaved]=useState<Recording|null>(null);const tracks=useRef(new Map<string,RecordedAircraft>()),started=useRef(0),total=useRef(0);const active=useRef(false);
+ const stop=useCallback(()=>{active.current=false;setRecording(false);const snapshot:Recording={format:'skyward-session',version:1,name:'Viewing session',source:'ADSB.lol received observations',license:'ODbL-1.0',createdAt:started.current,tracks:[...tracks.current.values()].map(t=>({identity:{...t.identity},points:t.points.slice()}))};setSaved(snapshot.tracks.length?snapshot:null);return snapshot;},[]);
+ const start=()=>{tracks.current.clear();total.current=0;started.current=Date.now();active.current=true;setCount(0);setSaved(null);setNotice('');setRecording(true);};
+ useEffect(()=>{if(!active.current)return;const now=Date.now();if(now-started.current>=SESSION_LIMITS.duration){setNotice('Recording stopped at the one-hour limit.');stop();return;}for(const a of rows){if(a.targetKind!=='aircraft'||a.lat===null||a.lon===null||a.altitude===null||a.observedAt===null||now-a.observedAt>120000||a.observedAt>now+5000)continue;const old=tracks.current.get(a.hex);if(old&&old.points.at(-1)!.time>=a.observedAt)continue;if(total.current>=SESSION_LIMITS.fixes||(!old&&tracks.current.size>=SESSION_LIMITS.aircraft)){setNotice('Recording stopped at the local storage limit. Save this session and start another.');stop();break;}const t=old??{identity:a,points:[]};t.identity=a;t.points.push({lat:a.lat,lon:a.lon,altitude:a.altitude,time:a.observedAt,ground:a.ground,groundSpeed:a.groundSpeed});tracks.current.set(a.hex,t);total.current++;}setCount(total.current);},[rows,recording,stop]);
+ useEffect(()=>{if(!recording)return;const timer=setInterval(()=>{if(Date.now()-started.current>=SESSION_LIMITS.duration){setNotice('Recording stopped at the one-hour limit.');stop();}},1000);return()=>clearInterval(timer);},[recording,stop]);
+ return {recording,count,notice,saved,start,stop,aircraft:tracks.current.size};
+}

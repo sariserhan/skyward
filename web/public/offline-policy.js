@@ -1,0 +1,2 @@
+/* Local map/app assets only: never API responses, third-party tiles or source archives. */
+globalThis.skywardOfflinePolicy={name:'skyward-map-v2',maxEntries:100,maxBytes:40*1024*1024,maxAssetBytes:10*1024*1024,eligible(url,origin){const u=new URL(url,origin);if(u.origin!==origin||u.search)return false;return u.pathname==='/'||u.pathname==='/watch/'||u.pathname==='/watch/index.html'||/^\/watch\/assets\/[^/]+\.(js|css)$/.test(u.pathname)||/^\/watch\/cesium\//.test(u.pathname)||/^\/watch\/data\/[^?#]+\.json$/.test(u.pathname);}};

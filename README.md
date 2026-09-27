@@ -1,5 +1,10 @@
 # RIVERDALE / BOARDING
 
+The new **Skyward flight observatory** runs at http://localhost:8000/
+with free community aircraft observations, a 3D globe, a 2D map, and Dulles /
+Istanbul airport views. See [web/README.md](web/README.md) for launch instructions,
+features, data sources and limitations. The original game runs at http://localhost:8000/airport-simulation/.
+
 A Godot airport operations simulator with a preserved aircraft boarding engine.
 The default scene runs Riverdale International: manage gate conflicts while
 fictional flights land, taxi, turn around and depart. Airport M0–M12 and M13 part 1 are
@@ -45,13 +50,20 @@ game/        Godot 4 project (GDScript)
   configs/       aircraft, scenarios, simulation constants (JSON)
   tests/         headless test harness
 docs/        spec, simulation notes, roadmap, decisions
-web/         reserved for the future Next.js site
+web/         Skyward observatory (React, Cesium, Node; free community data)
 ```
 
 ## Requirements
 
 Godot **4.7.2-stable** (pinned in `.godot-version`). Put the binary on your
 PATH as `godot`.
+
+## Dulles airport prototype
+
+Choose **WASHINGTON DULLES · IAD → PLAY DULLES** from the menu for the geographic
+airport sandbox: four FAA-positioned runways, mapped terminal footprints and
+taxiways, and real airline names with explicitly illustrative traffic.
+See [Dulles details and limitations](docs/dulles.md).
 
 ## Run the game
 

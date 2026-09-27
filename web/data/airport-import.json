@@ -1,0 +1,4629 @@
+{
+  "retrievedAt": "2026-09-27T02:40:00.136602+00:00",
+  "selection": "type=large_airport AND scheduled_service=yes; plus existing IAD and IST",
+  "license": "Public domain",
+  "sources": {
+    "airports": {
+      "url": "https://davidmegginson.github.io/ourairports-data/airports.csv",
+      "sha256": "2144a01fb74f20f80fcfc52a919e72e2f42ceb93aca456804a1cb9bb2d3ce79e"
+    },
+    "runways": {
+      "url": "https://davidmegginson.github.io/ourairports-data/runways.csv",
+      "sha256": "4202aab8eadafaab7f3350115cff5a7e5d8de482b98e1260c43a499a40d4dac4"
+    },
+    "countries": {
+      "url": "https://davidmegginson.github.io/ourairports-data/countries.csv",
+      "sha256": "2a9dbee691125b0cdb8ceb5fe227c48c903f99c488963b8e53e2ab366521c639"
+    }
+  },
+  "airports": {
+    "AAC": {
+      "runways": 1,
+      "omittedRunways": 1
+    },
+    "AAE": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "AAL": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "AAN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "AAR": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "ABA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ABB": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "ABD": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "ABJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ABQ": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "ABV": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ABZ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ACA": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "ACC": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ACE": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ADB": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "ADD": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "ADE": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ADJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ADL": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "ADZ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "AEP": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "AER": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "AES": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "AEY": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "AGA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "AGP": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "AGT": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "AGU": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "AHB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "AJF": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "AKL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "AKX": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ALA": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "ALB": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "ALC": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ALG": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "ALP": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "AMD": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "AMM": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "AMQ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "AMS": {
+      "runways": 6,
+      "omittedRunways": 0
+    },
+    "ANC": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "ANF": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ANU": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "AOE": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "AOJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "APL": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "APW": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "AQI": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "AQJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "AQP": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ARN": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "ASB": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "ASF": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "ASR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ASU": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ASW": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ATH": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "ATL": {
+      "runways": 5,
+      "omittedRunways": 0
+    },
+    "ATQ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ATZ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "AUA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "AUH": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "AUS": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "AVV": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "AWA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "AWZ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "AYT": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "BAH": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BAQ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BAV": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "BAX": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BBI": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BBK": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BBU": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BCD": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "BCM": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BCN": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "BCU": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "BDA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BDJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BDL": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BDQ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BDS": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BEG": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BEL": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BEM": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BEN": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BER": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BES": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BEW": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BEY": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "BFN": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BFS": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BGF": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BGI": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BGO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BGW": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BGY": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BHK": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BHM": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BHO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BHX": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BIA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BIO": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BJA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BJL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BJM": {
+      "runways": 1,
+      "omittedRunways": 1
+    },
+    "BJV": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BJX": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BKI": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BKK": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "BKO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BLA": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BLJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BLL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BLQ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BLR": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BLZ": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BME": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BNA": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "BND": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BNE": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BNX": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BOD": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BOG": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BOI": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BOJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BOM": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BON": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BOO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BOS": {
+      "runways": 6,
+      "omittedRunways": 0
+    },
+    "BOY": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BPN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BPS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BQT": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BRC": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BRE": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BRI": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BRM": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BRS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BRU": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "BSA": {
+      "runways": 0,
+      "omittedRunways": 2
+    },
+    "BSB": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BSG": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "BSK": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BSL": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BSR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BSZ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BTH": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BTJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BTS": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BUD": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BUF": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BUQ": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BUR": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "BUS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BVA": {
+      "runways": 2,
+      "omittedRunways": 1
+    },
+    "BVB": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "BVC": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BWA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BWI": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "BWN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BXY": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "BZE": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "BZV": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CA-1291": {
+      "runways": 0,
+      "omittedRunways": 0
+    },
+    "CA-1292": {
+      "runways": 0,
+      "omittedRunways": 0
+    },
+    "CAG": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CAI": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "CAN": {
+      "runways": 5,
+      "omittedRunways": 0
+    },
+    "CAP": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CAY": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CBB": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "CCJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CCK": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CCP": {
+      "runways": 1,
+      "omittedRunways": 1
+    },
+    "CCS": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "CCU": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "CDG": {
+      "runways": 5,
+      "omittedRunways": 0
+    },
+    "CEB": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "CEI": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CEK": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CFE": {
+      "runways": 1,
+      "omittedRunways": 2
+    },
+    "CFK": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "CFU": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CGB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CGH": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "CGK": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "CGN": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "CGO": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "CGP": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CGQ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CGY": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CHC": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "CHQ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CHS": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "CIA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CIT": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CIX": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CJB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CJJ": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "CJS": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "CJU": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "CKG": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "CKY": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CLE": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "CLJ": {
+      "runways": 1,
+      "omittedRunways": 1
+    },
+    "CLO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CLT": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "CMB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CMH": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "CMN": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "CMW": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CND": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CNF": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CNN": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "CNS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CNX": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "COK": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "COO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "COR": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "COS": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "COV": {
+      "runways": 0,
+      "omittedRunways": 2
+    },
+    "CPH": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "CPT": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "CRA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CRD": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CRK": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CRL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CRZ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CSX": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "CTA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CTG": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CTS": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "CTU": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "CUL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CUN": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "CUR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CUU": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "CUZ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CVG": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "CWB": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "CWL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CXI": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "CXR": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "CZL": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "CZM": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "DAC": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "DAD": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "DAL": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "DAM": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "DAR": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "DAT": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "DBB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "DBV": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "DCA": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "DEB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "DEL": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "DEN": {
+      "runways": 6,
+      "omittedRunways": 0
+    },
+    "DFW": {
+      "runways": 7,
+      "omittedRunways": 0
+    },
+    "DIA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "DIL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "DIR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "DJE": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "DJG": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "DJJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "DJT": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "DLA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "DLC": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "DLM": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "DMB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "DME": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "DMK": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "DMM": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "DNH": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "DOH": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "DPS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "DQM": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "DRP": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "DRS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "DRW": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "DSM": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "DSN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "DSS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "DSY": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "DTM": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "DTW": {
+      "runways": 6,
+      "omittedRunways": 0
+    },
+    "DUB": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "DUR": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "DUS": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "DVO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "DWC": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "DXB": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "DXN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "DYG": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "DYU": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "DZA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "DZN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "EBB": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "EBL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ECN": {
+      "runways": 1,
+      "omittedRunways": 1
+    },
+    "EDI": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "EDL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "EDO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "EHU": {
+      "runways": 0,
+      "omittedRunways": 2
+    },
+    "EIN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "EIS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ELP": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "ELQ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ELS": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "EMA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ENO": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "ENU": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ERF": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ESB": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "ESM": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ETM": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "EUN": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "EVE": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "EVN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "EWR": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "EZE": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "FAE": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "FAO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "FAT": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "FBM": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "FCO": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "FDF": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "FDH": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "FEZ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "FIH": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "FJR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "FKB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "FKI": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "FLL": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "FLN": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "FLR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "FMM": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "FMO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "FNA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "FNC": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "FNJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "FOC": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "FOR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "FPO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "FRA": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "FRW": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "FSC": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "FSZ": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "FUE": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "FUK": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "GAN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GAU": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GBE": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GCM": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GDL": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "GDN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GEG": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "GEO": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "GES": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GHV": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GIB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GIG": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "GJL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GLA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GMP": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "GND": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GNJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GNY": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GOA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GOH": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GOI": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GOJ": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "GOM": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GOT": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GOU": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GOX": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GRJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GRO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GRQ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GRR": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "GRU": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "GRV": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "GRZ": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "GSM": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GSO": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "GSV": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GUA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GUM": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "GUW": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GVA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GWD": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GXF": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GYD": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "GYE": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GYN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "GZT": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HAH": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HAJ": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "HAK": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "HAM": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "HAN": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "HAQ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HAS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HAV": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HBA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HBE": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "HDY": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HEA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HEL": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "HER": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "HET": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HFE": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HGA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HGH": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "HHN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HIA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HIJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HIR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HKD": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HKG": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "HKT": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HLA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HLD": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HLP": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HMB": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "HMO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HND": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "HNL": {
+      "runways": 6,
+      "omittedRunways": 0
+    },
+    "HOF": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HOG": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HOU": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "HPH": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HRB": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "HRE": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HRG": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "HSA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HSG": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HSN": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "HSR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HSS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HTA": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "HUI": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HUN": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "HUX": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HWR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "HYD": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "IAD": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "IAH": {
+      "runways": 5,
+      "omittedRunways": 0
+    },
+    "IAR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "IAS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "IBR": {
+      "runways": 1,
+      "omittedRunways": 1
+    },
+    "IBZ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ICN": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "IDR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "IFN": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "IGU": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "IKA": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "IKT": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "IKU": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ILO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ILR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "IMF": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "INC": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "IND": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "INI": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "INN": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "IOM": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "IPC": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "IPH": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "IQQ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "IQT": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ISB": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "ISK": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "IST": {
+      "runways": 6,
+      "omittedRunways": 0
+    },
+    "ITM": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "IVL": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "IXB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "IXC": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "IXE": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "IXZ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "JAF": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "JAI": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "JAX": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "JCL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "JED": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "JFK": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "JGN": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "JHB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "JHG": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "JIB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "JIJ": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "JJN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "JNB": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "JPA": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "JRO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "JTR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "JUB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "JUJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "JUL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KAD": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KAN": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "KBL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KBV": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KCH": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KCZ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KDH": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KDU": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "KEF": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "KEJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KER": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "KGD": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KGF": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KGL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KGS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KHG": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KHH": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KHI": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "KHN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KIH": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KIJ": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "KIK": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "KIM": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "KIN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KIS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KIX": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "KJA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KKJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KLO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KLU": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "KLV": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KMG": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "KMI": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KMJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KMQ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KMS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KNO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KOA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KOJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KOS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KOV": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KQT": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "KRK": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KRN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KRR": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "KRS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KRT": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KSA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KSF": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KSN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KTI": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KTM": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KTT": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KTW": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KUF": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "KUL": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "KUN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KUO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KUT": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KVA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KWE": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "KWI": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "KWL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KYA": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "KZN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "KZO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LAD": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "LAE": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LAO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LAQ": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "LAS": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "LAX": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "LBA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LBD": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LBV": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LCA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LCJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LED": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "LEJ": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "LFW": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LGA": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "LGB": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "LGK": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LGW": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "LHE": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "LHR": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "LHW": {
+      "runways": 2,
+      "omittedRunways": 1
+    },
+    "LIH": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "LIL": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "LIM": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "LIN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LIR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LIS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LJG": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LJU": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LKO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LLA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LLW": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LNZ": {
+      "runways": 2,
+      "omittedRunways": 1
+    },
+    "LOP": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LOS": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "LPA": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "LPB": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "LPI": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LPL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LPP": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LPQ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LRM": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LTN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LTO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LUN": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "LUX": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LUZ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LVI": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "LWN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LXA": {
+      "runways": 1,
+      "omittedRunways": 2
+    },
+    "LXR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "LYA": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "LYG": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "LYP": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "LYS": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "MAA": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "MAD": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "MAH": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MAJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MAN": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "MAO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MAR": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "MBA": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "MBJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MCI": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "MCO": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "MCT": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "MCX": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MCY": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MCZ": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "MDC": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MDE": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MDL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MDW": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "MDZ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MED": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "MEL": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "MEM": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "MEX": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "MFM": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MFU": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MGA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MGQ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MHD": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "MIA": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "MID": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "MIU": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MJI": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MJN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MKE": {
+      "runways": 5,
+      "omittedRunways": 0
+    },
+    "MLA": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "MLE": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MLM": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MMK": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MMX": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "MNI": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "MNL": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "MPL": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "MPM": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "MQF": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MQP": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MRS": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "MRU": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MRV": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MSP": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "MSQ": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "MST": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MSU": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "MSY": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "MTY": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "MUB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MUC": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "MUH": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "MUX": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MVD": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "MWX": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "MWZ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MXP": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "MYJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MYR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MZG": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MZR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "MZT": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NAG": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NAJ": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "NAN": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "NAP": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NAS": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "NAT": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NAV": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NBJ": {
+      "runways": 0,
+      "omittedRunways": 2
+    },
+    "NBO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NCE": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "NCL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NCU": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "NDB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NDG": {
+      "runways": 1,
+      "omittedRunways": 1
+    },
+    "NDJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NDR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NG-0005": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NGB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NGO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NGS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NIM": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "NJC": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NJF": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NKC": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "NKG": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "NLA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NLU": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "NMA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NMI": {
+      "runways": 1,
+      "omittedRunways": 1
+    },
+    "NNG": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NOC": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NOS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NOU": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NQN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NQZ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NRN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NRT": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "NSI": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NSK": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NTE": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NTL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NUE": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NUM": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NVT": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "NYO": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "NYT": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "OAK": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "OAX": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "OCS": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "ODE": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "OEC": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "OGG": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "OHD": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "OHS": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "OKA": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "OKC": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "OKJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "OLB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "OMA": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "OMO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "OMR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "OMS": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "ONT": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "OOL": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "OPO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ORD": {
+      "runways": 8,
+      "omittedRunways": 0
+    },
+    "ORF": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "ORK": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "ORN": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "ORU": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "ORY": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "OSL": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "OSR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "OSS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "OST": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "OTP": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "OUA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "OUD": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "OUL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "OVB": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "OVD": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "OXB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "OZG": {
+      "runways": 0,
+      "omittedRunways": 0
+    },
+    "OZZ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PAD": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PAP": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PBC": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PBH": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PBM": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PCL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PDG": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PDL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PDV": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PDX": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "PED": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PEE": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PEG": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PEK": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "PEN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PER": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "PEV": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PEW": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PFO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PHC": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PHE": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "PHH": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "PHL": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "PHX": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "PIE": {
+      "runways": 1,
+      "omittedRunways": 1
+    },
+    "PIK": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "PIT": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "PKC": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PKX": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "PKZ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PLQ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PLS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PLX": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "PLZ": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "PMC": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PMI": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "PMO": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "PMV": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "PNK": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PNQ": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "PNR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PNS": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "POA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "POG": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "POM": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "POS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "POZ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PPG": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "PPK": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PPS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PPT": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PQC": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "PRG": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "PRN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PSA": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "PSD": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PSP": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "PSR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PTG": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "PTP": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PTY": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "PUJ": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "PUQ": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "PUS": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "PUY": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PVD": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "PVG": {
+      "runways": 4,
+      "omittedRunways": 1
+    },
+    "PVH": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "PVR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PWM": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "PWQ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PYK": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PZO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "PZU": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "QRO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "RAI": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "RAK": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "RAR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "RBA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "RBR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "RDU": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "REC": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "RES": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "REU": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "RGL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "RGN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "RHO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "RIC": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "RIX": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "RIY": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "RJK": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "RKT": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "RKZ": {
+      "runways": 0,
+      "omittedRunways": 2
+    },
+    "RMF": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "RMI": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "RML": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "RMO": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "RMQ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "RMU": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "RNO": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "ROB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ROC": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "ROP": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ROR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ROS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "RSI": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "RSW": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "RTB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "RTM": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "RUH": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "RUN": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "RVN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "RZE": {
+      "runways": 2,
+      "omittedRunways": 2
+    },
+    "SAG": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SAH": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SAI": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "SAL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SAN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SAP": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SAT": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "SAV": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "SAW": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "SBD": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SBZ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SCL": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "SCO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SCQ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SCR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SCU": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "SCV": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SDF": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "SDJ": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "SDQ": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "SDU": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "SEA": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "SEZ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SFB": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "SFO": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "SFS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SGC": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SGN": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "SHA": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "SHE": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SHJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SHO": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "SID": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SIN": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "SJC": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "SJD": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SJJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SJO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SJU": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "SJW": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SKB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SKD": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SKG": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "SKO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SKP": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SKT": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "SKX": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SLA": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "SLC": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "SLL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SLZ": {
+      "runways": 0,
+      "omittedRunways": 2
+    },
+    "SMF": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "SNA": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "SNC": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "SNN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SNU": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SOC": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SOF": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SPU": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SPX": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SRE": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "SRG": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SRQ": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "SSA": {
+      "runways": 0,
+      "omittedRunways": 2
+    },
+    "SSG": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SSH": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "STI": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "STL": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "STN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "STR": {
+      "runways": 1,
+      "omittedRunways": 2
+    },
+    "STT": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "STV": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SUB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SUF": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SUV": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SVD": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "SVG": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "SVO": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "SVQ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SVX": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "SWA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SXB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SXM": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SXR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SYD": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "SYR": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "SYX": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SYZ": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "SZB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SZG": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "SZX": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "SZZ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TAB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TAE": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "TAG": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "TAK": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TAO": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "TAS": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "TAZ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TBS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TBU": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "TBZ": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "TET": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TFN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TFS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TFU": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "TGD": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "THR": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "TIA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TIF": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "TIJ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TIR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TJM": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "TJU": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TKK": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TKS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TKU": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TLC": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TLL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TLM": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TLS": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "TLV": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "TML": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TMM": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TMP": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TMR": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "TMS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TNA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TNG": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TNN": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "TNR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TOF": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TOM": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TOS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TPA": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "TPE": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "TQO": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "TRD": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TRF": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TRN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TRS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TRU": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TRV": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TRW": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TRZ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TSA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TSF": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TSN": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "TSR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TTU": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TUC": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TUK": {
+      "runways": 1,
+      "omittedRunways": 1
+    },
+    "TUL": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "TUN": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "TUS": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "TUU": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "TXN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "TYN": {
+      "runways": 1,
+      "omittedRunways": 1
+    },
+    "TYS": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "TZL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "UBN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "UET": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "UFA": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "UGC": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "UIO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "UKB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "UKK": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "ULH": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "UME": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "UPG": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "URA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "URC": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "USM": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "UTH": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "UTP": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "UUD": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "UUS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "UVF": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "UYU": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "VAA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "VAR": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "VAV": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "VBY": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "VCA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "VCE": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "VCP": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "VER": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "VFA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "VGA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "VIE": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "VIL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "VIX": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "VKO": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "VLC": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "VLI": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "VLN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "VNO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "VNS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "VOG": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "VRA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "VRN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "VSA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "VST": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "VTE": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "VTZ": {
+      "runways": 0,
+      "omittedRunways": 0
+    },
+    "VVI": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "VVO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "VXE": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "WAW": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "WDH": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "WLG": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "WLS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "WMI": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "WNZ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "WRO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "WTB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "WUH": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "WUX": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "WVB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "XBJ": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "XIY": {
+      "runways": 3,
+      "omittedRunways": 1
+    },
+    "XMN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "XNN": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "XPL": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "YAP": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "YCU": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "YEG": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "YHM": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "YHZ": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "YIA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "YIW": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "YKS": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "YLW": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "YNB": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "YNT": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "YNY": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "YNZ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "YOW": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "YQB": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "YQG": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "YUL": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "YVR": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "YWG": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "YXE": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "YYC": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "YYJ": {
+      "runways": 3,
+      "omittedRunways": 0
+    },
+    "YYT": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "YYZ": {
+      "runways": 5,
+      "omittedRunways": 0
+    },
+    "ZAD": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "ZAG": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ZAH": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "ZAM": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ZAZ": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "ZCO": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ZHA": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "ZIA": {
+      "runways": 0,
+      "omittedRunways": 1
+    },
+    "ZIH": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ZNZ": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ZQN": {
+      "runways": 2,
+      "omittedRunways": 0
+    },
+    "ZRH": {
+      "runways": 4,
+      "omittedRunways": 0
+    },
+    "ZSA": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ZSE": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ZUH": {
+      "runways": 1,
+      "omittedRunways": 0
+    },
+    "ZYL": {
+      "runways": 1,
+      "omittedRunways": 0
+    }
+  }
+}

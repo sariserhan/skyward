@@ -1,0 +1,124 @@
+{
+  "AMS": {
+    "buildings": 239,
+    "gates": 140,
+    "omittedComplexFeatures": 0,
+    "recordedAt": "2026-09-27T03:16:28.694301+00:00",
+    "status": "imported"
+  },
+  "ATL": {
+    "buildings": 128,
+    "gates": 201,
+    "recordedAt": "2026-09-27T02:51:25.422126+00:00",
+    "retrievedAt": "2026-09-27T02:49:53.554124+00:00",
+    "status": "imported"
+  },
+  "CDG": {
+    "buildings": 902,
+    "gates": 299,
+    "recordedAt": "2026-09-27T02:51:25.422126+00:00",
+    "retrievedAt": "2026-09-27T02:44:32.494087+00:00",
+    "status": "imported"
+  },
+  "DFW": {
+    "buildings": 183,
+    "gates": 168,
+    "recordedAt": "2026-09-27T02:51:25.422126+00:00",
+    "retrievedAt": "2026-09-27T02:44:09.180156+00:00",
+    "status": "imported"
+  },
+  "DOH": {
+    "buildings": 223,
+    "gates": 107,
+    "recordedAt": "2026-09-27T02:51:25.422126+00:00",
+    "retrievedAt": "2026-09-27T02:45:27.093456+00:00",
+    "status": "imported"
+  },
+  "DXB": {
+    "buildings": 2219,
+    "gates": 113,
+    "recordedAt": "2026-09-27T02:51:25.422126+00:00",
+    "retrievedAt": "2026-09-27T02:45:19.986198+00:00",
+    "status": "imported"
+  },
+  "FRA": {
+    "buildings": 432,
+    "gates": 122,
+    "recordedAt": "2026-09-27T02:51:25.422126+00:00",
+    "retrievedAt": "2026-09-27T02:44:54.007854+00:00",
+    "status": "imported"
+  },
+  "GRU": {
+    "reason": "HTTP Error 504: Gateway Timeout",
+    "recordedAt": "2026-09-27T03:16:09.653089+00:00",
+    "retryAfter": null,
+    "status": "unavailable"
+  },
+  "HKG": {
+    "reason": "HTTP Error 504: Gateway Timeout",
+    "recordedAt": "2026-09-27T03:16:43.601548+00:00",
+    "retryAfter": null,
+    "status": "unavailable"
+  },
+  "HND": {
+    "buildings": 303,
+    "gates": 95,
+    "omittedComplexFeatures": 3,
+    "recordedAt": "2026-09-27T02:59:24.801380+00:00",
+    "status": "imported"
+  },
+  "ICN": {
+    "buildings": 73,
+    "gates": 150,
+    "recordedAt": "2026-09-27T02:51:25.422126+00:00",
+    "retrievedAt": "2026-09-27T02:47:55.299875+00:00",
+    "status": "imported"
+  },
+  "JFK": {
+    "buildings": 302,
+    "gates": 137,
+    "recordedAt": "2026-09-27T02:51:25.422126+00:00",
+    "retrievedAt": "2026-09-27T02:48:50.683349+00:00",
+    "status": "imported"
+  },
+  "LAX": {
+    "reason": "HTTP Error 504: Gateway Timeout",
+    "recordedAt": "2026-09-27T03:15:41.752890+00:00",
+    "retryAfter": null,
+    "status": "unavailable"
+  },
+  "LHR": {
+    "buildings": 207,
+    "gates": 147,
+    "recordedAt": "2026-09-27T02:51:25.422126+00:00",
+    "retrievedAt": "2026-09-27T02:44:17.525157+00:00",
+    "status": "imported"
+  },
+  "MAD": {
+    "buildings": 170,
+    "gates": 104,
+    "omittedComplexFeatures": 4,
+    "recordedAt": "2026-09-27T02:58:49.731734+00:00",
+    "status": "imported"
+  },
+  "ORD": {
+    "buildings": 581,
+    "gates": 219,
+    "recordedAt": "2026-09-27T02:51:25.422126+00:00",
+    "retrievedAt": "2026-09-27T02:43:42.535908+00:00",
+    "status": "imported"
+  },
+  "SIN": {
+    "reason": "HTTP Error 504: Gateway Timeout",
+    "recordedAt": "2026-09-27T03:15:56.376815+00:00",
+    "retryAfter": null,
+    "status": "unavailable"
+  },
+  "SYD": {
+    "buildings": 229,
+    "gates": 73,
+    "recordedAt": "2026-09-27T02:51:25.422126+00:00",
+    "retrievedAt": "2026-09-27T02:48:07.059285+00:00",
+    "status": "imported"
+  }
+}

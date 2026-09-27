@@ -70,17 +70,29 @@ func _build() -> void:
 	center.add_child(column)
 	_label(column, "RIVERDALE / BOARDING", 34, Color.WHITE)
 	_label(column, "Run a small airport. Grow it.", 16)
-	for id in ["home", "new", "load", "settings", "developer"]: column.add_child(_page(id))
+	for id in ["home", "new", "dulles", "load", "settings", "developer"]: column.add_child(_page(id))
 	# Home
 	var home: VBoxContainer = pages.home
 	continue_button = _button(home, "CONTINUE", _continue)
 	_button(home, "NEW CAREER", func(): _show("new"))
 	_button(home, "SANDBOX · RIVERDALE INTERNATIONAL", func():
 		AirportLaunch.open(get_tree(), AirportLaunch.start_new(AirportLaunch.SANDBOX, -1, {"mode": "sandbox", "name": "Riverdale International"})))
+	_button(home, "WASHINGTON DULLES · IAD", func(): _show("dulles"))
 	_button(home, "LOAD GAME", func(): _show("load"))
 	_button(home, "SETTINGS", func(): _show("settings"))
 	if GameSettings.developer() or OS.is_debug_build(): _button(home, "DEVELOPER SCENARIOS", func(): _show("developer"))
 	if not OS.has_feature("web"): _button(home, "QUIT", func(): get_tree().quit())
+	# Real airport sandbox, with the traffic provenance visible before starting.
+	var dulles: VBoxContainer = pages.dulles
+	_label(dulles, "WASHINGTON DULLES · IAD", 24, Color.WHITE)
+	_label(dulles, "Four runways. The real terminal footprints and mapped taxiways. United, American, Delta and British Airways.", 16)
+	_label(dulles, "SAMPLE TRAFFIC · OFFLINE", 16, AMBER)
+	_label(dulles, "14 illustrative flights, 12 active gates. Flight numbers, times, aircraft assignments and airline policies are simulated. This is not today's schedule.", 14)
+	_label(dulles, "North is up. Scroll to zoom; right-drag to pan. Buildings and gates become clearer as you zoom in.", 14)
+	_label(dulles, "Geometry: FAA runway thresholds; © OpenStreetMap contributors (ODbL). Ground operations and terminal transfers are approximations.", 13)
+	_button(dulles, "PLAY DULLES", func():
+		AirportLaunch.open(get_tree(), AirportLaunch.start_new(AirportLaunch.DULLES, -1, {"mode": "sandbox", "name": "Washington Dulles · IAD"})))
+	_button(dulles, "BACK", func(): _show("home"))
 	# New career
 	var new: VBoxContainer = pages.new
 	_label(new, "NEW CAREER", 22, Color.WHITE)

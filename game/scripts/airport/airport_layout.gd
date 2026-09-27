@@ -272,6 +272,9 @@ static func _direct(e: Dictionary, direction: int) -> void:
 	e.oneway = true
 	if direction < 0:
 		var from = e.from
+		if e.has("points"):
+			e.points = e.points.duplicate()
+			e.points.reverse()
 		e.from = e.to
 		e.to = from
 

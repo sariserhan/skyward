@@ -1,0 +1,20 @@
+import type {Aircraft,TrailPoint} from '../types.ts';
+import {observedFrame} from './flightPresentation.ts';
+export const SESSION_LIMITS={aircraft:1000,fixes:100000,bytes:20*1024*1024,duration:3600000};
+export interface RecordedAircraft {identity:Aircraft;points:TrailPoint[];}
+export interface Recording {format:'skyward-session';version:1;name:string;source?:string;license?:string;createdAt:number;tracks:RecordedAircraft[];}
+export function recordingBounds(r:Recording){let start=Infinity,end=-Infinity,count=0;for(const t of r.tracks){start=Math.min(start,t.points[0]?.time??Infinity);end=Math.max(end,t.points.at(-1)?.time??-Infinity);count+=t.points.length;}return {start:Number.isFinite(start)?start:0,end:Number.isFinite(end)?end:0,count};}
+const finite=(x:unknown):x is number=>typeof x==='number'&&Number.isFinite(x);
+export function parseRecording(raw:unknown):Recording{
+ if(!raw||typeof raw!=='object')throw Error('Not a Skyward session file.');const r=raw as Recording;
+ if(r.format!=='skyward-session'||r.version!==1||!Array.isArray(r.tracks)||r.tracks.length>SESSION_LIMITS.aircraft||(!finite(r.createdAt)||r.createdAt<0||r.createdAt>8640000000000000))throw Error('Unsupported session format or too many aircraft.');
+ let count=0;const ids=new Set<string>();const tracks=r.tracks.map(t=>{if(!t||!t.identity||!Array.isArray(t.points))throw Error('Invalid aircraft track.');const a=t.identity;
+ if(typeof a.hex!=='string'||!/^[a-f\d]{6}$/i.test(a.hex)||ids.has(a.hex.toLowerCase()))throw Error('Invalid or duplicate aircraft identifier.');ids.add(a.hex.toLowerCase());
+ const text=(x:unknown)=>typeof x==='string'?x.slice(0,80):'';let previous=-Infinity;
+ const points=t.points.map(p=>{if(++count>SESSION_LIMITS.fixes)throw Error('Session exceeds 100,000 fixes.');if(!p||!finite(p.lon)||Math.abs(p.lon)>180||!finite(p.lat)||Math.abs(p.lat)>90||!finite(p.altitude)||p.altitude< -2000||p.altitude>100000||!finite(p.time)||p.time<0||p.time>8640000000000000||p.time<=previous||typeof p.ground!=='boolean'||(p.groundSpeed!=null&&(!finite(p.groundSpeed)||p.groundSpeed<0||p.groundSpeed>2000)))throw Error('Invalid or unordered position fix.');previous=p.time;return {lon:p.lon,lat:p.lat,altitude:p.altitude,time:p.time,ground:p.ground,groundSpeed:p.groundSpeed??null,...(p.breakBefore===true?{breakBefore:true}:{})};});
+ if(!points.length)throw Error('An aircraft track is empty.');const last=points.at(-1)!;
+ return {identity:{hex:a.hex.toLowerCase(),callsign:text(a.callsign),registration:text(a.registration),aircraftType:text(a.aircraftType),targetKind:'aircraft' as const,lat:last.lat,lon:last.lon,altitude:last.altitude,observedAt:last.time,ground:last.ground,groundSpeed:last.groundSpeed,heading:finite(a.heading)?a.heading:null,verticalRate:null,sourceType:'Recorded session'},points};});
+ if(!tracks.length)throw Error('This session contains no positions.');const result:Recording={format:'skyward-session',version:1,source:typeof r.source==='string'?r.source.slice(0,200):'User-provided recording; source unverified',license:typeof r.license==='string'?r.license.slice(0,80):'Not supplied',name:typeof r.name==='string'?r.name.slice(0,80):'Recorded session',createdAt:r.createdAt,tracks};const bounds=recordingBounds(result);if(bounds.end-bounds.start>SESSION_LIMITS.duration+120000)throw Error('Session spans more than one hour.');return result;
+}
+export function sessionFrame(r:Recording,time:number){return r.tracks.flatMap(t=>{const first=t.points[0];if(time<first.time)return [];const fix=observedFrame(t.points,time);if(!fix||time-fix.time>120000)return [];return [{...t.identity,lon:fix.lon,lat:fix.lat,altitude:fix.altitude,ground:fix.ground,observedAt:fix.time,heading:'heading' in fix?fix.heading:t.identity.heading,groundSpeed:fix.groundSpeed??null}];});}
+export function downloadRecording(r:Recording){const url=URL.createObjectURL(new Blob([JSON.stringify(r)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download=`skyward-session-${new Date(r.createdAt).toISOString().replace(/[:.]/g,'-')}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}

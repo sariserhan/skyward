@@ -4,6 +4,7 @@ extends RefCounted
 ## Empty when the airport scene is opened directly (tests, --scenario=).
 
 const STARTER := "res://configs/airports/career_starter.json"
+const DULLES := "res://configs/airports/dulles.json"
 const SANDBOX := "res://configs/airports/riverdale.json"
 const MENU_SCENE := "res://scenes/menu.tscn"
 const AIRPORT_SCENE := "res://scenes/airport.tscn"

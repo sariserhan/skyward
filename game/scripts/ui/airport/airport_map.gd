@@ -20,6 +20,7 @@ const MINT := Color("70dec0")
 const AMBER := Color("ffc078")
 
 func _ready() -> void:
+	clip_contents = true
 	custom_minimum_size = Vector2(600, 290)
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 
@@ -100,6 +101,10 @@ func _fit() -> void:
 		var p := sim.airside.node_position(id)
 		lo = lo.min(p)
 		hi = hi.max(p)
+	for surface in sim.airside.config.get("surfaces", []):
+		for point in surface.points:
+			lo = lo.min(Vector2(point[0], point[1]))
+			hi = hi.max(Vector2(point[0], point[1]))
 	var zone: Dictionary = sim.airside.config.get("terminal_zone", {})
 	if not zone.is_empty(): hi.y = maxf(hi.y, float(zone.y0) + 250.0)
 	var span := (hi - lo).max(Vector2(1, 1))
@@ -117,10 +122,12 @@ func _node(id: String) -> Vector2:
 func _draw_airside() -> void:
 	_fit()
 	var net := sim.airside
+	if net.config.get("geographic", false): _draw_geographic_ground()
 	var open := 0
 	for r: AirportRunway in sim.airport.runways.values(): open += 1 if r.status == "open" else 0
 	_label(Vector2(20, 28), "AIRFIELD" + ("" if is_equal_approx(zoom, 1.0) else "  ·  ZOOM %d%% (middle-click resets)" % roundi(zoom * 100)), MINT, 13)
 	var header := "%d RUNWAY%s  ·  %d TAXI EDGES%s" % [open, "" if open == 1 else "S", net.edges.size(), "  ·  OVERLAY" if overlay else ""]
+	if net.config.get("geographic", false) and not debug: header = "%d RUNWAYS  ·  SCROLL TO ZOOM / RIGHT-DRAG TO PAN" % open
 	_label(Vector2(size.x - 20 - ThemeDB.fallback_font.get_string_size(header, HORIZONTAL_ALIGNMENT_LEFT, -1, 13).x, 28), header)
 	var zone: Dictionary = net.config.get("terminal_zone", {})
 	if not zone.is_empty():
@@ -131,7 +138,7 @@ func _draw_airside() -> void:
 		var a := _node(r.a)
 		var b := _node(r.b)
 		var closed := str(r.get("status", "open")) != "open"
-		var width := maxf(10.0, 45.0 * _scale)
+		var width := maxf(3.0 if net.config.get("geographic", false) else 10.0, float(r.get("width_m", 45.0)) * _scale * zoom)
 		draw_line(a, b, Color("2a353c") if closed else Color("344753"), width)
 		var along := (b - a).normalized()
 		var dash := 0.0
@@ -151,7 +158,8 @@ func _draw_airside() -> void:
 		if overlay:
 			if not st.occupants.is_empty(): color = AMBER
 			elif int(st.locks) > 0: color = MINT.darkened(0.3)
-		draw_line(a, b, color, 3 if e.get("kind", "taxiway") == "taxiway" else 2)
+		if not net.config.get("geographic", false) or overlay or debug:
+			draw_line(a, b, color, 3 if e.get("kind", "taxiway") == "taxiway" else 2)
 		if bool(e.get("oneway", false)) and a.distance_to(b) > 24:
 			var mid := (a + b) / 2.0
 			var d := (b - a).normalized()
@@ -166,7 +174,12 @@ func _draw_airside() -> void:
 		var sf: AirportFlight = sim.airport.flights[selected_id]
 		if sf.status in ["taxiing_in", "taxiing_out"]:
 			for i in range(maxi(0, sf.taxi_leg), sf.taxi_route.size()):
-				draw_line(_node(net.leg_from(sf.taxi_route[i])), _node(net.leg_to(sf.taxi_route[i])), Color(1, 0.75, 0.47, 0.8), 5)
+				var edge: Dictionary = net.edges[net.leg_edge(sf.taxi_route[i])]
+				if edge.has("points"):
+					var line := PackedVector2Array()
+					for point in edge.points: line.append(_screen(Vector2(point[0], point[1])))
+					draw_polyline(line, Color(1, 0.75, 0.47, 0.8), 4)
+				else: draw_line(_node(net.leg_from(sf.taxi_route[i])), _node(net.leg_to(sf.taxi_route[i])), Color(1, 0.75, 0.47, 0.8), 5)
 	var stands: Dictionary = net.config.get("stands", {})
 	for gate_id in sim.airport.gates:
 		var gate: AirportGate = sim.airport.gates[gate_id]
@@ -175,12 +188,14 @@ func _draw_airside() -> void:
 		var color := MINT if not gate.occupied_by_flight_id.is_empty() else INK
 		for conflict in sim.conflicts.values():
 			if conflict.gate_id == gate.id: color = AMBER
-		draw_circle(pos, 13, Color("2c414d"))
-		draw_arc(pos, 13, 0, TAU, 24, color, 2)
+		var radius := clampf(2.0 * zoom, 2.0, 7.0) if net.config.get("geographic", false) else 13.0
+		draw_circle(pos, radius, Color("2c414d"))
+		draw_arc(pos, radius, 0, TAU, 24, color, 1.0)
 		if sim.airport.flights.has(selected_id) and sim.airport.flights[selected_id].assigned_gate_id == gate.id:
 			draw_arc(pos, 18, 0, TAU, 32, AMBER, 2)
-		_label(pos + Vector2(-9, 30), gate.id, color, 12)
-		if gate.type == "wide": _label(pos + Vector2(-13, 42), "WIDE", INK, 9)
+		if not net.config.get("geographic", false) or zoom >= 3.0:
+			_label(pos + Vector2(4, -4), gate.id, color, 10)
+			if gate.type == "wide" and not net.config.get("geographic", false): _label(pos + Vector2(-13, 42), "WIDE", INK, 9)
 	var approaching := 0
 	for flight: AirportFlight in sim.airport.flights.values():
 		if flight.status in ["scheduled", "departed"]: continue
@@ -200,6 +215,47 @@ func _draw_airside() -> void:
 		_plane_small(position, color)
 		_label(position + Vector2(-20, -13), flight.flight_number, color, 9)
 		hits[flight.id] = position
+
+
+## Geographic source polygons and surveyed centre lines; no invented terminal boxes.
+func _draw_geographic_ground() -> void:
+	var data := sim.airside.config
+	for layer in ["apron", "buildings"]:
+		for surface in data.get("surfaces", []):
+			if (surface.kind == "apron") != (layer == "apron"): continue
+			var points := PackedVector2Array()
+			for point in surface.points: points.append(_screen(Vector2(point[0], point[1])))
+			if points.size() < 3: continue
+			var color := Color("263b43") if layer == "apron" else Color("527382")
+			if surface.kind == "terminal": color = Color("658d9c")
+			if not Geometry2D.triangulate_polygon(points).is_empty(): draw_colored_polygon(points, color)
+			points.append(points[0])
+			draw_polyline(points, color.lightened(0.18), 1.0, true)
+	for path in data.get("map_paths", []):
+		var points := PackedVector2Array()
+		for point in path.points: points.append(_screen(Vector2(point[0], point[1])))
+		if points.size() < 2: continue
+		var stand: bool = path.kind == "parking_position"
+		draw_polyline(points, Color("9f9359") if stand else Color("52615e"), maxf(1.0, (3.0 if stand else 23.0) * _scale * zoom), true)
+		if zoom >= 3.0 and not stand and not str(path.label).is_empty():
+			_label(points[points.size() / 2], path.label, Color("d3c986"), 10)
+	if zoom >= 4.0:
+		for gate in data.get("map_gates", []):
+			if sim.airport.gates.has(gate.label): continue
+			var p := _screen(Vector2(gate.position[0], gate.position[1]))
+			draw_circle(p, 2, INK)
+			_label(p + Vector2(3, -3), gate.label, INK, 9)
+	for surface in data.get("surfaces", []):
+		if surface.kind != "terminal" or str(surface.label).is_empty(): continue
+		if zoom < 2.0: continue
+		if zoom < 4.0 and not str(surface.label) in ["Washington-Dulles International Airport, Main Terminal", "Concourse A & B", "Concourses C & D"]: continue
+		var center := Vector2.ZERO
+		for point in surface.points: center += Vector2(point[0], point[1])
+		center /= surface.points.size()
+		var text := str(surface.label).replace("Washington-Dulles International Airport, ", "")
+		_label(_screen(center) + Vector2(0, -8), text, Color.WHITE, 11)
+	_label(Vector2(20, 57), "N ↑  ·  FAA RUNWAYS / MAPPED FOOTPRINTS", INK, 10)
+	_label(Vector2(20, size.y - 12), str(data.get("attribution", "")), INK, 10)
 
 ## World position (metres) of an aircraft, or (INF, INF) while still in the air.
 func _aircraft_world(f: AirportFlight) -> Vector2:

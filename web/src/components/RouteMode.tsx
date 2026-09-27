@@ -1,0 +1,3 @@
+import type {FlightRoute} from '../types';
+import {RouteUnits,useRouteSettings} from './RouteSettings';
+export function RouteMode({route,fit,close}:{route:FlightRoute;fit:()=>void;close:()=>void}){const {viewAirport}=useRouteSettings();return <section className="route-mode-panel" aria-label="Route mode"><strong>Route mode · {route.callsign}</strong><div>{route.airports.map((a,i)=><button key={i} onClick={()=>viewAirport(a)}>{i?'Destination':'Origin'} · {a.iata||a.icao}</button>)}</div><RouteUnits/><p>Altitude colors: blue below 10,000 ft; mint 10,000–25,000 ft; violet above 25,000 ft · dashed: geographic estimate. Coverage gaps stay disconnected.</p><div><button onClick={fit}>Fit complete route</button><button onClick={close}>Exit route mode</button></div></section>;}

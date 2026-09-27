@@ -16,3 +16,12 @@ game/export/
 
 # Rendered-test dependencies fetched by tools/ui_tests.sh
 /.cache/
+
+# Python scenario generators
+__pycache__/
+
+# Flight observatory
+web/node_modules/
+web/dist/
+web/public/cesium/
+web/*.tsbuildinfo

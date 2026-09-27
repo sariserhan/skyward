@@ -1,0 +1,586 @@
+[
+  {
+    "id": "beluga",
+    "label": "Airbus A300-600ST Beluga",
+    "types": [
+      "A3ST"
+    ],
+    "uri": "models/sourced/beluga-v1.gltf",
+    "length": 55.54
+  },
+  {
+    "id": "ask21",
+    "label": "Schleicher ASK 21",
+    "types": [
+      "AS21"
+    ],
+    "uri": "models/sourced/ask21-v1.gltf",
+    "length": 8.33
+  },
+  {
+    "id": "bae146",
+    "label": "BAe 146",
+    "types": [],
+    "uri": "models/sourced/bae146-v1.gltf",
+    "length": 28.31
+  },
+  {
+    "id": "a318",
+    "label": "Airbus A318",
+    "types": [
+      "A318"
+    ],
+    "uri": "models/sourced/a318-v1.gltf",
+    "length": 31.71
+  },
+  {
+    "id": "a319",
+    "label": "Airbus A319",
+    "types": [
+      "A319"
+    ],
+    "uri": "models/sourced/a319-v1.gltf",
+    "length": 33.89
+  },
+  {
+    "id": "a320",
+    "label": "Airbus A320",
+    "types": [
+      "A320"
+    ],
+    "uri": "models/sourced/a320-v1.gltf",
+    "length": 38.27
+  },
+  {
+    "id": "a321",
+    "label": "Airbus A321",
+    "types": [
+      "A321"
+    ],
+    "uri": "models/sourced/a321-v1.gltf",
+    "length": 44.52
+  },
+  {
+    "id": "a332",
+    "label": "Airbus A330-200",
+    "types": [
+      "A332"
+    ],
+    "uri": "models/sourced/a332-v1.gltf",
+    "length": 58.36
+  },
+  {
+    "id": "a333",
+    "label": "Airbus A330-300",
+    "types": [
+      "A333"
+    ],
+    "uri": "models/sourced/a333-v1.gltf",
+    "length": 63.05
+  },
+  {
+    "id": "a343",
+    "label": "Airbus A340-300",
+    "types": [
+      "A343"
+    ],
+    "uri": "models/sourced/a343-v1.gltf",
+    "length": 66.94
+  },
+  {
+    "id": "a346",
+    "label": "Airbus A340-600",
+    "types": [
+      "A346"
+    ],
+    "uri": "models/sourced/a346-v1.gltf",
+    "length": 77.12
+  },
+  {
+    "id": "a359",
+    "label": "Airbus A350-900",
+    "types": [
+      "A359"
+    ],
+    "uri": "models/sourced/a359-v1.gltf",
+    "length": 67.02
+  },
+  {
+    "id": "a380",
+    "label": "Airbus A380",
+    "types": [
+      "A388"
+    ],
+    "uri": "models/sourced/a380-v1.gltf",
+    "length": 72.68
+  },
+  {
+    "id": "b736",
+    "label": "Boeing 737-600",
+    "types": [
+      "B736"
+    ],
+    "uri": "models/sourced/b736-v1.gltf",
+    "length": 36.64
+  },
+  {
+    "id": "b737",
+    "label": "Boeing 737-700",
+    "types": [
+      "B737"
+    ],
+    "uri": "models/sourced/b737-v1.gltf",
+    "length": 34.93
+  },
+  {
+    "id": "b738",
+    "label": "Boeing 737-800",
+    "types": [
+      "B738"
+    ],
+    "uri": "models/sourced/b738-v1.gltf",
+    "length": 39.42
+  },
+  {
+    "id": "b739",
+    "label": "Boeing 737-900",
+    "types": [
+      "B739"
+    ],
+    "uri": "models/sourced/b739-v1.gltf",
+    "length": 40.62
+  },
+  {
+    "id": "b744",
+    "label": "Boeing 747-400",
+    "types": [
+      "B744"
+    ],
+    "uri": "models/sourced/b744-v1.gltf",
+    "length": 70.94
+  },
+  {
+    "id": "b748",
+    "label": "Boeing 747-8",
+    "types": [
+      "B748"
+    ],
+    "uri": "models/sourced/b748-v1.gltf",
+    "length": 76.55
+  },
+  {
+    "id": "b752",
+    "label": "Boeing 757-200",
+    "types": [
+      "B752"
+    ],
+    "uri": "models/sourced/b752-v1.gltf",
+    "length": 46.34
+  },
+  {
+    "id": "b753",
+    "label": "Boeing 757-300",
+    "types": [
+      "B753"
+    ],
+    "uri": "models/sourced/b753-v1.gltf",
+    "length": 53.45
+  },
+  {
+    "id": "b762",
+    "label": "Boeing 767-200",
+    "types": [
+      "B762"
+    ],
+    "uri": "models/sourced/b762-v1.gltf",
+    "length": 50.37
+  },
+  {
+    "id": "b763",
+    "label": "Boeing 767-300",
+    "types": [
+      "B763"
+    ],
+    "uri": "models/sourced/b763-v1.gltf",
+    "length": 55.2
+  },
+  {
+    "id": "b764",
+    "label": "Boeing 767-400",
+    "types": [
+      "B764"
+    ],
+    "uri": "models/sourced/b764-v1.gltf",
+    "length": 61.06
+  },
+  {
+    "id": "b772",
+    "label": "Boeing 777-200",
+    "types": [
+      "B772"
+    ],
+    "uri": "models/sourced/b772-v1.gltf",
+    "length": 64.43
+  },
+  {
+    "id": "b773",
+    "label": "Boeing 777-300",
+    "types": [
+      "B773"
+    ],
+    "uri": "models/sourced/b773-v1.gltf",
+    "length": 74.38
+  },
+  {
+    "id": "b788",
+    "label": "Boeing 787-8",
+    "types": [
+      "B788"
+    ],
+    "uri": "models/sourced/b788-v1.gltf",
+    "length": 56.68
+  },
+  {
+    "id": "b789",
+    "label": "Boeing 787-9",
+    "types": [
+      "B789"
+    ],
+    "uri": "models/sourced/b789-v1.gltf",
+    "length": 65.9
+  },
+  {
+    "id": "crj700",
+    "label": "Bombardier CRJ700",
+    "types": [
+      "CRJ7"
+    ],
+    "uri": "models/sourced/crj700-v1.gltf",
+    "length": 32.46
+  },
+  {
+    "id": "crj900",
+    "label": "Bombardier CRJ900",
+    "types": [
+      "CRJ9"
+    ],
+    "uri": "models/sourced/crj900-v1.gltf",
+    "length": 36.36
+  },
+  {
+    "id": "cs100",
+    "label": "Airbus A220-100 / CSeries CS100",
+    "types": [
+      "BCS1"
+    ],
+    "uri": "models/sourced/cs100-v1.gltf",
+    "length": 35.02
+  },
+  {
+    "id": "cs300",
+    "label": "Airbus A220-300 / CSeries CS300",
+    "types": [
+      "BCS3"
+    ],
+    "uri": "models/sourced/cs300-v1.gltf",
+    "length": 38.17
+  },
+  {
+    "id": "e170",
+    "label": "Embraer E170",
+    "types": [
+      "E170"
+    ],
+    "uri": "models/sourced/e170-v1.gltf",
+    "length": 29.8
+  },
+  {
+    "id": "e190",
+    "label": "Embraer E190",
+    "types": [
+      "E190"
+    ],
+    "uri": "models/sourced/e190-v1.gltf",
+    "length": 35.83
+  },
+  {
+    "id": "q400",
+    "label": "De Havilland Dash 8 Q400",
+    "types": [
+      "DH8D"
+    ],
+    "uri": "models/sourced/q400-v1.gltf",
+    "length": 32.59
+  },
+  {
+    "id": "citation",
+    "label": "Cessna Citation II",
+    "types": [
+      "C550"
+    ],
+    "uri": "models/sourced/citation-v1.gltf",
+    "length": 14.48
+  },
+  {
+    "id": "pa28",
+    "label": "Piper PA-28",
+    "types": [
+      "PA28"
+    ],
+    "uri": "models/sourced/pa28-v1.gltf",
+    "length": 7.15
+  },
+  {
+    "id": "atr42",
+    "label": "ATR 42",
+    "types": [
+      "AT43",
+      "AT45",
+      "AT46"
+    ],
+    "uri": "models/sourced/atr42-v1.gltf",
+    "length": 22.77
+  },
+  {
+    "id": "b39m",
+    "label": "Boeing 737 MAX 9",
+    "types": [
+      "B39M"
+    ],
+    "uri": "models/sourced/b39m-v1.gltf",
+    "length": 42.159,
+    "variantVerified": false,
+    "fidelityNote": "Community MAX exterior; exact variant and registration-specific details are unverified. MAX 7/8 use this MAX-family model; the upstream MAX 8 geometry is unfinished."
+  },
+  {
+    "id": "b3xm",
+    "label": "Boeing 737 MAX 10",
+    "types": [
+      "B3XM"
+    ],
+    "uri": "models/sourced/b3xm-v1.gltf",
+    "length": 44.229,
+    "variantVerified": false,
+    "fidelityNote": "Community MAX exterior; exact variant and registration-specific details are unverified. MAX 7/8 use this MAX-family model; the upstream MAX 8 geometry is unfinished."
+  },
+  {
+    "id": "c750",
+    "label": "Cessna Citation X",
+    "types": [
+      "C750"
+    ],
+    "uri": "models/sourced/c750-v1.gltf",
+    "length": 21.944,
+    "sourceRepository": "https://github.com/FGMEMBERS/CitationX"
+  },
+  {
+    "id": "fa50",
+    "label": "Dassault Falcon 50",
+    "types": [
+      "FA50"
+    ],
+    "uri": "models/sourced/fa50-v1.gltf",
+    "length": 19.006,
+    "sourceRepository": "https://github.com/FGMEMBERS/Falcon-50"
+  },
+  {
+    "id": "atr72",
+    "label": "ATR 72-500",
+    "types": [
+      "AT75"
+    ],
+    "uri": "models/sourced/atr72-v1.gltf",
+    "length": 27.39,
+    "sourceRepository": "https://github.com/Ysurac/FlightAirMap-3dmodels"
+  },
+  {
+    "id": "c182",
+    "label": "Cessna 182 Skylane",
+    "types": [
+      "C182"
+    ],
+    "uri": "models/sourced/c182-v1.gltf",
+    "length": 8.5,
+    "sourceRepository": "https://github.com/Ysurac/FlightAirMap-3dmodels"
+  },
+  {
+    "id": "c208",
+    "label": "Cessna 208 Caravan",
+    "types": [
+      "C208"
+    ],
+    "uri": "models/sourced/c208-v1.gltf",
+    "length": 12.6,
+    "sourceRepository": "https://github.com/Ysurac/FlightAirMap-3dmodels"
+  },
+  {
+    "id": "crj2",
+    "label": "Bombardier CRJ200",
+    "types": [
+      "CRJ2"
+    ],
+    "uri": "models/sourced/crj2-v1.gltf",
+    "length": 28.98,
+    "sourceRepository": "https://github.com/Ysurac/FlightAirMap-3dmodels"
+  },
+  {
+    "id": "dhc4",
+    "label": "De Havilland DHC-4 Caribou",
+    "types": [
+      "DHC4"
+    ],
+    "uri": "models/sourced/dhc4-v1.gltf",
+    "length": 22.09,
+    "sourceRepository": "https://github.com/Ysurac/FlightAirMap-3dmodels"
+  },
+  {
+    "id": "dr40",
+    "label": "Robin DR400",
+    "types": [
+      "DR40"
+    ],
+    "uri": "models/sourced/dr40-v1.gltf",
+    "length": 6.96,
+    "sourceRepository": "https://github.com/Ysurac/FlightAirMap-3dmodels"
+  },
+  {
+    "id": "e145",
+    "label": "Embraer ERJ 145",
+    "types": [
+      "E145"
+    ],
+    "uri": "models/sourced/e145-v1.gltf",
+    "length": 29.78,
+    "sourceRepository": "https://github.com/Ysurac/FlightAirMap-3dmodels"
+  },
+  {
+    "id": "e175",
+    "label": "Embraer E175",
+    "types": [
+      "E75L"
+    ],
+    "uri": "models/sourced/e175-v1.gltf",
+    "length": 30.82,
+    "sourceRepository": "https://github.com/Ysurac/FlightAirMap-3dmodels"
+  },
+  {
+    "id": "ec35",
+    "label": "Eurocopter EC135",
+    "types": [
+      "EC35"
+    ],
+    "uri": "models/sourced/ec35-v1.gltf",
+    "length": 11.84,
+    "sourceRepository": "https://github.com/Ysurac/FlightAirMap-3dmodels"
+  },
+  {
+    "id": "gazl",
+    "label": "Aérospatiale Gazelle",
+    "types": [
+      "GAZL"
+    ],
+    "uri": "models/sourced/gazl-v1.gltf",
+    "length": 10.62,
+    "sourceRepository": "https://github.com/Ysurac/FlightAirMap-3dmodels"
+  },
+  {
+    "id": "md11",
+    "label": "McDonnell Douglas MD-11",
+    "types": [
+      "MD11"
+    ],
+    "uri": "models/sourced/md11-v1.gltf",
+    "length": 61.61,
+    "sourceRepository": "https://github.com/Ysurac/FlightAirMap-3dmodels"
+  },
+  {
+    "id": "p40",
+    "label": "Curtiss P-40 Warhawk",
+    "types": [
+      "P40"
+    ],
+    "uri": "models/sourced/p40-v1.gltf",
+    "length": 9.64,
+    "sourceRepository": "https://github.com/Ysurac/FlightAirMap-3dmodels"
+  },
+  {
+    "id": "pa18",
+    "label": "Piper PA-18 Super Cub",
+    "types": [
+      "PA18"
+    ],
+    "uri": "models/sourced/pa18-v1.gltf",
+    "length": 6.92,
+    "sourceRepository": "https://github.com/Ysurac/FlightAirMap-3dmodels"
+  },
+  {
+    "id": "pa22",
+    "label": "Piper PA-22 Tri-Pacer",
+    "types": [
+      "PA22"
+    ],
+    "uri": "models/sourced/pa22-v1.gltf",
+    "length": 6.25,
+    "sourceRepository": "https://github.com/Ysurac/FlightAirMap-3dmodels"
+  },
+  {
+    "id": "pa32",
+    "label": "Piper PA-32 Cherokee Six",
+    "types": [
+      "PA32"
+    ],
+    "uri": "models/sourced/pa32-v1.gltf",
+    "length": 8.37,
+    "sourceRepository": "https://github.com/Ysurac/FlightAirMap-3dmodels"
+  },
+  {
+    "id": "pc12",
+    "label": "Pilatus PC-12",
+    "types": [
+      "PC12"
+    ],
+    "uri": "models/sourced/pc12-v1.gltf",
+    "length": 14.39,
+    "sourceRepository": "https://github.com/Ysurac/FlightAirMap-3dmodels"
+  },
+  {
+    "id": "pc21",
+    "label": "Pilatus PC-21",
+    "types": [
+      "PC21"
+    ],
+    "uri": "models/sourced/pc21-v1.gltf",
+    "length": 9.88,
+    "sourceRepository": "https://github.com/Ysurac/FlightAirMap-3dmodels"
+  },
+  {
+    "id": "sr22",
+    "label": "Cirrus SR22",
+    "types": [
+      "SR22"
+    ],
+    "uri": "models/sourced/sr22-v1.gltf",
+    "length": 7.91,
+    "sourceRepository": "https://github.com/Ysurac/FlightAirMap-3dmodels"
+  },
+  {
+    "id": "t134",
+    "label": "Tupolev Tu-134",
+    "types": [
+      "T134"
+    ],
+    "uri": "models/sourced/t134-v1.gltf",
+    "length": 41.54,
+    "sourceRepository": "https://github.com/Ysurac/FlightAirMap-3dmodels"
+  },
+  {
+    "id": "b703",
+    "label": "Boeing 707",
+    "types": [
+      "B703"
+    ],
+    "uri": "models/sourced/b703-v1.gltf",
+    "length": 45.55,
+    "sourceRepository": "https://github.com/Ysurac/FlightAirMap-3dmodels"
+  }
+]

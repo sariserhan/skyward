@@ -1,0 +1,223 @@
+{
+  "retrieved": "2026-09-27",
+  "repository": "https://github.com/Jxck-S/airline-logos",
+  "notice": "Airline trademarks belong to their respective owners. Used for operator identification; not an endorsement or a blanket commercial-use license. Source repository provides identification-use notice, not a transferable brand license.",
+  "logos": [
+    {
+      "icao": "THY",
+      "sourceUrl": "https://raw.githubusercontent.com/Jxck-S/airline-logos/main/radarbox_logos/THY.png",
+      "sha256": "bb2d27f9c675390d1809b7878c14b02df51286a6c26e907c8837151d299c19df",
+      "size": [
+        54,
+        54
+      ]
+    },
+    {
+      "icao": "UAL",
+      "sourceUrl": "https://raw.githubusercontent.com/Jxck-S/airline-logos/main/radarbox_logos/UAL.png",
+      "sha256": "e71a4800ea6d0154274763cf9d7b1eae6e1f43af4319af8091dd226047021e6a",
+      "size": [
+        54,
+        54
+      ]
+    },
+    {
+      "icao": "AAL",
+      "sourceUrl": "https://raw.githubusercontent.com/Jxck-S/airline-logos/main/radarbox_logos/AAL.png",
+      "sha256": "3ef94c38daf15a2421412ddec1e575972076a5a2d09952031c91ddc5967cca27",
+      "size": [
+        54,
+        54
+      ]
+    },
+    {
+      "icao": "DAL",
+      "sourceUrl": "https://raw.githubusercontent.com/Jxck-S/airline-logos/main/radarbox_logos/DAL.png",
+      "sha256": "66cf159427f1c75c04b372b74cb069f1ceab05131b734203eec0758a9a11f555",
+      "size": [
+        70,
+        70
+      ]
+    },
+    {
+      "icao": "BAW",
+      "sourceUrl": "https://raw.githubusercontent.com/Jxck-S/airline-logos/main/radarbox_logos/BAW.png",
+      "sha256": "8f5a456661bea6fda64d49363978aa939ca3ca1ebcbb278638839c164b3f9f3e",
+      "size": [
+        54,
+        54
+      ]
+    },
+    {
+      "icao": "DLH",
+      "sourceUrl": "https://raw.githubusercontent.com/Jxck-S/airline-logos/main/radarbox_logos/DLH.png",
+      "sha256": "3d832250c43590a3f6dc9bad7af52f805de476078552ad8b148b0d1fde977c98",
+      "size": [
+        54,
+        54
+      ]
+    },
+    {
+      "icao": "AFR",
+      "sourceUrl": "https://raw.githubusercontent.com/Jxck-S/airline-logos/main/radarbox_logos/AFR.png",
+      "sha256": "81ef0881dad83487658f8f19fabf7c5ce8e7cb368dd809a7485566c6287ec4c4",
+      "size": [
+        54,
+        54
+      ]
+    },
+    {
+      "icao": "KLM",
+      "sourceUrl": "https://raw.githubusercontent.com/Jxck-S/airline-logos/main/radarbox_logos/KLM.png",
+      "sha256": "00fc555f20b6d98dd8c44a706fd1d5849eae39ed15acf3d9921dc8cd07ee23b2",
+      "size": [
+        54,
+        54
+      ]
+    },
+    {
+      "icao": "QTR",
+      "sourceUrl": "https://raw.githubusercontent.com/Jxck-S/airline-logos/main/radarbox_logos/QTR.png",
+      "sha256": "e9d1be3e6e0a31710248b0ac15d686289b0e2496dd44b953e9110fa1d44670c9",
+      "size": [
+        54,
+        54
+      ]
+    },
+    {
+      "icao": "UAE",
+      "sourceUrl": "https://raw.githubusercontent.com/Jxck-S/airline-logos/main/radarbox_logos/UAE.png",
+      "sha256": "7e8a0ed9091407d3bdfe1a7aa41e217118c9a4e5c1928d15bb2da4cc0c20749d",
+      "size": [
+        54,
+        54
+      ]
+    },
+    {
+      "icao": "PGT",
+      "sourceUrl": "https://raw.githubusercontent.com/Jxck-S/airline-logos/main/radarbox_logos/PGT.png",
+      "sha256": "c46c4165a48b431a0695e1f74bd29b826b6e89224d7f6a581e4817635a82e893",
+      "size": [
+        54,
+        54
+      ]
+    },
+    {
+      "icao": "SWA",
+      "sourceUrl": "https://raw.githubusercontent.com/Jxck-S/airline-logos/main/radarbox_logos/SWA.png",
+      "sha256": "2f8e847bd34350a0fcc018046aa2245d7c8e82b9562d12e0feddb51b474ab30e",
+      "size": [
+        54,
+        54
+      ]
+    },
+    {
+      "icao": "JBU",
+      "sourceUrl": "https://raw.githubusercontent.com/Jxck-S/airline-logos/main/radarbox_logos/JBU.png",
+      "sha256": "29fdbad2662fc7290cfdad57d4cfb25190e45e7e53be4551e9a4c8198b8370ad",
+      "size": [
+        54,
+        54
+      ]
+    },
+    {
+      "icao": "ETH",
+      "sourceUrl": "https://raw.githubusercontent.com/Jxck-S/airline-logos/main/radarbox_logos/ETH.png",
+      "sha256": "8ac3b9a93c0d4e1dad0e8edd281338817d97e905be40d2b4ca04addc7f09c3b5",
+      "size": [
+        54,
+        54
+      ]
+    },
+    {
+      "icao": "SAS",
+      "sourceUrl": "https://raw.githubusercontent.com/Jxck-S/airline-logos/main/radarbox_logos/SAS.png",
+      "sha256": "82ed40ce669844b021847579bb60f16874ccb202a44ee13cb102216863bfd8a0",
+      "size": [
+        54,
+        54
+      ]
+    },
+    {
+      "icao": "RYR",
+      "sourceUrl": "https://raw.githubusercontent.com/Jxck-S/airline-logos/main/radarbox_logos/RYR.png",
+      "sha256": "a9dc2fc3402b62547c5d446dc3fd3aa1bcc777f1f985ec5f5c9f5bfef48d0102",
+      "size": [
+        54,
+        54
+      ]
+    },
+    {
+      "icao": "EZY",
+      "sourceUrl": "https://raw.githubusercontent.com/Jxck-S/airline-logos/main/radarbox_logos/EZY.png",
+      "sha256": "8622bd6951a347e4dbdc2e74c330d73334acab62a725c293983dae18b3ef05fe",
+      "size": [
+        54,
+        54
+      ]
+    },
+    {
+      "icao": "WZZ",
+      "sourceUrl": "https://raw.githubusercontent.com/Jxck-S/airline-logos/main/radarbox_logos/WZZ.png",
+      "sha256": "eb06d3d5f05724aa163810e2d3481ce3dbd0d207d55b8b8f996e6ec1a20298c7",
+      "size": [
+        54,
+        54
+      ]
+    },
+    {
+      "icao": "SIA",
+      "sourceUrl": "https://raw.githubusercontent.com/Jxck-S/airline-logos/main/radarbox_logos/SIA.png",
+      "sha256": "46bbce516f4f9c63fd587ff8c1a793b4bf98371e5001c8c3898f7a55229755cc",
+      "size": [
+        54,
+        54
+      ]
+    },
+    {
+      "icao": "CPA",
+      "sourceUrl": "https://raw.githubusercontent.com/Jxck-S/airline-logos/main/radarbox_logos/CPA.png",
+      "sha256": "dff7840d8d1b386b5ee663dd44faddd25bb7d1118c9c235946467290b9af17d7",
+      "size": [
+        54,
+        54
+      ]
+    },
+    {
+      "icao": "ANA",
+      "sourceUrl": "https://raw.githubusercontent.com/Jxck-S/airline-logos/main/radarbox_logos/ANA.png",
+      "sha256": "495fcdb60192c2bc242051923514b53cd21f0fe6c6b114ef4f5aeab39ac9bbfb",
+      "size": [
+        54,
+        54
+      ]
+    },
+    {
+      "icao": "JAL",
+      "sourceUrl": "https://raw.githubusercontent.com/Jxck-S/airline-logos/main/radarbox_logos/JAL.png",
+      "sha256": "3978666e4c99cfe97299ff8f9164a5b31f738d47d0cd2b8ccf2f636a588014aa",
+      "size": [
+        54,
+        54
+      ]
+    },
+    {
+      "icao": "QFA",
+      "sourceUrl": "https://raw.githubusercontent.com/Jxck-S/airline-logos/main/radarbox_logos/QFA.png",
+      "sha256": "8a195ec0246001d338e5bd2aa92f447d9f95ca2aa492b5622c7ba154736dd7c9",
+      "size": [
+        54,
+        54
+      ]
+    },
+    {
+      "icao": "ACA",
+      "sourceUrl": "https://raw.githubusercontent.com/Jxck-S/airline-logos/main/radarbox_logos/ACA.png",
+      "sha256": "b215d6661172bc1c53a228f16951a7fe3c478fee3aad4a734689170299be98b8",
+      "size": [
+        54,
+        54
+      ]
+    }
+  ]
+}

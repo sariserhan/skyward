@@ -1,0 +1,41 @@
+import type * as Cesium from 'cesium';
+// Mapzen/Terrarium open elevation; no key, account, trial, or billable endpoint.
+export const TERRAIN_ROOT='https://s3.amazonaws.com/elevation-tiles-prod/terrarium';
+export function terrariumHeight(r:number,g:number,b:number){return r*256+g+b/256-32768;}
+export function createOpenTerrain(failed:()=>void, updated:()=>void) {
+  const C=window.Cesium, controller=new AbortController();
+  let active=0,disposed=false,reported=false;
+  const cache=new Map<string,Float32Array>(),pending=new Map<string,Promise<Float32Array>>();
+  const load=(x:number,y:number,z:number):Promise<Float32Array>|undefined=>{
+    const key=`${z}/${x}/${y}`;
+    if(cache.has(key))return Promise.resolve(cache.get(key)!);
+    if(pending.has(key))return pending.get(key);
+    if(active>=6||disposed)return undefined;
+    active++;
+    const job=(async()=>{
+      const response=await fetch(`${TERRAIN_ROOT}/${key}.png`,{signal:AbortSignal.any([controller.signal,AbortSignal.timeout(12000)])});
+      if(!response.ok)throw new Error('Elevation unavailable');
+      const bitmap=await createImageBitmap(await response.blob());
+      try{
+        const canvas=document.createElement('canvas');canvas.width=256;canvas.height=256;
+        const context=canvas.getContext('2d',{willReadFrequently:true});if(!context)throw new Error('Elevation decoding unavailable');
+        context.drawImage(bitmap,0,0);const rgba=context.getImageData(0,0,256,256).data;
+        const heights=new Float32Array(65*65);
+        for(let row=0;row<65;row++)for(let col=0;col<65;col++){
+          const px=Math.round(col*255/64),py=Math.round(row*255/64),i=(py*256+px)*4;
+          // Imagery depicts sea surface, not the bathymetric sea floor.
+          heights[row*65+col]=Math.max(0,terrariumHeight(rgba[i],rgba[i+1],rgba[i+2]));
+        }
+        cache.set(key,heights);if(cache.size>128)cache.delete(cache.keys().next().value!);return heights;
+      }finally{bitmap.close();}
+    })().catch(()=>{if(!disposed&&!reported){reported=true;failed();}return new Float32Array(65*65);}).finally(()=>{active--;pending.delete(key);if(!disposed)updated();});
+    pending.set(key,job);return job;
+  };
+  const provider=new C.CustomHeightmapTerrainProvider({width:65,height:65,tilingScheme:new C.WebMercatorTilingScheme(),callback:load,
+    credit:new C.Credit(`<a href="${import.meta.env.BASE_URL}terrain-attribution.txt" target="_blank">Open terrain: Mapzen · USGS · NOAA · other contributors</a>`,true)});
+  provider.requestTileGeometry=(x,y,level)=>{
+    const heights=load(x,y,level);if(!heights)return undefined;
+    return heights.then(buffer=>new C.HeightmapTerrainData({buffer,width:65,height:65,childTileMask:level>=12?0:15}));
+  };
+  return {provider:provider as Cesium.TerrainProvider,dispose:()=>{disposed=true;controller.abort();cache.clear();}};
+}

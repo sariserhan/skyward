@@ -1,0 +1,11 @@
+{
+  "title": "NASA Earth Observatory Black Marble 2016",
+  "sourceUrl": "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/imagerecords/144000/144898/BlackMarble_2016_01deg.jpg",
+  "informationUrl": "https://science.nasa.gov/earth/earth-observatory/earth-at-night/maps/",
+  "year": 2016,
+  "resolution": "0.1 degree / 3600 x 1800",
+  "credit": "NASA Earth Observatory / Suomi NPP VIIRS",
+  "description": "Historical nighttime composite, not live lights or street-level imagery. Original JPEG retained.",
+  "sha256": "d87de751a264e4f8ff69c68de5dab9606daee87a6f15ae743c93200743bd7ec1",
+  "bytes": 779638
+}
