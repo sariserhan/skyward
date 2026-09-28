@@ -33,10 +33,11 @@ export function observedFrame(points:TrailPoint[],time:number){
 }
 export function runwayFrame(r:Runway,kind:'takeoff'|'landing',progress:number){
  const t=Math.max(0,Math.min(1,progress));
- const f=kind==='takeoff'?(t<.55?.8*(t/.55)**2:.8+(t-.55)*5):(t<.5?-2+4*t:.85*(1-(1-(t-.5)*2)**2));
- const height=kind==='takeoff'?Math.max(0,(t-.55)*1500):Math.max(0,(.5-t)*1100);
+ const lift=Math.max(0,t-.55),roll=Math.max(0,(t-.5)*2);
+ const f=kind==='takeoff'?(t<.55?.8*(t/.55)**2:.8+(1.6/.55)*lift+2*lift*lift):(t<.5?-2+4*t:.3*roll**3-1.45*roll**2+2*roll);
+ const height=kind==='takeoff'?1500*lift*(1-Math.exp(-lift/.06)):550*Math.max(0,1-2*t)**1.4;
  const dl=((r.b[0]-r.a[0]+540)%360)-180;
- return {lon:((r.a[0]+dl*f+540)%360)-180,lat:r.a[1]+(r.b[1]-r.a[1])*f,altitude:height/.3048,heading:bearing({lon:r.a[0],lat:r.a[1]},{lon:r.b[0],lat:r.b[1]}),pitch:kind==='takeoff'&&t>.55?10:kind==='landing'&&t<.5?-3:0,ground:height===0};
+ return {lon:((r.a[0]+dl*f+540)%360)-180,lat:r.a[1]+(r.b[1]-r.a[1])*f,altitude:height/.3048,heading:bearing({lon:r.a[0],lat:r.a[1]},{lon:r.b[0],lat:r.b[1]}),pitch:kind==='takeoff'?10*(1-Math.exp(-lift/.04)):t<.5?2+2*(2*t)**4:4*(1-roll)**4,ground:height===0};
 }
 
 export const profileNames:Record<string,string>={b772:'Boeing 777-200',b788:'Boeing 787-8',b78x:'Boeing 787-10',a35k:'Airbus A350-1000',e190:'Embraer E-Jet',crj:'Bombardier CRJ',pc12:'Pilatus PC-12',a319:'Airbus A319',a320:'Airbus A320',a321:'Airbus A321',a220:'Airbus A220',a330:'Airbus A330',a350:'Airbus A350',a380:'Airbus A380',b737:'Boeing 737',b737max:'Boeing 737 MAX',b747:'Boeing 747',b757:'Boeing 757',b767:'Boeing 767',b777:'Boeing 777',b787:'Boeing 787',regional:'Regional jet',bizjet:'Business jet',turboprop:'Turboprop',light:'Light aircraft',generic:'Generic aircraft'};

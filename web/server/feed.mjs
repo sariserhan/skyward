@@ -4,6 +4,7 @@ import { routePath, normalizeRoute } from './routes.mjs';
 // serialized and cached across browser sessions; errors never become live data.
 import catalog from '../data/airport-catalog.json' with { type: 'json' };
 export const AIRPORTS = catalog;
+const distanceNm=(a,b,c,d)=>{const r=Math.PI/180;return 6880.13*Math.asin(Math.min(1,Math.sqrt(Math.sin((c-a)*r/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin((d-b)*r/2)**2)));};
 const finite = (v) => typeof v === 'number' && Number.isFinite(v);
 export function normalizeAircraft(raw, sourceNow) {
   if (!raw || !/^[a-f\d]{6}$/i.test(raw.hex ?? '')) return null;
@@ -44,17 +45,24 @@ export function cameraAreaPath(lat,lon,radius){
 }
 
 export class FeedClient {
-  constructor(fetcher = fetch) { this.fetcher = fetcher; this.cache = new Map(); this.pending = new Map(); this.tail = Promise.resolve(); this.nextAt = 0; this.stats = {started:0,failed:0,cacheHits:0,lastSuccessAt:null,lastPositionAt:null,totalMs:0}; }
+  constructor(fetcher = fetch) { this.fetcher = fetcher; this.cooldowns = new Map(); this.cache = new Map(); this.pending = new Map(); this.tail = Promise.resolve(); this.nextAt = 0; this.stats = {started:0,failed:0,cacheHits:0,lastSuccessAt:null,lastPositionAt:null,totalMs:0}; }
+  checkCooldown(origin) {
+    const until=this.cooldowns.get(origin)??0;
+    if(until>Date.now()){const error=new Error('Flight feed is rate limited. Retrying after the requested pause.');error.retryAfter=Math.ceil((until-Date.now())/1000);throw error;}
+  }
   async request(path, body, kind = 'positions', origin = 'https://api.adsb.lol') {
     const key = origin + kind + path + (body ? JSON.stringify(body) : '');
     const cached = this.cache.get(key);
     if (cached && Date.now() < cached.expires) {this.stats.cacheHits++;return cached.value;}
+    this.checkCooldown(origin);
     if (this.pending.has(key)) return this.pending.get(key);
     if (this.pending.size >= 16) throw new Error('Observation service busy. Please retry shortly.');
     const queuedAt = Date.now();
     const task = this.tail.catch(() => {}).then(async () => {
+      this.checkCooldown(origin);
       const wait = Math.max(0, this.nextAt - Date.now());
       if (wait) await new Promise(resolve => setTimeout(resolve, wait));
+      this.checkCooldown(origin);
       if (Date.now() - queuedAt > 15000) throw new Error('Observation request expired in queue.');
       this.nextAt = Date.now() + 1100;
       const startedAt=Date.now();this.stats.started++;
@@ -63,7 +71,16 @@ export class FeedClient {
           headers: { 'User-Agent': 'Skyward-Observatory/0.2', ...(body ? { 'Content-Type': 'application/json' } : {}) },
           signal: AbortSignal.timeout(12000), ...(body ? { method: 'POST', body: JSON.stringify(body) } : {}),
         });
-        if (!response.ok) { const error = new Error(`Provider returned ${response.status}`); error.status = response.status; throw error; }
+        if (!response.ok) {
+          const error = new Error(`Provider returned ${response.status}`); error.status = response.status;
+          if(response.status===429){
+            const raw=response.headers?.get('retry-after'),seconds=raw?Number(raw):NaN;
+            const delay=Number.isFinite(seconds)?seconds*1000:raw?Date.parse(raw)-Date.now():60000;
+            const until=Date.now()+Math.max(60000,Number.isFinite(delay)?delay:60000);
+            this.cooldowns.set(origin,until);error.retryAfter=Math.ceil((until-Date.now())/1000);
+          }
+          throw error;
+        }
         const raw = await response.json();
         const value = kind === 'route' ? { raw, fetchedAt: Date.now() } : body ? raw : normalizePayload(raw);
         this.stats.lastSuccessAt=Date.now();
@@ -106,8 +123,30 @@ export class FeedClient {
   area(airport) {
     const p = AIRPORTS[airport];
     if (!Object.hasOwn(AIRPORTS,airport)) throw new Error('Unknown airport');
-    return this.request(`/v2/point/${p.lat}/${p.lon}/100`);
+    return this.cameraArea(p.lat,p.lon,100);
   }
-  cameraArea(lat,lon,radius) { return this.request(cameraAreaPath(lat,lon,radius)); }
+  cameraArea(lat,lon,radius) {
+    const path=cameraAreaPath(lat,lon,radius);
+    const [,queryLat,queryLon]=path.match(/point\/([^/]+)\/([^/]+)/);
+    // A recent larger observation circle can answer a contained viewport query.
+    // Preserve its original timestamps; never turn cached positions into new fixes.
+    for(const [key,cached] of [...this.cache].reverse()){
+      const match=key.match(/^https:\/\/api\.adsb\.lolpositions\/v2\/point\/([^/]+)\/([^/]+)\/([^/]+)$/);
+      if(!match||cached.expires<=Date.now()||distanceNm(+queryLat,+queryLon,+match[1],+match[2])+radius>+match[3])continue;
+      this.stats.cacheHits++;
+      return Promise.resolve({...cached.value,aircraft:cached.value.aircraft.filter(a=>a.lat!==null&&a.lon!==null&&distanceNm(+queryLat,+queryLon,a.lat,a.lon)<=radius)});
+    }
+    for(const [key,pending] of this.pending){
+      const match=key.match(/^https:\/\/api\.adsb\.lolpositions\/v2\/point\/([^/]+)\/([^/]+)\/([^/]+)$/);
+      if(match&&distanceNm(+queryLat,+queryLon,+match[1],+match[2])+radius<=+match[3]){
+        this.stats.cacheHits++;
+        return pending.then(value=>({...value,aircraft:value.aircraft.filter(a=>a.lat!==null&&a.lon!==null&&distanceNm(+queryLat,+queryLon,a.lat,a.lon)<=radius)}));
+      }
+    }
+    // Neighboring viewports share a padded half-degree bucket. The 25 nm margin
+    // covers the maximum center shift; large 250 nm requests remain unchanged.
+    const bucket=radius<=225?cameraAreaPath(Math.round(+queryLat*2)/2,((Math.round(+queryLon*2)/2+540)%360)-180,radius+25):path;
+    return this.request(bucket).then(value=>({...value,aircraft:value.aircraft.filter(a=>a.lat!==null&&a.lon!==null&&distanceNm(+queryLat,+queryLon,a.lat,a.lon)<=radius)}));
+  }
   search(kind, query) { return this.request(searchPath(kind, query)); }
 }

@@ -9,7 +9,7 @@ export function aircraftLightPulse(seconds:number,phase=0,reduced=false){
 }
 /** glTF +Z nose / +Y up becomes Cesium +X nose / +Z up. +Y is aircraft left. */
 export function lightAnchorToBody(p:number[]){return [p[2],p[0],p[1]];}
-export function installAircraftLights(C:typeof Cesium,v:Cesium.Viewer,getState:()=>{aircraft:Aircraft[];selected:Aircraft|null;reduced:boolean}){
+export function installAircraftLights(C:typeof Cesium,v:Cesium.Viewer,getState:()=>{aircraft:Aircraft[];selected:Aircraft|null;reduced:boolean;tower?:boolean}){
  const collection=v.scene.primitives.add(new C.PointPrimitiveCollection());
  type Entry={entity:Cesium.Entity;anchor:Anchor;points:Cesium.PointPrimitive[];phase:number};
  const entries=new Map<string,Entry>();let discovery=0;
@@ -26,7 +26,7 @@ export function installAircraftLights(C:typeof Cesium,v:Cesium.Viewer,getState:(
     const position=entity.position?.getValue(time);if(!position)continue;
     const uri=String(entity.model!.uri?.getValue(time)??''),source=uri.includes('/models/fleet/')?null:sourcedModel(a.aircraftType);
     const anchor=(anchors as Record<string,Anchor>)[source?.id??('fallback:'+fleetProfile(a.aircraftType))];if(!anchor)continue;
-    if(C.Cartesian3.distance(position,v.camera.positionWC)>Math.min(1800,anchor.length*10))continue;
+    if(C.Cartesian3.distance(position,v.camera.positionWC)>(state.tower?20000:Math.min(1800,anchor.length*10)))continue;
     keep.add(entity.id);const old=entries.get(entity.id);if(old){old.anchor=anchor;continue;}
     const points=colors.map((color,i)=>collection.add({id:entity,position,pixelSize:i<3?3.5:5,outlineWidth:i<3?2:4,color,outlineColor:color.withAlpha(.16),show:false,disableDepthTestDistance:0}));
     const phase=[...entity.id].reduce((n,c)=>n+c.charCodeAt(0),0)%120/100;entries.set(entity.id,{entity,anchor,points,phase});

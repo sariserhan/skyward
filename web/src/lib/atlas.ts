@@ -5,7 +5,7 @@ export const ATLAS_COLORS={ocean:'#10283b',land:['#314d50','#365557','#3a5651','
 export function overlaps(a:number[],b:number[]){return a[0]<=b[2]&&a[2]>=b[0]&&a[1]<=b[3]&&a[3]>=b[1];}
 export function createAtlasProvider(data:AtlasData){
  const C=window.Cesium,scheme=new C.GeographicTilingScheme();
- const credit=new C.Credit('<a href="https://www.naturalearthdata.com/" target="_blank" rel="noreferrer">Atlas: Natural Earth · regional reference map</a>',true);
+ const credit=new C.Credit('<a href="https://www.naturalearthdata.com/" target="_blank" rel="noreferrer">Atlas: Natural Earth · regional reference map</a>',false);
  const cache=new Map<string,HTMLCanvasElement>();
  const provider:Cesium.ImageryProvider={
   tileWidth:256,tileHeight:256,minimumLevel:0,maximumLevel:10,tilingScheme:scheme,rectangle:scheme.rectangle,credit,errorEvent:new C.Event(),hasAlphaChannel:false,tileDiscardPolicy:new C.NeverTileDiscardPolicy(),proxy:undefined as unknown as Cesium.Proxy,

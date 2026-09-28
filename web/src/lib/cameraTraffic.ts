@@ -38,3 +38,11 @@ export function combineRegions(results:{region:TrafficRegion;rows:Aircraft[]|nul
  const retained=previous.filter(a=>failed.some(r=>inRegion(a,r.region))&&!successful.some(r=>inRegion(a,r.region)));
  return mergeCameraAircraft([...successful.flatMap(r=>r.rows!),...retained],previous,area);
 }
+
+/** Only recently received real fixes can bridge a new/failed viewport request. */
+export function retainedViewportRows(rows:Aircraft[],known:Aircraft[],area:CameraArea|null,now:number){
+ if(!area)return [];
+ const latest=new Map(rows.map(a=>[a.hex,a]));
+ for(const a of known){if(a.observedAt===null||now-a.observedAt>120000||a.observedAt>now+1000||!inCameraArea(a,area))continue;const old=latest.get(a.hex);if(!old||(old.observedAt??0)<a.observedAt)latest.set(a.hex,a);}
+ return [...latest.values()].filter(a=>inCameraArea(a,area));
+}

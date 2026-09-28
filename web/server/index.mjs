@@ -11,6 +11,10 @@ import { resolve, extname, dirname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { FeedClient, AIRPORTS, cameraAreaPath } from './feed.mjs';
 import { routePath } from './routes.mjs';
+import { airlabsPreview } from './airlabs.mjs';
+import {createMembership} from './membership.mjs';
+import {simulatorPage} from './simulator.mjs';
+const membership=createMembership();
 
 const here = dirname(fileURLToPath(import.meta.url));
 const webRoot = resolve(here, '../dist');
@@ -26,6 +30,8 @@ export const server = http.createServer(async (req, res) => {
   res.setHeader('X-Frame-Options', 'SAMEORIGIN');
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   try {
+    const memberUrl = new URL(req.url, 'http://localhost');
+    if(await membership.handle(req,res,memberUrl)) return;
     if (!['GET', 'HEAD'].includes(req.method)) return json(res, 405, { error: 'Method not allowed' });
     const url = new URL(req.url, 'http://localhost');
     if (url.pathname === '/healthz') {
@@ -40,6 +46,7 @@ export const server = http.createServer(async (req, res) => {
       if (rate.count > 60) { res.setHeader('Retry-After', String(Math.max(1, Math.ceil((rate.start + 60000 - Date.now()) / 1000)))); return json(res, 429, { error: 'Please wait a moment before refreshing.' }); }
       if (rates.size > 500) rates.delete(rates.keys().next().value);
       try {
+        if (url.pathname === '/api/flight-details') return json(res, 200, airlabsPreview(process.env.SKYWARD_AIRLABS_MODE));
         if (url.pathname === '/api/status') {const {totalMs,...stats}=feed.stats;return json(res,200,{...stats,pending:feed.pending.size,meanProviderMs:stats.started?Math.round(totalMs/stats.started):0});}
         if (url.pathname === '/api/area') {
           const values=['lat','lon','radius'].map(key=>{const raw=url.searchParams.get(key);return raw!==null&&raw.trim()!==''?Number(raw):NaN;});
@@ -65,13 +72,23 @@ export const server = http.createServer(async (req, res) => {
           return json(res, 200, await feed.search(kind, q));
         }
         return json(res, 404, { error: 'Endpoint not found' });
-      } catch { return json(res, 503, { error: 'Live feed unavailable. Last observations are retained with their original timestamps.' }); }
+      } catch (error) { if(error.retryAfter)res.setHeader('Retry-After',String(error.retryAfter));return json(res, 503, { error: error.retryAfter?'Flight feed temporarily rate limited. Retrying automatically.':'Live feed unavailable. Last observations are retained with their original timestamps.', ...(error.retryAfter?{retryAfter:error.retryAfter}:{}) }); }
     }
     if (['/watch','/watch/','/watch/index.html','/index.html'].includes(url.pathname)) { res.writeHead(302, { Location: '/' + url.search, 'Cache-Control':'no-store' }); return res.end(); }
     if (url.pathname === '/airport-simulation') { res.writeHead(302, { Location: '/airport-simulation/' + url.search, 'Cache-Control':'no-store' }); return res.end(); }
     const isWatch = url.pathname.startsWith('/watch/');
     const isGame = url.pathname.startsWith('/airport-simulation/');
     if(!isWatch&&!isGame&&!['/','/offline-worker.js'].includes(url.pathname))return json(res,404,{error:'File not found'});
+    if(isGame) {
+      const access=await membership.simulatorAccess(req);
+      const document=['/airport-simulation/','/airport-simulation/index.html'].includes(url.pathname);
+      if(!access.allowed||document&&url.searchParams.get('embed')!=='1') {
+        if(!document&&!access.allowed)return json(res,access.status,{error:'An active Premium subscription is required to load simulator assets.'});
+        const page=Buffer.from(simulatorPage(access));
+        res.writeHead(access.status,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'private, no-store','Content-Length':page.length});
+        return res.end(req.method==='HEAD'?undefined:page);
+      }
+    }
     const root = isGame ? gameRoot : webRoot;
     const path = decodeURIComponent(isWatch ? url.pathname.slice('/watch/'.length) : isGame ? url.pathname.slice('/airport-simulation/'.length) : url.pathname.slice(1));
     let file = resolve(root, path || 'index.html');
@@ -89,12 +106,13 @@ export const server = http.createServer(async (req, res) => {
       }
     }
     res.setHeader('Content-Length',data.length);
-    res.writeHead(200, { 'Content-Type': MIME[extname(file)] ?? 'application/octet-stream', 'Cache-Control': extname(file) === '.html' ? 'no-store' : /[/\\]assets[/\\][^/\\]+-[A-Za-z0-9_-]+\.(js|css)$/.test(file) ? 'public, max-age=31536000, immutable' : 'public, max-age=300', 'X-Content-Type-Options': 'nosniff' });
+    res.writeHead(200, { 'Content-Type': MIME[extname(file)] ?? 'application/octet-stream', 'Cache-Control': isGame ? 'private, no-store' : extname(file) === '.html' ? 'no-store' : /[/\\]assets[/\\][^/\\]+-[A-Za-z0-9_-]+\.(js|css)$/.test(file) ? 'public, max-age=31536000, immutable' : 'public, max-age=300', 'X-Content-Type-Options': 'nosniff' });
     res.end(req.method === 'HEAD' ? undefined : data);
   } catch { json(res, 500, { error: 'Unable to serve this request.' }); }
 });
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  server.listen(Number(process.env.PORT ?? 8000), process.env.HOST ?? '0.0.0.0', () => console.log(`Skyward: http://localhost:${process.env.PORT ?? 8000}/ · airport simulation: /airport-simulation/`));
+  // Let Node bind dual-stack localhost by default; explicit HOST remains supported.
+  server.listen({port:Number(process.env.PORT ?? 8000), ...(process.env.HOST ? {host:process.env.HOST} : {}), ipv6Only:false}, () => console.log(`Skyward: http://localhost:${server.address().port}/ · airport simulation: /airport-simulation/`));
   const stop = () => { server.close(() => process.exit(0)); setTimeout(() => process.exit(1), 10000).unref(); };
   process.once('SIGTERM', stop); process.once('SIGINT', stop);
 }

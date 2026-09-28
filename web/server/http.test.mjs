@@ -48,9 +48,9 @@ test('homepage serves Skyward, legacy watch redirects, and the game has its own 
  const home=await fetch(base+'/');assert.equal(home.status,200);assert.match(await home.text(),/Skyward · Flight observatory/);
  for(const path of ['/watch','/watch/','/watch/index.html']){const r=await fetch(base+path+'?test=1',{redirect:'manual'});assert.equal(r.status,302);assert.equal(r.headers.get('location'),'/?test=1');}
  const redirect=await fetch(base+'/airport-simulation?test=1',{redirect:'manual'});assert.equal(redirect.headers.get('location'),'/airport-simulation/?test=1');
- const game=await fetch(base+'/airport-simulation/');assert.equal(game.status,200);assert.match(await game.text(),/GODOT_CONFIG/);
- for(const file of ['index.js','index.wasm','index.pck']){const r=await fetch(base+'/airport-simulation/'+file,{method:'HEAD'});assert.equal(r.status,200);assert.ok(Number(r.headers.get('content-length'))>0);}
- assert.equal((await fetch(base+'/index.wasm')).status,404);assert.equal((await fetch(base+'/airport-simulation/%2e%2e%2fpackage.json')).status,403);
+ const game=await fetch(base+'/airport-simulation/');assert.equal(game.status,401);assert.match(await game.text(),/included with Premium/);
+ for(const file of ['index.js','index.wasm','index.pck']){const r=await fetch(base+'/airport-simulation/'+file,{method:'HEAD'});assert.equal(r.status,401);assert.match(r.headers.get('cache-control'),/no-store/);}
+ assert.equal((await fetch(base+'/index.wasm')).status,404);assert.equal((await fetch(base+'/airport-simulation/%2e%2e%2fpackage.json')).status,401);
  const sw=await fetch(base+'/offline-worker.js');assert.equal(sw.status,200);assert.match(sw.headers.get('content-type'),/javascript/);
  const manifest=await (await fetch(base+'/watch/manifest.json')).json();assert.equal(manifest.start_url,'/');assert.equal(manifest.scope,'/');
 });

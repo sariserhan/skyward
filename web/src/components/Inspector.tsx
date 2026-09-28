@@ -1,3 +1,4 @@
+import {JourneyDetails} from './JourneyDetails';
 import {CabinPassengers} from './CabinPassengers';
 import {SheetHandle} from './SheetHandle';
 import {FlightSummary} from './FlightSummary';
@@ -13,7 +14,7 @@ import { ageSeconds, airline, aircraftNames, duration, freshness, inferRunway, p
 interface Props { compare:()=>void; quality:string;feedHealth:{error:string;updatedAt:number|null}; reducedMotion:boolean; aircraft: Aircraft | null; now: number; watched: boolean; toggleWatch: () => void; focus: () => void; fullRoute: () => void; trail: TrailPoint[]; error: string; runways: Runway[]; replayIndex: number | null; setReplay: (n: number | null) => void; route: FlightRoute | null; routeLoading: boolean; routeError: string; following: boolean; close: () => void; }
 export function Inspector(p: Props) {
   const a = p.aircraft;
-  if (!a) return <section className="inspector empty-inspector" aria-label="Aircraft details"><Navigation size={30}/><div className="empty-inspector-copy"><h2>Choose an aircraft to follow</h2><p>Live position, altitude and speed. Clear gaps when coverage ends.</p></div><div className="placeholder-metrics">{['Altitude · ft', 'Ground speed · kt', 'Last seen · UTC'].map(label => <div key={label}><small>{label}</small><strong>—</strong></div>)}</div><div className="source-mini">Position feed<br/><strong>ADSB.lol</strong></div></section>;
+  if (!a) return <section className="inspector empty-inspector" aria-label="Aircraft details"><Navigation size={30}/><div className="empty-inspector-copy"><h2>Choose an aircraft to follow</h2><p>Live position, altitude and speed. Clear gaps when coverage ends.</p></div><div className="placeholder-metrics">{['Altitude · ft', 'Ground speed · kt', 'Last seen · UTC'].map(label => <div key={label}><small>{label}</small><strong>—</strong></div>)}</div><div className="source-mini">Live aircraft observations</div></section>;
   const age = ageSeconds(a, p.now); const runway = inferRunway(a, p.runways, p.now);
   const replay = p.replayIndex === null ? null : p.trail[p.replayIndex];
   const exportTrail = () => {
@@ -22,7 +23,9 @@ export function Inspector(p: Props) {
   };
   return <section className="inspector selected-inspector" aria-label="Aircraft details"><SheetHandle/>
     <div className="inspector-top"><div><div className="flight-identity"><h2>{a.callsign || a.registration || a.hex.toUpperCase()}</h2><span className={`observation-label ${age > 30 || replay ? 'warning' : 'mint'}`}><i className={`status-dot ${age > 30 || replay ? 'amber' : ''}`}/>{replay ? 'Recorded observation' : freshness(a, p.now)}</span></div><p>{airline(a)} <span>·</span> {aircraftNames[a.aircraftType] || a.aircraftType || 'Aircraft type unknown'} <span>·</span> {a.registration || 'Registration unknown'}</p></div><div className="inspector-actions"><button className="quiet-button" onClick={p.compare}>Compare flight</button><button className={`icon-button ${p.watched ? 'is-watched' : ''}`} onClick={p.toggleWatch} aria-label={p.watched ? 'Remove from watchlist' : 'Add to watchlist'} title="Save aircraft"><Star size={19} fill={p.watched ? 'currentColor' : 'none'}/></button><button className="quiet-button" onClick={p.focus} disabled={a.lat === null}><Crosshair size={15}/>{p.following ? 'Following · stop' : 'Follow'}</button><button className="icon-button" aria-label="Close aircraft details" onClick={p.close}><X size={17}/></button></div></div>
+    {!replay&&<JourneyDetails reducedMotion={p.reducedMotion} key={a.hex} aircraft={a} route={p.route} trail={p.trail} now={p.now}/>}
     {!replay&&<RouteOverview aircraft={a} route={p.route} trail={p.trail} now={p.now} loading={p.routeLoading} error={p.routeError} showRoute={p.fullRoute}/>}
+
     <CabinPassengers aircraft={a}/><AircraftIdentity aircraft={a}/><FlightSummary aircraft={a} points={p.replayIndex===null?p.trail:p.trail.slice(0,p.replayIndex+1)}/>{a.positionWarning&&<p className="warning" role="status">Position quality: {a.positionWarning} · retaining last accepted fix.</p>}
     {!replay&&<MotionDiagnostics aircraft={a} points={p.trail} now={p.now} reduced={p.reducedMotion} quality={p.quality} {...p.feedHealth}/>}
     {!replay&&a.targetKind==='aircraft'&&<p className="airport-note">{motionStatus(p.trail,p.now,p.reducedMotion)}</p>}

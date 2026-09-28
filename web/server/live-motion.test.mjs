@@ -4,10 +4,10 @@ import {liveFrame,liveMotionStatus,LiveMotion} from '../src/lib/liveMotion.ts';
 import {trackDistance} from '../src/lib/positionQuality.ts';
 import {observedFrame} from '../src/lib/flightPresentation.ts';
 const a={hex:'abcdef',targetKind:'aircraft',lat:0,lon:0,altitude:30000,ground:false,heading:90,groundSpeed:360,observedAt:100000,verticalRate:0};
-test('short cruise gaps animate but long outages stop prediction without altering telemetry',()=>{
+test('airborne motion continues through long outages without altering telemetry',()=>{
  const original=structuredClone(a),frame=liveFrame(a,[],a.observedAt+60000);
  assert.ok(Math.abs(trackDistance(a,frame)-6)<.001);assert.ok(frame.lon>0);assert.equal(frame.altitude,30000);assert.equal(frame.time,a.observedAt);assert.equal(frame.estimated,true);assert.deepEqual(a,original);
- assert.ok(Math.abs(trackDistance(a,liveFrame(a,[],a.observedAt+1800000))-12)<.001);assert.match(liveMotionStatus(a,[],a.observedAt+1800000),/Awaiting live position/);
+ assert.ok(Math.abs(trackDistance(a,liveFrame(a,[],a.observedAt+1800000))-180)<.001);assert.match(liveMotionStatus(a,[],a.observedAt+1800000),/Extended predicted motion/);
 });
 test('prediction crosses the dateline and poles with finite coordinates',()=>{
  const f=liveFrame({...a,lon:179.99},[],160000);assert.ok(f.lon<0);assert.ok(Math.abs(trackDistance({...a,lon:179.99},f)-6)<.001);
@@ -23,10 +23,10 @@ test('missing speed and heading can come from a recent continuous observed track
  assert.equal(liveFrame({...a,heading:null,groundSpeed:null},[points[0],{...points[1],breakBefore:true}],160000).estimated,false);
  assert.deepEqual(observedFrame(points,999999),{...points[1],interpolated:false});
 });
-test('fresh fixes blend from the previous display and converge to the moving prediction in two seconds',()=>{
+test('fresh fixes blend from the previous display and converge to the moving prediction within eight seconds',()=>{
  const motion=new LiveMotion(),before=motion.sample(a,[],160000),next={...a,lat:.02,lon:.09,heading:95,observedAt:160000};
  const start=motion.sample(next,[],160001);assert.ok(trackDistance(before,start)<.00001);
- const middle=motion.sample(next,[],161001),end=motion.sample(next,[],162001),target=liveFrame(next,[],162001);
+ const middle=motion.sample(next,[],161001),end=motion.sample(next,[],168001),target=liveFrame(next,[],168001);
  assert.ok(middle.lat>0&&middle.lat<end.lat);assert.ok(trackDistance(end,target)<.00001);
  const exact=new LiveMotion();const old=exact.sample(a,[],160000);assert.ok(trackDistance(old,exact.sample(next,[],160000))<.00001);
 });
@@ -41,13 +41,13 @@ test('vertical trends settle within 30 seconds and never project a landing',()=>
  assert.equal(liveFrame({...a,altitude:1000},[],160000).altitude,1000);assert.ok(liveFrame({...a,altitude:2100,verticalRate:-6000},[],160000).altitude>=1500);assert.equal(liveFrame({...a,verticalRate:Infinity},[],160000).altitude,30000);
 });
 
-test('stale approaches stop before projecting through a plausible destination; fresh ground fixes win',()=>{
+test('approaches without runway context continue moving; fresh ground fixes win',()=>{
  const approach={...a,callsign:'TEST1',altitude:1500,verticalRate:-700,groundSpeed:160};
  const route={callsign:'TEST1',status:'PLAUSIBLE',airports:[{lat:0,lon:-5},{lat:0,lon:.03}]};
  const near=liveFrame(approach,[],160000,false,route),later=liveFrame(approach,[],900000,false,route);
- assert.equal(near.predictionLimited,true);assert.equal(near.lon,later.lon);assert.ok(trackDistance(near,route.airports[1])>=.999);assert.equal(near.ground,false);
+ assert.equal(near.predictionLimited,true);assert.ok(trackDistance(near,later)>20);assert.equal(near.ground,false);
  const ground={...approach,ground:true,lon:.03,observedAt:900000};assert.equal(liveFrame(ground,[],900000,false,route).lon,.03);assert.equal(liveFrame(ground,[],900000,false,route).estimated,false);
- const other=liveFrame(approach,[],160000,false,{...route,callsign:'OTHER'});assert.ok(other.lon>near.lon);
- assert.equal(liveFrame(approach,[],160000).lon,liveFrame(approach,[],900000).lon);
+ const other=liveFrame(approach,[],160000,false,{...route,callsign:'OTHER'});assert.equal(other.lon,near.lon);
+ assert.notEqual(liveFrame(approach,[],160000).lon,liveFrame(approach,[],900000).lon);
  assert.deepEqual(approach,{...a,callsign:'TEST1',altitude:1500,verticalRate:-700,groundSpeed:160});
 });

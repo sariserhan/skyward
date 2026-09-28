@@ -31,10 +31,10 @@ test('worldwide sharing preserves airport and rejects forged facility identities
  assert.equal(parseView('#airport=LHR&facility=facility-JFK-3').facility,'');
  assert.equal(parseView('#airport=constructor').airport,'IAD');
 });
-test('selected-airport requests use validated catalog coordinates with no global polling',async()=>{
+test('selected-airport requests use a padded regional bucket with no global polling',async()=>{
  const calls=[];const feed=new FeedClient(async url=>{calls.push(url);return {ok:true,json:async()=>({now:Date.now()/1000,ac:[]})};});
  assert.equal(calls.length,0);await feed.area('HND');
- assert.deepEqual(calls,[`https://api.adsb.lol/v2/point/${AIRPORTS.HND.lat}/${AIRPORTS.HND.lon}/100`]);
+ assert.deepEqual(calls,['https://api.adsb.lol/v2/point/35.5/140/125']);
  for(const id of ['constructor','UNKNOWN','__proto__'])assert.throws(()=>feed.area(id),/Unknown airport/);
 });
 test('proximity alerts cover newly supported airports without asserting arrivals',()=>{

@@ -11,5 +11,7 @@ test('cabin windows occupy opposite sides and face outward with finite fallback 
  assert.ok(Object.values(aircraftViewpoint('pilot',NaN,NaN)).every(Number.isFinite));
 });
 test('new follow views survive preferences and backup validation',()=>{
- for(const view of ['pilot','cabin','bird']){const saved=sanitizeFlightPreferences({view});assert.equal(saved.view,view);assert.ok(validBackupValue('skyward.flight-view.v1',JSON.stringify(saved)));}
+ for(const view of ['front','cockpit','cabin','bird']){const saved=sanitizeFlightPreferences({view});assert.equal(saved.view,view);assert.ok(validBackupValue('skyward.flight-view.v1',JSON.stringify(saved)));}
 });
+
+test('legacy pilot camera preferences migrate to front view',()=>{assert.equal(sanitizeFlightPreferences({view:'pilot'}).view,'front');});

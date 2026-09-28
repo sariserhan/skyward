@@ -1,0 +1,11 @@
+{
+  "source": "https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat",
+  "publisher": "OpenFlights",
+  "license": "ODbL-1.0",
+  "licenseUrl": "https://github.com/jpatokal/openflights/blob/master/data/LICENSE",
+  "retrievedAt": "2026-09-27T23:05:24.733573+00:00",
+  "sha256": "9387cdb38df5bd664da823f8ccb69fdd9b33a1888f5b7cca09c34a3cd9ff59f9",
+  "matched": 1080,
+  "catalog": 1152,
+  "match": "Exact ICAO and within 20 km; unknown zones omitted. Historical reference; offsets and DST from browser IANA database."
+}

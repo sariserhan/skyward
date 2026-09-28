@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "astronomy-engine": "2.1.19",
     "cesium": "1.145.0",
     "lucide-react": "1.48.0",
     "react": "19.3.0",
@@ -34,6 +35,13 @@
     "import:flightairmap": "node scripts/import-flightairmap-models.mjs",
     "import:business": "python3 scripts/import-business-models.py",
     "prepare:aircraft-lights": "node scripts/prepare-aircraft-lights.mjs",
-    "import:airport-elevations": "python3 scripts/import-airport-elevations.py"
+    "import:airport-elevations": "python3 scripts/import-airport-elevations.py",
+    "check:airlabs": "node scripts/check-airlabs.mjs",
+    "start:airlabs-demo": "SKYWARD_AIRLABS_MODE=demo node server/index.mjs",
+    "start:premium-test": "SKYWARD_ACCOUNTS=test node server/index.mjs",
+    "premium:usage": "node scripts/premium-usage.mjs",
+    "test:views": "npm run build && node scripts/browser-tests.mjs --views",
+    "test:customer": "npm run build && node scripts/browser-tests.mjs --customer",
+    "test:launch": "npm test && npm run test:browser && npm run test:customer"
   }
 }

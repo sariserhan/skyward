@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {coverageSummary,flightFraming,illustrativeGear,wheelAngle,angleStep} from '../src/lib/flightVisuals.ts';
-import {modelBudget,modelOpacity,modelRange} from '../src/lib/modelBudget.ts';
+import {modelBudget,modelOpacity,modelRange,nearbyModelIds} from '../src/lib/modelBudget.ts';
 import {fullLivery,fleetUri,fallbackFleetUri} from '../src/lib/flightPresentation.ts';
 import {sourcedModel} from '../src/lib/sourcedModels.ts';
 test('coverage freshness uses observation time and treats unknown timestamps separately',()=>{
@@ -37,4 +37,13 @@ test('rigged fallback wheels rotate around local axles under the gear parent',()
  const gear=g.nodes.find(n=>n.name==='Gear');assert.equal(gear.children.length,3);
  for(const index of gear.children){const n=g.nodes[index];assert.match(n.name,/^Wheel[LRN]$/);assert.ok(n.translation[1]<0);for(const primitive of g.meshes[n.mesh].primitives){const a=g.accessors[primitive.attributes.POSITION];assert.ok(a.max.every(v=>v<=.41));assert.ok(a.min.every(v=>v>=-.41));}}
  assert.match(fallbackFleetUri({aircraftType:'B38M',callsign:'THY1'}),/-v4.gltf$/);
+});
+
+test('tower retains bounded detailed traffic at approach distances even on low quality',()=>{
+ const rows=Array.from({length:12},(_,i)=>({id:String(i),distance:3000+i*1000,loaded:false,visible:true}));
+ assert.equal(modelBudget('low',true),3);
+ assert.equal(modelRange(false,true),20000);
+ assert.deepEqual(nearbyModelIds(rows,modelBudget('low',true),true),['0','1','2']);
+ assert.deepEqual(nearbyModelIds(rows,modelBudget('high')),[]);
+ assert.equal(modelOpacity(6000,false,true),1);assert.equal(modelOpacity(20000,false,true),0);
 });

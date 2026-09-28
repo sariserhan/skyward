@@ -36,6 +36,9 @@ def run(page):
   route.fulfill(json=dict(source='fixture',sourceAt=f.anchor+epoch*360000,fetchedAt=f.anchor+epoch*360000,aircraft=rows));seen+=1
  page.route('**/api/**',mock)
  def refresh():
+  # Keep the sampled region on the fixture airport after flight-camera exits.
+  page.evaluate("__viewer.camera.cancelFlight();__viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);__viewer.camera.setView({destination:Cesium.Cartesian3.fromDegrees(-77.46,38.947,80000),orientation:{heading:0,pitch:-Math.PI/2,roll:0}});__viewer.scene.requestRender()")
+  page.wait_for_timeout(400)
   page.evaluate('(t)=>{window.__shift=t-(Date.now()-window.__shift)}',f.anchor+epoch*360000)
   button=page.get_by_role('button',name='Refresh traffic',exact=True)
   deadline=time.time()+30
@@ -51,7 +54,7 @@ def run(page):
  cdp=page.context.new_cdp_session(page);samples=[]
  for step in range(61):
   epoch=step;mode='error' if step%12==6 else 'normal';page.evaluate('(t)=>{window.__shift=t-(Date.now()-window.__shift)}',f.anchor+epoch*360000);refresh()
-  if step%12==6:expect(page.get_by_role('region',name='Traffic coverage') if False else page.get_by_label('Traffic coverage')).to_contain_text('Feed interrupted')
+  if step%12==6:expect(page.get_by_role('region',name='Traffic coverage') if False else page.get_by_label('Traffic coverage')).to_contain_text('Simulated provider interruption')
   if step%10==0 and step>0:
    page.get_by_role('button',name='View SOAK0',exact=True).click();page.get_by_role('button',name='✈ Flight view',exact=True).click();page.wait_for_timeout(200);page.get_by_role('button',name='Close flight view').click();page.get_by_role('button',name='Close aircraft details',exact=True).click()
    cdp.send('HeapProfiler.collectGarbage');heap=cdp.send('Runtime.getHeapUsage')['usedSize'];counts=page.evaluate("({entities:__viewer.entities.values.length,aircraft:__viewer.entities.values.filter(e=>e.id.startsWith('aircraft-')).length,dom:document.querySelectorAll('*').length,sources:__viewer.dataSources.length})");samples.append(dict(hour=step/10,heap=heap,**counts));assert counts['aircraft']<=240;assert counts['sources']<=3;print('SOAK '+json.dumps(samples[-1]),flush=True)

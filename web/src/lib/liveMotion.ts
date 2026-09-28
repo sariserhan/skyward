@@ -4,7 +4,7 @@ import {bearing} from './flightPresentation.ts';
 import {contiguous,trackDistance} from './positionQuality.ts';
 const wrap=(n:number)=>((n+540)%360+360)%360-180;
 const finite=(n:unknown):n is number=>typeof n==='number'&&Number.isFinite(n);
-export interface LiveFrame {lon:number;lat:number;altitude:number;heading:number;time:number;ground:boolean;estimated:boolean;age:number;turnRate?:number;verticalRate?:number;correcting?:boolean;predictionLimited?:boolean;landingPhase?:LandingPhase;runway?:string;groundSpeed?:number;pitch?:number;}
+export interface LiveFrame {lon:number;lat:number;altitude:number;heading:number;time:number;ground:boolean;estimated:boolean;age:number;turnRate?:number;verticalRate?:number;correcting?:boolean;predictionLimited?:boolean;landingPhase?:LandingPhase;runway?:string;groundSpeed?:number;pitch?:number;gate?:string;}
 function destination(lat:number,lon:number,heading:number,nm:number){
  const r=Math.PI/180,p=lat*r,l=lon*r,h=heading*r,d=nm/3440.065;
  const y=Math.asin(Math.max(-1,Math.min(1,Math.sin(p)*Math.cos(d)+Math.cos(p)*Math.sin(d)*Math.cos(h))));
@@ -14,7 +14,24 @@ function destination(lat:number,lon:number,heading:number,nm:number){
 export function liveFrame(a:Aircraft,points:TrailPoint[],now:number,reduced=false,route?:FlightRoute|null,arrivalGeometry?:AirportGeometry|null):LiveFrame|null{
  if(!finite(now)||!finite(a.lat)||!finite(a.lon)||Math.abs(a.lat)>90||Math.abs(a.lon)>180||!finite(a.observedAt)||a.observedAt>now+5000)return null;
  const age=Math.max(0,now-a.observedAt),frame:LiveFrame={lat:a.lat,lon:a.lon,altitude:finite(a.altitude)?a.altitude:0,heading:finite(a.heading)?a.heading:0,time:a.observedAt,ground:a.ground,estimated:false,age};
- if(reduced||a.ground||(a.targetKind&&a.targetKind!=='aircraft'))return frame;
+ if(reduced||(a.targetKind&&a.targetKind!=='aircraft'))return frame;
+ if(a.ground){
+  if(a.positionWarning||!finite(a.groundSpeed)||a.groundSpeed<2||a.groundSpeed>200||!finite(a.heading)||a.heading<0||a.heading>360)return frame;
+  // Short ground prediction decelerates rather than driving indefinitely through buildings.
+  let limit=8;
+  if(a.groundSpeed>45){
+   let remaining=0;
+   for(const runway of arrivalGeometry?.runways??[]){
+    for(const reverse of [false,true]){const from=reverse?runway.b:runway.a,to=reverse?runway.a:runway.b,heading=bearing({lon:from[0],lat:from[1]},{lon:to[0],lat:to[1]});if(Math.abs(wrap(a.heading-heading))>20)continue;
+     const c=Math.cos(a.lat*Math.PI/180),dx=wrap(to[0]-from[0])*111120*c,dy=(to[1]-from[1])*111120,x=wrap(a.lon-from[0])*111120*c,y=(a.lat-from[1])*111120,L=Math.hypot(dx,dy),along=(x*dx+y*dy)/L,side=Math.abs(x*dy-y*dx)/L;
+     if(along>=0&&along<L&&side<=Math.max(15,runway.width/2))remaining=Math.max(remaining,L-along-20);
+    }
+   }
+   if(remaining<=0)return frame;limit=Math.min(8,2*remaining/(a.groundSpeed*.514444));
+  }
+  const t=Math.min(age/1000,limit),seconds=t-t*t/(2*limit),position=destination(a.lat,a.lon,a.heading,a.groundSpeed*seconds/3600);
+  return {...frame,...position,groundSpeed:a.groundSpeed*(1-t/limit),estimated:age>0,predictionLimited:age>=limit*1000};
+ }
  const landing=predictedLanding(a,now,route,arrivalGeometry);if(landing)return landing;
  let speed=finite(a.groundSpeed)&&a.groundSpeed>0&&a.groundSpeed<=1200?a.groundSpeed:null;
  let heading=finite(a.heading)&&a.heading>=0&&a.heading<=360?a.heading:null;
@@ -30,13 +47,11 @@ export function liveFrame(a:Aircraft,points:TrailPoint[],now:number,reduced=fals
   const dt1=(previous.time-older.time)/1000,dt2=(last.time-previous.time)/1000;
   if(dt1>=5&&dt2>=5&&dt1<=60&&dt2<=60&&trackDistance(older,previous)>.01&&trackDistance(previous,last)>.01)turnRate=Math.max(-1.5,Math.min(1.5,wrap(bearing(previous,last)-bearing(older,previous))/((dt1+dt2)/2)));
  }
- // Short gaps can be animated; stale approaches must not fly on indefinitely.
+ // Confidence expires, not animation. Continue display-only motion through outages.
+ // Mapped, aligned approaches above use the landing trajectory instead of flying past it.
  const approaching=frame.altitude<8000||(finite(a.verticalRate)&&a.verticalRate<-300);
- let limit=approaching?30:120;
- // A plausible destination can shorten prediction, never steer or manufacture a landing.
- const arrival=route?.status==='PLAUSIBLE'&&route.callsign===a.callsign&&route.airports.length===2?route.airports[1]:null;
- if(approaching&&arrival){const distance=trackDistance(frame,arrival);if(distance<20)limit=Math.min(limit,Math.max(0,distance-1)*3600/speed);}
- const seconds=Math.min(age/1000,limit),trendSeconds=Math.min(30,seconds);
+ const limit=approaching?30:120;
+ const seconds=age/1000,trendSeconds=Math.min(30,seconds);
  const turn=(t:number)=>turnRate*(t-t*t/60);
  let position={lat:a.lat,lon:a.lon};
  if(turnRate){for(let t=0;t<trendSeconds;t+=5){const step=Math.min(5,trendSeconds-t);position=destination(position.lat,position.lon,heading+turn(t+step/2),speed*step/3600);}}
@@ -47,31 +62,32 @@ export function liveFrame(a:Aircraft,points:TrailPoint[],now:number,reduced=fals
  // Fade vertical speed to zero over 30 seconds; never simulate touchdown.
  const vertical=finite(a.verticalRate)&&Math.abs(a.verticalRate)<=6000?a.verticalRate:0;
  const delta=vertical/60*(trendSeconds-trendSeconds*trendSeconds/60);
- const altitude=frame.altitude>2000&&frame.altitude<60000?frame.altitude+Math.max(-Math.min(1500,frame.altitude-1500),Math.min(1500,60000-frame.altitude,delta)):frame.altitude;
+ const altitude=frame.altitude<60000&&(frame.altitude>2000||vertical>0)?frame.altitude+Math.max(-Math.min(1500,Math.max(0,frame.altitude-1500)),Math.min(1500,60000-frame.altitude,delta)):frame.altitude;
  return {...frame,...position,altitude,heading:bearing(position,next),estimated:age>0,predictionLimited:age>0&&age/1000>=limit,turnRate:turnRate*(1-trendSeconds/30),verticalRate:vertical*(1-trendSeconds/30)};
 }
 export function liveMotionStatus(a:Aircraft,points:TrailPoint[],now:number,reduced=false,route?:FlightRoute|null,arrivalGeometry?:AirportGeometry|null){
  if(reduced)return 'Reduced motion · showing received positions';
- if(a.ground)return 'Live · reported on ground';
+ if(a.ground)return now-(a.observedAt??0)>8000?'On ground · awaiting position update':'Ground tracking · short motion estimate';
  const frame=liveFrame(a,points,now,false,route,arrivalGeometry);
  if(!frame)return 'Position unavailable · cannot estimate movement';
+ if(frame.landingPhase==='taxi'||frame.landingPhase==='parked')return `Predicted airport animation · ${frame.landingPhase==='taxi'?'taxiing toward':'parked near'} illustrative gate ${frame.gate??'unknown'} · assignment unconfirmed`;
  if(frame.landingPhase)return `Predicted landing · ${frame.landingPhase==='approach'?'final approach':frame.landingPhase==='rollout'?'rollout':'rollout complete'} · runway ${frame.runway}`;
- if(frame.predictionLimited)return `Awaiting live position · prediction paused. Last observed ${Math.floor(frame.age/1000)}s ago; arrival unconfirmed.`;
+ if(frame.predictionLimited)return `Extended predicted motion · awaiting live position. Last observed ${Math.floor(frame.age/1000)}s ago; arrival unconfirmed.`;
  if(!frame.estimated)return 'Live position';
  return `${frame.age>30000?'Predicted motion':'Live tracking'} · ${Math.floor(frame.age/1000)}s since update`;
 }
 /** Smooth incoming corrections while the extrapolated destination keeps moving. */
 export class LiveMotion {
- private frames=new Map<string,{signature:string;frame:LiveFrame;start:number;dx:number;dy:number;dz:number;dh:number}>();
+ private frames=new Map<string,{signature:string;frame:LiveFrame;start:number;duration:number;dx:number;dy:number;dz:number;dh:number}>();
  sample(a:Aircraft,points:TrailPoint[],now:number,reduced=false,route?:FlightRoute|null,arrivalGeometry?:AirportGeometry|null){
   const target=liveFrame(a,points,now,reduced,route,arrivalGeometry);if(!target)return null;
-  if(reduced||a.ground||(!target.estimated&&target.age>0)){this.frames.delete(a.hex);return target;}
-  const signature=[a.observedAt,a.lat,a.lon,a.altitude,a.groundSpeed,a.heading,a.verticalRate,!!target.landingPhase].join('/');
+  if(reduced){this.frames.delete(a.hex);return target;}
+  const signature=[a.observedAt,a.lat,a.lon,a.altitude,a.groundSpeed,a.heading,a.verticalRate,a.ground,!!target.landingPhase].join('/');
   let state=this.frames.get(a.hex);
-  if(!state)state={signature,frame:target,start:now,dx:0,dy:0,dz:0,dh:0};
-  else if(state.signature!==signature)state={signature,frame:state.frame,start:now,dx:wrap(state.frame.lon-target.lon),dy:state.frame.lat-target.lat,dz:state.frame.altitude-target.altitude,dh:wrap(state.frame.heading-target.heading)};
-  const t=Math.max(0,Math.min(1,(now-state.start)/2000)),remaining=1-t*t*(3-2*t);
-  const frame={...target,lon:wrap(target.lon+state.dx*remaining),lat:Math.max(-90,Math.min(90,target.lat+state.dy*remaining)),altitude:target.altitude+state.dz*remaining,heading:(target.heading+state.dh*remaining+360)%360,correcting:remaining>0&&(Math.abs(state.dx)+Math.abs(state.dy)+Math.abs(state.dz))>0.00001};
+  if(!state)state={signature,frame:target,start:now,duration:2000,dx:0,dy:0,dz:0,dh:0};
+  else if(state.signature!==signature)state={signature,frame:state.frame,start:now,duration:state.frame.landingPhase&&!target.landingPhase&&(a.verticalRate??0)>150?2000:Math.max(2000,Math.min(8000,trackDistance(state.frame,target)*1852/(a.ground?12:100)*1000)),dx:wrap(state.frame.lon-target.lon),dy:state.frame.lat-target.lat,dz:state.frame.altitude-target.altitude,dh:wrap(state.frame.heading-target.heading)};
+  const t=Math.max(0,Math.min(1,(now-state.start)/state.duration)),remaining=1-t*t*(3-2*t);
+  const frame={...target,lon:wrap(target.lon+state.dx*remaining),lat:Math.max(-90,Math.min(90,target.lat+state.dy*remaining)),altitude:target.ground?target.altitude:target.altitude+state.dz*remaining,heading:(target.heading+state.dh*remaining+360)%360,correcting:remaining>0&&(Math.abs(state.dx)+Math.abs(state.dy)+Math.abs(state.dz))>0.00001};
   state.frame=frame;this.frames.delete(a.hex);this.frames.set(a.hex,state);
   while(this.frames.size>4000)this.frames.delete(this.frames.keys().next().value!);
   return frame;
@@ -84,3 +100,6 @@ export function predictionConfidence(a:Aircraft,now:number){
  const speed=finite(a.groundSpeed)&&a.groundSpeed>0?a.groundSpeed:450;
  return {age,level:age<=30?'Recent estimate':age<=120?'Aging estimate':'Low confidence',driftNm:Number.isFinite(age)?.1+speed*age/3600*(.1+Math.sin(Math.min(Math.PI/3,age/600))):null};
 }
+
+// Preserve the displayed pose when camera ownership switches between globe and flight view.
+export const sharedLiveMotion=new LiveMotion();

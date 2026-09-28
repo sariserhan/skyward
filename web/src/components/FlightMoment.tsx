@@ -1,0 +1,9 @@
+import {useState} from 'react';
+import type {Aircraft,TrailPoint} from '../types';
+import type {SharedCamera} from '../lib/sharedCamera';
+import {flightMoment} from '../lib/flightMoment';
+import {downloadRecording,type Recording} from '../lib/sessionRecording';
+export function FlightMoment({aircraft,points,camera,play}:{aircraft:Aircraft|null;points:TrailPoint[];camera:()=>SharedCamera|null;play:(r:Recording)=>void}){
+ const [seconds,setSeconds]=useState(120),[error,setError]=useState(''),[saved,setSaved]=useState<Recording|null>(null);
+ return <section aria-label="Flight moment"><h3>Save a flight moment</h3><p>Capture received positions for the selected flight and your current camera angle. Download the file to share; another viewer can open it in Sessions. Predictions and service animations are excluded.</p><p>{aircraft?aircraft.callsign||aircraft.hex:'Select a flight first.'}</p><label>Moment length<select value={seconds} onChange={e=>setSeconds(Number(e.target.value))}><option value={60}>Last minute</option><option value={120}>Last two minutes</option><option value={300}>Last five minutes</option></select></label><button className="quiet-button" disabled={!aircraft} onClick={()=>{try{setSaved(flightMoment(aircraft!,points,Date.now(),seconds,camera()));setError('');}catch(e){setError((e as Error).message);}}}>Capture flight moment</button>{error&&<p role="status">{error}</p>}{saved&&<><p role="status">{saved.tracks[0].points.length} received positions captured{saved.camera?' with camera angle':''}.</p><button className="quiet-button" onClick={()=>downloadRecording(saved)}>Download moment</button><button className="primary-button" onClick={()=>play(saved)}>Replay moment</button></>}</section>;
+}

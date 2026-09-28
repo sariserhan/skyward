@@ -2,7 +2,7 @@ import {coverageMessage} from '../lib/coverageMessage';
 import type {Aircraft} from '../types';
 import {coverageSummary} from '../lib/flightVisuals';
 import {duration} from '../lib/aircraft';
-interface Props{rows:Aircraft[];now:number;loading:boolean;error:string;updatedAt:number|null;completed:number;total:number;failed:number;limited:boolean;description:string;shown:number;refresh:()=>void;clear?:()=>void;}
+interface Props{suggestions?:React.ReactNode;rows:Aircraft[];now:number;loading:boolean;error:string;updatedAt:number|null;completed:number;total:number;failed:number;limited:boolean;description:string;shown:number;refresh:()=>void;clear?:()=>void;}
 export function CoverageStatus(p:Props){
  const counts=coverageSummary(p.rows,p.now),stale=!!p.updatedAt&&p.now-p.updatedAt>120000;
  const message=coverageMessage(p.rows,p.shown,p.now,p.loading,p.error,!!p.clear,navigator.onLine);
@@ -18,5 +18,6 @@ export function CoverageStatus(p:Props){
   {p.error&&<span className="coverage-error">{p.error}</span>}
   <div className="coverage-actions"><button disabled={p.loading} onClick={p.refresh}>Refresh traffic</button>{p.clear&&<button onClick={p.clear}>Clear traffic filter</button>}</div>
   </div></details>
- </aside>;
+  {p.clear&&<button className="active-filter-reset" onClick={p.clear}>Filters active · {p.shown} / {p.rows.length} shown · Reset</button>}
+ {p.shown===0&&!p.clear&&p.suggestions}</aside>;
 }

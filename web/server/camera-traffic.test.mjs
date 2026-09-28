@@ -20,7 +20,7 @@ test('successful camera snapshots deduplicate old fixes without retaining disapp
 });
 test('camera requests use canonical provider cache and share concurrent requests',async()=>{
  const calls=[];const feed=new FeedClient(async url=>{calls.push(url);return {ok:true,json:async()=>({now:Date.now()/1000,ac:[]})};});
- await Promise.all([feed.cameraArea(41.04,28.96,100),feed.cameraArea(41,29,100)]);assert.deepEqual(calls,['https://api.adsb.lol/v2/point/41/29/100']);
+ await Promise.all([feed.cameraArea(41.04,28.96,100),feed.cameraArea(41,29,100)]);assert.deepEqual(calls,['https://api.adsb.lol/v2/point/41/29/125']);
  await feed.cameraArea(41,29,100);assert.equal(calls.length,1);
 });
 
@@ -38,4 +38,29 @@ test('partial region failures preserve only failed-area fixes; successful empty 
  assert.deepEqual(combineRegions([{region:left,rows:[]},{region:right,rows:[]}],[a,b],area),[]);
  const overlap={lat:0,lon:1,radius:100};
  assert.deepEqual(combineRegions([{region:left,rows:[]},{region:overlap,rows:null}],[a],{...area,regions:[left,overlap]}),[]);
+});
+
+test('contained viewport queries reuse recent larger regions without changing timestamps',async()=>{
+ let calls=0;
+ const feed=new FeedClient(async()=>{calls++;return {ok:true,json:async()=>({now:Date.now()/1000,ac:[{hex:'abcdef',lat:41,lon:29,seen_pos:5},{hex:'bbbbbb',lat:42,lon:29,seen_pos:8}]})};});
+ const wide=await feed.cameraArea(41,29,100),close=await feed.cameraArea(41.1,29,25);
+ assert.equal(calls,1);assert.equal(close.aircraft.length,1);assert.equal(close.aircraft[0].observedAt,wide.aircraft[0].observedAt);assert.equal(close.fetchedAt,wide.fetchedAt);
+});
+test('viewport fallback uses only recent real in-area fixes and preserves observation age',async()=>{
+ const {retainedViewportRows}=await import('../src/lib/cameraTraffic.ts');
+ const now=200000,area={lat:41,lon:29,radius:25,limited:false},a={hex:'abcdef',lat:41,lon:29,observedAt:now-10000};
+ const rows=retainedViewportRows([], [a,{...a,hex:'old',observedAt:0},{...a,hex:'far',lat:0},{...a,hex:'future',observedAt:now+20000}],area,now);
+ assert.deepEqual(rows,[a]);assert.equal(retainedViewportRows([a],[{...a,observedAt:now-20000}],area,now)[0].observedAt,a.observedAt);
+});
+
+test('simultaneous contained viewport requests across users share one upstream request',async()=>{
+ let calls=0,release;
+ const feed=new FeedClient(async()=>{calls++;await new Promise(r=>release=r);return {ok:true,json:async()=>({now:Date.now()/1000,ac:[]})};});
+ const wide=feed.cameraArea(41,29,100),small=feed.cameraArea(41.1,29,25);await new Promise(r=>setImmediate(r));assert.equal(calls,1);release();await Promise.all([wide,small]);assert.equal(calls,1);
+});
+
+test('neighboring overlapping viewports share a padded regional bucket without returning outside targets',async()=>{
+ let calls=0,release;
+ const feed=new FeedClient(async()=>{calls++;await new Promise(r=>release=r);return {ok:true,json:async()=>({now:Date.now()/1000,ac:[{hex:'abcdef',lat:41,lon:29,seen_pos:2},{hex:'bbbbbb',lat:42.8,lon:29,seen_pos:2}]})};});
+ const first=feed.cameraArea(41,29,100),second=feed.cameraArea(41.1,29.1,100);await new Promise(r=>setImmediate(r));assert.equal(calls,1);release();const results=await Promise.all([first,second]);assert.ok(results.every(r=>r.aircraft.length===1));assert.equal(calls,1);
 });

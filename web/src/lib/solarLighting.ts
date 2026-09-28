@@ -1,6 +1,8 @@
 import {installNightMap} from './nightMap.ts';
 import type * as Cesium from 'cesium';
 type Engine=typeof Cesium;
+const clarityViews=new WeakSet<Cesium.Viewer>();
+export function setTowerClarity(viewer:Cesium.Viewer,enabled:boolean){if(enabled)clarityViews.add(viewer);else clarityViews.delete(viewer);if(!viewer.isDestroyed())viewer.scene.requestRender();}
 /** Use the same ephemeris and Earth-fixed transform as Cesium's SunLight. */
 export function sunDirectionFixed(C:Engine,time:Cesium.JulianDate){
  const sun=C.Simon1994PlanetaryPositions.computeSunPositionInEarthInertialFrame(time);
@@ -31,8 +33,8 @@ export function installSolarLighting(C:Engine,v:Cesium.Viewer){
  const amount=(entity:Cesium.Entity)=>{const position=entity.position?.getValue(v.clock.currentTime);if(!position)return 1;return sunlightAmount(solarElevation(C,position,sun),C.Cartographic.fromCartesian(position).height);};
  const wire=(entity:Cesium.Entity)=>{
   const model=entity.model;if(!model||wired.has(model))return;wired.add(model);
-  model.lightColor=new C.CallbackProperty(()=>{const k=amount(entity);return new C.Color(.025+1.975*k,.035+1.965*k,.06+1.94*k,1);},false);
-  model.imageBasedLightingFactor=new C.CallbackProperty(()=>{const k=amount(entity);return new C.Cartesian2(.12+.88*k,.06+.94*k);},false);
+  model.lightColor=new C.CallbackProperty(()=>{const k=Math.max(clarityViews.has(v)?.35:0,amount(entity));return new C.Color(.025+1.975*k,.035+1.965*k,.06+1.94*k,1);},false);
+  model.imageBasedLightingFactor=new C.CallbackProperty(()=>{const k=Math.max(clarityViews.has(v)?.5:0,amount(entity));return new C.Cartesian2(.12+.88*k,.06+.94*k);},false);
  };
  const update=()=>{
   if(document.hidden)return;

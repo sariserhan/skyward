@@ -569,7 +569,7 @@ Expansion validation: 114 automated tests pass. Chromium rendered all 22 new neu
 Cabin audio now uses original, locally synthesized ventilation noise and engine hum. Flight view exposes only “Cabin audio: On/Off”, defaults to On, and remembers an explicit Off choice. There is no YouTube player, video, duration selector, or external media request. Browser autoplay restrictions may defer sound until the next interaction. Audio pauses when hidden or the view is suspended and is disposed when flight view closes. This replaces the previous YouTube recording.
 
 
-Flight view includes Pilot (forward along the aircraft heading), Cabin (left/right window-side views), and Bird’s-eye (close overhead follow) in addition to existing external cameras. Pilot and cabin offsets scale with airframe length; these are approximate exterior viewpoints without modeled cockpit/cabin interiors. Pilot sits ahead of the nose to avoid looking through an opaque exterior mesh. Terrain clearance is retained, so low-altitude views can be raised above their nominal offsets. The selected view persists and is supported by settings backups. Dragging releases the camera, and closing restores the original clipping distance.
+Flight view includes Front view (forward along the aircraft heading), Cabin (left/right window-side views), and Bird’s-eye (close overhead follow) in addition to existing external cameras. Front and cabin offsets scale with airframe length; these are approximate exterior viewpoints without modeled cockpit/cabin interiors. Front view sits ahead of the nose to avoid looking through an opaque exterior mesh. Terrain clearance is retained, so low-altitude views can be raised above their nominal offsets. The selected view persists and is supported by settings backups. Dragging releases the camera, and closing restores the original clipping distance.
 
 Viewpoint validation: 116 automated tests pass and the production build succeeds. Chromium checks verify forward pilot heading, mirrored left/right window positions, close overhead framing, view persistence, mobile controls, restored clipping on close, and preserved pilot heading when terrain clearance raises the camera.
 
@@ -599,17 +599,317 @@ Map tools → **City lights globe** switches to 3D and frames the current night 
 
 The selected aircraft is polled by hex every 10 seconds while visible, independent of camera-area traffic. Hex results share an 8-second server cache; other position queries retain their 20-second cache. Failures back off up to 60 seconds, with one in-flight selected request. Existing provider serialization and concurrency limits remain. Restart the Node server to apply the cache change.
 
-Dead reckoning is now bounded: 120 seconds in cruise, 30 seconds below 8,000 reported feet or descending faster than 300 ft/min. Within 20 nm of a callsign-matching plausible destination, that horizon is shortened to avoid projecting inside a 1 nm destination boundary. This guard is conservative, does not assume runway alignment, and never redirects or lands the aircraft. An observed fix can pass that boundary (go-around/diversion/overflight); fresh observations and ground reports take precedence. The display explicitly says awaiting live position / arrival unconfirmed once limited, and polling continues. Estimated frames never enter source observations or recordings. Provider coverage may still prevent a live landing view.
+Airborne display prediction continues through feed outages instead of freezing at the former 30-second approach / 120-second cruise cutoff. Those thresholds now indicate extended, lower-confidence motion. A mapped, plausible landing context drives descent and rollout; otherwise the last usable course and speed continue, without inventing a confirmed arrival. Fresh observations and ground reports take precedence. Estimated frames never enter source observations or recordings.
 
 City-light registration uses camera-ray intersections with the fixed WGS84 ellipsoid, rather than reconstructing globe positions from the scene’s multi-frustum depth. The depth texture is read as a depth component. GPU coordinate probes were compared against independent Cesium globe intersections at nine screen positions across camera pans, rotations, zoom levels, and render scales; desktop/mobile rendering was also checked.
 
 
 ### Automatic predicted landing
 
-When a selected aircraft loses updates for at least 15 seconds on a plausible final approach, a matching destination runway can drive its display through descent, flare, touchdown, decelerating rollout and a stop before the runway end. The runway is chosen by proximity, approach alignment and heading; it is not a reported assignment. Go-arounds/climbs, overflights, aircraft beyond the runway, mismatched routes, missing elevation and unsuitable runways do not trigger it. Without a usable landing context, the existing bounded prediction remains in effect. There is no invented taxi route, gate assignment or observed arrival event.
+When a selected aircraft loses updates for at least 15 seconds on a plausible final approach, a matching destination runway can drive its display through descent, flare, touchdown, decelerating rollout and, where connected mapped taxiways and parking positions are available, taxiing to an illustrative stand. Without a connected route, the animation stops before the runway end. The runway is chosen by proximity, approach alignment and heading; it is not a reported assignment. Go-arounds/climbs, overflights, aircraft beyond the runway, mismatched routes, missing elevation and unsuitable runways do not trigger it. Without a usable landing context, display-only course prediction continues. Tower traffic without route data may use a stricter inferred final: descending faster than 150 ft/min, below 3,000 ft above known field elevation, within 6 nm, heading within 15° and approach alignment within 12°. An explicit unrelated/unverified route is never overridden. Taxi animation follows connected mapped paths with rounded turns and decelerates at a mapped parking position. The selected stand is illustrative, never a confirmed gate assignment or observed arrival event.
 
 Destination geometry loads independently of the airport being browsed, and renders alongside it. `data/airport-elevations.json` provides public-domain OurAirports field elevation for 1,146 catalog entries, with URL/date/source hash in `data/airport-elevations-source.json`; refresh with `npm run import:airport-elevations`. The animation uses a level runway and adjusts display clearance to rendered terrain; it is not surveyed ground geometry. Rigged fallback models extend gear and animate wheels; unrigged community models retain their authored gear geometry.
 
 Flight view has one persistent **Predicted landing** phase label. Its main position/speed/altitude reflect the presentation during that phase. Last received fixes, ages, confidence and provenance remain under **Position & prediction details**, collapsed by default. Fresh position/ground reports override the animation; predictions never modify telemetry, trail points, recordings or alerts. Reduced motion and replay keep observation-based behavior.
 
 Validation: 128 automated tests cover monotonic descent, continuity through touchdown, deceleration to a bounded stop, rejection of implausible landings, preservation of observations, and fresh go-around/ground recovery.
+
+### Flight context and sharing
+
+Flight session summary includes milestones derived only from retained observations; gaps never manufacture takeoff or landing events. Destination context shows calculated daylight, a timezone reference when available, and a rough direct-distance/current-speed arrival estimate only for a fresh plausible route heading toward the destination. This is not an airline ETA.
+
+Share view captures the current 3D camera position and selected aircraft. Reopening uses current observations, not a recording or a following camera. Save map image exports the globe with source credits; imagery restrictions may require switching to Atlas. Favorites under Collections can add aircraft to the local watchlist and enable visible-page alerts. Device & offline offers a lighter-graphics preset.
+
+Timezone references are an ICAO- and coordinate-matched subset of OpenFlights (ODbL-1.0), separate from the airport directory. Refresh with `python3 scripts/import-airport-timezones.py`; provenance and input SHA-256 are in `data/airport-timezones-source.json`. Browser IANA data supplies current offsets/DST. Missing or unsupported zones remain unavailable.
+
+### Premium accounts, billing, journeys and flight alerts (test environment)
+
+Start with `npm run start:premium-test` after `npm run build` (Node 24+).
+Set `SKYWARD_PUBLIC_ORIGIN` to the exact browser origin, e.g.
+`http://localhost:8000`. HTTPS is required for non-local origins, including forwarded
+public URLs. Accounts are disabled on the normal server unless
+`SKYWARD_ACCOUNTS=test`. This release deliberately rejects live payment keys.
+Your existing free flight tracking stays available without an account.
+
+Open **Upgrade** or **Account & journeys** in the footer (mobile: **More**).
+Create a test account with email and a password of at least 12 characters. In a
+selected flight's **Save journey & premium details**, choose the departure date
+(UTC) and save it. Account journeys are persistent and private to each account.
+**Find aircraft** looks up the current aircraft; a saved journey does not imply
+that its original flight is still operating. Journey date and aircraft identity
+are required before verified changes can become flight alerts.
+
+To exercise hosted subscription checkout, configure server-only environment values:
+
+- `STRIPE_SECRET_KEY`: your Stripe **test** secret key.
+- `STRIPE_PRICE_ID`: an existing recurring test Price ID (you choose the price).
+- Configure the test Customer Portal in Stripe for subscription management.
+- `SKYWARD_ACCOUNT_DB`: optional database path (default `.local/accounts.sqlite`).
+
+No secrets go into `VITE_` variables, browser storage, committed files or chat.
+Checkout and Customer Portal use server-owned customer IDs. Premium verification
+queries Stripe directly on each premium request: the matching price, active
+subscription, unexpired item period and paid nonzero invoice must agree. A redirect,
+client flag, demo fixture or trial does not grant access. No webhook endpoint is
+needed for this request-time verification strategy. Provider outages fail closed;
+there is no stale entitlement cache. Configure `SKYWARD_PUBLIC_ORIGIN` before using
+checkout return URLs or posting any account mutations. Return links reopen the
+account panel; **Refresh subscription** checks the current status.
+
+**Test premium checks use a separate synthetic DEMO101 example only.** They do not
+invoke AirLabs, even if an API key is present. Sample gates and times are never
+merged into a real aircraft or its arrival prediction. Passenger names and actual
+onboard counts remain unavailable. The public `/api/flight-details` preview stays
+synthetic/disabled. The operator-only `npm run check:airlabs -- --live-once AAL6 AAB812`
+can make one real API request with server-side `AIRLABS_API_KEY`; this is a separate
+manual coverage check and does not use the membership quota ledger. Without arguments,
+`npm run check:airlabs` is a no-network sample. Do not automate the operator tool.
+
+### Usage and budget controls
+
+SQLite transactions reserve allowance before premium checks. Limits persist across
+restarts, are shared across processes using the same database, and apply globally
+as well as to each account. Concurrent requests cannot overrun the allowance.
+Failures after reservation conservatively retain their reservation. There is no
+automatic premium polling. Rechecking one journey has a one-minute cooldown.
+
+- `SKYWARD_MONTHLY_LOOKUPS`: per-account UTC calendar-month cap (default 100).
+- `SKYWARD_GLOBAL_LOOKUPS`: global monthly cap (default 1000).
+- `SKYWARD_BUDGET_MICROS`: global monthly reservation budget (default 1000000).
+- `SKYWARD_REQUEST_MICROS`: conservative cost reservation per lookup (default 1000).
+
+These defaults are **test accounting units, not AirLabs pricing or invoice claims**.
+Actual flight-data spend is zero in this test flow. `npm run premium:usage` displays
+aggregate test usage and budget reservations without disclosing account identities.
+Use the same environment when inspecting limits. Every counter resets by UTC month,
+not Stripe billing anniversary. A real spend cap requires confirmed provider unit
+costs and must include base subscription fees and any other consumers of the key.
+
+### Alert behavior and launch boundaries
+
+Saved journeys have an alerts toggle and an in-app alert list. The verified-change
+processor detects departures, arrivals, gate changes and delays of at least five
+minutes. It rejects wrong identities, wrong departure dates, older checks and
+synthetic data; repeated observations do not duplicate alerts. **Preview sample
+alerts** is explicitly illustrative. No real alerts are generated until an authorized
+live detail source is connected. There is no background monitoring, email or push
+service in this release; existing observation-based watch alerts remain separate.
+
+Before live customer launch: configure actual provider/account contracts and
+coverage, email verification and account recovery, live payment credentials and
+prices, and a reviewed live-only premium data path. Current test sessions cannot
+access paid flight data. Accounts use salted scrypt hashes, revocable HTTP-only
+sessions, HTTPS secure cookies, strict same-origin mutations, bounded request bodies
+and persistent request throttling. Local SQLite files contain account information:
+keep them private and back them up. No real subscription purchase was made by these
+changes. Use the deterministic membership tests for payment/cancellation/failure
+flows until your own Stripe test account is configured.
+
+References: https://airlabs.co/docs/flight ; https://docs.stripe.com/billing/subscriptions/build-subscriptions ;
+https://docs.stripe.com/api/subscriptions/list . Stripe API version: 2026-08-26.dahlia.
+
+### Premium airport simulator
+
+`/airport-simulation/` now requires the same server-verified Premium entitlement.
+Anonymous visitors see a sign-in/upgrade page; free accounts cannot load the game.
+Every simulator asset request (including JS, WASM and PCK, GET and HEAD) checks
+entitlement before reading or serving files. Game responses are private/no-store;
+there is no shared browser cache authorization shortcut. A verification outage
+returns an unavailable page or denies the asset request. Existing downloaded game
+code cannot be remotely revoked; cancellation blocks subsequent requests.
+
+The authorized page embeds the game below a persistent **Back to Skyward** bar,
+with a separate **Your account** link. In game fullscreen, exit fullscreen first
+to return to that bar. The footer and Premium comparison advertise simulator
+inclusion. Test checkout remains test-only; configuring a test subscription does
+not charge a real payment. Restart the Node server after this route change.
+
+### Arrival rotation and sky objects
+
+A fresh homepage visit gently rotates the camera around Earth. Clicking, dragging,
+touching, scrolling, keyboard camera input, or using a control ends the arrival
+animation. Explicit shared views, aircraft navigation, replay, restored camera
+poses and reduced-motion mode do not start it. Hidden tabs and modal dialogs pause
+render work. This camera motion does not rotate the map imagery relative to Earth.
+
+In the 3D globe, **Map tools → Sun, Moon & planets** locates the Sun, Moon, Mercury,
+Venus, Mars, Jupiter, Saturn, Uranus and Neptune. Hover their globe-scene markers
+for names, or use the finder buttons on touch devices. **Back to Earth** restores
+the prior camera. Sky markers are illustrative, with enlarged discs and compressed
+distances, not a scale solar-system simulation. The Moon now shows its calculated
+Earth-view illuminated fraction and waxing/waning phase; surface orientation is
+illustrative. Optional sky labels persist locally. Escape returns from a sky
+object after any open menu has closed.
+Directions are calculated locally using astronomy-engine 2.1.19 (MIT), refreshed
+once a minute; no paid API is used. The celestial bundle is loaded separately.
+Its license is included at `/watch/data/astronomy-engine-LICENSE.txt`.
+
+
+### First visit, camera controls, and airport timeline
+
+The dismissible three-step introduction appears on a fresh homepage visit and can
+be replayed from **Map tools → Getting started**. Dismissal stays in local storage;
+shared links are not interrupted. **Reset view** exits flight/replay/spotter views
+and restores a north-up 3D globe. Touch pinch zoom no longer also tilts the camera;
+use the tilt button for that. Inertia and maximum input movement are reduced.
+
+Flight view, account forms and help load in separate chunks when requested.
+Background aircraft model downloads wait until camera motion settles for 350 ms;
+existing nearby models and selected aircraft retain priority. No model archives
+are prefetched. This reduces startup work but is not a measured network-speed SLA.
+
+Airport details include **Observed activity timeline**, a bounded session view of
+the last 30 minutes. An event needs two consistent observed fixes on each side of
+a ground/airborne transition, no gap over two minutes or impossible position jump,
+ground fixes within 3 nm and airborne fixes within 8 nm. It displays the timestamp
+interval, not an invented touchdown time. These are likely local arrivals/departures,
+not airport-confirmed movements; nearby airports can share coverage. Events rely on
+retained session histories (up to 250 aircraft) and can disappear when histories are
+evicted. Receiver gaps and missing ground fixes result in no event. Predicted
+positions never populate the timeline. The existing inferred activity view remains
+separate. This adds no paid requests, schedules or airport operational data.
+
+Map attribution uses Cesium's external credit container in the adjacent app footer.
+No credit text or attribution button overlays the globe. Active-provider credits
+remain visible in normal, mobile and focus layouts; supplementary source details
+remain available through the native keyboard-accessible Map credits dialog.
+
+### Viewport traffic and rate limits
+
+The camera publishes its area after movement settles (about 400 ms). Continuous
+arrival rotation and manual panning do not enqueue changing area requests; a
+following camera can still publish its moving area. The first settled viewport
+request starts after a 400 ms debounce. Subsequent refreshes remain 35 seconds.
+Recent real observations already received in this session can bridge pending or
+failed viewport requests, limited to the requested area and two-minute-old fixes;
+original timestamps and selected-flight freshness disclosures are preserved.
+Successful empty snapshots still clear the viewport normally.
+
+The backend reuses unexpired larger area snapshots for contained viewport queries,
+filtering to the smaller radius without modifying observation or fetch timestamps.
+An upstream 429 establishes a shared per-origin cooldown (at least 60 seconds,
+or longer when Retry-After requests it). Queued work also checks the cooldown
+before contacting the provider. The HTTP response forwards Retry-After so camera
+requests pause too. No paid API fallback or fabricated traffic is used. Free-feed
+coverage and upstream availability still determine how many aircraft can appear.
+Backend changes require restarting the locally managed Node server.
+Aircraft remain recognizable billboard icons out to 600 km camera distance in low
+and balanced graphics (1,000 km in high); graphics reductions no longer turn them
+into tiny dots at ordinary regional zoom. Labels still wait for closer zoom to
+avoid clutter, and 3D model budgets are unchanged.
+
+### Airport motion and map reliability
+
+Ground fixes blend over two to eight seconds, depending on correction distance. Moving ground traffic gets up to eight seconds of bounded, decelerating extrapolation; high-speed ground prediction requires a matching mapped runway. Stationary observations remain parked. Low-altitude climbs and takeoff/landing demonstrations use continuous motion through liftoff and touchdown. Fresh observations replace prediction; animation never becomes recorded telemetry.
+
+Nearby airport and camera requests share padded half-degree regional buckets (25 nautical miles of padding), pending containing requests and fresh cached results. Each response is filtered back to its requested circle. Provider rate-limit cooldowns apply across views, retaining original observation times. Restart the Node server to apply backend changes.
+
+The existing traffic status distinguishes loading, empty coverage and failures, with a visible filter-reset button. Callsign labels avoid collisions and controls while aircraft icons remain visible. Explore tools → Device & offline offers optional last-view resume (up to seven days; shared links take precedence) and battery saver (20 fps during motion, 5 fps when idle, reduced pixel density and steady aircraft lights). Hidden tabs pause rendering and polling.
+
+Explore tools → Connection health contains the Reliability dashboard: initial globe setup, session feed request/failure counts, response timings and script/render errors. Diagnostics stay in the browser; no external analytics are sent.
+
+### Airport activity, turnarounds and flight moments
+
+- **Explore tools → Spotter** now offers arrival candidates, departure candidates and recently reported ground traffic. Automatic 20-second aircraft switching is optional; manual selection/dragging stops following and open dialogs pause it. Arrival/departure categories are inferred trends, not confirmed itinerary events.
+- **Explore tools → Airport → Start ground animation** runs three illustrative turnarounds over a connected mapped taxi/parking route. A shared route and stand stay reserved through departure, so queued simulations cannot meet an outgoing aircraft head-on or occupy its gate. Recent reported traffic gets priority: a simulation holds for 65 m separation or an occupied mapped runway. Coverage gaps cannot prove a runway clear. No connected route means no animation; IAD has usable routes.
+- The optional ground scene includes an illustrative jet bridge, baggage cart, pushback tug and departure, with pause, speed, restart, stand and aircraft views. Its original lightweight aircraft supports gear, rolling/steering wheels and hinged flaps. Community aircraft without verified rigs retain their source geometry; gear animation is not claimed for them. Regenerate the optional rig with `node scripts/prepare-ground-rig.mjs`. Simulations never enter live observations, alerts, recordings or flight status.
+- New fixes blend over 2–8 seconds depending on correction distance, preserving the current presentation across globe/flight-camera handoffs. This reduces abrupt repositioning; it cannot establish actual unobserved movement.
+- Empty camera areas offer up to three nearby areas represented by recently received aircraft, within 500 nm. Suggestions use existing observations, expire after two minutes and issue no speculative polling.
+- Nearby 3D model allocation now excludes offscreen aircraft, uses a small retention band to reduce loading churn, and retains quality-based budgets. Distant aircraft remain icons; leaving the view releases their model graphics.
+- **Select a flight → Explore tools → Sessions → Save a flight moment** captures the last 1, 2 or 5 minutes of received fixes and the current camera. At least two fixes are required. Download the JSON to share; recipients open it through **Open a saved session**. Replay restores the camera, preserves missing-data boundaries and never imports predictions into live traffic. This is local replay data, not a video or a hosted public link.
+
+### Tower activity viewing
+
+Open an airport’s **Tower view** for a fixed viewpoint 65 m above rendered terrain. Auto-aim turns toward a chosen recent aircraft or the nearest one within 10 nm; binocular zoom changes the lens, not the tower position. Dragging pauses auto-aim. Closing the tower restores normal globe controls. Ground observations are placed on rendered terrain rather than treating reported field altitude as height above the apron.
+
+**Watch landing, taxi & takeoff** starts a labeled synthetic sequence through approach, touchdown, rollout, taxi, stand services, pushback and departure on the chosen runway’s connected mapped route. **Watch landing / taxi / takeoff** jumps to each demonstration phase; pause and playback speed remain available. The camera stays at the same tower throughout. Unsupported/disconnected runway-to-stand geometry is reported instead of inventing a path. Switching back to **Observed traffic** removes the simulation. Actual receiver coverage may not show every airport movement, and neither the viewpoint nor simulated gate/runway assignments claim operational accuracy.
+
+### Front and pilot cockpit views
+
+The former **Pilot** camera is now **Front view**: the same unobstructed forward position. Old saved pilot preferences migrate to front view, and backups support both new modes. **Flight view → Pilot cockpit** opens a generic illustrated glass cockpit with a forward windshield, ground-speed/altitude/vertical-speed readouts, a track compass and an interactive yoke/throttle console. The cockpit loads on demand and adapts to desktop/mobile screens. It is not a verified Boeing/Airbus or other type-specific interior.
+
+**Following observed flight** keeps received readouts separate from the projected camera position. Ground speed is labeled GS, not airspeed; attitude is explicitly illustrative because pitch/bank, indicated airspeed, fuel and engine data are unavailable. **Try practice controls** starts an isolated local camera simulation. Drag/focus the yoke and use arrow keys or WASD (pull/down climbs, push/up descends); Q/E controls rudder. Throttle, gear/flap drag, level hold, pause and reset affect only the practice view. Practice never updates aircraft entities, observations, histories, routes, recordings or server data. Hidden tabs pause practice and release inputs. Return to live follow, Front view, Side view or Exit cockpit restores observation-based viewing. This simplified response model is not flight-training software.
+
+
+### Tower motion and aircraft rendering
+
+Tower aircraft and demonstrations update on Cesium's frame clock; auto-aim runs before rendering with time-based smoothing. Demonstrations start at 1×, with 5×/20× available. Pause, background-tab suspension and reduced-motion preferences still apply. Low/balanced tower quality allows three nearby detailed aircraft; high allows eight, with approach visibility up to 20 km and distant marker fallback. Known types use existing sourced models/liveries. Explicitly watched tower targets remain tracked during a feed gap. Displayed landings and taxi-to-stand remain predictions, not confirmed operations.
+
+### Tower radar
+
+Tower view includes a north-up flight-data scope with mapped runway outlines, range rings (2/5/10/25 nm), direction vectors, observed trail dots, callsigns and received altitude/ground-speed readouts. Select a target with the mouse or Enter/Space to aim the tower camera without leaving tower view. Ground and label filters affect the scope only. The scope follows displayed globe positions, including predicted motion; selecting a track reveals fix age. Older tracks use muted colors. Demonstration aircraft are excluded. This is a visualization of the existing flight feed, not a connection to operational ATC radar, and it adds no API calls. Mobile starts minimized and temporarily hides the tower controls while the scope is expanded. The scope stops updating when minimized, obscured or the tab is hidden.
+
+The pilot cockpit also embeds the traffic scope in its navigation display. It is centred on the displayed aircraft (or local practice position), keeps north up, and rotates the ownship symbol with the displayed track. Ownship is excluded from traffic targets. Selecting traffic opens its readout without changing the piloted flight or camera. Radar/compass and mobile radar/instrument controls share the dashboard space; range, label and ground filters remain available. Existing received traffic supplies the scope, with no additional polling or API cost. This is a traffic visualization, not TCAS or a collision-avoidance instrument.
+
+If no connected runway-to-stand taxi route is mapped, tower and ground-animation panels still offer independent landing/rollout and takeoff demonstrations on a usable mapped runway. Taxi is disabled with a capability explanation; stand/service controls are omitted. Each runway-only demonstration ends after 45 simulation seconds and can be replayed. Landing ends on the runway; completed takeoff removes the demonstration aircraft rather than leaving it frozen aloft. Airports without usable runway geometry show a runway-specific unavailable message. Connected airports retain the full landing/taxi/turnaround/takeoff sequence.
+
+### Tower, cockpit and airport viewing improvements
+
+- Tower camera controls provide Wide (1×), Approach (2×) and Runway (4×) binocular presets and optional clearer aircraft lighting. This raises aircraft illumination only; the globe retains the actual day/night cycle. Next arrival/departure/ground controls and the activity queue use recent received movement candidates, not a confirmed schedule or clearance.
+- Cockpit traffic can switch between north-up and track-up, show relative or absolute received altitude, and expand into a larger scope. Escape compacts the expanded radar without leaving the cockpit. Missing altitude remains unknown. Relative values are based on ownship's received altitude (local displayed altitude during practice).
+- Predicted finals use finer arc-length sampling, eased flare pitch and nose lowering after touchdown. Fresh climbing observations override a predicted landing and blend to the new moving track within two seconds. Other corrections retain the existing distance-dependent smoothing. No prediction enters observation or recording stores.
+- Mapped airport detail adds decorative runway-edge/threshold lights at night, yellow taxiway/stand markings and terminal roof outlines. Light placement is illustrative, not a surveyed lighting system or its live operational state. Geometry is capped by quality, and missing terminal/taxi geometry is not fabricated.
+- Performance now reports browser-frame p95, the percentage over 50 ms, pending/slow model loads and the last completed model-load duration. Automatic detail reduces nearby background models during sustained frame pressure, keeps the selected/watched aircraft model, and uses a 15-second recovery hold to avoid repeated loading/unloading. Existing overall automatic-quality reduction still applies. Browser scheduling measurements are not GPU timings.
+
+All features use existing local geometry/assets and existing received flight data; they add no paid service or new flight-data polling.
+
+### Spatial audio, director and diagnostic snapshots
+
+- **Tower audio** is off until clicked. It synthesizes engine hum and noise locally
+  for up to three nearby displayed aircraft. Stereo direction follows the camera;
+  distance controls attenuation. Volume is adjustable. Hidden/paused views suspend
+  audio, and leaving the tower closes the audio context. This is illustrative
+  sound, not an aircraft recording or radio feed.
+- **Auto-director** prefers recent arrival candidates, then departures. It retains
+  a predicted approach through rollout before switching. Otherwise it changes
+  subjects after three minutes. Manual track selection or dragging disables it;
+  completed subjects are remembered in a bounded queue until the director resets.
+- Cockpit radar offers **All / ±1,000 / ±2,000 / ±5,000 ft** altitude bands and
+  selected-target distance/relative bearing. Unknown traffic altitude is excluded
+  while filtering; unknown ownship altitude disables altitude filtering.
+- Aircraft bank smoothly with displayed turns. Gear/flap transitions run only
+  on models with the supported local rig; imported meshes without matching nodes
+  are not assigned fabricated rig controls. The configuration is illustrative.
+- **Map tools → Performance → Download problem snapshot** saves camera, rendering,
+  entity counts and up to 30 feed timing changes locally. It uploads nothing and
+  includes no cookies, credentials, storage contents or passenger information.
+- `npm run test:views` checks repeated view/audio lifecycle behavior for five
+  wall-clock minutes; `npm run test:soak` separately exercises six accelerated
+  hours of feed/reconnect updates. See `tests/browser/README.md` for limits.
+
+### Discovery, saved flights and sharing
+
+- **Watch something interesting** uses recent aircraft already received near the
+  camera. Supported approach/departure trends get priority; otherwise it chooses
+  a nearby airborne aircraft. It opens a side or bird camera immediately and
+  avoids choosing the same aircraft twice when another candidate is available.
+  Without a suitable airborne track, it prefers a nearby airport with received
+  activity and opens its tower, or uses the current airport while waiting
+  for coverage. This does not scan the world or add background provider polling.
+- **My flights** combines watched aircraft, local favorites, a resume button and
+  received-track replay. Identity/favorites remain on this device; resumed
+  aircraft may now be flying a different service. Missing observations stay
+  unavailable. Replay only uses positions actually received in this session.
+- Local watch alerts now include reported airborne-to-ground transitions and
+  inferred destination approaches when matching route information was already
+  loaded. Optional browser notifications require a click and browser permission.
+  The page must remain visible; this is not an email or background push service.
+- Airport timelines include recent ground observations separately from supported
+  arrival/departure transitions. Gate occupancy and airport-confirmed events are
+  never invented from these observations.
+- Recorded sessions can restart, scrub time, and follow a selected recorded
+  aircraft from side or bird cameras. Dragging releases the replay camera.
+- Sharing from Flight view captures the selected flight and viewpoint as well as
+  the map camera. Opening that link follows the latest available position, not a
+  historical moment. Map image export retains source attribution.
+- Upgrade includes an explicitly illustrative premium example. Previewing it
+  cannot create a checkout, consume a premium lookup, or grant simulator access.
+  Accounts/payments remain test-only and live passenger information is unavailable.
+
+Launch checks include the unit suite's premium access enforcement, quota/budget
+limits, simulator protection, and a server restart on the same local port. Browser
+QA uses fixture traffic on an isolated random port, leaving port 8000 untouched.
+
+Run `npm run test:customer` for the customer flows, or `npm run test:launch`
+for unit/server plus core and customer browser checks. Set `SKYWARD_QA_PYTHON`
+to your Playwright-enabled Python interpreter when needed.

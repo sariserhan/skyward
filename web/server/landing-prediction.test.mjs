@@ -32,8 +32,8 @@ test('fresh go-around and observed ground reports replace predicted landing; his
  const history=[];const motion=new LiveMotion();assert.equal(motion.sample(a,history,400000,false,route,airport).landingPhase,'stopped');
  const climb={...a,lat:.01,lon:.02,altitude:1800,verticalRate:1800,observedAt:400000};
  assert.equal(motion.sample(climb,history,400000,false,route,airport).landingPhase,undefined);
- const actual=motion.sample(climb,history,402000,false,route,airport),expected=liveFrame(climb,history,402000,false,route,airport);assert.ok(trackDistance(actual,expected)<1e-6);
- const ground={...climb,ground:true,altitude:300,groundSpeed:18,observedAt:403000};const frame=motion.sample(ground,history,403000,false,route,airport);assert.equal(frame.ground,true);assert.equal(frame.estimated,false);assert.equal(frame.lon,ground.lon);assert.deepEqual(history,[]);
+ const actual=motion.sample(climb,history,408000,false,route,airport),expected=liveFrame(climb,history,408000,false,route,airport);assert.ok(trackDistance(actual,expected)<1e-6);
+ const ground={...climb,ground:true,altitude:300,groundSpeed:18,observedAt:409000};const frame=motion.sample(ground,history,409000,false,route,airport);assert.equal(frame.ground,true);assert.equal(frame.estimated,false);const settled=motion.sample(ground,history,417000,false,route,airport),target=liveFrame(ground,history,417000,false,route,airport);assert.ok(trackDistance(settled,target)<1e-6);assert.deepEqual(history,[]);
 });
 test('animated approach speed matches the decelerating readout through touchdown',()=>{
  for(const patch of [{},{lat:.006,heading:100}]){
@@ -45,5 +45,19 @@ test('animated approach speed matches the decelerating readout through touchdown
    assert.ok(Math.abs(animatedSpeed-first.groundSpeed)<2,`${animatedSpeed} vs ${first.groundSpeed}`);checked++;
   }
   assert.ok(checked>100);
+ }
+});
+
+test('tower infers only a descending, closely aligned final when no route is available',()=>{
+ const original=structuredClone(a);
+ assert.equal(predictedLanding(a,160000,null,airport).landingPhase,'approach');
+ assert.equal(predictedLanding(a,700000,null,airport).ground,true);
+ for(const patch of [{verticalRate:null},{verticalRate:0},{verticalRate:1000},{heading:115},{lat:.03},{lon:-.2},{altitude:5000}])assert.equal(predictedLanding({...a,...patch},160000,null,airport),null,JSON.stringify(patch));
+ assert.deepEqual(a,original);
+});
+test('approach keeps moving beyond old 30-second cap until touchdown',()=>{
+ for(const context of [route,null]){
+  let previous=liveFrame(a,[],130000,false,context,airport);
+  for(let now=130100;now<170000;now+=100){const next=liveFrame(a,[],now,false,context,airport);assert.equal(next.ground,false);assert.ok(trackDistance(previous,next)>.0001);assert.ok(next.altitude<previous.altitude);previous=next;}
  }
 });

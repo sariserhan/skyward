@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-export interface MapPreferences { offlineMaps:boolean; autoQuality:boolean; lighting:'natural'; shadows:boolean; quality:'low'|'balanced'|'high'; declutter:boolean; basemap: 'satellite' | 'atlas'; structures: boolean; labels: boolean; grid: boolean; terrain: boolean; reducedMotion:boolean; largeLabels:boolean; highContrast:boolean; }
-const defaults: MapPreferences = { offlineMaps:true,autoQuality:true,lighting:'natural',shadows:true,quality:'balanced',declutter:true,basemap: 'satellite', structures: true, labels: true, grid: false, terrain:false, reducedMotion:matchMedia('(prefers-reduced-motion: reduce)').matches,largeLabels:false,highContrast:false };
+export interface MapPreferences { batterySaver:boolean; resumeView:boolean; offlineMaps:boolean; autoQuality:boolean; lighting:'natural'; shadows:boolean; quality:'low'|'balanced'|'high'; declutter:boolean; basemap: 'satellite' | 'atlas'; structures: boolean; labels: boolean; grid: boolean; terrain: boolean; reducedMotion:boolean; largeLabels:boolean; highContrast:boolean; }
+const defaults: MapPreferences = { batterySaver:false,resumeView:false, offlineMaps:true,autoQuality:true,lighting:'natural',shadows:true,quality:'balanced',declutter:true,basemap: 'satellite', structures: true, labels: true, grid: false, terrain:false, reducedMotion:matchMedia('(prefers-reduced-motion: reduce)').matches,largeLabels:false,highContrast:false };
 export function useMapPreferences() {
   const [preferences, setPreferences] = useState<MapPreferences>(() => {
     try {
       const value = JSON.parse(localStorage.getItem('skyward.map.v1') || 'null');
       if (!value || typeof value !== 'object') return defaults;
-      return { offlineMaps:value.offlineMaps!==false,autoQuality:value.autoQuality!==false,lighting:'natural',shadows:value.shadows!==false,quality:value.quality==='low'||value.quality==='high'?value.quality:'balanced',declutter:value.declutter!==false,basemap: value.basemap === 'atlas' ? 'atlas' : 'satellite',
+      return { batterySaver:value.batterySaver===true,resumeView:value.resumeView===true,offlineMaps:value.offlineMaps!==false,autoQuality:value.autoQuality!==false,lighting:'natural',shadows:value.shadows!==false,quality:value.quality==='low'||value.quality==='high'?value.quality:'balanced',declutter:value.declutter!==false,basemap: value.basemap === 'atlas' ? 'atlas' : 'satellite',
         structures: typeof value.structures === 'boolean' ? value.structures : true,
         labels: typeof value.labels === 'boolean' ? value.labels : true,
         reducedMotion:typeof value.reducedMotion==='boolean'?value.reducedMotion:defaults.reducedMotion,largeLabels:value.largeLabels===true,highContrast:value.highContrast===true,

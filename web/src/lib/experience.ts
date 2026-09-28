@@ -1,3 +1,4 @@
+import {parseCamera} from './sharedCamera.ts';
 import { AIRPORTS, validAirport } from './airportCatalog.ts';
 import type { Aircraft, AirportId } from '../types';
 export type TrafficFilter = 'all' | 'vehicles' | 'fixed' | 'aircraft' | 'unknown' | 'ground' | 'airborne' | 'low' | 'high';
@@ -16,7 +17,7 @@ export function parseView(hash: string) {
   const airport: AirportId = validAirport(q.get('airport') || '') ? q.get('airport')! : 'IAD';
   const hex = q.get('aircraft') || '';
   const facility = q.get('facility') || '';
-  return { airport, mode: q.get('mode') === '2D' ? '2D' as const : '3D' as const,
+  return { airport, sceneView:q.get('scene')==='flight'&&['side','chase','front','cockpit','cabin','bird','orbit','area'].includes(q.get('view')??'')?q.get('view'):null, camera:q.get('mode')==='2D'?null:parseCamera(q.get('camera')), mode: q.get('mode') === '2D' ? '2D' as const : '3D' as const,
     aircraft: /^[a-f\d]{6}$/i.test(hex) ? hex.toLowerCase() : '',
     facility: /^facility-[A-Z0-9-]{3,12}-\d{1,6}$/.test(facility) && facility.startsWith(`facility-${airport}-`) ? facility : '',
     hasView: q.has('airport') || /^[a-f\d]{6}$/i.test(hex) };
@@ -29,7 +30,7 @@ export interface LocalEvent { id: string; hex: string; title: string; time: numb
 export interface AlertState { last: Aircraft; gap: boolean; }
 const airports=Object.entries(AIRPORTS).map(([id,a])=>({id,lat:a.lat,lon:a.lon}));
 export function observeAlerts(previous: AlertState | undefined, a: Aircraft, now: number): {state: AlertState; events: LocalEvent[]} {
-  const fresh=a.observedAt!==null && now-a.observedAt<=30000 && a.lat!==null && a.lon!==null;
+  const fresh=a.observedAt!==null && now-a.observedAt<=30000 && a.observedAt<=now+1000 && a.lat!==null && a.lon!==null;
   if (!previous) return {state:{last:a,gap:false},events:[]};
   const events:LocalEvent[]=[];const label=a.callsign||a.registration||a.hex.toUpperCase();
   const emit=(key:string,title:string)=>events.push({id:`${a.hex}-${key}-${a.observedAt}`,hex:a.hex,title:`${label}: ${title}`,time:now});
@@ -38,6 +39,7 @@ export function observeAlerts(previous: AlertState | undefined, a: Aircraft, now
   if(fresh&&newer){
     if(previous.gap)emit('restored','fresh position received again');
     if(a.targetKind!=='vehicle'&&a.targetKind!=='fixed'&&contiguous&&previous.last.ground&&!a.ground&&a.altitude!==null)emit('airborne','now reported airborne (takeoff unconfirmed)');
+    if(a.targetKind==='aircraft'&&contiguous&&!previous.last.ground&&a.ground)emit('ground','now reported on ground (landing unconfirmed)');
     for(const ap of airports){
       if(contiguous&&previous.last.lat!==null&&previous.last.lon!==null&&distanceNm(a.lat!,a.lon!,ap.lat,ap.lon)<=5&&distanceNm(previous.last.lat,previous.last.lon,ap.lat,ap.lon)>5)
         emit(`near-${ap.id}`,`observed within 5 nm of ${ap.id} (arrival unconfirmed)`);

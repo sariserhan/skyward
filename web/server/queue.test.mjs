@@ -18,3 +18,12 @@ test('overload is bounded, duplicate requests still share work, and expired work
     assert.equal(calls,1);assert.equal(client.pending.size,0);
   } finally {Date.now=realNow;}
 });
+
+test('429 pauses new and already queued upstream work, honors Retry-After, and later recovers',async()=>{
+ let calls=0;
+ const client=new FeedClient(async()=>{calls++;return calls===1?{ok:false,status:429,headers:new Headers({'Retry-After':'120'})}:{ok:true,json:async()=>({now:Date.now()/1000,ac:[]})};});
+ const settled=await Promise.allSettled([client.cameraArea(41,29,100),client.cameraArea(40,28,100)]);
+ assert.equal(calls,1);assert.ok(settled.every(r=>r.status==='rejected'&&r.reason.retryAfter>100));
+ await assert.rejects(client.search('hex','abcdef'),e=>e.retryAfter>100);assert.equal(calls,1);
+ const actual=Date.now;try{Date.now=()=>actual()+121000;await client.cameraArea(41,29,100);assert.equal(calls,2);}finally{Date.now=actual;}
+});

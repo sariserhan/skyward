@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import {parseView,matchesTraffic,observeAlerts,modelFamily} from '../src/lib/experience.ts';
 const now=1800000000000,a={hex:'abcdef',callsign:'TEST',registration:'',aircraftType:'A320',lat:38.94,lon:-77.46,ground:true,altitude:0,observedAt:now};
 test('share links accept only supported views and valid aircraft/facility IDs',()=>{
- assert.deepEqual(parseView('#airport=IST&mode=2D&aircraft=ABCDEF&facility=facility-IST-3'),{airport:'IST',mode:'2D',aircraft:'abcdef',facility:'facility-IST-3',hasView:true});
+ assert.deepEqual(parseView('#airport=IST&mode=2D&aircraft=ABCDEF&facility=facility-IST-3'),{airport:'IST',sceneView:null,camera:null,mode:'2D',aircraft:'abcdef',facility:'facility-IST-3',hasView:true});
  const x=parseView('#airport=OTHER&aircraft=<script>&facility=facility-IST-3&mode=bad');assert.equal(x.aircraft,'');assert.equal(x.facility,'');assert.equal(x.mode,'3D');assert.equal(x.airport,'IAD');
 });
 test('traffic bands handle ground, zero altitude and unknown altitude without fabricating height',()=>{

@@ -16,3 +16,27 @@ heap samples; the guard is less than 64 MiB retained JS-heap growth and fewer th
 this fixture. GPU memory is not measured. This is not a six-hour wall-clock test.
 The unit suite separately feeds 600 aircraft every 35 simulated seconds for six
 hours and asserts the 4,000-aircraft / 32-fix motion retention limits throughout.
+
+`npm run test:views` runs a five-minute wall-clock lifecycle check with fixture
+traffic. It repeatedly enters and exits tower and cockpit views, starts and closes
+spatial audio, checks auto-director manual override, altitude filtering, a mobile
+radar layout, and a downloaded diagnostic snapshot. Each cycle samples retained
+JS heap, DOM nodes, data sources, and open AudioContexts. All tower audio contexts
+must close on exit; heap growth after warm-up must stay below 64 MiB. Results go
+to `view-soak.json`. `SKYWARD_VIEW_SOAK_SECONDS` can override the duration (at least
+three cycles always run). This measures browser lifecycle behavior, not perceived
+audio quality or real-device GPU performance.
+
+`npm run test:customer` checks one-click discovery, My flights/favorites/resume,
+flight-scene sharing and PNG export, notification opt-in, ground activity,
+recorded-session scrubbing and camera angles, and the illustrative Premium
+preview. It covers desktop (1440×1000) and mobile (390×844) layouts and keyboard
+activation/Escape. Preview interactions must make no billing or premium-detail
+requests. Screenshots and the exported image stay in the external artifact folder.
+
+`npm run test:launch` combines unit/server checks, the core browser regression,
+and customer-flow checks. Unit/server coverage includes premium and simulator
+access enforcement, spending limits, and stopping/restarting an isolated server on
+the same port. Payment and flight data fixtures make no real purchases or paid
+provider calls. This is a local validation gate, not certification of a live billing
+setup or all browsers/devices; accounts and payments still remain test-only.

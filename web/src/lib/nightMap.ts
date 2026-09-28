@@ -54,7 +54,7 @@ export function installNightMap(C:typeof Cesium,v:Cesium.Viewer){
  };
  const onFrame=v.scene.preRender.addEventListener(updateDetail);
  const onLayer=v.imageryLayers.layerAdded.addEventListener(place);
- const credit=new C.Credit('<a href="https://science.nasa.gov/earth/earth-observatory/earth-at-night/maps/" target="_blank" rel="noreferrer">Night lights: NASA Black Marble 2016 · historical composite</a>',true);
+ const credit=new C.Credit('<a href="https://science.nasa.gov/earth/earth-observatory/earth-at-night/maps/" target="_blank" rel="noreferrer">Night lights: NASA Black Marble 2016 · historical composite</a>',false);
  void C.SingleTileImageryProvider.fromUrl(`${import.meta.env.BASE_URL}data/night-lights/black-marble-2016.jpg`,{credit}).then(provider=>{
   if(!active||v.isDestroyed())return;
   layer=new C.ImageryLayer(provider,{dayAlpha:0,nightAlpha:.62,brightness:2.0,contrast:1.1});

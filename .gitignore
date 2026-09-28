@@ -25,3 +25,11 @@ web/node_modules/
 web/dist/
 web/public/cesium/
 web/*.tsbuildinfo
+
+# Provider credentials (server-only)
+.env
+.env.*
+!.env.example
+
+# Local membership database
+web/.local/
