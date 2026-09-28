@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';
-import {AIRFRAMES,commandFlight,goAround,initialFlight,stepFlight,chooseRunway,runwayStart,runwayHeading,movePoint,nauticalMiles} from '../src/lib/flightSimulator.ts';
+import {simulationOccupants,AIRFRAMES,commandFlight,goAround,initialFlight,stepFlight,chooseRunway,runwayStart,runwayHeading,movePoint,nauticalMiles} from '../src/lib/flightSimulator.ts';
 import {careerSummary,connectionTimeline} from '../src/lib/premiumExperience.ts';
 const geometry=id=>JSON.parse(readFileSync(new URL(`../public/data/airports/${id}.json`,import.meta.url)));
 const a=geometry('IAD'),b=geometry('DCA');
@@ -32,4 +32,17 @@ test('Engines spool gradually, reverse only works on jets on the ground, go-arou
  const flying={...start,ground:false,altitude:200,phase:'landing',pitch:-3,speed:140,gear:true,speedbrake:true};assert.equal(commandFlight(flying,p,{reverse:true}).reverse,false);
  const around=goAround(flying,p);assert.equal(around.lon,flying.lon);assert.equal(around.altitude,200);assert.equal(around.throttle,1);assert.equal(around.speedbrake,false);assert.ok(around.pitch>0);assert.equal(around.gear,true);
  const rolling={...initialFlight(p),phase:'rollout',speed:80,throttle:.8,enginePower:.8,brakes:false};assert.ok(stepFlight({...rolling,reverse:true},p,neutral,1).speed<stepFlight(rolling,p,neutral,1).speed);
+});
+
+test('Fuel burns at simulation time and engine demand, stops at zero and cannot be restarted in flight',()=>{
+ const p=plan(),initial=initialFlight(p),low=stepFlight(initial,p,neutral,2),high=stepFlight({...initial,throttle:1,enginePower:1},p,neutral,2);assert.ok(high.fuelKg<low.fuelKg);assert.ok(low.fuelKg<initial.fuelKg);
+ let s={...initial,ground:false,phase:'cruise',altitude:3000,speed:200,throttle:1,enginePower:1,fuelKg:.001,autopilot:true};s=stepFlight(s,p,neutral,1);assert.equal(s.fuelKg,0);assert.equal(s.fuelExhausted,true);assert.equal(s.autopilot,false);assert.match(s.warning,/ENGINE FAILURE/);assert.equal(commandFlight(s,p,{autopilot:true}).autopilot,false);assert.equal(goAround(s,p).phase,s.phase);
+ for(let n=0;n<10;n++)s=stepFlight({...s,throttle:1},p,neutral,1);assert.ok(s.enginePower<.02);assert.ok(s.altitude<3000);assert.equal(s.fuelBurnKgHour,0);
+ const taxi=stepFlight({...initial,fuelKg:0,throttle:1},p,neutral,2);assert.equal(taxi.ground,true);assert.equal(taxi.phase,'ready');assert.equal(taxi.speed,0);assert.equal(taxi.fatalCrash,false);
+});
+test('Fuel-out impacts are terminal, but a controlled glide touchdown is survivable',()=>{
+ const p=plan('C172','advanced');let falling={...initialFlight(p),lat:0,lon:0,ground:false,phase:'climb',altitude:20,pitch:-10,speed:90,verticalSpeed:-1800,fuelKg:0};
+ for(let n=0;n<60&&falling.phase!=='crashed';n++)falling=stepFlight(falling,p,neutral,.1);assert.equal(falling.phase,'crashed');assert.equal(falling.fatalCrash,true);assert.equal(falling.altitude,0);assert.deepEqual(stepFlight(falling,p,{pitch:1,roll:1,rudder:1},2),falling);
+ let landing={...initialFlight(p),...movePoint(runwayStart(p.arrival),runwayHeading(p.arrival),.2),ground:false,phase:'landing',heading:runwayHeading(p.arrival),altitude:.1,speed:65,pitch:3,verticalSpeed:-200,fuelKg:0,flaps:2,flapPosition:2};landing=stepFlight(landing,p,neutral,.1);assert.equal(landing.phase,'rollout');assert.equal(landing.fatalCrash,false);assert.equal(landing.fuelExhausted,true);
+ const survivors=simulationOccupants({...p,passengers:2});assert.deepEqual(survivors,{passengers:2,crew:1,total:3});assert.equal(simulationOccupants({...p,passengers:999}).total,4);
 });

@@ -1268,3 +1268,30 @@ selected flight view, the flyable simulator and cockpit practice. Positive bank
 means a right turn/right wing down; the attitude-indicator horizon counter-rotates.
 Regression tests check actual Cesium quaternion-transformed wing/nose directions,
 heading wraparound, simulator turn direction and cockpit camera axes.
+
+#### Fuel, engine-out flight and game over
+
+Choose a **Starting fuel** percentage and **Simulated passengers** before departure.
+The aircraft-specific fuel capacities, burn rates and load limits are gameplay
+profiles, not real dispatch/performance data. Fuel burns according to simulated
+elapsed time and engine power (including idle); pause freezes consumption and
+cruise acceleration advances consumption with the simulation. Fuel quantity and
+flow appear in the mission panel and cockpit. Low fuel triggers a warning.
+
+An empty tank removes thrust, winds down engine sound, disengages autopilot and
+blocks powered go-around. The aircraft can still steer and glide: no automatic
+instant crash or teleportation. Tower radio announces engine failure and stops
+issuing altitude-climb reminders. A controlled touchdown on the selected runway
+can survive. The existing flat runway datum remains the collision surface; this
+is not terrain-aware emergency-landing training.
+
+Severe impacts show a brief stylized fireball and rising smoke at the impact
+location, an impact sound when audio is enabled, and **Game over**. The result
+states that the pilot died and counts the other fictional occupants. Low-speed
+accidents can instead report survivors. Fatality classification is a game rule
+based on impact speed/descent, not a real survivability prediction. Counts include
+the configured passengers plus simulated crew (including the player); no real
+passenger data is used. Reduced-motion mode uses static smoke without the expanding
+fireball. Mute/pause stops impact audio. Retry resets fuel, controls and effects;
+Choose another flight returns to setup, and Review flight dismisses the result.
+Career saves retain fictional occupant/fatality totals and fuel remaining.

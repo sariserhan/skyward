@@ -12,6 +12,7 @@ export class SimulatorAudio {
  private nodes:AudioNode[]=[];
  private speech:SpeechSynthesisUtterance|null=null;
  private disposed=false;
+ private impactSource:AudioBufferSourceNode|null=null;
  async start(){
   if(this.disposed)return;
   if(!this.context){
@@ -24,7 +25,12 @@ export class SimulatorAudio {
   }
   await this.context.resume();
  }
- update(s:FlightState,type:AircraftType,volume:number,muted:boolean){const c=this.context;if(!c||!this.master)return;const at=c.currentTime;this.master.gain.setTargetAtTime(muted?0:volume*.22,at,.08);this.engine?.frequency.setTargetAtTime((type==='C172'?35:65)+s.enginePower*(type==='C172'?85:155),at,.15);this.engineGain?.gain.setTargetAtTime(.08+s.enginePower*.35,at,.15);this.wind?.gain.setTargetAtTime(Math.min(.35,s.speed/800),at,.1);this.rumble?.gain.setTargetAtTime(s.ground?Math.min(.6,s.speed/150):0,at,.12);this.gear?.gain.setTargetAtTime(Math.abs(Number(s.gear)-s.gearPosition)>.01?.08:0,at,.08);this.alarm?.gain.setTargetAtTime(s.warning.includes('STALL')?.17:0,at,.04);}
+ update(s:FlightState,type:AircraftType,volume:number,muted:boolean){const c=this.context;if(!c||!this.master)return;const at=c.currentTime;this.master.gain.setTargetAtTime(muted?0:volume*.22,at,.08);this.engine?.frequency.setTargetAtTime((type==='C172'?35:65)+s.enginePower*(type==='C172'?85:155),at,.15);this.engineGain?.gain.setTargetAtTime(s.fuelExhausted?s.enginePower*.35:.08+s.enginePower*.35,at,.15);this.wind?.gain.setTargetAtTime(Math.min(.35,s.speed/800),at,.1);this.rumble?.gain.setTargetAtTime(s.ground?Math.min(.6,s.speed/150):0,at,.12);this.gear?.gain.setTargetAtTime(Math.abs(Number(s.gear)-s.gearPosition)>.01?.08:0,at,.08);this.alarm?.gain.setTargetAtTime(s.warning.includes('STALL')?.17:0,at,.04);}
+ impact(volume:number,fatal:boolean){
+  const c=this.context;if(!c||c.state!=='running')return;
+  const duration=fatal?1.6:.5,buffer=c.createBuffer(1,Math.floor(c.sampleRate*duration),c.sampleRate),data=buffer.getChannelData(0);for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*Math.exp(-i/data.length*5);
+  const source=c.createBufferSource(),filter=c.createBiquadFilter(),gain=c.createGain();source.buffer=buffer;filter.type='lowpass';filter.frequency.value=fatal?450:180;gain.gain.value=volume*.2;source.connect(filter);filter.connect(gain);gain.connect(c.destination);this.nodes.push(source,filter,gain);source.onended=()=>{source.disconnect();filter.disconnect();gain.disconnect();this.nodes=this.nodes.filter(n=>n!==source&&n!==filter&&n!==gain);};this.impactSource=source;source.start();
+ }
  say(text:string,volume:number){
   if(this.disposed||!('speechSynthesis' in window)||this.context?.state!=='running')return false;
   // Local voices avoid sending simulator text to an external speech service.
@@ -32,6 +38,6 @@ export class SimulatorAudio {
   try{this.cancelSpeech();const utterance=new SpeechSynthesisUtterance(text);utterance.voice=voice;utterance.rate=1.04;utterance.volume=volume;this.speech=utterance;window.speechSynthesis.speak(utterance);return true;}catch{this.speech=null;return false;}
  }
  cancelSpeech(){if(this.speech&&'speechSynthesis' in window){window.speechSynthesis.cancel();this.speech=null;}}
- suspend(){this.cancelSpeech();if(this.context?.state==='running')void this.context.suspend();}
+ suspend(){try{this.impactSource?.stop();}catch{}this.impactSource=null;this.cancelSpeech();if(this.context?.state==='running')void this.context.suspend();}
  dispose(){this.disposed=true;this.cancelSpeech();for(const n of this.nodes){try{if(n instanceof AudioScheduledSourceNode)n.stop();n.disconnect();}catch{}}this.nodes=[];if(this.context)void this.context.close();this.context=null;}
 }

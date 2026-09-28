@@ -15,3 +15,6 @@ test('Height callouts happen once per approach and radio history remains bounded
  r=stepRadio(r,{...s,elapsed:11},p);assert.equal(r.calls.filter(c=>c.id==='height-100').length,1);
  for(let i=1;i<40;i++)r=stepRadio(r,{...s,phase:'cruise',altitude:3000,elapsed:i*40},p);assert.ok(r.calls.length<=8);
 });
+test('Fuel failure cancels altitude-climb reminders and announces the emergency once',()=>{
+ const s={...initialFlight(p),ground:false,phase:'cruise',altitude:2000,elapsed:40,fuelKg:0,fuelExhausted:true};let r=stepRadio(initialRadio(),s,p);assert.match(r.calls.at(-1).text,/Engines out/);r=stepRadio(r,{...s,elapsed:100},p);assert.equal(r.calls.filter(c=>c.id==='fuel-empty').length,1);assert.ok(!r.calls.some(c=>c.id.startsWith('altitude')));
+});
