@@ -1318,3 +1318,10 @@ Wording follows the general heading-vector pattern in the
 [FAA vectoring phraseology](https://www.faa.gov/air_traffic/publications/atpubs/atc_html/chap5_section_6.html).
 The simulation uses rounded true headings from its geographic model, not magnetic
 headings, published procedures, obstacle clearance or real traffic separation.
+
+The simulator gives a runway-holding reminder after 12 simulated seconds below
+1 kt during manual departure, with a 30-second repeat cooldown. It explains
+**Release brakes** (or **B**) when brakes are applied, and increasing throttle
+when brakes are released. The controls show brake state separately from the
+button action, with an immediate departure hint. Reminders are suppressed during
+autopilot, fuel exhaustion, landing rollout, and completed or crashed flights.

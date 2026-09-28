@@ -18,3 +18,15 @@ test('Height callouts happen once per approach and radio history remains bounded
 test('Fuel failure cancels altitude-climb reminders and announces the emergency once',()=>{
  const s={...initialFlight(p),ground:false,phase:'cruise',altitude:2000,elapsed:40,fuelKg:0,fuelExhausted:true};let r=stepRadio(initialRadio(),s,p);assert.match(r.calls.at(-1).text,/Engines out/);r=stepRadio(r,{...s,elapsed:100},p);assert.equal(r.calls.filter(c=>c.id==='fuel-empty').length,1);assert.ok(!r.calls.some(c=>c.id.startsWith('altitude')));
 });
+test('Runway idle reminders explain brakes and throttle with cooldown and departure-only guards',()=>{
+ const s=initialFlight(p);let r=stepRadio(initialRadio(),s,p);
+ r=stepRadio(r,{...s,elapsed:11},p);assert.ok(!r.calls.some(c=>c.id.startsWith('runway-idle')));
+ r=stepRadio(r,{...s,elapsed:12},p);assert.match(r.calls.at(-1).text,/Release brakes button or press B/);
+ const count=r.calls.length;r=stepRadio(r,{...s,elapsed:13},p);assert.equal(r.calls.length,count);
+ r=stepRadio(r,{...s,brakes:false,elapsed:42},p);assert.match(r.calls.at(-1).text,/Brakes are released.*increase throttle/);
+ r=stepRadio(r,{...s,speed:5,elapsed:43},p);assert.equal(r.idleSince,null);
+ r=stepRadio(r,{...s,elapsed:80},p);assert.equal(r.idleSince,80);assert.equal(r.lastIdleReminder,42);
+ for(const patch of [{phase:'rollout'},{phase:'landed'},{phase:'crashed'},{ground:false,phase:'climb'},{fuelExhausted:true},{autopilot:true}]){
+  let quiet=stepRadio(initialRadio(),{...s,...patch},p);quiet=stepRadio(quiet,{...s,...patch,elapsed:60},p);assert.ok(!quiet.calls.some(c=>c.id.startsWith('runway-idle')));
+ }
+});

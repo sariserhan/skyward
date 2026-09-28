@@ -1,7 +1,7 @@
 import {navigationGuidance,FUEL_PROFILES,AIRFRAMES,headingError,runwayHeading,runwayOffset,type FlightState,type FlightPlan} from './flightSimulator.ts';
 export interface RadioCall {id:string;time:number;speaker:'Tower'|'Approach'|'Flight deck';text:string;}
-export interface RadioState {stage:string;lastReminder:number;calls:RadioCall[];altitude:number;seen:number[];fuel:'normal'|'low'|'empty';assignedHeading:number|null;lastVector:number;vectorLeg:string;offRoute:boolean;recoveredSince:number|null;vectorSerial:number;}
-export const initialRadio=():RadioState=>({stage:'',lastReminder:-100,altitude:3000,seen:[],calls:[],fuel:'normal',assignedHeading:null,lastVector:-100,vectorLeg:'',offRoute:false,recoveredSince:null,vectorSerial:0});
+export interface RadioState {stage:string;lastReminder:number;calls:RadioCall[];altitude:number;seen:number[];fuel:'normal'|'low'|'empty';assignedHeading:number|null;lastVector:number;vectorLeg:string;offRoute:boolean;recoveredSince:number|null;vectorSerial:number;idleSince:number|null;lastIdleReminder:number;}
+export const initialRadio=():RadioState=>({stage:'',lastReminder:-100,altitude:3000,seen:[],calls:[],fuel:'normal',assignedHeading:null,lastVector:-100,vectorLeg:'',offRoute:false,recoveredSince:null,vectorSerial:0,idleSince:null,lastIdleReminder:-100});
 /** Deterministic entertainment radio; never uses real ATC frequencies or traffic clearances. */
 export function stepRadio(prev:RadioState,s:FlightState,p:FlightPlan,requestHeading=false):RadioState {
  const next={...prev,calls:[...prev.calls],seen:[...prev.seen]},a=AIRFRAMES[p.aircraftType];
@@ -22,6 +22,11 @@ export function stepRadio(prev:RadioState,s:FlightState,p:FlightPlan,requestHead
  if(!s.fuelExhausted&&stage==='approach'&&s.elapsed-next.lastReminder>20){
   const off=runwayOffset(s,p.arrival),unstable=s.altitude<400&&(s.gearPosition<.98||s.speed>a.approach*1.2||Math.abs(off.cross)>p.arrival.width||Math.abs(headingError(s.heading,runwayHeading(p.arrival)))>20||s.verticalSpeed< -900);
   emit('Approach','final-'+Math.floor(s.elapsed),unstable?'Unstable approach. Go around, full power and climb.':`Continue approach runway ${p.arrival.id.split('/')[0]}. Keep the descent stable.`);next.lastReminder=s.elapsed;
+ }
+ const waiting=stage==='departure'&&s.speed<1&&!s.fuelExhausted&&!s.autopilot;
+ next.idleSince=waiting?(prev.idleSince??s.elapsed):null;
+ if(next.idleSince!==null&&s.elapsed-next.idleSince>=12&&s.elapsed-prev.lastIdleReminder>=30){
+  emit('Tower','runway-idle-'+Math.floor(s.elapsed),`Skyward one, you are still holding on the runway. ${s.brakes?'Release the brakes using the Release brakes button or press B, then smoothly increase throttle.':s.throttle<.5?'Brakes are released. Smoothly increase throttle to begin your takeoff roll.':'Check takeoff power and engine response before continuing.'}`);next.lastIdleReminder=s.elapsed;
  }
  const off=runwayOffset(s,p.arrival),unstable=stage==='approach'&&s.altitude<400&&(s.gearPosition<.98||s.speed>a.approach*1.2||Math.abs(off.cross)>p.arrival.width||Math.abs(headingError(s.heading,runwayHeading(p.arrival)))>20||s.verticalSpeed< -900);
  if(!s.ground&&!s.fuelExhausted&&!unstable&&s.altitude>=200&&!['crashed','landed'].includes(stage)){
