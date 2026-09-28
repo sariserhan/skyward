@@ -1262,3 +1262,9 @@ above still apply. General ground/rotation concepts were checked against the
 [FAA Airplane Flying Handbook](https://www.faa.gov/regulations_policies/handbooks_manuals/aviation/airplane_handbook),
 particularly [Chapter 6](https://www.faa.gov/sites/faa.gov/files/regulations_policies/handbooks_manuals/aviation/airplane_handbook/07_afh_ch6.pdf);
 this simulator is not an FAA-approved training device or an aircraft flight manual.
+
+Aircraft attitude rendering uses a shared bank convention across globe traffic,
+selected flight view, the flyable simulator and cockpit practice. Positive bank
+means a right turn/right wing down; the attitude-indicator horizon counter-rotates.
+Regression tests check actual Cesium quaternion-transformed wing/nose directions,
+heading wraparound, simulator turn direction and cockpit camera axes.

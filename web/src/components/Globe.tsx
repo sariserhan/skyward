@@ -1,3 +1,4 @@
+import {aircraftModelAttitude} from '../lib/aircraftAttitude';
 import {loadGeography} from '../lib/geographyLoader';
 import {SkyBoundary} from './SkyBoundary';
 import type {FlightRequest,FlightScene} from '../lib/watchDiscovery';
@@ -511,7 +512,7 @@ export function Globe(p: Props) {
           e.position=new C.ConstantPositionProperty(pos);
           const heading='heading' in fix?fix.heading:a.heading??0;
           const animation=aircraftAnimation.sample(e,{...fix,groundSpeed:fix.groundSpeed??a.groundSpeed??0},Date.now(),s.preferences.reducedMotion);
-          e.orientation=new C.ConstantProperty(C.Transforms.headingPitchRollQuaternion(pos,new C.HeadingPitchRoll((heading-90)*Math.PI/180,(fix.pitch??0)*Math.PI/180,-animation.bank*Math.PI/180)));if(e.model)applyAircraftRig(e,Date.now()/1000,fix.groundSpeed??a.groundSpeed??0,animation.gear,(fix.turnRate??0)*.1,animation.flaps,heading,fix.ground);
+          e.orientation=new C.ConstantProperty(C.Transforms.headingPitchRollQuaternion(pos,new C.HeadingPitchRoll(...aircraftModelAttitude(heading,fix.pitch??0,animation.bank))));if(e.model)applyAircraftRig(e,Date.now()/1000,fix.groundSpeed??a.groundSpeed??0,animation.gear,(fix.turnRate??0)*.1,animation.flaps,heading,fix.ground);
           if(e.billboard)e.billboard.rotation=new C.ConstantProperty(-heading*Math.PI/180);changed=true;
         }
       }

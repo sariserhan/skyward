@@ -1,3 +1,4 @@
+import {aircraftModelAttitude} from '../lib/aircraftAttitude';
 import {directedView,journeyPhase} from '../lib/arrivalExperience';
 import {sceneViews,type FlightRequest,type FlightScene} from '../lib/watchDiscovery';
 import {aircraftAnimation} from '../lib/aircraftAnimation';
@@ -123,7 +124,7 @@ export function FlightExperience(p:Props){
      shown.position=new C.ConstantPositionProperty(position);shown.orientation=new C.ConstantProperty(C.Transforms.headingPitchRollQuaternion(position,new C.HeadingPitchRoll((heading-90)*Math.PI/180,pitch*Math.PI/180,0)));
     }else{
      if(shown){v.entities.remove(shown);shown=undefined;}
-     if(actual){if(actual.model)actual.model.heightReference=new C.ConstantProperty(C.HeightReference.NONE);if(actual.billboard)actual.billboard.heightReference=new C.ConstantProperty(C.HeightReference.NONE);actual.position=new C.ConstantPositionProperty(position);actual.orientation=new C.ConstantProperty(C.Transforms.headingPitchRollQuaternion(position,new C.HeadingPitchRoll((heading-90)*Math.PI/180,pitch*Math.PI/180,-animation.bank*Math.PI/180)));}
+     if(actual){if(actual.model)actual.model.heightReference=new C.ConstantProperty(C.HeightReference.NONE);if(actual.billboard)actual.billboard.heightReference=new C.ConstantProperty(C.HeightReference.NONE);actual.position=new C.ConstantPositionProperty(position);actual.orientation=new C.ConstantProperty(C.Transforms.headingPitchRollQuaternion(position,new C.HeadingPitchRoll(...aircraftModelAttitude(heading,pitch,animation.bank))));}
     }
    }
    if(!s.demo&&actual)gear(actual,a,animation.gear,fix&&'groundSpeed' in fix?fix.groundSpeed??0:a.groundSpeed??0,movingWheels,heading,animation.flaps,!!fix?.ground);
