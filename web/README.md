@@ -1325,3 +1325,34 @@ The simulator gives a runway-holding reminder after 12 simulated seconds below
 when brakes are released. The controls show brake state separately from the
 button action, with an immediate departure hint. Reminders are suppressed during
 autopilot, fuel exhaustion, landing rollout, and completed or crashed flights.
+
+### Flight training and debrief
+
+The flight simulator includes a preflight checklist (fuel, brake, flaps, trim,
+controls), contextual **Help me** control highlighting, once-per-flight takeoff
+callouts, centreline/glide-path indicators, flare guidance and a touchdown score.
+All coaching uses the entertainment flight model; no live ATC or new paid API is
+involved. Speech uses an available local English browser voice; transcripts work
+without one.
+
+Choose **Training mission** before starting:
+- First takeoff: C172 / Easy, climb through 800 ft; optional autopilot is labelled
+  as assisted. Use **Review flight so far** to pause, review and save the lesson.
+- Traffic pattern: C172 / Easy, same-airport left circuit with crosswind,
+  downwind, base and final legs. The preflight checklist starts collapsed.
+- Crosswind landing: C172 / Advanced, starts on final with a 12 kt crosswind.
+- Engine-out glide: C172 / Advanced, starts airborne two nautical miles from the
+  runway with no usable fuel. Pitch and airspeed management are required.
+
+Debriefs provide route playback, an altitude trace, speed/fuel readouts, warnings,
+practice suggestions and JSON download. Samples are bounded to 1,800 with adaptive
+sampling for long flights; the full replay stays in memory for the current flight.
+Career saves retain the lesson result and touchdown score, not the full replay.
+
+After a successful landing, **Request taxi to stand** selects a connected route
+from the actual stopped position along the remaining mapped runway and taxiways.
+Taxi is explicitly assisted, with a highlighted route, assigned stand, gradual
+acceleration and corner/parking deceleration. It cannot start with exhausted fuel,
+a missing route, or too little runway remaining to find a forward exit. At the
+stand, use **Shut down engines**. Missing geometry never generates an invented
+connection. Taxi time and fuel consumption are included in the flight record.

@@ -1,10 +1,10 @@
 import {navigationGuidance,FUEL_PROFILES,AIRFRAMES,headingError,runwayHeading,runwayOffset,type FlightState,type FlightPlan} from './flightSimulator.ts';
 export interface RadioCall {id:string;time:number;speaker:'Tower'|'Approach'|'Flight deck';text:string;}
-export interface RadioState {stage:string;lastReminder:number;calls:RadioCall[];altitude:number;seen:number[];fuel:'normal'|'low'|'empty';assignedHeading:number|null;lastVector:number;vectorLeg:string;offRoute:boolean;recoveredSince:number|null;vectorSerial:number;idleSince:number|null;lastIdleReminder:number;}
-export const initialRadio=():RadioState=>({stage:'',lastReminder:-100,altitude:3000,seen:[],calls:[],fuel:'normal',assignedHeading:null,lastVector:-100,vectorLeg:'',offRoute:false,recoveredSince:null,vectorSerial:0,idleSince:null,lastIdleReminder:-100});
+export interface RadioState {stage:string;lastReminder:number;calls:RadioCall[];altitude:number;seen:number[];fuel:'normal'|'low'|'empty';assignedHeading:number|null;lastVector:number;vectorLeg:string;offRoute:boolean;recoveredSince:number|null;vectorSerial:number;coached:string[];idleSince:number|null;lastIdleReminder:number;}
+export const initialRadio=():RadioState=>({stage:'',lastReminder:-100,altitude:3000,seen:[],calls:[],fuel:'normal',assignedHeading:null,lastVector:-100,vectorLeg:'',offRoute:false,recoveredSince:null,vectorSerial:0,coached:[],idleSince:null,lastIdleReminder:-100});
 /** Deterministic entertainment radio; never uses real ATC frequencies or traffic clearances. */
 export function stepRadio(prev:RadioState,s:FlightState,p:FlightPlan,requestHeading=false):RadioState {
- const next={...prev,calls:[...prev.calls],seen:[...prev.seen]},a=AIRFRAMES[p.aircraftType];
+ const next={...prev,calls:[...prev.calls],seen:[...prev.seen],coached:[...prev.coached]},a=AIRFRAMES[p.aircraftType];
  const emit=(speaker:RadioCall['speaker'],id:string,text:string)=>{next.calls=[...next.calls,{speaker,id,time:s.elapsed,text}].slice(-8);};
  const stage=s.ground?s.phase==='landed'?'landed':s.phase==='rollout'?'rollout':s.phase==='crashed'?'crashed':'departure':s.phase==='approach'||s.phase==='landing'?'approach':'airborne';
  if(stage!==prev.stage){next.stage=stage;next.lastReminder=s.elapsed;if(prev.stage===''||prev.stage==='departure')next.lastVector=s.elapsed;
@@ -22,6 +22,13 @@ export function stepRadio(prev:RadioState,s:FlightState,p:FlightPlan,requestHead
  if(!s.fuelExhausted&&stage==='approach'&&s.elapsed-next.lastReminder>20){
   const off=runwayOffset(s,p.arrival),unstable=s.altitude<400&&(s.gearPosition<.98||s.speed>a.approach*1.2||Math.abs(off.cross)>p.arrival.width||Math.abs(headingError(s.heading,runwayHeading(p.arrival)))>20||s.verticalSpeed< -900);
   emit('Approach','final-'+Math.floor(s.elapsed),unstable?'Unstable approach. Go around, full power and climb.':`Continue approach runway ${p.arrival.id.split('/')[0]}. Keep the descent stable.`);next.lastReminder=s.elapsed;
+ }
+ const coach=(id:string,text:string)=>{if(!next.coached.includes(id)){next.coached.push(id);emit('Flight deck','coach-'+id,text);}};
+ if(!s.fuelExhausted&&p.lesson!=='crosswind'&&p.lesson!=='glide'){
+  if(stage==='departure'&&s.speed>=Math.min(30,a.rotate*.5))coach('airspeed','Airspeed alive. Maintain runway centreline.');
+  if(stage==='departure'&&s.speed>=a.rotate)coach('rotate',`Rotate. Raise the nose gently at ${a.rotate} knots.`);
+  if(!s.ground&&s.verticalSpeed>100&&s.altitude>100&&s.gear&&p.aircraftType!=='C172')coach('gear','Positive climb. Retract landing gear.');
+  if(!s.ground&&s.altitude>500&&s.speed>a.rotate*1.15&&s.flaps>0)coach('flaps','Climb established. Retract flaps as you accelerate.');
  }
  const waiting=stage==='departure'&&s.speed<1&&!s.fuelExhausted&&!s.autopilot;
  next.idleSince=waiting?(prev.idleSince??s.elapsed):null;

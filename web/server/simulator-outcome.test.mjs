@@ -6,3 +6,7 @@ test('Career retains fictional fuel/crash results and rejects impossible counts'
  for(const patch of [{fatalities:169},{occupants:1000},{fatalities:-1},{fatalities:2.5},{result:'landed'},{fuelRemainingKg:-1},{fuelRemainingKg:Infinity}])assert.throws(()=>validateLibrary('missions',{...result,...patch}));
  const old={...result};for(const k of ['occupants','fatalities','fuelRemainingKg','fuelExhausted'])delete old[k];assert.equal(validateLibrary('missions',old).result,'crashed');
 });
+test('Training career results permit same-airport patterns and preserve lesson and touchdown score',()=>{
+ const pattern={...result,result:'landed',fatalities:0,from:'IAD',to:'IAD',lesson:'pattern',lessonCompleted:true,touchdownScore:85};const saved=validateLibrary('missions',pattern);assert.equal(saved.lesson,'pattern');assert.equal(saved.lessonCompleted,true);assert.equal(saved.touchdownScore,85);
+ for(const patch of [{lesson:'unknown'},{lesson:'free'},{touchdownScore:101},{touchdownScore:-1}])assert.throws(()=>validateLibrary('missions',{...pattern,...patch}));
+});

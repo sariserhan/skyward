@@ -6,8 +6,8 @@ export const AIRFRAMES={B738:{name:'Boeing 737-800',rotate:140,stall:120,approac
 // Gameplay profiles, not operational fuel/load figures for a real aircraft.
 export const FUEL_PROFILES={B738:{capacity:20000,burn:2600,glide:200,crew:6,passengers:162,maxPassengers:188},C172:{capacity:150,burn:24,glide:65,crew:1,passengers:2,maxPassengers:3},C560:{capacity:2500,burn:600,glide:125,crew:2,passengers:6,maxPassengers:7}};
 export interface Point {lat:number;lon:number;}
-export interface FlightPlan {from:string;to:string;departure:Runway;arrival:Runway;difficulty:Difficulty;aircraftType:AircraftType;challenge:'calm'|'crosswind'|'precision';fuelPercent?:number;passengers?:number;}
-export interface FlightState extends Point {altitude:number;speed:number;heading:number;pitch:number;bank:number;verticalSpeed:number;throttle:number;assignedAltitude:number;gear:boolean;gearPosition:number;flaps:number;flapPosition:number;enginePower:number;fuelKg:number;fuelBurnKgHour:number;fuelExhausted:boolean;fatalCrash:boolean;speedbrake:boolean;reverse:boolean;brakes:boolean;trim:number;autopilot:boolean;assisted:boolean;ground:boolean;phase:FlightPhase;elapsed:number;distance:number;touchdownRate:number;warning:string;nav:'departure'|'intercept'|'align'|'final';navOrigin:Point;}
+export interface FlightPlan {lesson?:'free'|'takeoff'|'pattern'|'crosswind'|'glide';from:string;to:string;departure:Runway;arrival:Runway;difficulty:Difficulty;aircraftType:AircraftType;challenge:'calm'|'crosswind'|'precision';fuelPercent?:number;passengers?:number;}
+export interface FlightState extends Point {altitude:number;speed:number;heading:number;pitch:number;bank:number;verticalSpeed:number;throttle:number;assignedAltitude:number;gear:boolean;gearPosition:number;flaps:number;flapPosition:number;enginePower:number;fuelKg:number;fuelBurnKgHour:number;fuelExhausted:boolean;fatalCrash:boolean;speedbrake:boolean;reverse:boolean;brakes:boolean;trim:number;autopilot:boolean;assisted:boolean;ground:boolean;phase:FlightPhase;elapsed:number;distance:number;touchdownRate:number;warning:string;nav:'departure'|'intercept'|'align'|'base'|'final';navOrigin:Point;}
 export interface FlightInput {pitch:number;roll:number;rudder:number;}
 const rad=Math.PI/180,clamp=(n:number,a:number,b:number)=>Math.max(a,Math.min(b,n));
 export const headingError=(to:number,from:number)=>((to-from+540)%360)-180;
@@ -27,6 +27,9 @@ export function initialFlight(plan:FlightPlan):FlightState{return {...movePoint(
 export function navigationLeg(s:FlightState,p:FlightPlan){
  const runway=p.arrival,heading=runwayHeading(runway),offset=runwayOffset(s,runway);
  const target=s.nav==='departure'?movePoint(runwayEnd(p.departure),runwayHeading(p.departure),2):s.nav==='intercept'?movePoint(runwayStart(runway),heading+180,10):s.nav==='align'?movePoint(runwayStart(runway),heading+180,5):movePoint(runwayStart(runway),heading,Math.max(1000,offset.along+1000)/1852);
+ if(p.lesson==='pattern'&&s.nav==='intercept')return {origin:s.navOrigin,target:movePoint(movePoint(runwayEnd(p.departure),runwayHeading(p.departure),1),runwayHeading(p.departure)-90,1.5)};
+ if(p.lesson==='pattern'&&s.nav==='align')return {origin:s.navOrigin,target:movePoint(movePoint(runwayStart(runway),heading+180,3),heading-90,1.5)};
+ if(p.lesson==='pattern'&&s.nav==='base')return {origin:s.navOrigin,target:movePoint(runwayStart(runway),heading+180,3)};
  const origin=s.nav==='final'?movePoint(runwayStart(runway),heading+180,5):s.navOrigin;
  return {origin,target};
 }
@@ -66,8 +69,9 @@ export function stepFlight(previous:FlightState,p:FlightPlan,input:FlightInput,s
   if(s.fuelKg<=0){s.fuelKg=0;s.fuelExhausted=true;s.autopilot=false;}
   if(!s.ground){const before=s.nav;
    if(s.nav==='departure'&&s.altitude>800)s.nav='intercept';
-   if(s.nav==='intercept'&&nauticalMiles(s,intercept)<.45)s.nav='align';
-   if(s.nav==='align'&&nauticalMiles(s,alignment)<.4)s.nav='final';
+   if(s.nav==='intercept'&&nauticalMiles(s,p.lesson==='pattern'?navigationLeg(s,p).target:intercept)<.45)s.nav='align';
+   if(s.nav==='align'&&nauticalMiles(s,p.lesson==='pattern'?navigationLeg(s,p).target:alignment)<.4)s.nav=p.lesson==='pattern'?'base':'final';
+   if(s.nav==='base'&&nauticalMiles(s,navigationLeg(s,p).target)<.25)s.nav='final';
    if(s.nav!==before)s.navOrigin={lat:s.lat,lon:s.lon};
   }
   if(s.autopilot&&p.difficulty==='easy'){
@@ -76,8 +80,8 @@ export function stepFlight(previous:FlightState,p:FlightPlan,input:FlightInput,s
    else if(s.phase==='rollout'){s.throttle=0;s.pitch=0;s.bank=0;s.heading=(s.heading+clamp(headingError(runwayHeading(r)-clamp(offset.cross*.5,-8,8),s.heading),-5*dt,5*dt)+360)%360;}
    else{
     const {error}=navigationGuidance(s,p);s.bank=clamp(error*1.2,-25,25);
-    const final=s.nav==='final',targetAltitude=final?Math.max(0,(350-offset.along)/1852*318):s.nav==='departure'?2500:s.nav==='align'?1650:s.assignedAltitude;
-    const targetSpeed=final||s.nav==='align'||s.nav==='intercept'&&nauticalMiles(s,intercept)<3?a.approach:a.cruise;s.throttle=clamp(.43+(targetSpeed-s.speed)*.018,0,1);
+    const final=s.nav==='final',targetAltitude=final?Math.max(0,(350-offset.along)/1852*318):s.nav==='departure'?2500:p.lesson==='pattern'?1000:s.nav==='align'?1650:s.assignedAltitude;
+    const targetSpeed=final||s.nav==='align'||s.nav==='base'||s.nav==='intercept'&&nauticalMiles(s,intercept)<3?a.approach:a.cruise;s.throttle=clamp(.43+(targetSpeed-s.speed)*.018,0,1);
     s.pitch=final?-3+clamp((targetAltitude-s.altitude)*.012,-3,3):clamp((targetAltitude-s.altitude)*.012,-4,10);if(final&&s.altitude<35)s.pitch=-1;
     s.gear=final||s.altitude<500;s.flaps=final?2:s.altitude<500?1:0;
    }
