@@ -1,11 +1,11 @@
 import type * as Cesium from 'cesium';
 const states=new WeakMap<Cesium.Entity,{time:number;angle:number;heading:number;steer:number;gear:number;flaps:number}>();
-const configurations=new WeakMap<Cesium.Entity,{gear:number;speed:number}>();
+const configurations=new WeakMap<Cesium.Entity,{gear:number;speed:number;ground:boolean}>();
 export const aircraftGearConfiguration=(entity:Cesium.Entity)=>configurations.get(entity);
 /** Animate known fallback nodes; sourced airframes use an independent gear overlay. */
-export function applyAircraftRig(entity:Cesium.Entity,seconds:number,speed:number,gear:number,steering:number,flaps:number,heading?:number){
+export function applyAircraftRig(entity:Cesium.Entity,seconds:number,speed:number,gear:number,steering:number,flaps:number,heading?:number,ground=false){
  if(!entity.model)return;
- configurations.set(entity,{gear,speed});
+ configurations.set(entity,{gear,speed,ground});
  if(!String(entity.model.uri?.getValue(window.Cesium.JulianDate.now())??'').includes('/models/fleet/'))return;
  const old=states.get(entity)??{time:seconds,angle:0,heading:heading??0,steer:0,gear,flaps},dt=Math.max(0,Math.min(2,seconds-old.time));old.angle=(old.angle+dt*Math.max(0,speed)*.514444/.4)%(Math.PI*2);if(heading!==undefined&&dt>0&&speed>1)steering=Math.max(-.5,Math.min(.5,(((heading-old.heading+540)%360)-180)/dt*.04));old.steer+=(steering-old.steer)*(1-Math.exp(-dt*6));old.gear+=Math.max(-dt*.4,Math.min(dt*.4,gear-old.gear));old.flaps+=Math.max(-dt*.3,Math.min(dt*.3,flaps-old.flaps));old.heading=heading??old.heading;old.time=seconds;states.set(entity,old);const C=window.Cesium,g=Math.max(0,Math.min(1,old.gear)),roll=C.Quaternion.fromAxisAngle(C.Cartesian3.UNIT_X,old.angle),steer=C.Quaternion.fromAxisAngle(C.Cartesian3.UNIT_Y,Math.max(-.5,Math.min(.5,old.steer))),nose=C.Quaternion.multiply(steer,roll,new C.Quaternion()),flap=C.Quaternion.fromAxisAngle(C.Cartesian3.UNIT_X,-Math.max(0,Math.min(1,old.flaps))*.6);
  entity.model.nodeTransformations=new C.PropertyBag({Gear:new C.TranslationRotationScale(new C.Cartesian3(0,(1-g)*3.5,0),C.Quaternion.IDENTITY,new C.Cartesian3(g<=.001?0:1,g<=.001?0:1,g<=.001?0:1)),WheelN:new C.TranslationRotationScale(C.Cartesian3.ZERO,nose),WheelL:new C.TranslationRotationScale(C.Cartesian3.ZERO,roll),WheelR:new C.TranslationRotationScale(C.Cartesian3.ZERO,roll),FlapL:new C.TranslationRotationScale(C.Cartesian3.ZERO,flap),FlapR:new C.TranslationRotationScale(C.Cartesian3.ZERO,flap)});

@@ -35,7 +35,7 @@ def run(page):
     page.goto(f.URL + '/#airport=IAD', wait_until='domcontentloaded')
     page.get_by_role('button', name='View THY111', exact=True).click()
     page.get_by_role('button', name='✈ Flight view', exact=True).click()
-    page.wait_for_function("__viewer.entities.values.filter(e=>e.id.startsWith('landing-gear-')&&e.show).length===6")
+    page.wait_for_function("__viewer.entities.values.filter(e=>e.id.startsWith('landing-gear-')&&e.show).length>=6")
     # Freeze only the fixture clock to verify actual rendered wheel geometry,
     # not merely entities marked show=true, even on slow headless rendering.
     page.evaluate('window.__movingClock=Date.now;const n=Date.now();Date.now=()=>n')

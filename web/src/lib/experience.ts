@@ -17,7 +17,7 @@ export function parseView(hash: string) {
   const airport: AirportId = validAirport(q.get('airport') || '') ? q.get('airport')! : 'IAD';
   const hex = q.get('aircraft') || '';
   const facility = q.get('facility') || '';
-  return { airport, sceneView:q.get('scene')==='flight'&&['side','chase','front','cockpit','cabin','bird','orbit','area'].includes(q.get('view')??'')?q.get('view'):null, camera:q.get('mode')==='2D'?null:parseCamera(q.get('camera')), mode: q.get('mode') === '2D' ? '2D' as const : '3D' as const,
+  return { airport, sceneView:q.get('scene')==='flight'&&['side','chase','front','cockpit','cabin','bird','wing','tail','director','orbit','area'].includes(q.get('view')??'')?q.get('view'):null, camera:q.get('mode')==='2D'?null:parseCamera(q.get('camera')), mode: q.get('mode') === '2D' ? '2D' as const : '3D' as const,
     aircraft: /^[a-f\d]{6}$/i.test(hex) ? hex.toLowerCase() : '',
     facility: /^facility-[A-Z0-9-]{3,12}-\d{1,6}$/.test(facility) && facility.startsWith(`facility-${airport}-`) ? facility : '',
     hasView: q.has('airport') || /^[a-f\d]{6}$/i.test(hex) };
