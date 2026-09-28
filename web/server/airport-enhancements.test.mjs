@@ -15,7 +15,7 @@ test('ground turnarounds retain continuous positions through services, pushback,
  const plan=groundPlan(airport);assert.ok(plan);const phases=new Set();let previous;
  for(let t=0;t<=plan.end+1;t+=.05){const f=groundFrame(plan,t);phases.add(f.phase);assert.ok(Number.isFinite(f.heading));if(previous)assert.ok(trackDistance(previous,f)*1852<20,`jump at ${t}`);previous=f;}
  for(const phase of ['taxi in','gate service','pushback','taxi out','takeoff','complete'])assert.ok(phases.has(phase),phase);
- const departure=plan.taxiSeconds*2+48.75,left=groundFrame(plan,departure-.01),right=groundFrame(plan,departure+.01);assert.ok(Math.abs(((right.heading-left.heading+540)%360)-180)<1);
+ const departure=plan.taxiSeconds+plan.outboundSeconds+48.75,left=groundFrame(plan,departure-.01),right=groundFrame(plan,departure+.01);assert.ok(Math.abs(((right.heading-left.heading+540)%360)-180)<1);
  assert.equal(groundPlan({...airport,paths:[]}),null);
  assert.ok(groundPlan(JSON.parse(readFileSync(new URL('../public/data/airports/IAD.json',import.meta.url)))));
 });

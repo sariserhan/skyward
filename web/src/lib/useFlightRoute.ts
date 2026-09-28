@@ -1,3 +1,4 @@
+import {rememberSearchRoute} from './flightSearch';
 import { useEffect, useRef, useState } from 'react';
 import type { Aircraft, FlightRoute } from '../types';
 export function useFlightRoute(aircraft: Aircraft | null) {
@@ -16,7 +17,7 @@ export function useFlightRoute(aircraft: Aircraft | null) {
         const response = await fetch(`/api/route?callsign=${encodeURIComponent(a.callsign)}&lat=${a.lat}&lon=${a.lon}`, { signal: AbortSignal.any([controller.signal, AbortSignal.timeout(25000)]) });
         if (!response.ok) throw new Error('Route lookup unavailable. Live aircraft positions are unaffected.');
         const data: FlightRoute = await response.json();
-        if (!controller.signal.aborted) setState({key, data, error: '', loading: false});
+        if (!controller.signal.aborted) {rememberSearchRoute(a,data);setState({key, data, error: '', loading: false});}
       } catch (e) { if (!controller.signal.aborted) setState(previous=>({key,data:previous.key===key?previous.data:null,error:e instanceof Error?e.message:'Route unavailable',loading:false})); }
       finally { busy = false; }
     }

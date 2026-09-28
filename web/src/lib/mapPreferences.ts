@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 export interface MapPreferences { batterySaver:boolean; resumeView:boolean; offlineMaps:boolean; autoQuality:boolean; lighting:'natural'; shadows:boolean; quality:'low'|'balanced'|'high'; declutter:boolean; basemap: 'satellite' | 'atlas'; structures: boolean; labels: boolean; grid: boolean; terrain: boolean; reducedMotion:boolean; largeLabels:boolean; highContrast:boolean; }
-const defaults: MapPreferences = { batterySaver:false,resumeView:false, offlineMaps:true,autoQuality:true,lighting:'natural',shadows:true,quality:'balanced',declutter:true,basemap: 'satellite', structures: true, labels: true, grid: false, terrain:false, reducedMotion:matchMedia('(prefers-reduced-motion: reduce)').matches,largeLabels:false,highContrast:false };
+const compactDevice=matchMedia('(max-width: 759px) and (pointer: coarse)').matches;
+const defaults: MapPreferences = { batterySaver:false,resumeView:false, offlineMaps:true,autoQuality:true,lighting:'natural',shadows:!compactDevice,quality:compactDevice?'low':'balanced',declutter:true,basemap: 'satellite', structures: !compactDevice, labels: true, grid: false, terrain:false, reducedMotion:matchMedia('(prefers-reduced-motion: reduce)').matches,largeLabels:false,highContrast:false };
 export function useMapPreferences() {
   const [preferences, setPreferences] = useState<MapPreferences>(() => {
     try {

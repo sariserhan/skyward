@@ -13,6 +13,7 @@ export function TowerRadar({viewer,airport,observations,target,select,reduced,su
  const readout=(a:Aircraft)=>radarReadout(a,cockpit&&relative?ownAltitude:undefined);
  useEffect(()=>{if(!large)return;const escape=(e:KeyboardEvent)=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();setLarge(false);}};window.addEventListener('keydown',escape,true);return()=>window.removeEventListener('keydown',escape,true);},[large]);
  const [expanded,setExpanded]=useState(()=>cockpit||window.innerWidth>=760),[range,setRange]=useState(10),[ground,setGround]=useState(true),[labels,setLabels]=useState(true),[tracks,setTracks]=useState<Track[]>([]),[now,setNow]=useState(Date.now());
+ useEffect(()=>{const media=matchMedia('(max-width: 759px)');const compact=()=>{if(media.matches){if(!cockpit)setExpanded(false);setLarge(false);}};media.addEventListener('change',compact);return()=>media.removeEventListener('change',compact);},[cockpit]);
  const clip=useId().replace(/:/g,''),history=useRef(new Map<string,{time:number;points:RadarPoint[]}>());
  const state=useRef({observations,viewer,airport,reduced,suspended,excludeHex});state.current={observations,viewer,airport,reduced,suspended,excludeHex};
  useEffect(()=>{history.current.clear();setTracks([]);},[airport.id]);

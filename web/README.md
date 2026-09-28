@@ -929,3 +929,12 @@ small surface offset and alpha masking to avoid transparent-layer sorting and
 surface flicker. All sourced branding variants and illustrative fallback logos
 are regenerated locally; supplied full-aircraft livery textures remain intact.
 Model and shared-buffer URLs carry a tail revision so cached assets refresh.
+
+
+Flight experience refinements: the full-aircraft livery catalog now contains 34 pinned, Git-object-verified community paints (737-800 and A320), including fuselage and engine textures. Other types retain the higher, silhouette-fitted tail overlays. Paint can be historical and is not registration-specific. Taxi animation uses a cached curvature/acceleration profile to slow through bends and reach the stand before service; approach arc tables are cached, and long-outage corrections blend for up to 30 seconds. Mapped landing/taxi trajectories remain illustrative, separate from observation history; disconnected ground geometry does not fabricate a route.
+
+Tower auto-director starts enabled, offers arrival/departure filtering, an explicit next-flight action and the current callsign, and releases camera aiming when dragged. Cockpit ambience distinguishes piston, turboprop, business jet, narrowbody and heavy jet profiles; practice gear changes and touchdown transitions have synthesized effects. Optional altitude callouts use a local English device voice when available, otherwise a chime. Unknown ground elevation suppresses altitude cues; joining a flight or a large position jump does not trigger a backlog. Audio stops on mute, hidden tabs, pause and cockpit exit.
+
+Search combines callsign, airline, aircraft type, registration, origin and destination. Route fields use plausible routes opened in the current session, keyed by aircraft and callsign and expired after 30 minutes (200-entry cap); they do not launch bulk aviation requests. Flights with unknown routes do not match route filters. Mobile search fields and tower controls have larger touch targets; secondary footer actions sit under More, and new small touch devices start with lower rendering detail and no shadows/buildings. Existing device settings remain respected.
+
+Camera-feed recovery retains the last successful fetch time and original observations, displays a compact retry countdown, and backs off repeated failures (70, 140, then 180 seconds, normal cycle 35 seconds). HTTP Retry-After seconds and dates take precedence; manual retries and reconnect events respect provider cooldowns. No paid APIs are introduced by these changes.

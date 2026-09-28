@@ -43,11 +43,24 @@ export function planTaxi(airport:AirportGeometry,from:{lon:number;lat:number},to
  const length=meters.at(-1)!;if(length<20||length>10000)return fail();
  const route={stop:geo(stop),points:smooth.map(geo),meters,length,gate:gates.get(end)!};plans.set(key,route);return route;
 }
+const profiles=new WeakMap<TaxiRoute,{times:number[];speeds:number[];distances:number[]}>();
+/** Limit lateral acceleration through corners and brake smoothly into the stand. */
+export function taxiSpeedProfile(route:TaxiRoute){
+ const cached=profiles.get(route);if(cached)return cached;
+ const distances=[0];for(let d=2;d<route.length;d+=2)distances.push(d);distances.push(route.length);
+ const at=(d:number)=>{let k=1;while(k<route.meters.length-1&&route.meters[k]<d)k++;const f=(d-route.meters[k-1])/Math.max(.001,route.meters[k]-route.meters[k-1]),a=route.points[k-1],b=route.points[k];return {lon:a.lon+(b.lon-a.lon)*f,lat:a.lat+(b.lat-a.lat)*f};};
+ const speeds=distances.map(d=>{if(d<4||d>route.length-4)return 6;const angle=Math.abs(((bearing(at(d),at(d+4))-bearing(at(d-4),at(d))+540)%360)-180)*Math.PI/180;return Math.min(6,Math.sqrt(.8/Math.max(.001,angle/4)));});
+ speeds[speeds.length-1]=0;
+ for(let i=speeds.length-2;i>=0;i--)speeds[i]=Math.min(speeds[i],Math.sqrt(speeds[i+1]**2+1.6*(distances[i+1]-distances[i])));
+ for(let i=1;i<speeds.length;i++)speeds[i]=Math.min(speeds[i],Math.sqrt(speeds[i-1]**2+1.2*(distances[i]-distances[i-1])));
+ const times=[0];for(let i=1;i<distances.length;i++)times.push(times[i-1]+2*(distances[i]-distances[i-1])/Math.max(.01,speeds[i]+speeds[i-1]));
+ const profile={times,speeds,distances};profiles.set(route,profile);return profile;
+}
 export function taxiFrame(route:TaxiRoute,seconds:number){
- const speed=6,brake=Math.min(40,route.length/2),cruise=(route.length-brake)/speed,brakeTime=2*brake/speed,t=Math.max(0,seconds),b=Math.min(brakeTime,Math.max(0,t-cruise));
- const d=t<=cruise?t*speed:route.length-brake+speed*b-speed*b*b/(2*brakeTime);
- let i=1;while(i<route.meters.length-1&&route.meters[i]<d)i++;
- const f=Math.max(0,Math.min(1,(d-route.meters[i-1])/Math.max(.001,route.meters[i]-route.meters[i-1]))),a=route.points[i-1],z=route.points[i];
+ const {times,speeds,distances}=taxiSpeedProfile(route),t=Math.max(0,seconds),parked=t>=times.at(-1)!;
+ let segment=1;while(segment<times.length-1&&times[segment]<t)segment++;
+ const elapsed=Math.min(t-times[segment-1],times[segment]-times[segment-1]),acceleration=(speeds[segment]-speeds[segment-1])/(times[segment]-times[segment-1]);
+ const d=parked?route.length:distances[segment-1]+speeds[segment-1]*elapsed+.5*acceleration*elapsed**2;
  const at=(distance:number)=>{const x=Math.max(0,Math.min(route.length,distance));let k=1;while(k<route.meters.length-1&&route.meters[k]<x)k++;const u=(x-route.meters[k-1])/Math.max(.001,route.meters[k]-route.meters[k-1]),p=route.points[k-1],q=route.points[k];return {lon:p.lon+(q.lon-p.lon)*u,lat:p.lat+(q.lat-p.lat)*u};};
- return {lon:a.lon+(z.lon-a.lon)*f,lat:a.lat+(z.lat-a.lat)*f,heading:bearing(at(d-3),at(d+3)),groundSpeed:t<=cruise?speed/.514444:Math.max(0,speed*(1-b/brakeTime))/.514444,parked:t>=cruise+brakeTime,gate:route.gate};
+ return {...at(d),heading:bearing(at(d-3),at(d+3)),groundSpeed:parked?0:Math.max(0,speeds[segment-1]+acceleration*elapsed)/.514444,parked,gate:route.gate};
 }

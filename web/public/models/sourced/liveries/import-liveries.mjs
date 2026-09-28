@@ -8,8 +8,8 @@ import {createHash} from 'node:crypto';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),out=path.join(root,'public/models/sourced/liveries');
 await fs.mkdir(out,{recursive:true});
 const sources=[
- {repo:'FGMEMBERS/737-800',commit:'9126249dd0236479ad723f3e7c4c7139455c7d81',license:'LICENSE',model:'b738',images:[0],entries:{THY:'THY-800',UAL:'UAL',AAL:'AAL',DAL:'DAL',KLM:'KLM-800',RYR:'RYR-800',QFA:'QFA-800'},folder:'Models/Liveries-800/'},
- {repo:'FGMEMBERS/A320-family',commit:'00038142d3443d7f4aec9410520df608e8ae7ba8',license:'COPYING',model:'a320',images:[0],entries:{AFR:'A320-AFR',BAW:'A320-BAW',DLH:'A320-DLH',EZY:'A320-EZY',UAL:'A320-UAL'},folder:'Models/Liveries/'}
+ {repo:'FGMEMBERS/737-800',commit:'9126249dd0236479ad723f3e7c4c7139455c7d81',license:'LICENSE',model:'b738',images:[0],entries:{THY:'THY-800',UAL:'UAL',AAL:'AAL',DAL:'DAL',KLM:'KLM-800',RYR:'RYR-800',QFA:'QFA-800',ASA:'ASA',CAL:'CAL',GIA:'GIA',KAL:'KAL',CMP:'CMP',MSR:'MSR new',TRA:'TRA-800'},folder:'Models/Liveries-800/'},
+ {repo:'FGMEMBERS/A320-family',commit:'00038142d3443d7f4aec9410520df608e8ae7ba8',license:'COPYING',model:'a320',images:[0],entries:{AFR:'A320-AFR',BAW:'A320-BAW',DLH:'A320-DLH',EZY:'A320-EZY',UAL:'A320-UAL',ACA:'A320-ACA',DAL:'A320-DAL',JBU:'A320-231/JBU',WZZ:'A320-231/WZZ',ANZ:'A320-ANZ',EIN:'A320-EIN',IBE:'A320-IBE',FIN:'A320-FIN',SWR:'A320-SWR',IGO:'A320-IGO',TAP:'A320-211/A320-TAP-SA',AVA:'A320-AVA',VLG:'A320-211/VLG',NKS:'A320-231/NKS',JST:'A320-JST'},folder:'Models/Liveries/'}
 ];
 const files=[],catalog=[];
 for(const source of sources){

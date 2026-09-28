@@ -263,3 +263,12 @@ body>.cesium-credit-lightbox-overlay .cesium-credit-lightbox-close{min-width:36p
 
 .discovery-feedback{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
 .cockpit-audio{display:flex;flex-wrap:wrap;gap:6px;align-items:center;pointer-events:auto;max-width:100%}.cockpit-audio label{display:flex;align-items:center;gap:5px;font-size:10px}.cockpit-audio input{width:75px;accent-color:#b3efb2}.cockpit-audio small{font-size:8px;color:#a8bfbe}@media(max-width:480px){.cockpit-audio{gap:4px}.cockpit-audio input{width:65px}.cockpit-audio small{flex-basis:100%}}
+
+/* Keep search and tower controls comfortably usable on touch screens. */
+.tower-now{display:flex;flex-direction:column;gap:4px;padding:10px;margin:8px 0;border:1px solid #4c776f;border-radius:8px;background:#112e34}.tower-now strong{color:#c3eddd}.tower-director-filter{display:flex;align-items:center;gap:8px}.tower-director-filter select{min-width:0;flex:1}.search-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.search-fields label{min-width:0}.search-fields input{box-sizing:border-box;width:100%}.quick-search{overscroll-behavior:contain}.quick-search li button{min-height:44px}
+@media(max-width:759px){
+ .quick-search{width:calc(100vw - 24px);max-height:calc(100dvh - 32px);padding:16px}.search-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.quick-search input{font-size:16px;min-height:44px}.quick-search .dialog-heading{position:sticky;top:-16px;background:#102633;padding:10px 0;z-index:2}
+ .tower-view button,.tower-view select,.tower-view summary,.tower-radar:not(.cockpit-radar) button,.unified-map-tools>summary,.focus-toggle,.statusbar>.quiet-button{min-height:44px}.tower-view summary{display:flex;align-items:center}.tower-view{overscroll-behavior:contain;scrollbar-gutter:stable}.tower-director-filter{flex-wrap:wrap}.tower-director-filter select{width:100%}.tower-view .tower-now{position:sticky;top:0;z-index:1;background:#112e34}
+ .cockpit-audio{gap:5px}.cockpit-audio label:has(input[type=checkbox]){min-height:32px}.cockpit-audio input[type=checkbox]{width:18px;height:18px}.cockpit-audio input[type=range]{min-height:32px}.cockpit-audio small{max-width:230px;line-height:1.4}
+ .statusbar:not(.mobile-more-open)>.discover-trigger{display:none!important}.statusbar>.simulation-link{display:none!important}.statusbar.mobile-more-open>.simulation-link{display:inline-flex!important;min-height:44px}.statusbar{padding-bottom:max(5px,env(safe-area-inset-bottom))}
+}

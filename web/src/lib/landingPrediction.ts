@@ -6,6 +6,7 @@ const radians=Math.PI/180;
 const wrap=(n:number)=>((n+540)%360+360)%360-180;
 const clamp=(v:number,a:number,b:number)=>Math.max(a,Math.min(b,v));
 type Point={x:number;y:number};
+const approachArcs=new WeakMap<AirportGeometry,Map<string,number[]>>();
 export type LandingPhase='approach'|'rollout'|'stopped'|'taxi'|'parked';
 /** A presentation trajectory only. Never persist this as an aircraft observation. */
 export function predictedLanding(a:Aircraft,now:number,route:FlightRoute|null|undefined,airport:AirportGeometry|null|undefined){
@@ -45,7 +46,9 @@ export function predictedLanding(a:Aircraft,now:number,route:FlightRoute|null|un
  const p1={x:p0.x+Math.sin(a.heading!*radians)*dist/3,y:p0.y+Math.cos(a.heading!*radians)*dist/3};
  const p2={x:touch.x-Math.sin(heading*radians)*Math.min(dist/3,.65),y:touch.y-Math.cos(heading*radians)*Math.min(dist/3,.65)};
  const curve=(t:number)=>{const u=1-t;return {x:u*u*u*p0.x+3*u*u*t*p1.x+3*u*t*t*p2.x+t*t*t*touch.x,y:u*u*u*p0.y+3*u*u*t*p1.y+3*u*t*t*p2.y+t*t*t*touch.y};};
- const segments=256,arc=[0];let prior=p0;for(let i=1;i<=segments;i++){const p=curve(i/segments);arc.push(arc[i-1]+Math.hypot(p.x-prior.x,p.y-prior.y));prior=p;}
+ const segments=256,key=[a.hex,a.observedAt,a.lat,a.lon,a.heading,a.groundSpeed,id].join('/');
+ let arcs=approachArcs.get(airport);if(!arcs){arcs=new Map();approachArcs.set(airport,arcs);}let arc=arcs.get(key);
+ if(!arc){arc=[0];let prior=p0;for(let i=1;i<=segments;i++){const p=curve(i/segments);arc.push(arc[i-1]+Math.hypot(p.x-prior.x,p.y-prior.y));prior=p;}arcs.set(key,arc);while(arcs.size>256)arcs.delete(arcs.keys().next().value!);}
  const pathLength=arc[segments],approachSeconds=pathLength/((a.groundSpeed!+touchdownSpeed)/2)*3600;
  const base={time:a.observedAt!,age:age*1000,estimated:true as const,predictionLimited:false,runway:id};
  if(age<approachSeconds){
@@ -61,7 +64,7 @@ export function predictedLanding(a:Aircraft,now:number,route:FlightRoute|null|un
  }
  const taxi=planTaxi(airport,geo(start),geo(end));
  const stop=taxi?local(taxi.stop.lon,taxi.stop.lat):{x:start.x+(end.x-start.x)*.85,y:start.y+(end.y-start.y)*.85},rollDistance=Math.hypot(stop.x-touch.x,stop.y-touch.y);
- const exitSpeed=taxi?6/.514444:0,rollSeconds=2*rollDistance/(touchdownSpeed+exitSpeed)*3600,t=clamp((age-approachSeconds)/rollSeconds,0,1),progress=(touchdownSpeed*t+(exitSpeed-touchdownSpeed)*t*t/2)/((touchdownSpeed+exitSpeed)/2);
+ const exitSpeed=taxi?taxiFrame(taxi,0).groundSpeed:0,rollSeconds=2*rollDistance/(touchdownSpeed+exitSpeed)*3600,t=clamp((age-approachSeconds)/rollSeconds,0,1),progress=(touchdownSpeed*t+(exitSpeed-touchdownSpeed)*t*t/2)/((touchdownSpeed+exitSpeed)/2);
  if(taxi&&age>=approachSeconds+rollSeconds){const ground=taxiFrame(taxi,age-approachSeconds-rollSeconds);return {...base,...ground,altitude:airport.elevationFt!,ground:true,pitch:0,landingPhase:(ground.parked?'parked':'taxi') as LandingPhase};}
  return {...base,...geo({x:touch.x+(stop.x-touch.x)*progress,y:touch.y+(stop.y-touch.y)*progress}),altitude:airport.elevationFt!,ground:true,heading,pitch:4*(1-Math.min(1,(age-approachSeconds)/4)**2*(3-2*Math.min(1,(age-approachSeconds)/4))),groundSpeed:touchdownSpeed+(exitSpeed-touchdownSpeed)*t,landingPhase:(t<1?'rollout':'stopped') as LandingPhase};
 }

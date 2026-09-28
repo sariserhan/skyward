@@ -16,7 +16,14 @@
         "DAL": "DAL",
         "KLM": "KLM-800",
         "RYR": "RYR-800",
-        "QFA": "QFA-800"
+        "QFA": "QFA-800",
+        "ASA": "ASA",
+        "CAL": "CAL",
+        "GIA": "GIA",
+        "KAL": "KAL",
+        "CMP": "CMP",
+        "MSR": "MSR new",
+        "TRA": "TRA-800"
       },
       "folder": "Models/Liveries-800/"
     },
@@ -33,7 +40,22 @@
         "BAW": "A320-BAW",
         "DLH": "A320-DLH",
         "EZY": "A320-EZY",
-        "UAL": "A320-UAL"
+        "UAL": "A320-UAL",
+        "ACA": "A320-ACA",
+        "DAL": "A320-DAL",
+        "JBU": "A320-231/JBU",
+        "WZZ": "A320-231/WZZ",
+        "ANZ": "A320-ANZ",
+        "EIN": "A320-EIN",
+        "IBE": "A320-IBE",
+        "FIN": "A320-FIN",
+        "SWR": "A320-SWR",
+        "IGO": "A320-IGO",
+        "TAP": "A320-211/A320-TAP-SA",
+        "AVA": "A320-AVA",
+        "VLG": "A320-211/VLG",
+        "NKS": "A320-231/NKS",
+        "JST": "A320-JST"
       },
       "folder": "Models/Liveries/"
     }
@@ -130,6 +152,84 @@
       "bytes": 272
     },
     {
+      "file": "b738-ASA.png",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/737-800/9126249dd0236479ad723f3e7c4c7139455c7d81/Models/Liveries-800/ASA.png",
+      "sha256": "40fd98fe43bf64a1511eeb77d9cd738e4d5b31bdca61edec03fc2d61212151f7",
+      "bytes": 400462
+    },
+    {
+      "file": "b738-ASA.xml",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/737-800/9126249dd0236479ad723f3e7c4c7139455c7d81/Models/Liveries-800/ASA.xml",
+      "sha256": "985b4bc3a5adc9a1cdb150b533fb1962458c6c31f8dceb7834d04d6b73cefada",
+      "bytes": 276
+    },
+    {
+      "file": "b738-CAL.png",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/737-800/9126249dd0236479ad723f3e7c4c7139455c7d81/Models/Liveries-800/CAL.png",
+      "sha256": "9f2fdd293a02b4c71a816ca3225c05b17ea9051e5630034f96421116e9aba23a",
+      "bytes": 569617
+    },
+    {
+      "file": "b738-CAL.xml",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/737-800/9126249dd0236479ad723f3e7c4c7139455c7d81/Models/Liveries-800/CAL.xml",
+      "sha256": "f65503048fa919e0ca46410210d56d61e26c02e690d2afd51e73573291d6629e",
+      "bytes": 275
+    },
+    {
+      "file": "b738-GIA.png",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/737-800/9126249dd0236479ad723f3e7c4c7139455c7d81/Models/Liveries-800/GIA.png",
+      "sha256": "92b4d064410b77c94e6772fbe29e84909afabb153305514c8597b0a7549e453e",
+      "bytes": 524172
+    },
+    {
+      "file": "b738-GIA.xml",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/737-800/9126249dd0236479ad723f3e7c4c7139455c7d81/Models/Liveries-800/GIA.xml",
+      "sha256": "a4c48144c7e9fe6f79ed920b8207312c1e3e537b5cd4581ca3fcb883335c98e7",
+      "bytes": 278
+    },
+    {
+      "file": "b738-KAL.png",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/737-800/9126249dd0236479ad723f3e7c4c7139455c7d81/Models/Liveries-800/KAL.png",
+      "sha256": "85fe858024bf567d4753858ee691fa56da18df5a4d9e21deb5822753a668dec9",
+      "bytes": 289548
+    },
+    {
+      "file": "b738-KAL.xml",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/737-800/9126249dd0236479ad723f3e7c4c7139455c7d81/Models/Liveries-800/KAL.xml",
+      "sha256": "c2435957140b4955b8126423758f25af8d60fe3c3b24e4005d19dacd0b8467a3",
+      "bytes": 272
+    },
+    {
+      "file": "b738-CMP.png",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/737-800/9126249dd0236479ad723f3e7c4c7139455c7d81/Models/Liveries-800/CMP.png",
+      "sha256": "b446b88d7ec9c1741eb8dc234b13cdb213447e4c5dbe030cebc4e9135f76de78",
+      "bytes": 345540
+    },
+    {
+      "file": "b738-CMP.xml",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/737-800/9126249dd0236479ad723f3e7c4c7139455c7d81/Models/Liveries-800/CMP.xml",
+      "sha256": "56642d1f4d89afa11f1fb087dbe7c800dbd0192e2c78ff2d2866528d49df237c",
+      "bytes": 274
+    },
+    {
+      "file": "b738-MSR.png",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/737-800/9126249dd0236479ad723f3e7c4c7139455c7d81/Models/Liveries-800/MSR new.png",
+      "sha256": "2d381f1266fad7eea55c16be25cfd2fc6d8e92cc9bc28c056481a6ccf4c67e1d",
+      "bytes": 620196
+    },
+    {
+      "file": "b738-MSR.xml",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/737-800/9126249dd0236479ad723f3e7c4c7139455c7d81/Models/Liveries-800/MSR new.xml",
+      "sha256": "a147681f6ba8236e937c97f6547de0616e8bac3408570b4a4e48130f527b442f",
+      "bytes": 285
+    },
+    {
+      "file": "b738-TRA.png",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/737-800/9126249dd0236479ad723f3e7c4c7139455c7d81/Models/Liveries-800/TRA-800.png",
+      "sha256": "c7f4204df6d8ec2f75c0421ee2f70815dec24d30daa5bd6d98ebaf703a65071a",
+      "bytes": 295693
+    },
+    {
       "file": "a320-LICENSE.txt",
       "source": "https://raw.githubusercontent.com/FGMEMBERS/A320-family/00038142d3443d7f4aec9410520df608e8ae7ba8/COPYING",
       "sha256": "dcc100d4161cc0b7177545ab6e47216f84857cda3843847c792a25289852dcaa",
@@ -164,6 +264,120 @@
       "source": "https://raw.githubusercontent.com/FGMEMBERS/A320-family/00038142d3443d7f4aec9410520df608e8ae7ba8/Models/Liveries/A320-UAL.png",
       "sha256": "f040edf52e1b898b2122c9673ec179b4fa038d6414facc055863fee8e16df302",
       "bytes": 476836
+    },
+    {
+      "file": "a320-ACA.png",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/A320-family/00038142d3443d7f4aec9410520df608e8ae7ba8/Models/Liveries/A320-ACA.png",
+      "sha256": "7aed181e5dd2eed124043bb8ed162b19982b9a072b88f526789a14b05f262b3d",
+      "bytes": 655534
+    },
+    {
+      "file": "a320-DAL.png",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/A320-family/00038142d3443d7f4aec9410520df608e8ae7ba8/Models/Liveries/A320-DAL.png",
+      "sha256": "87ea63ae05b4412d66c98f941b7cb202293e177c80b001df3f58e9dbaa71d5ad",
+      "bytes": 563885
+    },
+    {
+      "file": "a320-JBU.png",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/A320-family/00038142d3443d7f4aec9410520df608e8ae7ba8/Models/Liveries/A320-231/JBU.png",
+      "sha256": "63c08283f5227f25e9acf87e06a4db88585fe63212dd6514c9c1de05e875b87f",
+      "bytes": 483564
+    },
+    {
+      "file": "a320-JBU.xml",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/A320-family/00038142d3443d7f4aec9410520df608e8ae7ba8/Models/Liveries/A320-231/JBU.xml",
+      "sha256": "66931e1f103095555d38eb56769dd28b24e1ec8d3c2a6e0f63917c512a4f99af",
+      "bytes": 215
+    },
+    {
+      "file": "a320-WZZ.png",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/A320-family/00038142d3443d7f4aec9410520df608e8ae7ba8/Models/Liveries/A320-231/WZZ.png",
+      "sha256": "794c25a3f361973073300a64539cf6141a67370faa4fcdc7a12d12241456b109",
+      "bytes": 444025
+    },
+    {
+      "file": "a320-WZZ.xml",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/A320-family/00038142d3443d7f4aec9410520df608e8ae7ba8/Models/Liveries/A320-231/WZZ.xml",
+      "sha256": "f42d6bbd5fe0ae0a6bd255f1315d3905324c005f95c492a614b7628fe980b9a1",
+      "bytes": 208
+    },
+    {
+      "file": "a320-ANZ.png",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/A320-family/00038142d3443d7f4aec9410520df608e8ae7ba8/Models/Liveries/A320-ANZ.png",
+      "sha256": "4c925930d75b0f8a8270ba2b38228f48832cd264795ad2e055fddab0d743e87a",
+      "bytes": 1465780
+    },
+    {
+      "file": "a320-EIN.png",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/A320-family/00038142d3443d7f4aec9410520df608e8ae7ba8/Models/Liveries/A320-EIN.png",
+      "sha256": "245aa9e87fe7c39ced3844febdebf62534255c0cefeb7440eb1a47491e438804",
+      "bytes": 453599
+    },
+    {
+      "file": "a320-IBE.png",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/A320-family/00038142d3443d7f4aec9410520df608e8ae7ba8/Models/Liveries/A320-IBE.png",
+      "sha256": "65d858c592a7bd3fdf74422fc042bdcd7d1c4c61e074826ecb1d4d53470845f3",
+      "bytes": 466275
+    },
+    {
+      "file": "a320-FIN.png",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/A320-family/00038142d3443d7f4aec9410520df608e8ae7ba8/Models/Liveries/A320-FIN.png",
+      "sha256": "fe826068717557a86130aef0d2476c36b6cff275080ffbc3a2e8d355edb30409",
+      "bytes": 485895
+    },
+    {
+      "file": "a320-SWR.png",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/A320-family/00038142d3443d7f4aec9410520df608e8ae7ba8/Models/Liveries/A320-SWR.png",
+      "sha256": "5d6e19faebc5bf5b08e42df3a0c408575fbadb85a5b144e13d29f4849e3f91dd",
+      "bytes": 473761
+    },
+    {
+      "file": "a320-IGO.png",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/A320-family/00038142d3443d7f4aec9410520df608e8ae7ba8/Models/Liveries/A320-IGO.png",
+      "sha256": "787357efbbd85c722e2e6b0904768187b6579869ab4d502b7b2ba0d8ce6f76fa",
+      "bytes": 672581
+    },
+    {
+      "file": "a320-TAP.png",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/A320-family/00038142d3443d7f4aec9410520df608e8ae7ba8/Models/Liveries/A320-211/A320-TAP-SA.png",
+      "sha256": "e08963379d574f09679f1be0cb9facd5d07249c6b7ff1db5ecc690ef7e1daaf2",
+      "bytes": 484702
+    },
+    {
+      "file": "a320-AVA.png",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/A320-family/00038142d3443d7f4aec9410520df608e8ae7ba8/Models/Liveries/A320-AVA.png",
+      "sha256": "fe6f42a3a5301fda949cbf1b58f9f057dbdcdfaba4cee70d1382f8f3734a9d28",
+      "bytes": 496633
+    },
+    {
+      "file": "a320-VLG.png",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/A320-family/00038142d3443d7f4aec9410520df608e8ae7ba8/Models/Liveries/A320-211/VLG.png",
+      "sha256": "02798e06d0f8445f6210586161383b253af483a08431d283679d81025a8130f4",
+      "bytes": 550919
+    },
+    {
+      "file": "a320-VLG.xml",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/A320-family/00038142d3443d7f4aec9410520df608e8ae7ba8/Models/Liveries/A320-211/VLG.xml",
+      "sha256": "b6e6829348286362a60e8d722ac04c4cf9290a86996068ae2f0ebff3791b4fa8",
+      "bytes": 207
+    },
+    {
+      "file": "a320-NKS.png",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/A320-family/00038142d3443d7f4aec9410520df608e8ae7ba8/Models/Liveries/A320-231/NKS.png",
+      "sha256": "edfac45ffef97b520716d2b10f12d2e85d6e8545acfd72939077944cc4caef1d",
+      "bytes": 451318
+    },
+    {
+      "file": "a320-NKS.xml",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/A320-family/00038142d3443d7f4aec9410520df608e8ae7ba8/Models/Liveries/A320-231/NKS.xml",
+      "sha256": "b3f2c20fbab899a75d1db0204efc1a53aa509e78d5e13055225b17126c371d1a",
+      "bytes": 215
+    },
+    {
+      "file": "a320-JST.png",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/A320-family/00038142d3443d7f4aec9410520df608e8ae7ba8/Models/Liveries/A320-JST.png",
+      "sha256": "6a4608594497f1b14a660ffb23edddb91cc8b6658825409a135d765ae1920495",
+      "bytes": 491661
     }
   ]
 }

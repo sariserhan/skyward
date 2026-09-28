@@ -85,7 +85,7 @@ export class LiveMotion {
   const signature=[a.observedAt,a.lat,a.lon,a.altitude,a.groundSpeed,a.heading,a.verticalRate,a.ground,!!target.landingPhase].join('/');
   let state=this.frames.get(a.hex);
   if(!state)state={signature,frame:target,start:now,duration:2000,dx:0,dy:0,dz:0,dh:0};
-  else if(state.signature!==signature)state={signature,frame:state.frame,start:now,duration:state.frame.landingPhase&&!target.landingPhase&&(a.verticalRate??0)>150?2000:Math.max(2000,Math.min(8000,trackDistance(state.frame,target)*1852/(a.ground?12:100)*1000)),dx:wrap(state.frame.lon-target.lon),dy:state.frame.lat-target.lat,dz:state.frame.altitude-target.altitude,dh:wrap(state.frame.heading-target.heading)};
+  else if(state.signature!==signature)state={signature,frame:state.frame,start:now,duration:state.frame.landingPhase&&!target.landingPhase&&(a.verticalRate??0)>150?2000:Math.max(2000,Math.min(state.frame.age>120000?30000:8000,trackDistance(state.frame,target)*1852/(a.ground?12:100)*1000)),dx:wrap(state.frame.lon-target.lon),dy:state.frame.lat-target.lat,dz:state.frame.altitude-target.altitude,dh:wrap(state.frame.heading-target.heading)};
   const t=Math.max(0,Math.min(1,(now-state.start)/state.duration)),remaining=1-t*t*(3-2*t);
   const frame={...target,lon:wrap(target.lon+state.dx*remaining),lat:Math.max(-90,Math.min(90,target.lat+state.dy*remaining)),altitude:target.ground?target.altitude:target.altitude+state.dz*remaining,heading:(target.heading+state.dh*remaining+360)%360,correcting:remaining>0&&(Math.abs(state.dx)+Math.abs(state.dy)+Math.abs(state.dz))>0.00001};
   state.frame=frame;this.frames.delete(a.hex);this.frames.set(a.hex,state);

@@ -49,6 +49,55 @@
     "license": "GPL-2.0"
   },
   {
+    "model": "b738",
+    "operator": "ASA",
+    "uri": "models/sourced/liveries/b738-ASA-v1.gltf",
+    "source": "https://github.com/FGMEMBERS/737-800/tree/9126249dd0236479ad723f3e7c4c7139455c7d81",
+    "license": "GPL-2.0"
+  },
+  {
+    "model": "b738",
+    "operator": "CAL",
+    "uri": "models/sourced/liveries/b738-CAL-v1.gltf",
+    "source": "https://github.com/FGMEMBERS/737-800/tree/9126249dd0236479ad723f3e7c4c7139455c7d81",
+    "license": "GPL-2.0"
+  },
+  {
+    "model": "b738",
+    "operator": "GIA",
+    "uri": "models/sourced/liveries/b738-GIA-v1.gltf",
+    "source": "https://github.com/FGMEMBERS/737-800/tree/9126249dd0236479ad723f3e7c4c7139455c7d81",
+    "license": "GPL-2.0"
+  },
+  {
+    "model": "b738",
+    "operator": "KAL",
+    "uri": "models/sourced/liveries/b738-KAL-v1.gltf",
+    "source": "https://github.com/FGMEMBERS/737-800/tree/9126249dd0236479ad723f3e7c4c7139455c7d81",
+    "license": "GPL-2.0"
+  },
+  {
+    "model": "b738",
+    "operator": "CMP",
+    "uri": "models/sourced/liveries/b738-CMP-v1.gltf",
+    "source": "https://github.com/FGMEMBERS/737-800/tree/9126249dd0236479ad723f3e7c4c7139455c7d81",
+    "license": "GPL-2.0"
+  },
+  {
+    "model": "b738",
+    "operator": "MSR",
+    "uri": "models/sourced/liveries/b738-MSR-v1.gltf",
+    "source": "https://github.com/FGMEMBERS/737-800/tree/9126249dd0236479ad723f3e7c4c7139455c7d81",
+    "license": "GPL-2.0"
+  },
+  {
+    "model": "b738",
+    "operator": "TRA",
+    "uri": "models/sourced/liveries/b738-TRA-v1.gltf",
+    "source": "https://github.com/FGMEMBERS/737-800/tree/9126249dd0236479ad723f3e7c4c7139455c7d81",
+    "license": "GPL-2.0"
+  },
+  {
     "model": "a320",
     "operator": "AFR",
     "uri": "models/sourced/liveries/a320-AFR-v1.gltf",
@@ -80,6 +129,111 @@
     "model": "a320",
     "operator": "UAL",
     "uri": "models/sourced/liveries/a320-UAL-v1.gltf",
+    "source": "https://github.com/FGMEMBERS/A320-family/tree/00038142d3443d7f4aec9410520df608e8ae7ba8",
+    "license": "GPL-2.0"
+  },
+  {
+    "model": "a320",
+    "operator": "ACA",
+    "uri": "models/sourced/liveries/a320-ACA-v1.gltf",
+    "source": "https://github.com/FGMEMBERS/A320-family/tree/00038142d3443d7f4aec9410520df608e8ae7ba8",
+    "license": "GPL-2.0"
+  },
+  {
+    "model": "a320",
+    "operator": "DAL",
+    "uri": "models/sourced/liveries/a320-DAL-v1.gltf",
+    "source": "https://github.com/FGMEMBERS/A320-family/tree/00038142d3443d7f4aec9410520df608e8ae7ba8",
+    "license": "GPL-2.0"
+  },
+  {
+    "model": "a320",
+    "operator": "JBU",
+    "uri": "models/sourced/liveries/a320-JBU-v1.gltf",
+    "source": "https://github.com/FGMEMBERS/A320-family/tree/00038142d3443d7f4aec9410520df608e8ae7ba8",
+    "license": "GPL-2.0"
+  },
+  {
+    "model": "a320",
+    "operator": "WZZ",
+    "uri": "models/sourced/liveries/a320-WZZ-v1.gltf",
+    "source": "https://github.com/FGMEMBERS/A320-family/tree/00038142d3443d7f4aec9410520df608e8ae7ba8",
+    "license": "GPL-2.0"
+  },
+  {
+    "model": "a320",
+    "operator": "ANZ",
+    "uri": "models/sourced/liveries/a320-ANZ-v1.gltf",
+    "source": "https://github.com/FGMEMBERS/A320-family/tree/00038142d3443d7f4aec9410520df608e8ae7ba8",
+    "license": "GPL-2.0"
+  },
+  {
+    "model": "a320",
+    "operator": "EIN",
+    "uri": "models/sourced/liveries/a320-EIN-v1.gltf",
+    "source": "https://github.com/FGMEMBERS/A320-family/tree/00038142d3443d7f4aec9410520df608e8ae7ba8",
+    "license": "GPL-2.0"
+  },
+  {
+    "model": "a320",
+    "operator": "IBE",
+    "uri": "models/sourced/liveries/a320-IBE-v1.gltf",
+    "source": "https://github.com/FGMEMBERS/A320-family/tree/00038142d3443d7f4aec9410520df608e8ae7ba8",
+    "license": "GPL-2.0"
+  },
+  {
+    "model": "a320",
+    "operator": "FIN",
+    "uri": "models/sourced/liveries/a320-FIN-v1.gltf",
+    "source": "https://github.com/FGMEMBERS/A320-family/tree/00038142d3443d7f4aec9410520df608e8ae7ba8",
+    "license": "GPL-2.0"
+  },
+  {
+    "model": "a320",
+    "operator": "SWR",
+    "uri": "models/sourced/liveries/a320-SWR-v1.gltf",
+    "source": "https://github.com/FGMEMBERS/A320-family/tree/00038142d3443d7f4aec9410520df608e8ae7ba8",
+    "license": "GPL-2.0"
+  },
+  {
+    "model": "a320",
+    "operator": "IGO",
+    "uri": "models/sourced/liveries/a320-IGO-v1.gltf",
+    "source": "https://github.com/FGMEMBERS/A320-family/tree/00038142d3443d7f4aec9410520df608e8ae7ba8",
+    "license": "GPL-2.0"
+  },
+  {
+    "model": "a320",
+    "operator": "TAP",
+    "uri": "models/sourced/liveries/a320-TAP-v1.gltf",
+    "source": "https://github.com/FGMEMBERS/A320-family/tree/00038142d3443d7f4aec9410520df608e8ae7ba8",
+    "license": "GPL-2.0"
+  },
+  {
+    "model": "a320",
+    "operator": "AVA",
+    "uri": "models/sourced/liveries/a320-AVA-v1.gltf",
+    "source": "https://github.com/FGMEMBERS/A320-family/tree/00038142d3443d7f4aec9410520df608e8ae7ba8",
+    "license": "GPL-2.0"
+  },
+  {
+    "model": "a320",
+    "operator": "VLG",
+    "uri": "models/sourced/liveries/a320-VLG-v1.gltf",
+    "source": "https://github.com/FGMEMBERS/A320-family/tree/00038142d3443d7f4aec9410520df608e8ae7ba8",
+    "license": "GPL-2.0"
+  },
+  {
+    "model": "a320",
+    "operator": "NKS",
+    "uri": "models/sourced/liveries/a320-NKS-v1.gltf",
+    "source": "https://github.com/FGMEMBERS/A320-family/tree/00038142d3443d7f4aec9410520df608e8ae7ba8",
+    "license": "GPL-2.0"
+  },
+  {
+    "model": "a320",
+    "operator": "JST",
+    "uri": "models/sourced/liveries/a320-JST-v1.gltf",
     "source": "https://github.com/FGMEMBERS/A320-family/tree/00038142d3443d7f4aec9410520df608e8ae7ba8",
     "license": "GPL-2.0"
   }
