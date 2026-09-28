@@ -275,3 +275,7 @@ body>.cesium-credit-lightbox-overlay .cesium-credit-lightbox-close{min-width:36p
 
 .map-title .map-flight-route{display:block;margin-top:5px;color:var(--mint);font-size:12px;line-height:1.4;max-width:100%;overflow-wrap:anywhere}
 @media(max-width:700px){.map-title .map-flight-route{font-size:10px;margin-top:3px}}
+
+/* Independent map-layer failures must not cover each other's recovery controls. */
+.geometry-error{top:auto;bottom:calc(var(--inspector-space,0px) + 72px);margin:0;max-width:min(520px,calc(100% - 28px))}
+.map-error{top:auto;bottom:calc(var(--inspector-space,0px) + 152px);z-index:4;max-width:min(520px,calc(100% - 28px))}

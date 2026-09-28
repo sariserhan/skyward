@@ -1,3 +1,4 @@
+import {loadAirportGeometry} from './geographyLoader';
 import {useEffect,useState} from 'react';
 import type {Aircraft,AirportGeometry,FlightRoute} from '../types';
 import {AIRPORTS} from './airportCatalog';
@@ -20,7 +21,7 @@ export function useArrivalGeometry(a:Aircraft|null,route:FlightRoute|null){
  useEffect(()=>{
   if(!id)return;const existing=cache.get(id);if(existing){setState({id,identity,geometry:existing});return;}
   const controller=new AbortController();
-  void fetch(`${import.meta.env.BASE_URL}data/airports/${encodeURIComponent(id)}.json`,{signal:AbortSignal.any([controller.signal,AbortSignal.timeout(15000)])}).then(r=>{if(!r.ok)throw Error('Arrival geometry unavailable');return r.json();}).then((g:AirportGeometry)=>{if(controller.signal.aborted||g.id!==id||!Array.isArray(g.runways))return;const geometry={...g,elevationFt:(elevations as Record<string,number>)[id]};cache.set(id,geometry);if(cache.size>8)cache.delete(cache.keys().next().value!);setState({id,identity,geometry});}).catch(()=>{/* Remain on observation-based predicted motion if the destination cannot be mapped. */});
+  void loadAirportGeometry(`${import.meta.env.BASE_URL}data/airports/${encodeURIComponent(id)}.json`,id,controller.signal).then((g:AirportGeometry)=>{if(controller.signal.aborted||g.id!==id||!Array.isArray(g.runways))return;const geometry={...g,elevationFt:(elevations as Record<string,number>)[id]};cache.set(id,geometry);if(cache.size>8)cache.delete(cache.keys().next().value!);setState({id,identity,geometry});}).catch(()=>{/* Remain on observation-based predicted motion if the destination cannot be mapped. */});
   return()=>controller.abort();
  },[id,identity]);
  return state&&state.id===id&&state.identity===identity?state.geometry:null;

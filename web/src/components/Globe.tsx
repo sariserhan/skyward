@@ -1,3 +1,4 @@
+import {loadGeography} from '../lib/geographyLoader';
 import {SkyBoundary} from './SkyBoundary';
 import type {FlightRequest,FlightScene} from '../lib/watchDiscovery';
 import {aircraftAnimation} from '../lib/aircraftAnimation';
@@ -98,7 +99,7 @@ export function Globe(p: Props) {
   const [tilesLoading,setTilesLoading]=useState(false);
   const [terrainError,setTerrainError]=useState(false);
   const terrainActive=p.preferences.terrain&&p.mode==='3D'&&!terrainError;
-  const [mapError, setMapError] = useState('');
+  const [mapError, setMapError] = useState(''),[mapAttempt,setMapAttempt]=useState(0);
   const [imageryError, setImageryError] = useState('');
   const [imageryReady, setImageryReady] = useState(false);
   const [imageryAttempt, retryImagery] = useState(0);
@@ -174,17 +175,6 @@ export function Globe(p: Props) {
       for (const [name, lon, lat] of [['N O R T H  A M E R I C A', -102, 40], ['E U R O P E', 13, 51], ['A F R I C A', 12, 9], ['N O R T H  A T L A N T I C', -35, 23]] as [string, number, number][]) {
         atlasLabels.current.push(v.entities.add({ position: C.Cartesian3.fromDegrees(lon, lat, 3000), label: { text: name, font: '10px sans-serif', fillColor: C.Color.fromCssColorString('#82a3b9'), distanceDisplayCondition: new C.DistanceDisplayCondition(1000000, 40000000), translucencyByDistance: new C.NearFarScalar(5000000, .85, 22000000, .4) } }));
       }
-      void C.GeoJsonDataSource.load(`${BASE}data/world.geojson`, { fill: C.Color.fromCssColorString('#294555'), stroke: C.Color.fromCssColorString('#476273'), strokeWidth: 1, clampToGround: true }).then(async data => {
-        await C.GroundPrimitive.initializeTerrainHeights();
-        if (!alive) return;
-        const instances = data.entities.values.filter(entity => entity.polygon).map(entity => new C.GeometryInstance({
-          geometry: new C.PolygonGeometry({ polygonHierarchy: entity.polygon!.hierarchy!.getValue(v.clock.currentTime), vertexFormat: C.PerInstanceColorAppearance.FLAT_VERTEX_FORMAT }),
-          attributes: { color: C.ColorGeometryInstanceAttribute.fromColor(C.Color.fromCssColorString('#294555')) },
-        }));
-        atlas.current = v.scene.groundPrimitives.add(new C.GroundPrimitive({ geometryInstances: instances, asynchronous: false }));
-        atlas.current!.show = !hasBaseImagery(v);
-        v.scene.requestRender();
-      }).catch(() => { if (alive) setMapError('Country outlines could not load. Aircraft observations are still available.'); });
       // Selection and camera following are separate. Never let Cesium's default
       // double-click tracking lock the globe without an explicit Follow action.
       v.screenSpaceEventHandler.removeInputAction(C.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
@@ -261,6 +251,21 @@ export function Globe(p: Props) {
     } catch { setError('WebGL is unavailable. Try a browser with hardware acceleration. The aircraft list still works.'); readyCallback.current(); }
     return () => { callbacks.current.onViewer(null);alive = false; cleanupInput(); if (v && !v.isDestroyed()) v.destroy(); viewer.current = null; };
   }, []);
+  useEffect(()=>{
+    const v=viewer.current;if(!ready||!v||v.isDestroyed())return;
+    const C=window.Cesium,abort=new AbortController();let alive=true,primitive:Cesium.GroundPrimitive|undefined;
+    setMapError('');
+    void (async()=>{
+      const json=await loadGeography(`${BASE}data/world.geojson`,abort.signal);
+      if(!alive||v.isDestroyed())return;
+      const data=await C.GeoJsonDataSource.load(json,{clampToGround:true});
+      await C.GroundPrimitive.initializeTerrainHeights();
+      if(!alive||v.isDestroyed())return;
+      const instances=data.entities.values.filter(e=>e.polygon).map(e=>new C.GeometryInstance({geometry:new C.PolygonGeometry({polygonHierarchy:e.polygon!.hierarchy!.getValue(v.clock.currentTime),vertexFormat:C.PerInstanceColorAppearance.FLAT_VERTEX_FORMAT}),attributes:{color:C.ColorGeometryInstanceAttribute.fromColor(C.Color.fromCssColorString('#294555'))}}));
+      primitive=v.scene.groundPrimitives.add(new C.GroundPrimitive({geometryInstances:instances,asynchronous:false}));atlas.current=primitive!;primitive!.show=!hasBaseImagery(v);v.scene.requestRender();
+    })().catch(()=>{if(alive&&!v.isDestroyed())setMapError('Country outlines unavailable. Check connection health for live traffic.');});
+    return()=>{alive=false;abort.abort();if(primitive&&!v.isDestroyed())v.scene.groundPrimitives.remove(primitive);if(atlas.current===primitive)atlas.current=null;};
+  },[ready,mapAttempt]);
   useEffect(()=>{const v=viewer.current;if(!v||!ready)return;const update=()=>{if(v.isDestroyed())return;v.useDefaultRenderLoop=!p.obscured&&!document.hidden&&!contextLost;if(v.useDefaultRenderLoop){v.resize();v.scene.requestRender();}};update();document.addEventListener('visibilitychange',update);return()=>document.removeEventListener('visibilitychange',update);},[ready,p.obscured,contextLost]);
   useEffect(()=>{
     const v=viewer.current;if(!v||!ready)return;const C=window.Cesium;let last='';
@@ -607,7 +612,7 @@ export function Globe(p: Props) {
     <AirportDetailLayer viewer={ready?viewer.current:null} airports={detailAirports} enabled={p.mode==='3D'&&(p.preferences.structures||p.camera.type==='tower'||flightOpen)} quality={p.preferences.quality}/>{p.groundAnimation&&p.mode==='3D'&&!flightOpen&&<Suspense fallback={null}><GroundAnimation viewer={ready?viewer.current:null} airport={p.geometry?.airports[0]} observations={p.groundObservations} close={p.closeGround} reduced={p.preferences.reducedMotion} suspended={p.obscured}/></Suspense>}{p.camera.type==='route'&&!flightOpen&&!p.playback&&p.route?.airports.length===2&&['PLAUSIBLE','UNVERIFIED'].includes(p.route.status)&&<RouteMode route={p.route} fit={fitCompleteRoute} close={p.exitRoute}/>}<RouteLayer viewer={ready?viewer.current:null} route={p.route} aircraft={p.selected} trail={p.trail} active={p.camera.type==='route'&&!flightOpen&&!p.playback}/><SkyBoundary><Suspense fallback={null}><CelestialSky navigationKey={`${p.camera.serial}-${p.command.serial}`} viewer={ready?viewer.current:null} enabled={ready&&p.mode==='3D'&&!flightOpen&&!p.playback} host={p.toolsHost} onInteract={p.onInteract} reduced={p.preferences.reducedMotion}/></Suspense></SkyBoundary>{p.toolsHost&&createPortal(<div className="globe-utilities"><CameraBookmarks viewer={ready?viewer.current:null} mode={p.mode} preferences={p.preferences} restore={p.bookmarkRestore}/><PerformanceMonitor viewer={ready?viewer.current:null} quality={p.preferences.quality} automatic={p.automatic} feed={p.feedHealth}/></div>,p.toolsHost)}<SpotterCamera viewer={ready?viewer.current:null} mode={p.spotterMode} paused={p.spotterPaused} selected={p.selected} airport={p.geometry?.airports[0]}/>{p.playback&&<SessionReplayLayer skipInitialFrame={!!p.recoveryPose} labels={p.preferences.labels} viewer={ready?viewer.current:null} recording={p.playback.recording} time={p.playback.time}/>}<TowerView onTarget={setTowerTarget} observations={p.groundObservations} reduced={p.preferences.reducedMotion} suspended={p.obscured} viewer={ready?viewer.current:null} airport={p.geometry?.airports[0]} active={p.camera.type==='tower'&&p.mode==='3D'} close={()=>p.onAirport(p.camera.airport!)}/><AtlasLayer viewer={ready?viewer.current:null} active={!satellite&&(p.preferences.basemap==='atlas'||!!imageryError)} labels={p.preferences.labels} large={p.preferences.largeLabels}/><CityLabels viewer={ready?viewer.current:null} cities={cities} enabled={p.preferences.labels} large={p.preferences.largeLabels}/><Suspense fallback={null}>{p.selected&&<FlightExperience request={p.flightRequest} onScene={p.onFlightScene} observations={p.groundObservations} arrivalGeometry={p.arrivalGeometry} modelStage={modelAttempts.current.get(`aircraft-${p.selected?.hex}`)?.stage??'primary'} retryModel={retryModel} modelReady={selectedModelReady} suspended={p.obscured||contextLost} quality={p.preferences.quality} feedHealth={p.feedHealth} cities={cities} onOpenChange={setFlightOpen} navigationKey={`${p.camera.serial}-${p.command.serial}-${p.zoomSignal}`} viewer={ready?viewer.current:null} aircraft={p.selected} trail={p.trail} geometry={p.geometry} route={p.route} reducedMotion={p.preferences.reducedMotion} mode={p.mode} replay={p.replayIndex!==null||!!p.playback} onRoute={fitCompleteRoute}/>}</Suspense><div ref={container} className="globe" aria-label={`${p.mode === '3D' ? '3D globe' : '2D map'} of observed aircraft`}/><div className="map-readout" aria-label="Map orientation and scale"><span className="north-indicator" title="Camera heading"><b style={{transform:`rotate(${-readout.heading}deg)`}}>↑</b>N <small>{readout.heading}°</small></span>{readout.scale && <span className="scale-bar" style={{width:readout.width}}>{readout.scale}</span>}<span className="basemap-caption">{tilesLoading?'Loading map detail…':satellite?'Satellite imagery':p.preferences.basemap==='satellite'&&!imageryError?'Loading imagery…':'Atlas'}</span></div>
     {hover&&<div className="aircraft-tooltip" style={{left:Math.max(8,hover.x),top:hover.y}}><strong>{hover.aircraft.callsign||hover.aircraft.registration||hover.aircraft.hex}</strong><span>{hover.aircraft.aircraftType||'Type unknown'} · {hover.aircraft.ground?'Ground':`${hover.aircraft.altitude?.toLocaleString()??'Unknown'} ft`}</span><small>Click for flight details · {Math.round(ageSeconds(hover.aircraft,p.now))}s since fix</small></div>}
     {p.replayIndex!==null&&<div className="replay-banner">Replay · recorded observations · other aircraft show latest reports</div>}
-    {error && <div className="map-error" role="alert">{error}<button className="text-button" onClick={()=>p.recover(null,true)}>Restart globe</button></div>}{mapError && <div className="map-error" role="status">{mapError}</div>}
+    {error && <div className="map-error" role="alert">{error}<button className="text-button" onClick={()=>p.recover(null,true)}>Restart globe</button></div>}{mapError && <div className="map-error" role="status">{mapError}<button className="text-button" onClick={()=>{setMapAttempt(n=>n+1);window.dispatchEvent(new Event('online'));}}>Retry map &amp; traffic</button></div>}
     {terrainError&&<div className="terrain-warning" role="status">Elevation unavailable. Using the flat globe. Toggle Open terrain off/on to retry.</div>}
     {imageryError && <div className="imagery-warning" role="status">{imageryError}<button onClick={()=>retryImagery(n=>n+1)}>Retry imagery</button></div>}</>;
 }

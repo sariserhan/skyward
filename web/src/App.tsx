@@ -1,3 +1,4 @@
+import {loadAirportGeometry} from './lib/geographyLoader';
 import {flightHeaderRoute} from './lib/flightHeader';
 import {busyObservedAirports} from './lib/discovery';
 import type {AlertDestination} from './lib/destinationAlerts';
@@ -153,12 +154,12 @@ export default function App() {
     const controller = new AbortController();
     setGeometryError(false);setGeometry(geometryCache.current.get(airport) ?? null);
     if (geometryCache.current.has(airport)) return;
-    fetch(`${import.meta.env.BASE_URL}data/airports/${encodeURIComponent(airport)}.json`, {signal:AbortSignal.any([controller.signal,AbortSignal.timeout(20000)])})
-      .then(r=>{if(!r.ok)throw new Error('Airport geometry unavailable');return r.json();})
+    loadAirportGeometry(`${import.meta.env.BASE_URL}data/airports/${encodeURIComponent(airport)}.json`,airport,controller.signal)
       .then(a=>{if(controller.signal.aborted)return;const data={airports:[a]};geometryCache.current.set(airport,data);if(geometryCache.current.size>8)geometryCache.current.delete(geometryCache.current.keys().next().value!);setGeometry(data);})
       .catch(()=>{if(!controller.signal.aborted)setGeometryError(true);});
     return ()=>controller.abort();
   },[airport,geometryAttempt]);
+  useEffect(()=>{if(!geometryError)return;const retry=()=>setGeometryAttempt(n=>n+1);window.addEventListener('online',retry);return()=>window.removeEventListener('online',retry);},[geometryError]);
   const select = useCallback((a: Aircraft) => { setGroundAnimation(false);setSpotter(false);setSession(null);setFlightRequest(null); initialIntent.current=false;feed.select(a);try{localStorage.setItem('skyward.last-flight.v1',JSON.stringify({hex:a.hex,label:a.callsign||a.registration||a.hex}));}catch{} setPanel('aircraft'); setFollowing(false); setReplay(null); setMobileOpen(false); setCamera(previous => ({ type: 'aircraft', serial: previous.serial + 1 })); }, [feed.select]);
   const watchFlight=(a:Aircraft,view='side')=>{select(a);setMode('3D');setExplore(false);setFlightRequest({hex:a.hex,view,serial:++requestSerial.current});};
   const discover=()=>{const candidate=interestingFlight(receivedAircraft,feed.histories,airport,trafficArea??AIRPORTS[airport],Date.now(),lastDiscovery.current);if(candidate){lastDiscovery.current=candidate.a.hex;watchFlight(candidate.a,candidate.view);setDiscoveryNotice(`${candidate.reason} · ${candidate.a.callsign||candidate.a.hex}`);}else{const center=trafficArea??AIRPORTS[airport],busy=busyObservedAirports(receivedAircraft,Date.now()).find(x=>distanceNm(center.lat,center.lon,x.airport.lat,x.airport.lon)<=150),id=busy?.id??airport;focusAirport(id);setMode('3D');setCamera(c=>({type:'tower',airport:id,serial:c.serial+1}));setDiscoveryNotice(busy?`${id} tower · ${busy.count} recently observed aircraft nearby`:`Waiting for recent traffic near ${id}. Try again after positions arrive.`);}};
@@ -200,7 +201,7 @@ export default function App() {
       {!ready && <div className="globe-loading"><span className="loading-ring"/>Opening the observatory…</div>}
       {shared.aircraft&&feed.searchError&&<p className="shared-error" role="status">Shared aircraft: {feed.searchError}</p>}
       {(trafficFilter!=='all'||filtersActive(filters)||hideStale)&&<p className="active-filter">Traffic filter active · selected aircraft stays visible</p>}
-      {geometryError && <p className="geometry-error">Airport geometry could not load. Live tracking is still available.</p>}
+      {geometryError && <p className="geometry-error" role="status">Airport map unavailable. Check connection health for live traffic. <button className="text-button" onClick={()=>setGeometryAttempt(n=>n+1)}>Retry airport map</button></p>}
 
       {!groundAnimation&&(panel === 'airport' ? <AirportInspector observations={feed.observations} retryGeometry={()=>setGeometryAttempt(n=>n+1)} histories={feed.histories} board={()=>openTools('board')} tower={tower} overview={overview} geometryError={geometryError} selected={camera.type==='facility'?camera.facility:undefined} key={airport} airport={airport} geometry={geometry?.airports.find(a=>a.id===airport)} aircraft={feed.aircraft} now={now} updatedAt={feed.updatedAt} loading={feed.loading} error={feed.error} refresh={feed.refresh} focus={focusFacility} select={select} close={closeDetails}/> : <Inspector compare={()=>openTools('compare')} quality={effectivePreferences.quality} feedHealth={{error:cameraTraffic.error,updatedAt:cameraTraffic.updatedAt}} reducedMotion={preferences.reducedMotion} fullRoute={fullRoute} aircraft={feed.selected} now={now} watched={feed.watches.some(w => w.hex === feed.selected?.hex)} toggleWatch={() => feed.selected && feed.toggleWatch(feed.selected)} focus={focusAircraft} trail={displayedTrail} error={feed.selectedError} runways={runways} replayIndex={replayIndex} setReplay={changeReplay} route={route.data} routeLoading={route.loading} routeError={route.error} following={following} close={closeDetails}/>)}
     </main></div>
