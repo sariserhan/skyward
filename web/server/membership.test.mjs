@@ -206,3 +206,25 @@ test('Local Premium testing is opt-in, loopback-only and cannot be granted by HT
   assert.equal((await f.call('/api/account',undefined,c)).body.user.premium,false);assert.equal(f.requests.length,0);
  }finally{await f.close();}
 });
+
+test('Development accounts unlock Premium libraries, tools and simulators without billing',async()=>{
+ const origin='http://localhost:8000';
+ const f=await fixture({env:{NODE_ENV:'development',SKYWARD_DEV_PREMIUM:'1',SKYWARD_PUBLIC_ORIGIN:origin,STRIPE_SECRET_KEY:'',STRIPE_PRICE_ID:''}});
+ try{
+  assert.equal((await f.call('/api/account')).body.user,null);
+  assert.equal((await f.membership.simulatorAccess({headers:{}})).status,401);
+  const registered=await f.call('/api/account/register',{email:'dev@example.test',password:'correct horse battery staple'},'',{Origin:origin});
+  assert.equal(registered.code,200);const cookie=registered.cookie;
+  assert.equal((await f.call('/api/account',undefined,cookie)).body.user.premium,true);
+  assert.equal((await f.membership.simulatorAccess({headers:{cookie}})).allowed,true);
+  for(const kind of ['trips','journal','airports','missions','recordings','simulator']){
+   const result=await f.call('/api/account/library?kind='+kind,undefined,cookie);
+   assert.equal(result.code,200,JSON.stringify({kind,...result.body}));
+  }
+  for(const path of ['monitoring','notifications','shares'])assert.equal((await f.call('/api/premium/'+path,undefined,cookie)).code,200);
+  await f.call('/api/journeys',journey,cookie,{Origin:origin});
+  const detail=await f.call('/api/premium/details',{key:journeyKey},cookie,{Origin:origin});assert.equal(detail.code,200);assert.equal(detail.body.mode,'demo');
+  assert.equal(f.requests.length,0,'No billing or paid API requests');
+  assert.equal(f.membership.db.prepare('SELECT count(*) AS n FROM local_test_access').get().n,0);
+ }finally{await f.close();}
+});

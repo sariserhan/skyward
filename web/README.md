@@ -989,6 +989,26 @@ item counts are bounded. Browser storage never grants Premium.
 The SQLite mode is local testing only. Neon mode provides Better Auth signup,
 email verification and password recovery; configure SMTP before enabling it.
 
+#### Development: all Premium features unlocked
+
+From `web`, run `npm run build`, then `npm run start:dev`. Open
+http://localhost:8000 and sign in or create a local test account. Every signed-in
+account automatically gets Premium, including both simulators and account tools;
+no checkout or manual grant is required. Saved data remains private to each account.
+The server stays on port 8000, so the existing SSH tunnel continues to work.
+
+For a configured Neon / Better Auth development database, run
+`npm run start:neon:dev` instead. Normal sign-in and email verification still apply.
+Use a development database, and run `npm run db:migrate` before startup.
+
+These commands explicitly set `NODE_ENV=development` and
+`SKYWARD_DEV_PREMIUM=1`. The bypass requires a loopback public origin and refuses
+to start in production. Ordinary `npm start` / `npm run start:neon` keep normal
+subscription checks. Access is not persisted as a subscription or grant. API
+budgets remain enforced; flight details/monitoring remain synthetic test data,
+and push delivery still needs VAPID configuration. The command does not enable
+paid API requests, live billing, or fabricate flight information.
+
 #### Try Premium locally without a payment-provider account
 
 From `web`, stop your existing server yourself, then start:

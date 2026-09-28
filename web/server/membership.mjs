@@ -1,3 +1,4 @@
+import {developmentPremium} from './development-premium.mjs';
 import {sqlitePremiumStore} from './premium-store.mjs';
 import {createPremiumTools} from './premium-tools.mjs';
 import {createAccountLibrary} from './account-library.mjs';
@@ -20,6 +21,7 @@ import {changesSince} from './flight-alerts.mjs';
 
 export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now, dbPath}={}) {
   if(env.NODE_ENV==='production'&&env.SKYWARD_ACCOUNTS==='test')throw Error('Production accounts must use Neon and Better Auth.');
+  const devPremium=developmentPremium(env);
   const enabled=env.SKYWARD_ACCOUNTS==='test';
   const origin=env.SKYWARD_PUBLIC_ORIGIN||'http://localhost:8000';
   const parsed=new URL(origin);
@@ -65,6 +67,7 @@ export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now
     } catch {fail(503,'Subscription service is unavailable. No premium access was granted.');}
   }
   async function entitlement(u) {
+    if(devPremium&&u)return true;
     if(localPremium&&get('SELECT expires FROM local_test_access WHERE user_id=? AND expires>?',u.id,now()))return true;
     if(!billing||!u.customer)return false;
     const q=new URLSearchParams({customer:u.customer,status:'active',limit:'100','expand[]':'data.latest_invoice'});

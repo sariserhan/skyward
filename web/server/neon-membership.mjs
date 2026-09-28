@@ -1,3 +1,4 @@
+import {developmentPremium} from './development-premium.mjs';
 import {postgresPremiumStore} from './premium-store.mjs';
 import {createPremiumTools} from './premium-tools.mjs';
 import {toNodeHandler,fromNodeHeaders} from 'better-auth/node';
@@ -12,6 +13,7 @@ const customerId=v=>typeof v==='string'?v:v?.id;
 const integer=(v,fallback)=>{const n=Number(v??fallback);if(!Number.isSafeInteger(n)||n<1)throw Error('Invalid premium limit');return n;};
 
 export function createNeonMembership({env=process.env,pool=createNeonPool(env),sendEmail,fetchImpl=fetch,now=Date.now}={}) {
+ const devPremium=developmentPremium(env);
  const {origin}=neonConfig(env),auth=createNeonAuth(pool,{env,sendEmail}),authHandler=toNodeHandler(auth);
  const rows=async(sql,args=[],db=pool)=>(await db.query(sql,args)).rows;
  const one=async(sql,args=[],db=pool)=>(await rows(sql,args,db))[0];
@@ -23,7 +25,7 @@ export function createNeonMembership({env=process.env,pool=createNeonPool(env),s
   if(!billing)fail(503,'Test checkout is not configured yet.');
   try{const response=await fetchImpl(`https://api.stripe.com/v1/${path}`,{method:params?'POST':'GET',headers:{Authorization:`Bearer ${key}`,'Stripe-Version':'2026-08-26.dahlia',...(params?{'Content-Type':'application/x-www-form-urlencoded'}:{}),...(idem?{'Idempotency-Key':idem}:{})},body:params?new URLSearchParams(params):undefined,signal:AbortSignal.timeout(10000),redirect:'error'});if(!response.ok)throw Error();return await response.json();}catch{fail(503,'Subscription service is unavailable. No premium access was granted.');}
  }
- async function entitlement(u){if(!billing||!u.customer)return false;const q=new URLSearchParams({customer:u.customer,status:'active',limit:'100','expand[]':'data.latest_invoice'}),s=await stripe(`subscriptions?${q}`);return (s.data||[]).some(v=>v.livemode===false&&v.status==='active'&&customerId(v.customer)===u.customer&&v.latest_invoice?.status==='paid'&&v.latest_invoice.amount_paid>0&&customerId(v.latest_invoice.customer)===u.customer&&v.items?.data?.some(i=>i.price?.id===price&&i.current_period_end*1000>now()));}
+ async function entitlement(u){if(devPremium&&u)return true;if(!billing||!u.customer)return false;const q=new URLSearchParams({customer:u.customer,status:'active',limit:'100','expand[]':'data.latest_invoice'}),s=await stripe(`subscriptions?${q}`);return (s.data||[]).some(v=>v.livemode===false&&v.status==='active'&&customerId(v.customer)===u.customer&&v.latest_invoice?.status==='paid'&&v.latest_invoice.amount_paid>0&&customerId(v.latest_invoice.customer)===u.customer&&v.items?.data?.some(i=>i.price?.id===price&&i.current_period_end*1000>now()));}
  async function usage(u){const month=new Date(now()).toISOString().slice(0,7),r=await one('SELECT requests,cost FROM skyward_usage WHERE user_id=$1 AND month=$2',[u.id,month]);return {requests:r?.requests??0,cost:Number(r?.cost??0),limit:limits.userRequests,month,mode:'test',actualProviderSpend:0};}
  async function throttle(req){const expiry=(Math.floor(now()/60000)+1)*60000,k=createHash('sha256').update(`${req.socket.remoteAddress}:${expiry}`).digest('hex');const r=await one('INSERT INTO skyward_rate_limits VALUES($1,1,$2) ON CONFLICT(key) DO UPDATE SET count=skyward_rate_limits.count+1 RETURNING count',[k,expiry]);await pool.query('DELETE FROM skyward_rate_limits WHERE expires<$1',[now()]);if(r.count>120)fail(429,'Too many attempts. Please try again shortly.');}
  async function body(req,path){const chunks=[];let bytes=0;for await(const c of req){bytes+=c.length;if(bytes>(path==='/api/account/library'?17*1024*1024:8192))fail(413,'Request too large.');chunks.push(c);}try{const b=JSON.parse(Buffer.concat(chunks).toString()||'{}');if(!b||typeof b!=='object'||Array.isArray(b))throw Error();return b;}catch{fail(400,'Invalid request.');}}
