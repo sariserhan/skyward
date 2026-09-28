@@ -272,3 +272,6 @@ body>.cesium-credit-lightbox-overlay .cesium-credit-lightbox-close{min-width:36p
  .cockpit-audio{gap:5px}.cockpit-audio label:has(input[type=checkbox]){min-height:32px}.cockpit-audio input[type=checkbox]{width:18px;height:18px}.cockpit-audio input[type=range]{min-height:32px}.cockpit-audio small{max-width:230px;line-height:1.4}
  .statusbar:not(.mobile-more-open)>.discover-trigger{display:none!important}.statusbar>.simulation-link{display:none!important}.statusbar.mobile-more-open>.simulation-link{display:inline-flex!important;min-height:44px}.statusbar{padding-bottom:max(5px,env(safe-area-inset-bottom))}
 }
+
+.map-title .map-flight-route{display:block;margin-top:5px;color:var(--mint);font-size:12px;line-height:1.4;max-width:100%;overflow-wrap:anywhere}
+@media(max-width:700px){.map-title .map-flight-route{font-size:10px;margin-top:3px}}

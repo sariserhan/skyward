@@ -1,7 +1,6 @@
 import {directedView,journeyPhase} from '../lib/arrivalExperience';
 import {sceneViews,type FlightRequest,type FlightScene} from '../lib/watchDiscovery';
 import {aircraftAnimation} from '../lib/aircraftAnimation';
-import {surfaceHeight} from '../lib/surfaceHeight';
 import {sourcedGearClearance,gearCompression} from '../lib/landingGear';
 import {applyAircraftRig} from '../lib/aircraftRig';
 import {JourneyDetails} from './JourneyDetails';
@@ -50,7 +49,8 @@ export function FlightExperience(p:Props){
  useEffect(()=>{if(p.reducedMotion)setPlaying(false);},[p.reducedMotion]);
  useEffect(()=>{
   const candidate=p.viewer;if(!candidate||!open||p.mode!=='3D'||p.replay)return;const v=candidate,original=p.aircraft,C=window.Cesium;
-  v.camera.cancelFlight();v.trackedEntity=undefined;last.current=0;const originalNear=v.camera.frustum.near;
+  v.camera.cancelFlight();v.trackedEntity=undefined;last.current=0;const originalNear=v.camera.frustum.near,controller=v.scene.screenSpaceCameraController,originalCollision=controller.enableCollisionDetection;let retainedSurface=0,retainedFloor=25;
+  const groundSurface=(lon:number,lat:number)=>{const sample=v.scene.globe.getHeight(C.Cartographic.fromDegrees(lon,lat));if(typeof sample==='number'&&Number.isFinite(sample)&&sample>=-430&&sample<=8849)retainedSurface=sample;return retainedSurface;};
   const release=()=>{if(state.current.view==='cockpit')return;previousView='free';setView('free');};v.canvas.addEventListener('pointerdown',release);v.canvas.addEventListener('wheel',release);v.canvas.addEventListener('keydown',release);
   const hidden=()=>{if(document.hidden||state.current.p.suspended)setPlaying(false);last.current=0;};document.addEventListener('visibilitychange',hidden);
   let shown:Cesium.Entity|undefined,drawn='',cameraAngle=original?.heading??0,cameraRange=0,layoutDirty=true,box:{left:number;top:number;right:number;bottom:number}|null=null;
@@ -76,10 +76,6 @@ export function FlightExperience(p:Props){
     v.camera.lookAtTransform(C.Matrix4.IDENTITY);v.camera.setView({destination,orientation:{heading:point.heading,pitch:point.pitch,roll:0}});
    }else{
     v.camera.lookAt(pos,new C.HeadingPitchRange(cameraAngle*Math.PI/180,view==='area'?-Math.PI/2:view==='bird'?-1.35:view==='tail'?-.3:-.18,cameraRange));v.camera.lookAtTransform(C.Matrix4.IDENTITY);
-    if(view!=='area'){
-     const halfHeight=cameraRange*Math.tan(framing.vfov/2),halfWidth=halfHeight*v.canvas.clientWidth/v.canvas.clientHeight;
-     v.camera.moveRight(-2*halfWidth*(framing.cx/v.canvas.clientWidth-.5));v.camera.moveUp(2*halfHeight*(framing.cy/v.canvas.clientHeight-.5));
-    }
    }
    const blendBack=reattachBlend(reattachTime,s.p.reducedMotion);
    if(blendBack<1){
@@ -88,17 +84,28 @@ export function FlightExperience(p:Props){
     // Avoid degenerate direction/up vectors while recovering from a reversed camera.
     if(C.Cartesian3.magnitudeSquared(direction)>.0001&&C.Cartesian3.magnitudeSquared(C.Cartesian3.cross(direction,up,new C.Cartesian3()))>.0001)v.camera.setView({destination:dest,orientation:{direction:C.Cartesian3.normalize(direction,direction),up:C.Cartesian3.normalize(up,up)}});
    }
-   const cart=v.camera.positionCartographic,floor=cameraFloor(v.scene.globe.getHeight(cart));
-   if(cart.height<floor){const dest=C.Cartesian3.fromRadians(cart.longitude,cart.latitude,floor),direction=C.Cartesian3.normalize(C.Cartesian3.subtract(pos,dest,new C.Cartesian3()),new C.Cartesian3()),up=C.Ellipsoid.WGS84.geodeticSurfaceNormal(dest,new C.Cartesian3());if(onboard)v.camera.setView({destination:dest,orientation:{direction:C.Cartesian3.clone(v.camera.directionWC),up:C.Cartesian3.clone(v.camera.upWC)}});else if(C.Cartesian3.magnitudeSquared(C.Cartesian3.cross(direction,up,new C.Cartesian3()))>.0001)v.camera.setView({destination:dest,orientation:{direction,up}});else v.camera.setView({destination:dest});}
+   const cart=v.camera.positionCartographic,height=v.scene.globe.getHeight(cart);if(typeof height==='number'&&Number.isFinite(height))retainedFloor=cameraFloor(height);const floor=retainedFloor;
+   if(cart.height<floor){const destination=C.Cartesian3.fromRadians(cart.longitude,cart.latitude,floor);v.camera.setView({destination,orientation:{direction:C.Cartesian3.clone(v.camera.directionWC),up:C.Cartesian3.clone(v.camera.upWC)}});}
+   // Compose by rotating the view, not by lowering the camera toward the runway.
+   // Terrain safety previously reset the aim to screen center, alternating with
+   // panel-aware framing at touchdown and hiding the aircraft behind the panel.
+   if(!onboard&&view!=='area'){
+    const destination=C.Cartesian3.clone(v.camera.positionWC),direction=C.Cartesian3.subtract(pos,destination,new C.Cartesian3()),up=C.Ellipsoid.WGS84.geodeticSurfaceNormal(destination,new C.Cartesian3());
+    if(C.Cartesian3.magnitudeSquared(direction)>.001&&C.Cartesian3.magnitudeSquared(C.Cartesian3.cross(direction,up,new C.Cartesian3()))>.001){
+     v.camera.setView({destination,orientation:{direction:C.Cartesian3.normalize(direction,direction),up}});
+     const y=(1-2*framing.cy/v.canvas.clientHeight)*Math.tan(framing.vfov/2),x=(2*framing.cx/v.canvas.clientWidth-1)*Math.tan(framing.vfov/2)*v.canvas.clientWidth/v.canvas.clientHeight;
+     v.camera.lookRight(-Math.atan(x));v.camera.lookUp(-Math.atan(y));
+    }
+   }
    return blendBack<1||Math.abs(targetRange-cameraRange)>.05||Math.abs(((targetAngle-cameraAngle+540)%360)-180)>.02;
   }
   let cameraMoving=true;const motion=sharedLiveMotion;
   const tick=(now:number)=>{
    if(v.isDestroyed())return;frame.current=requestAnimationFrame(tick);if(document.hidden||state.current.p.suspended)return;if(last.current&&now-last.current<33)return;
-   const s=state.current,dt=last.current?Math.min(.1,(now-last.current)/1000):.033;last.current=now;elapsed.current+=dt;
+   const s=state.current;controller.enableCollisionDetection=s.view==='free'||s.view==='route'?originalCollision:false;const dt=last.current?Math.min(.1,(now-last.current)/1000):.033;last.current=now;elapsed.current+=dt;
    let fraction=s.progress;if(s.demo&&s.playing){fraction=Math.min(1,fraction+dt/45);state.current.progress=fraction;setProgress(fraction);if(fraction===1)setPlaying(false);}
    const a=s.p.aircraft;if(!a)return;const r=s.p.geometry?.airports[0]?.runways[s.runway],actual=v.entities.getById(`aircraft-${a.hex}`);if(actual)actual.show=!s.demo&&s.view!=='cockpit';
-   const fix=s.demo&&r?runwayFrame(r,s.demo,fraction):motion.sample(a,s.p.trail,Date.now(),s.p.reducedMotion,s.p.route,a.ground?s.p.geometry?.airports[0]??s.p.arrivalGeometry:s.p.arrivalGeometry);
+   const fix=s.demo&&r?runwayFrame(r,s.demo,fraction):motion.sample(a,s.p.trail,Date.now(),s.p.reducedMotion,s.p.route,s.p.arrivalGeometry??(a.ground?s.p.geometry?.airports[0]:null));
    let heading=a.heading??0,pitch=0;if(fix&&'heading' in fix&&typeof fix.heading==='number')heading=fix.heading;if(fix&&'pitch' in fix)pitch=fix.pitch??0;
    const animation=actual&&fix?aircraftAnimation.sample(actual,{...fix,heading,groundSpeed:('groundSpeed' in fix?fix.groundSpeed:a.groundSpeed)??0},Date.now(),s.p.reducedMotion):{bank:0,gear:a.ground?1:0,flaps:0};
    const movingWheels=!s.p.reducedMotion&&(!sourcedModel(a.aircraftType)||s.p.modelStage==='fallback')&&(s.demo?!!fix?.ground:(!!fix?.ground&&(!!fix&&'landingPhase' in fix&&!!fix.landingPhase||ageSeconds(a,Date.now())<=30)))&&(s.demo?s.playing:((fix&&'groundSpeed' in fix?fix.groundSpeed:a.groundSpeed)??0)>0);
@@ -107,7 +114,7 @@ export function FlightExperience(p:Props){
    let position=actual?.position?.getValue(v.clock.currentTime);
    if(fix){
     const landing='landingPhase' in fix&&!!fix.landingPhase;
-    const ground=s.demo&&r?(surfaceHeight(v.scene.globe.getHeight(C.Cartographic.fromDegrees(r.a[0],r.a[1])))):landing?(surfaceHeight(v.scene.globe.getHeight(C.Cartographic.fromDegrees(fix.lon,fix.lat))))-(s.p.arrivalGeometry?.elevationFt??0)*.3048:fix.ground?(surfaceHeight(v.scene.globe.getHeight(C.Cartographic.fromDegrees(fix.lon,fix.lat))))-Math.max(0,fix.altitude)*.3048:0;
+    const ground=s.demo&&r?(groundSurface(r.a[0],r.a[1])):landing?(groundSurface(fix.lon,fix.lat))-(s.p.arrivalGeometry?.elevationFt??0)*.3048:fix.ground?(groundSurface(fix.lon,fix.lat))-Math.max(0,fix.altitude)*.3048:0;
     position=C.Cartesian3.fromDegrees(fix.lon,fix.lat,ground+Math.max(0,fix.altitude)*.3048+('groundClearance' in fix?(fix.groundClearance??0)*.3048:0)+(s.p.modelStage==='primary'?sourcedGearClearance(a.aircraftType):5)-gearCompression(s.demo?shown:actual));
     if(s.demo){
      if(!shown)shown=v.entities.add({id:'flight-simulation',model:{uri:import.meta.env.BASE_URL+(s.p.modelStage==='primary'?fleetUri(a):fallbackFleetUri(a)),minimumPixelSize:0,maximumScale:1,heightReference:C.HeightReference.NONE,shadows:C.ShadowMode.ENABLED},label:{text:'SIMULATION',font:'bold 14px sans-serif',fillColor:C.Color.ORANGE,pixelOffset:new C.Cartesian2(0,-65)}});
@@ -125,12 +132,12 @@ export function FlightExperience(p:Props){
    cameraMoving=!!position&&s.view!=='free'&&s.view!=='route'&&s.view!=='cockpit'?camera(position!,heading,s.view==='director'?directedView(fix&&'landingPhase' in fix&&fix.landingPhase?fix.landingPhase:fix?.ground?'taxi':undefined):s.view,dt):false;v.scene.requestRender();
   };
   frame.current=requestAnimationFrame(tick);
-  return()=>{cancelAnimationFrame(frame.current);resize.disconnect();v.canvas.removeEventListener('pointerdown',release);v.canvas.removeEventListener('wheel',release);v.canvas.removeEventListener('keydown',release);document.removeEventListener('visibilitychange',hidden);if(!v.isDestroyed()){v.camera.frustum.near=originalNear;if(shown)v.entities.remove(shown);const a=state.current.p.aircraft?.hex===original?.hex?state.current.p.aircraft:original,e=a&&v.entities.getById(`aircraft-${a.hex}`);if(e&&a){e.show=true;gear(e,a,a.ground?1:0,0,false);}v.camera.lookAtTransform(C.Matrix4.IDENTITY);v.scene.requestRender();}};
+  return()=>{cancelAnimationFrame(frame.current);resize.disconnect();v.canvas.removeEventListener('pointerdown',release);v.canvas.removeEventListener('wheel',release);v.canvas.removeEventListener('keydown',release);document.removeEventListener('visibilitychange',hidden);if(!v.isDestroyed()){controller.enableCollisionDetection=originalCollision;v.camera.frustum.near=originalNear;if(shown)v.entities.remove(shown);const a=state.current.p.aircraft?.hex===original?.hex?state.current.p.aircraft:original,e=a&&v.entities.getById(`aircraft-${a.hex}`);if(e&&a){e.show=true;gear(e,a,a.ground?1:0,0,false);}v.camera.lookAtTransform(C.Matrix4.IDENTITY);v.scene.requestRender();}};
  },[p.viewer,open,p.mode,p.replay]);
 
  if(!eligible||p.mode!=='3D'||p.replay)return null;
  if(!open)return <button className="flight-view-trigger" onClick={()=>{setView('side');setOpen(true);}}>✈ Flight view</button>;
- const a=p.aircraft!;const presentation=liveFrame(a,p.trail,Date.now(),p.reducedMotion,p.route,p.arrivalGeometry);const landing=!!presentation?.landingPhase;const location=landing?nearestCity(p.cities,presentation.lon,presentation.lat):nearest;const asset=p.modelStage==='primary'?sourcedModel(a.aircraftType):null;const route=p.route;const endpoints=route&&['PLAUSIBLE','UNVERIFIED'].includes(route.status)&&route.airports.length===2?route.airports:null;
+ const a=p.aircraft!;const presentation=sharedLiveMotion.displayed(a.hex)??liveFrame(a,p.trail,Date.now(),p.reducedMotion,p.route,p.arrivalGeometry);const landing=!!presentation?.landingPhase;const location=landing?nearestCity(p.cities,presentation.lon,presentation.lat):nearest;const asset=p.modelStage==='primary'?sourcedModel(a.aircraftType):null;const route=p.route;const endpoints=route&&['PLAUSIBLE','UNVERIFIED'].includes(route.status)&&route.airports.length===2?route.airports:null;
  return <>{view==='cockpit'&&<Suspense fallback={<div className="cockpit-loading" role="status">Loading cockpit…</div>}><CockpitView observations={p.observations} viewer={p.viewer} aircraft={a} points={p.trail} route={p.route} arrival={p.arrivalGeometry} reduced={p.reducedMotion} suspended={p.suspended} front={()=>setView('front')} side={()=>setView('side')} close={()=>setOpen(false)}/></Suspense>}<RouteLayer viewer={p.viewer} aircraft={a} route={route} trail={p.trail} active={view==='route'&&!demo}/><section ref={panelRef} className={`flight-experience${view==='cockpit'?' cockpit-sidebar':''}${compact?' flight-compact':''}`} aria-label="Passenger flight view"><SheetHandle rememberFlight/><header>{fleetPaint(a.callsign)!=='neutral'&&<img className="flight-airline-logo" src={`${import.meta.env.BASE_URL}airlines/${fleetPaint(a.callsign)}.png`} alt={`${airline(a)} logo`} onError={e=>{e.currentTarget.style.display='none';}}/>}<strong>{demo?'SIMULATION · '+demo.toUpperCase():a.callsign||a.registration||a.hex}</strong><button aria-label={compact?'Expand flight details':'Collapse flight details'} onClick={()=>setCompact(!compact)}>{compact?'+':'−'}</button><button aria-label="Close flight view" onClick={()=>{setOpen(false);setDemo(null);setPlaying(false);}}>×</button></header>
  {view==='free'&&<button className="resume-flight-camera" onClick={()=>setView('chase')}>Resume flight camera</button>}<div className="flight-buttons">{(['chase','front','cockpit','cabin','bird','side','wing','tail','director','orbit','area','free'] as View[]).map(v=><button key={v} aria-pressed={view===v} onClick={()=>{if(v==='cockpit'){setDemo(null);setPlaying(false);}setView(v);}}>{v==='front'?'Front view':v==='cockpit'?'Pilot cockpit':v==='cabin'?'Cabin':v==='bird'?'Bird’s-eye':v==='wing'?'Wing view':v==='tail'?'Tail view':v==='director'?'Landing director':v}</button>)}<button disabled={!endpoints||!!demo} onClick={()=>{setView('route');p.onRoute();}}>Route</button></div>
  {(view==='side'||view==='wing')&&<div className="flight-buttons" role="group" aria-label="Aircraft side view">{(['left','right'] as const).map(option=><button key={option} aria-pressed={side===option} onClick={()=>setSide(option)}>{option==='left'?'Left side':'Right side'}</button>)}</div>}
@@ -139,7 +146,7 @@ export function FlightExperience(p:Props){
  {view==='front'&&<p className="flight-viewpoint-note">Unobstructed front view along the flight track.</p>}
  {view==='cabin'&&<><div className="flight-buttons" aria-label="Cabin window side">{(['left','right'] as const).map(side=><button key={side} aria-pressed={cabinSide===side} onClick={()=>setCabinSide(side)}>{side==='left'?'Left window':'Right window'}</button>)}</div><p className="flight-viewpoint-note">Window-side view beside the aircraft · approximate seat position, no modeled cabin interior.</p></>}
  {view==='bird'&&<p className="flight-viewpoint-note">Following above the aircraft, aligned with its heading.</p>}
- {!demo&&<p className="flight-motion-status" role="status">{p.aircraft?.positionWarning?`Position quality: ${p.aircraft.positionWarning} · suspect fix excluded. ${liveMotionStatus(a,p.trail,Date.now(),p.reducedMotion,p.route,p.arrivalGeometry)}`:liveMotionStatus(a,p.trail,Date.now(),p.reducedMotion,p.route,p.arrivalGeometry)}{!p.modelReady&&view!=='area'&&view!=='route'&&<small>3D model not ready · aircraft marker retained</small>}</p>}
+ {!demo&&<p className="flight-motion-status" role="status">{p.aircraft?.positionWarning?`Position quality: ${p.aircraft.positionWarning} · suspect fix excluded. ${liveMotionStatus(a,p.trail,Date.now(),p.reducedMotion,p.route,p.arrivalGeometry,presentation)}`:liveMotionStatus(a,p.trail,Date.now(),p.reducedMotion,p.route,p.arrivalGeometry,presentation)}{!p.modelReady&&view!=='area'&&view!=='route'&&<small>3D model not ready · aircraft marker retained</small>}</p>}
  {p.modelStage!=='primary'&&!demo&&<div className="model-recovery" role="status"><p>{p.modelStage==='fallback'?'Lightweight model · detailed model unavailable or slow':'Aircraft marker · 3D models unavailable or slow'}</p><button onClick={p.retryModel}>Retry detailed model</button></div>}
  {view!=='front'&&view!=='cabin'&&<label className="flight-distance">Camera distance<input aria-label="Flight camera distance" type="range" min="0.8" max="2.4" step="0.05" value={distance} onChange={e=>{setDistance(Number(e.target.value));if(view==='free')setView('side');}}/></label>}
  <div className="flight-details" hidden={compact}>

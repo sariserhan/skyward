@@ -65,10 +65,10 @@ export function liveFrame(a:Aircraft,points:TrailPoint[],now:number,reduced=fals
  const altitude=frame.altitude<60000&&(frame.altitude>2000||vertical>0)?frame.altitude+Math.max(-Math.min(1500,Math.max(0,frame.altitude-1500)),Math.min(1500,60000-frame.altitude,delta)):frame.altitude;
  return {...frame,...position,altitude,heading:bearing(position,next),estimated:age>0,predictionLimited:age>0&&age/1000>=limit,turnRate:turnRate*(1-trendSeconds/30),verticalRate:vertical*(1-trendSeconds/30)};
 }
-export function liveMotionStatus(a:Aircraft,points:TrailPoint[],now:number,reduced=false,route?:FlightRoute|null,arrivalGeometry?:AirportGeometry|null){
+export function liveMotionStatus(a:Aircraft,points:TrailPoint[],now:number,reduced=false,route?:FlightRoute|null,arrivalGeometry?:AirportGeometry|null,displayed?:LiveFrame|null){
  if(reduced)return 'Reduced motion · showing received positions';
  if(a.ground)return now-(a.observedAt??0)>8000?'On ground · awaiting position update':'Ground tracking · short motion estimate';
- const frame=liveFrame(a,points,now,false,route,arrivalGeometry);
+ const frame=displayed??liveFrame(a,points,now,false,route,arrivalGeometry);
  if(!frame)return 'Position unavailable · cannot estimate movement';
  if(frame.landingPhase==='taxi'||frame.landingPhase==='parked')return `Predicted airport animation · ${frame.landingPhase==='taxi'?'taxiing toward':'parked near'} illustrative gate ${frame.gate??'unknown'} · assignment unconfirmed`;
  if(frame.landingPhase)return `Predicted landing · ${frame.landingPhase==='approach'?'final approach':frame.landingPhase==='rollout'?'rollout':'rollout complete'} · runway ${frame.runway}`;
@@ -78,10 +78,25 @@ export function liveMotionStatus(a:Aircraft,points:TrailPoint[],now:number,reduc
 }
 /** Smooth incoming corrections while the extrapolated destination keeps moving. */
 export class LiveMotion {
+ private approaches=new Map<string,{aircraft:Aircraft;airport:AirportGeometry}>();
+ displayed(hex:string){return this.frames.get(hex)?.frame??null;}
+
  private frames=new Map<string,{signature:string;frame:LiveFrame;start:number;duration:number;dx:number;dy:number;dz:number;dh:number}>();
  sample(a:Aircraft,points:TrailPoint[],now:number,reduced=false,route?:FlightRoute|null,arrivalGeometry?:AirportGeometry|null){
-  const target=liveFrame(a,points,now,reduced,route,arrivalGeometry);if(!target)return null;
-  if(reduced){this.frames.delete(a.hex);return target;}
+  let target=liveFrame(a,points,now,reduced,route,arrivalGeometry);if(!target)return null;
+  const anchor=this.approaches.get(a.hex);
+  if(anchor&&!reduced&&arrivalGeometry?.id===anchor.airport.id&&a.callsign===anchor.aircraft.callsign&&a.targetKind==='aircraft'&&(a.groundSpeed===null||(a.groundSpeed>=0&&a.groundSpeed<=260))&&!a.ground&&!a.positionWarning&&(a.verticalRate??0)<=150&&a.altitude!==null&&a.lat!==null&&a.lon!==null&&a.observedAt!==null&&a.observedAt>=anchor.aircraft.observedAt!&&a.observedAt-anchor.aircraft.observedAt!<=120000){
+   const continued=predictedLanding(anchor.aircraft,now,route,anchor.airport);
+   const agl=a.altitude-anchor.airport.elevationFt!;
+   // Once touchdown starts, noisy low airborne fixes must not restart final approach.
+   // Keep the plan only while new observations still agree with this runway arrival.
+   if(continued&&agl>=-200&&agl<=250&&trackDistance(a as {lat:number;lon:number},continued)<.65&&a.heading!==null&&Math.abs(wrap(a.heading-anchor.aircraft.heading!))<20&&(!target.landingPhase||continued.ground))target=continued;
+  }
+  if(!reduced&&target.landingPhase&&arrivalGeometry){
+   if(!anchor||target.time===a.observedAt)this.approaches.set(a.hex,{aircraft:{...a},airport:arrivalGeometry});
+  }else this.approaches.delete(a.hex);
+  while(this.approaches.size>256)this.approaches.delete(this.approaches.keys().next().value!);
+  if(reduced){this.frames.delete(a.hex);this.approaches.delete(a.hex);return target;}
   const signature=[a.observedAt,a.lat,a.lon,a.altitude,a.groundSpeed,a.heading,a.verticalRate,a.ground,!!target.landingPhase].join('/');
   let state=this.frames.get(a.hex);
   if(!state)state={signature,frame:target,start:now,duration:2000,dx:0,dy:0,dz:0,dh:0};

@@ -83,3 +83,19 @@ test('continuous observed history can supply missing heading and speed for a map
  const history=[{lat:0,lon:-.09,altitude:2300,time:85000,ground:false},{lat:0,lon:-.08,altitude:2200,time:100000,ground:false}];
  assert.equal(liveFrame({...a,heading:null,groundSpeed:null},history,115000,false,route,airport).landingPhase,'approach');
 });
+test('successive low airborne fixes cannot restart a rollout; genuine go-arounds still override it',()=>{
+ const motion=new LiveMotion(),first={...a,lon:.001,altitude:380};
+ motion.sample(first,[],first.observedAt+1000,false,route,airport);
+ const rollout=motion.sample(first,[],first.observedAt+20000,false,route,airport);assert.equal(rollout.landingPhase,'rollout');
+ const update={...first,lon:rollout.lon,altitude:420,verticalRate:0,observedAt:first.observedAt+20000};
+ const next=motion.sample(update,[],update.observedAt,false,route,airport);assert.equal(next.landingPhase,'rollout');assert.equal(next.ground,true);assert.ok(trackDistance(rollout,next)<1e-8);
+ const further=motion.sample(update,[],update.observedAt+1000,false,route,airport);assert.equal(further.landingPhase,'rollout');assert.ok(further.lon>next.lon);
+ assert.equal(motion.sample({...update,verticalRate:1800,observedAt:update.observedAt+2000},[],update.observedAt+2000,false,route,airport).landingPhase,undefined);
+});
+test('a retained landing cannot override a conflicting position or destination',()=>{
+ for(const mismatch of ['position','destination']){
+  const motion=new LiveMotion(),first={...a,lon:.001,altitude:380};motion.sample(first,[],101000,false,route,airport);motion.sample(first,[],120000,false,route,airport);
+  const updated={...first,lon:mismatch==='position'?.1:.009,observedAt:120000};
+  assert.equal(motion.sample(updated,[],120000,false,mismatch==='destination'?{...route,airports:[route.airports[0],{iata:'OTHER',lat:2,lon:2}]}:route,airport).landingPhase,undefined);
+ }
+});

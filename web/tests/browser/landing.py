@@ -4,6 +4,7 @@ Uses the bundled IAD geometry and local fixtures; no live aviation API required.
 import time
 import urllib.parse
 import regression as f
+from playwright.sync_api import expect
 
 
 def run(page):
@@ -35,6 +36,8 @@ def run(page):
     page.goto(f.URL + '/#airport=IAD', wait_until='domcontentloaded')
     page.get_by_role('button', name='View THY111', exact=True).click()
     page.get_by_role('button', name='✈ Flight view', exact=True).click()
+    expect(page.locator('.map-flight-route')).to_have_text('LHR → IAD')
+    assert page.evaluate('__viewer.scene.screenSpaceCameraController.enableCollisionDetection') is False
     page.wait_for_function("__viewer.entities.values.filter(e=>e.id.startsWith('landing-gear-')&&e.show).length>=6")
     # Freeze only the fixture clock to verify actual rendered wheel geometry,
     # not merely entities marked show=true, even on slow headless rendering.
@@ -63,7 +66,19 @@ def run(page):
     assert 'taxiing toward' in flight.inner_text(), flight.inner_text()
     assert not errors, errors
     assert not page.locator('.recovery-screen,.cesium-widget-errorPanel').count()
-    page.get_by_role('button', name='Close flight view').click()
+    page.set_viewport_size({'width': 390, 'height': 844})
+    page.wait_for_timeout(1800)
+    expect(page.locator('.map-flight-route')).to_be_visible()
+    page.wait_for_function("""(()=>{const v=__viewer,C=Cesium,e=v.entities.getById('aircraft-abcdef'),
+      p=C.SceneTransforms.worldToWindowCoordinates(v.scene,e.position.getValue(v.clock.currentTime)),
+      panel=document.querySelector('.flight-experience').getBoundingClientRect(),canvas=v.canvas.getBoundingClientRect();
+      return p&&p.y+canvas.top<panel.top-10;})()""")
+    page.get_by_role('button', name='Pilot cockpit', exact=True).click()
+    page.wait_for_timeout(1000)
+    assert page.evaluate('__viewer.camera.positionCartographic.height') > 0
+    page.get_by_role('button', name='Close cockpit', exact=True).click()
+    assert page.evaluate('__viewer.scene.screenSpaceCameraController.enableCollisionDetection') is True
+    assert not errors, errors
     print('PASS late runway fix lands, sourced gear stays visible, and mapped taxi follows touchdown', flush=True)
 
 
