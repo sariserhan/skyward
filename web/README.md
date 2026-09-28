@@ -992,9 +992,11 @@ email verification and password recovery; configure SMTP before enabling it.
 #### Development: all Premium features unlocked
 
 From `web`, run `npm run build`, then `npm run start:dev`. Open
-http://localhost:8000 and sign in or create a local test account. Every signed-in
-account automatically gets Premium, including both simulators and account tools;
-no checkout or manual grant is required. Saved data remains private to each account.
+http://localhost:8000. A private local test session is created automatically when
+you open the account controls or either simulator. No sign-in, checkout or manual
+grant is required. Existing signed-in accounts also get Premium. Saved data stays
+with that browser session; use a registered test account for repeatable sign-in.
+Clearing cookies loses access to an automatically created test account.
 The server stays on port 8000, so the existing SSH tunnel continues to work.
 
 For a configured Neon / Better Auth development database, run

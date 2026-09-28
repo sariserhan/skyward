@@ -211,8 +211,8 @@ test('Development accounts unlock Premium libraries, tools and simulators withou
  const origin='http://localhost:8000';
  const f=await fixture({env:{NODE_ENV:'development',SKYWARD_DEV_PREMIUM:'1',SKYWARD_PUBLIC_ORIGIN:origin,STRIPE_SECRET_KEY:'',STRIPE_PRICE_ID:''}});
  try{
-  assert.equal((await f.call('/api/account')).body.user,null);
-  assert.equal((await f.membership.simulatorAccess({headers:{}})).status,401);
+  const automatic=await f.call('/api/account');assert.equal(automatic.body.user.premium,true);assert.ok(automatic.cookie);
+  assert.equal((await f.membership.simulatorAccess({headers:{cookie:automatic.cookie}})).allowed,true);
   const registered=await f.call('/api/account/register',{email:'dev@example.test',password:'correct horse battery staple'},'',{Origin:origin});
   assert.equal(registered.code,200);const cookie=registered.cookie;
   assert.equal((await f.call('/api/account',undefined,cookie)).body.user.premium,true);

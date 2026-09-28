@@ -57,7 +57,7 @@ export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now
   const token=req=>String(req.headers.cookie||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('skyward_session='))?.slice(16)||'';
   function user(req) {return get('SELECT users.* FROM users JOIN sessions ON users.id=sessions.user_id WHERE sessions.token=? AND sessions.expires>?',digest(token(req)),now());}
   function cookie(res,raw,age=604800){res.setHeader('Set-Cookie',`skyward_session=${raw}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${age}${parsed.protocol==='https:'?'; Secure':''}`);}
-  function session(req,res,id){run('DELETE FROM sessions WHERE token=? OR expires<=?',digest(token(req)),now());const raw=randomBytes(32).toString('hex');run('INSERT INTO sessions VALUES(?,?,?)',digest(raw),id,now()+604800000);cookie(res,raw);}
+  function session(req,res,id){run('DELETE FROM sessions WHERE token=? OR expires<=?',digest(token(req)),now());const raw=randomBytes(32).toString('hex');run('INSERT INTO sessions VALUES(?,?,?)',digest(raw),id,now()+604800000);cookie(res,raw);return raw;}
   async function stripe(path,params,idem) {
     if(!billing)fail(503,'Test checkout is not configured yet.');
     let response;
@@ -107,6 +107,14 @@ export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now
     try{const value=JSON.parse(raw||'{}');if(!value||typeof value!=='object'||Array.isArray(value))throw Error();return value;}catch{fail(400,'Invalid request.');}
   }
   async function handle(req,res,url) {
+    // Local development gets a private browser session on first entry. Never
+    // bootstrap on mutations, static assets, shared pages, or in other modes.
+    if(devPremium&&req.method==='GET'&&['/api/account','/flight-simulator/','/airport-simulation/'].includes(url.pathname)&&!user(req)) {
+      const id=randomBytes(16).toString('hex');
+      run('INSERT INTO users(id,email,password) VALUES(?,?,?)',id,`developer-${id}@local.invalid`,`${randomBytes(16).toString('hex')}:${randomBytes(64).toString('hex')}`);
+      const raw=session(req,res,id);
+      req.headers.cookie=`skyward_session=${raw}`;
+    }
     if(await premium.publicHandle(req,res,url))return true;
     if(!/^\/api\/(account(?:\/|$)|billing(?:\/|$)|journeys(?:\/|$)|premium(?:\/|$))/.test(url.pathname))return false;
     const send=(status,value)=>{res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify(value));};
