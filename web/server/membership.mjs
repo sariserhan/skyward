@@ -1,3 +1,5 @@
+import {sqlitePremiumStore} from './premium-store.mjs';
+import {createPremiumTools} from './premium-tools.mjs';
 import {createAccountLibrary} from './account-library.mjs';
 import airports from '../data/airport-catalog.json' with {type:'json'};
 import {DatabaseSync} from 'node:sqlite';
@@ -81,6 +83,19 @@ export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now
       db.exec('COMMIT');
     }catch(e){db.exec('ROLLBACK');throw e;}
   }
+  async function lookup(u,journeyKey){
+          if(!await entitlement(u))fail(403,'An active paid subscription is required.');
+          const journey=get('SELECT body FROM journeys WHERE user_id=? AND key=?',u.id,String(journeyKey||''));if(!journey)fail(404,'Save this journey before checking details.');
+          const saved=JSON.parse(journey.body),previous=get('SELECT * FROM checks WHERE user_id=? AND key=?',u.id,saved.key);
+          if(previous&&now()-previous.checked<60000)fail(429,'Wait a minute before checking this journey again.');
+          reserve(u);
+          const sample=airlabsPreview('demo'); // Never call the live adapter from a test subscription.
+          const result={...sample,requestedJourney:saved,checkedAt:now(),message:'Synthetic example DEMO101. Not live data for your saved journey.'};
+          // Samples remain explicitly separate from saved flight identity; never send fictional alerts.
+          run('INSERT INTO checks VALUES(?,?,?,?) ON CONFLICT(user_id,key) DO UPDATE SET body=excluded.body,checked=excluded.checked',u.id,saved.key,JSON.stringify(result),now());
+    return {...result,usage:usage(u)};
+  }
+  const premium=createPremiumTools({store:sqlitePremiumStore(db),entitlement,env,now,userById:id=>get('SELECT * FROM users WHERE id=?',id),readJourney:(id,key)=>{const j=get('SELECT body FROM journeys WHERE user_id=? AND key=?',id,key),c=get('SELECT body FROM checks WHERE user_id=? AND key=?',id,key);return j?{...JSON.parse(j.body),details:c?JSON.parse(c.body):null}:null;},lookup});
   const accountLibrary=createAccountLibrary(db,{now,entitlement});
   async function body(req) {
     const maximum=req.url?.split('?')[0]==='/api/account/library'?17*1024*1024:8192;
@@ -89,6 +104,7 @@ export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now
     try{const value=JSON.parse(raw||'{}');if(!value||typeof value!=='object'||Array.isArray(value))throw Error();return value;}catch{fail(400,'Invalid request.');}
   }
   async function handle(req,res,url) {
+    if(await premium.publicHandle(req,res,url))return true;
     if(!/^\/api\/(account(?:\/|$)|billing(?:\/|$)|journeys(?:\/|$)|premium(?:\/|$))/.test(url.pathname))return false;
     const send=(status,value)=>{res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify(value));};
     try {
@@ -123,6 +139,7 @@ export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now
         }finally{inflight.delete(lock);}
       }
       if(!u)fail(401,'Sign in to continue.');
+      const extra=await premium.handle(path,req.method,u,b);if(extra){send(200,extra);return true;}
       if(await accountLibrary(path,req.method,u,url,b,send))return true;
       if(path==='/api/account/logout'&&req.method==='POST'){run('DELETE FROM sessions WHERE token=?',digest(token(req)));cookie(res,'',0);send(200,{ok:true});return true;}
       if(path==='/api/billing/checkout'&&req.method==='POST') {
@@ -152,18 +169,7 @@ export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now
       }
       if(path==='/api/premium/details'&&req.method==='POST') {
         if(inflight.has(u.id))fail(429,'A lookup is already running.');inflight.add(u.id);
-        try {
-          if(!await entitlement(u))fail(403,'An active paid subscription is required.');
-          const journey=get('SELECT body FROM journeys WHERE user_id=? AND key=?',u.id,String(b.key||''));if(!journey)fail(404,'Save this journey before checking details.');
-          const saved=JSON.parse(journey.body),previous=get('SELECT * FROM checks WHERE user_id=? AND key=?',u.id,saved.key);
-          if(previous&&now()-previous.checked<60000)fail(429,'Wait a minute before checking this journey again.');
-          reserve(u);
-          const sample=airlabsPreview('demo'); // Never call the live adapter from a test subscription.
-          const result={...sample,requestedJourney:saved,checkedAt:now(),message:'Synthetic example DEMO101. Not live data for your saved journey.'};
-          // Samples remain explicitly separate from saved flight identity; never send fictional alerts.
-          run('INSERT INTO checks VALUES(?,?,?,?) ON CONFLICT(user_id,key) DO UPDATE SET body=excluded.body,checked=excluded.checked',u.id,saved.key,JSON.stringify(result),now());
-          send(200,{...result,usage:usage(u)});return true;
-        }finally{inflight.delete(u.id);}
+        try{send(200,await lookup(u,b.key));return true;}finally{inflight.delete(u.id);}
       }
       fail(404,'Endpoint not found.');
     }catch(error){send(error.status||500,{error:error.status?error.message:'Unable to complete this request.'});}
@@ -184,6 +190,7 @@ export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now
       run('INSERT INTO checks VALUES(?,?,?,?) ON CONFLICT(user_id,key) DO UPDATE SET body=excluded.body,checked=excluded.checked',userId,journeyKey,JSON.stringify(result),now());
       run('DELETE FROM alerts WHERE user_id=? AND id NOT IN (SELECT id FROM alerts WHERE user_id=? ORDER BY id DESC LIMIT 50)',userId,userId);
       db.exec('COMMIT');
+      if(saved.alerts&&prior?.mode==='live')for(const message of changesSince(prior.flight,f))void premium.notifyVerified(userId,`${journeyKey}:${result.fetchedAt}:${message}`,`${saved.callsign}: ${message}`).catch(()=>{});
     }catch(e){db.exec('ROLLBACK');throw e;}
   }
   async function simulatorAccess(req) {
@@ -192,5 +199,5 @@ export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now
     try {return await entitlement(account)?{allowed:true,status:200}:{allowed:false,status:403};}
     catch {return {allowed:false,status:503};}
   }
-  return {handle,db,close:()=>db.close(),recordVerifiedCheck,simulatorAccess};
+  return {handle,db,premiumTick:premium.tick,close:()=>db.close(),recordVerifiedCheck,simulatorAccess};
 }

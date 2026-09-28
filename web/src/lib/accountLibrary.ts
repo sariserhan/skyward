@@ -1,6 +1,6 @@
 import {validBackupValue} from './localBackup';
 import {accountRequest} from './membership';
-export type LibraryKind='watchlist'|'views'|'recordings'|'logbook'|'simulator';
+export type LibraryKind='watchlist'|'views'|'recordings'|'logbook'|'simulator'|'trips'|'journal'|'airports'|'missions';
 export interface LibraryItem<T=unknown>{key:string;revision:number;updated:number;name?:string;bytes?:number;value:T;}
 export const listAccountItems=<T>(kind:LibraryKind)=>accountRequest<{items:LibraryItem<T>[];limits:{count:number;bytes:number}}>(`/api/account/library?kind=${kind}`);
 export const getAccountItem=<T>(kind:LibraryKind,key:string)=>accountRequest<LibraryItem<T>>(`/api/account/library?kind=${kind}&key=${encodeURIComponent(key)}`);

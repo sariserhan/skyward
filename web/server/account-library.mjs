@@ -4,7 +4,7 @@ import airports from '../data/airport-catalog.json' with {type:'json'};
 const fail=(status,message)=>{throw Object.assign(Error(message),{status});};
 const text=(v,n=100)=>typeof v==='string'?v.trim().slice(0,n):'';
 const date=v=>typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v)&&Number.isFinite(Date.parse(v))&&new Date(v).toISOString().slice(0,10)===v;
-export const LIBRARY_LIMITS={watchlist:{count:30,bytes:1024,free:true},views:{count:10,bytes:65536},recordings:{count:10,bytes:2*1024*1024},logbook:{count:500,bytes:2048},simulator:{count:5,bytes:16*1024*1024}};
+export const LIBRARY_LIMITS={watchlist:{count:30,bytes:1024,free:true},views:{count:10,bytes:65536},recordings:{count:10,bytes:2*1024*1024},logbook:{count:500,bytes:2048},simulator:{count:5,bytes:16*1024*1024},trips:{count:30,bytes:16384},journal:{count:200,bytes:512*1024},airports:{count:12,bytes:65536},missions:{count:100,bytes:8192}};
 const setupKeys=new Set(['skyward.map.v1','skyward.flight-view.v1','skyward.camera-bookmarks.v1','skyward.favorites.v1','skyward.cabin-audio.v1']);
 export function validateLibrary(kind,value){
  if(!value||typeof value!=='object'||Array.isArray(value))fail(400,'Choose a valid saved item.');
@@ -22,6 +22,26 @@ export function validateLibrary(kind,value){
   if(!date(value.date)||!Object.hasOwn(airports,from)||!Object.hasOwn(airports,to)||from===to)fail(400,'Choose a date and two different airports from the directory.');
   if(!Number.isFinite(value.durationMinutes)||value.durationMinutes<0||value.durationMinutes>1500)fail(400,'Duration must be between 0 and 1,500 minutes.');
   return {date:value.date,from,to,callsign:text(value.callsign,16),aircraftType:text(value.aircraftType,20),registration:text(value.registration,32),durationMinutes:Math.round(value.durationMinutes),notes:text(value.notes,500)};
+ }
+ if(kind==='trips'){
+  if(!Array.isArray(value.legs)||!value.legs.length||value.legs.length>12)fail(400,'A trip needs 1–12 legs.');
+  const legs=value.legs.map(l=>{if(!l||!Object.hasOwn(airports,l.from)||!Object.hasOwn(airports,l.to)||l.from===l.to||!Number.isFinite(l.departureAt)||!Number.isFinite(l.arrivalAt)||l.arrivalAt<=l.departureAt||l.arrivalAt-l.departureAt>48*3600000||l.departureAt<0||l.arrivalAt>8640000000000000)fail(400,'Use valid airports and UTC times for every leg.');return {from:l.from,to:l.to,callsign:text(l.callsign,16),journeyKey:text(l.journeyKey,100),departureAt:l.departureAt,arrivalAt:l.arrivalAt};});
+  for(let i=1;i<legs.length;i++)if(legs[i].departureAt<legs[i-1].arrivalAt||legs[i].from!==legs[i-1].to)fail(400,'Connect legs at the same airport in chronological order.');
+  return {name:text(value.name,80)||'My trip',legs};
+ }
+ if(kind==='journal'){
+  if(!date(value.date)||!Object.hasOwn(airports,value.airport))fail(400,'Choose a sighting date and airport.');
+  const photo=typeof value.photo==='string'?value.photo:'';if(photo&&!/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(photo))fail(400,'Use a JPEG, PNG or WebP photo.');
+  if(photo.length>480000)fail(413,'Resize the photo below 350 KB.');
+  return {date:value.date,airport:value.airport,callsign:text(value.callsign,16),registration:text(value.registration,32),aircraftType:text(value.aircraftType,20),airline:text(value.airline,80),notes:text(value.notes,1000),collection:text(value.collection,50),photo};
+ }
+ if(kind==='airports'){
+  if(!Object.hasOwn(airports,value.airport))fail(400,'Choose an airport from the directory.');
+  return {airport:value.airport,name:text(value.name,80)||value.airport,view:['tower','overhead'].includes(value.view)?value.view:'tower',settings:validateLibrary('views',{settings:value.settings??{}}).settings};
+ }
+ if(kind==='missions'){
+  if(!Object.hasOwn(airports,value.from)||!Object.hasOwn(airports,value.to)||value.from===value.to||!['easy','advanced'].includes(value.difficulty)||!['landed','crashed','aborted'].includes(value.result)||!Number.isFinite(value.duration)||value.duration<0||value.duration>86400||!Number.isFinite(value.touchdownRate)||Math.abs(value.touchdownRate)>20000)fail(400,'Invalid simulator result.');
+  return {from:value.from,to:value.to,difficulty:value.difficulty,result:value.result,duration:Math.round(value.duration),touchdownRate:Math.round(value.touchdownRate),aircraftType:text(value.aircraftType,16),assisted:value.assisted===true,challenge:text(value.challenge,30),completedAt:Date.now(),source:'Personal simulation result; not verified real flying'};
  }
  if(kind==='simulator'){
   if(value.kind!=='career'||!Number.isInteger(value.version)||!value.career||typeof value.career!=='object')fail(400,'Upload an airport career save.');

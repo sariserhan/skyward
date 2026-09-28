@@ -1,3 +1,5 @@
+import {postgresPremiumStore} from './premium-store.mjs';
+import {createPremiumTools} from './premium-tools.mjs';
 import {toNodeHandler,fromNodeHeaders} from 'better-auth/node';
 import {createHash} from 'node:crypto';
 import {createNeonPool,createNeonAuth,neonConfig} from './neon-auth.mjs';
@@ -51,7 +53,19 @@ export function createNeonMembership({env=process.env,pool=createNeonPool(env),s
    const revision=(old?.revision??0)+1;await db.query('INSERT INTO skyward_library VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT(user_id,kind,key) DO UPDATE SET body=excluded.body,revision=excluded.revision,updated=excluded.updated',[u.id,kind,key,encoded,revision,now()]);return {ok:true,key,revision};
   });
  }
+ async function lookup(u,journeyKey){
+    if(!await entitlement(u))fail(403,'An active paid subscription is required.');
+    const result=await transaction('skyward:lookup-budget',async db=>{
+     const j=await one('SELECT body FROM skyward_journeys WHERE user_id=$1 AND key=$2 FOR UPDATE',[u.id,String(journeyKey||'')],db);if(!j)fail(404,'Save this journey before checking details.');const saved=j.body,prev=await one('SELECT checked FROM skyward_checks WHERE user_id=$1 AND key=$2',[u.id,saved.key],db);if(prev&&now()-Number(prev.checked)<60000)fail(429,'Wait a minute before checking this journey again.');
+     const month=new Date(now()).toISOString().slice(0,7),own=await one('SELECT requests FROM skyward_usage WHERE user_id=$1 AND month=$2',[u.id,month],db),total=await one('SELECT COALESCE(SUM(requests),0) requests,COALESCE(SUM(cost),0) cost FROM skyward_usage WHERE month=$1',[month],db);
+     if((own?.requests??0)>=limits.userRequests||Number(total.requests)>=limits.globalRequests||Number(total.cost)+limits.requestMicros>limits.budgetMicros)fail(429,'Flight-detail allowance reached. No lookup was made.');
+     await db.query('INSERT INTO skyward_usage VALUES($1,$2,1,$3) ON CONFLICT(user_id,month) DO UPDATE SET requests=skyward_usage.requests+1,cost=skyward_usage.cost+excluded.cost',[u.id,month,limits.requestMicros]);
+     const result={...airlabsPreview('demo'),requestedJourney:saved,checkedAt:now(),message:'Synthetic example DEMO101. Not live data for your saved journey.'};await db.query('INSERT INTO skyward_checks VALUES($1,$2,$3,$4) ON CONFLICT(user_id,key) DO UPDATE SET body=excluded.body,checked=excluded.checked',[u.id,saved.key,JSON.stringify(result),now()]);return result;
+    });return {...result,usage:await usage(u)};
+ }
+ const premium=createPremiumTools({store:postgresPremiumStore(pool,transaction),entitlement,env,now,userById:async id=>{const u=await one('SELECT id,email FROM "user" WHERE id=$1 AND "emailVerified"=true',[id]);if(!u)return null;return {...u,customer:(await one('SELECT stripe_customer FROM skyward_profiles WHERE user_id=$1',[id]))?.stripe_customer};},readJourney:async(id,key)=>{const r=await one('SELECT j.body,c.body AS detail FROM skyward_journeys j LEFT JOIN skyward_checks c ON j.user_id=c.user_id AND j.key=c.key WHERE j.user_id=$1 AND j.key=$2',[id,key]);return r?{...r.body,details:r.detail}:null;},lookup});
  async function handle(req,res,url){
+  if(await premium.publicHandle(req,res,url))return true;
   if(url.pathname.startsWith('/api/auth/')){res.setHeader('Cache-Control','no-store');req.headers['x-skyward-client-ip']=req.socket.remoteAddress||'127.0.0.1';await authHandler(req,res);return true;}
   if(!/^\/api\/(account(?:\/|$)|billing(?:\/|$)|journeys(?:\/|$)|premium(?:\/|$))/.test(url.pathname))return false;
   const send=(status,value)=>{res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify(value));};
@@ -61,7 +75,7 @@ export function createNeonMembership({env=process.env,pool=createNeonPool(env),s
    await throttle(req);const u=await user(req),path=url.pathname;
    if(path==='/api/account'&&req.method==='GET'){send(200,{enabled:true,authProvider:'better-auth',billingReady:billing,mode:'test',user:u?{email:u.email,premium:await entitlement(u)}:null,usage:u?await usage(u):null});return true;}
    if(!u)fail(401,'Sign in with a verified email to continue.');
-   const b=req.method==='POST'?await body(req,path):{},result=await library(path,req.method,u,url,b);if(result){send(200,result);return true;}
+   const b=req.method==='POST'?await body(req,path):{};const extra=await premium.handle(path,req.method,u,b);if(extra){send(200,extra);return true;}const result=await library(path,req.method,u,url,b);if(result){send(200,result);return true;}
    if(path==='/api/billing/checkout'&&req.method==='POST'){
     if(await entitlement(u))fail(409,'Premium is already active. Use Manage subscription.');
     if(!u.customer){const c=await stripe('customers',{email:u.email,'metadata[skyward_user]':u.id},`skyward-test-customer-${u.id}`);if(c.livemode!==false||!/^cus_/.test(c.id))fail(503,'Invalid checkout configuration.');await pool.query('INSERT INTO skyward_profiles VALUES($1,$2) ON CONFLICT(user_id) DO UPDATE SET stripe_customer=excluded.stripe_customer',[u.id,c.id]);u.customer=c.id;}
@@ -75,31 +89,24 @@ export function createNeonMembership({env=process.env,pool=createNeonPool(env),s
     const k=`${callsign}:${hex}:${date}`,metadata={};for(const side of ['from','to']){const v=typeof b[side]==='string'?b[side].trim().toUpperCase():'';if(v&&!Object.hasOwn(airports,v))fail(400,'Choose an airport from the directory.');if(v)metadata[side]=v;}
     await transaction(`journeys:${u.id}`,async db=>{if(b.remove===true){await db.query('DELETE FROM skyward_journeys WHERE user_id=$1 AND key=$2',[u.id,k]);return;}const old=await one('SELECT key FROM skyward_journeys WHERE user_id=$1 AND key=$2',[u.id,k],db);if(!old&&Number((await one('SELECT COUNT(*) n FROM skyward_journeys WHERE user_id=$1',[u.id],db)).n)>=50)fail(429,'Keep up to 50 saved journeys.');await db.query('INSERT INTO skyward_journeys VALUES($1,$2,$3) ON CONFLICT(user_id,key) DO UPDATE SET body=excluded.body',[u.id,k,JSON.stringify({key:k,callsign,hex,date,...metadata,alerts:b.alerts===true})]);});send(200,{ok:true});return true;
    }
-   if(path==='/api/premium/details'&&req.method==='POST'){
-    if(!await entitlement(u))fail(403,'An active paid subscription is required.');
-    const result=await transaction('skyward:lookup-budget',async db=>{
-     const j=await one('SELECT body FROM skyward_journeys WHERE user_id=$1 AND key=$2 FOR UPDATE',[u.id,String(b.key||'')],db);if(!j)fail(404,'Save this journey before checking details.');const saved=j.body,prev=await one('SELECT checked FROM skyward_checks WHERE user_id=$1 AND key=$2',[u.id,saved.key],db);if(prev&&now()-Number(prev.checked)<60000)fail(429,'Wait a minute before checking this journey again.');
-     const month=new Date(now()).toISOString().slice(0,7),own=await one('SELECT requests FROM skyward_usage WHERE user_id=$1 AND month=$2',[u.id,month],db),total=await one('SELECT COALESCE(SUM(requests),0) requests,COALESCE(SUM(cost),0) cost FROM skyward_usage WHERE month=$1',[month],db);
-     if((own?.requests??0)>=limits.userRequests||Number(total.requests)>=limits.globalRequests||Number(total.cost)+limits.requestMicros>limits.budgetMicros)fail(429,'Flight-detail allowance reached. No lookup was made.');
-     await db.query('INSERT INTO skyward_usage VALUES($1,$2,1,$3) ON CONFLICT(user_id,month) DO UPDATE SET requests=skyward_usage.requests+1,cost=skyward_usage.cost+excluded.cost',[u.id,month,limits.requestMicros]);
-     const result={...airlabsPreview('demo'),requestedJourney:saved,checkedAt:now(),message:'Synthetic example DEMO101. Not live data for your saved journey.'};await db.query('INSERT INTO skyward_checks VALUES($1,$2,$3,$4) ON CONFLICT(user_id,key) DO UPDATE SET body=excluded.body,checked=excluded.checked',[u.id,saved.key,JSON.stringify(result),now()]);return result;
-    });send(200,{...result,usage:await usage(u)});return true;
-   }
+   if(path==='/api/premium/details'&&req.method==='POST'){send(200,await lookup(u,b.key));return true;}
    fail(404,'Endpoint not found.');
   }catch(e){send(e.status||500,{error:e.status?e.message:'Unable to complete this request.'});}
   return true;
  }
  async function recordVerifiedCheck(userId,journeyKey,result){
   if(result.mode!=='live'||result.status!=='MATCHED_RECENT_AIRCRAFT'||!Number.isFinite(result.fetchedAt))return;
+  const notifications=[];
   await transaction(`check:${userId}:${journeyKey}`,async db=>{
    const j=await one('SELECT body FROM skyward_journeys WHERE user_id=$1 AND key=$2 FOR UPDATE',[userId,journeyKey],db),saved=j?.body,f=result.flight;
    if(!saved||!f||f.callsign!==saved.callsign||f.hex!==saved.hex||!Number.isFinite(Date.parse(f.departure?.scheduledAt))||new Date(f.departure.scheduledAt).toISOString().slice(0,10)!==saved.date)return;
    const prior=(await one('SELECT body FROM skyward_checks WHERE user_id=$1 AND key=$2',[userId,journeyKey],db))?.body;
    if(prior?.mode==='live'&&result.fetchedAt<=prior.fetchedAt)return;
-   if(saved.alerts&&prior?.mode==='live')for(const message of changesSince(prior.flight,f))await db.query('INSERT INTO skyward_alerts(user_id,message,created) VALUES($1,$2,$3)',[userId,`${saved.callsign}: ${message}`,now()]);
+   if(saved.alerts&&prior?.mode==='live')for(const message of changesSince(prior.flight,f)){await db.query('INSERT INTO skyward_alerts(user_id,message,created) VALUES($1,$2,$3)',[userId,`${saved.callsign}: ${message}`,now()]);notifications.push(`${saved.callsign}: ${message}`);}
    await db.query('INSERT INTO skyward_checks VALUES($1,$2,$3,$4) ON CONFLICT(user_id,key) DO UPDATE SET body=excluded.body,checked=excluded.checked',[userId,journeyKey,JSON.stringify(result),now()]);await db.query('DELETE FROM skyward_alerts WHERE user_id=$1 AND id NOT IN (SELECT id FROM skyward_alerts WHERE user_id=$1 ORDER BY id DESC LIMIT 50)',[userId]);
   });
+  for(const message of notifications)await premium.notifyVerified(userId,`${journeyKey}:${result.fetchedAt}:${message}`,message);
  }
  async function simulatorAccess(req){try{const u=await user(req);return !u?{allowed:false,status:401}:await entitlement(u)?{allowed:true,status:200}:{allowed:false,status:403};}catch{return {allowed:false,status:503};}}
- return {handle,auth,pool,close:()=>pool.end(),recordVerifiedCheck,simulatorAccess};
+ return {handle,auth,pool,premiumTick:premium.tick,close:()=>pool.end(),recordVerifiedCheck,simulatorAccess};
 }

@@ -5,3 +5,12 @@ export async function accountRequest<T>(path:string,body?:unknown):Promise<T> {
   const data=await response.json();if(!response.ok)throw new Error((typeof data.error==='string'?data.error:data.message)||'Unable to complete this request.');return data;
 }
 export const openAccount=()=>window.dispatchEvent(new Event('skyward-account'));
+
+/** Remove this browser's private notification channel before switching accounts. */
+export async function disconnectAccountNotifications(){
+ if(!('serviceWorker' in navigator)||!('PushManager' in window))return;
+ const registration=await navigator.serviceWorker.getRegistration('/'),subscription=await registration?.pushManager.getSubscription();if(!subscription)return;
+ const hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(subscription.endpoint)),key=Array.from(new Uint8Array(hash),b=>b.toString(16).padStart(2,'0')).join('');
+ let removed=false;try{await accountRequest('/api/premium/notifications',{remove:true,key});removed=true;}catch{}
+ try{await subscription.unsubscribe();}catch{if(!removed)throw Error('Unable to disable this device’s private notifications. Please retry signing out.');}
+}

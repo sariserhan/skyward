@@ -1,8 +1,10 @@
 import {installSessionHealth} from './lib/sessionHealth';
 import './lib/installPrompt';
+import {lazy,Suspense} from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import './styles.css';
+const FlightSimulator=lazy(()=>import('./components/FlightSimulator').then(m=>({default:m.FlightSimulator})));
 installSessionHealth();
-createRoot(document.getElementById('root')!).render(<ErrorBoundary><App/></ErrorBoundary>);
+createRoot(document.getElementById('root')!).render(<ErrorBoundary>{location.pathname.startsWith('/flight-simulator')?<Suspense fallback={<p>Loading flight simulator…</p>}><FlightSimulator/></Suspense>:<App/>}</ErrorBoundary>);

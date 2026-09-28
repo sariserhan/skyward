@@ -8,7 +8,7 @@ export async function migrateNeon(pool,auth){
  try{
   await client.query('BEGIN');
   await client.query("SELECT pg_advisory_xact_lock(hashtextextended('skyward:schema',0))");
-  await client.query(await readFile(new URL('../server/migrations/001-account-data.sql',import.meta.url),'utf8'));
+  for(const file of ['001-account-data.sql','002-premium-tools.sql'])await client.query(await readFile(new URL('../server/migrations/'+file,import.meta.url),'utf8'));
   await client.query('COMMIT');
  }catch(error){await client.query('ROLLBACK');throw error;}finally{client.release();}
 }

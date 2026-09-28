@@ -25,11 +25,12 @@ test('Simulator protects documents and assets, provides navigation, and revokes 
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
   const base=`http://127.0.0.1:${server.address().port}`,headers={Cookie:'skyward_session=fixture-cookie'};
   try {
-    for(const path of ['/airport-simulation/','/airport-simulation/index.html?embed=1','/airport-simulation/index.js','/airport-simulation/index.wasm','/airport-simulation/index.pck']) {
+    for(const path of ['/flight-simulator/','/airport-simulation/','/airport-simulation/index.html?embed=1','/airport-simulation/index.js','/airport-simulation/index.wasm','/airport-simulation/index.pck']) {
       assert.equal((await fetch(base+path)).status,401);
       assert.equal((await fetch(base+path,{headers})).status,403);
     }
     paid=true;
+    const flight=await fetch(base+'/flight-simulator/',{headers});assert.equal(flight.status,200);assert.match(await flight.text(),/id="root"/);
     const page=await fetch(base+'/airport-simulation/',{headers}),html=await page.text();
     assert.equal(page.status,200);assert.match(html,/href="\/">← Back to Skyward/);assert.match(html,/<iframe/);assert.match(page.headers.get('cache-control'),/private, no-store/);
     const raw=await fetch(base+'/airport-simulation/index.html?embed=1',{headers});assert.equal(raw.status,200);assert.match(await raw.text(),/GODOT_CONFIG/);

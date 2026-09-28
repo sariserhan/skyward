@@ -71,6 +71,13 @@ test('Better Auth + Postgres: verification, sessions, recovery, owned libraries 
  assert.equal((await request('/api/premium/details',{key:journeyKey},cookie)).status,429);
  assert.equal((await request('/api/journeys',{...journey,callsign:'THY222'},cookie)).status,200);
  assert.equal((await request('/api/premium/details',{key:'THY222:abcdef:2026-09-28'},cookie)).status,429);
+ assert.equal((await request('/api/account/library',{kind:'journal',key:'spot',revision:0,value:{date:'2026-09-28',airport:'IAD',aircraftType:'B738'}},cookie)).status,200);
+ assert.equal((await request('/api/premium/monitoring',{key:journeyKey,enabled:true},cookie)).status,200);
+ await membership.premiumTick();
+ assert.equal((await request('/api/premium/monitoring',undefined,cookie)).data.used,1);
+ const share=await request('/api/premium/shares',{journeyKey,hours:1},cookie);assert.equal(share.status,200,JSON.stringify(share.data));
+ const shared=await request(share.data.url);assert.equal(shared.status,200);assert.ok(!shared.data.includes(email));
+ assert.equal((await request('/api/premium/shares',{key:share.data.key,remove:true},cookie)).status,200);
  const observation={mode:'live',status:'MATCHED_RECENT_AIRCRAFT',fetchedAt:Date.now(),flight:{callsign:'THY111',hex:'abcdef',status:'en-route',departure:{scheduledAt:'2026-09-28T10:00:00Z',gate:'A1'}}};
  await membership.recordVerifiedCheck(ids[0],journeyKey,observation);await membership.recordVerifiedCheck(ids[0],journeyKey,{...observation,fetchedAt:observation.fetchedAt+1000,flight:{...observation.flight,status:'landed'}});
  r=await request('/api/account/dashboard',undefined,cookie);assert.equal(r.status,200);assert.ok(r.data.alerts.length>0);assert.equal(r.data.alerts[0].read,false);

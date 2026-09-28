@@ -7,7 +7,8 @@
     "nodemailer": "10.0.12",
     "pg": "8.23.0",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "web-push": "3.6.7"
   },
   "devDependencies": {
     "@types/node": "26.6.3",
@@ -50,6 +51,7 @@
     "premium:test": "node scripts/test-premium.mjs",
     "db:migrate": "node --env-file-if-exists=.env scripts/migrate-neon.mjs",
     "start:neon": "SKYWARD_ACCOUNTS=neon node --env-file-if-exists=.env server/index.mjs",
-    "test:neon": "node --test server/neon-membership.test.mjs"
+    "test:neon": "node --test server/neon-membership.test.mjs",
+    "push:keys": "web-push generate-vapid-keys --json"
   }
 }

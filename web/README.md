@@ -697,8 +697,9 @@ processor detects departures, arrivals, gate changes and delays of at least five
 minutes. It rejects wrong identities, wrong departure dates, older checks and
 synthetic data; repeated observations do not duplicate alerts. **Preview sample
 alerts** is explicitly illustrative. No real alerts are generated until an authorized
-live detail source is connected. There is no background monitoring, email or push
-service in this release; existing observation-based watch alerts remain separate.
+live detail source is connected. Premium tools now provides background test monitoring and a configurable Web Push
+pipeline. Real flight-change delivery still requires a verified live source;
+existing observation-based watch alerts remain separate.
 
 Before live customer launch: configure actual provider/account contracts and
 coverage, delivery testing for verification/recovery email, live payment credentials and
@@ -1047,7 +1048,7 @@ npm run start:neon
 - `DATABASE_URL`: Neon **pooled** Postgres connection URL for the running server.
 - `DATABASE_URL_UNPOOLED`: direct Neon URL for migrations (optional fallback is
   `DATABASE_URL`). Run migrations once per deployment, before starting replicas.
-  The command applies the pinned Better Auth schema and the initial app schema;
+  The command applies the pinned Better Auth schema and the account and Premium tools schemas;
   rerunning it is safe. Back up/branch the database before future schema upgrades.
 - `BETTER_AUTH_SECRET`: generate a unique secret with `openssl rand -hex 48`.
   Preserve it across restarts and replicas. Never prefix server secrets with `VITE_`.
@@ -1104,3 +1105,99 @@ The integration test runs real Better Auth migrations, signup, verification,
 sessions, recovery, ownership checks, concurrent revisions, test quotas and alerts.
 It captures email in memory and stubs Stripe; it never sends mail or calls a paid
 aviation API. Its test users and dependent application rows are cleaned up.
+
+### Premium tools and flyable aircraft
+
+Open **Account & journeys → Premium tools** for:
+
+- **Trips:** 30 named itineraries, up to 12 connected legs each, UTC schedules,
+  verified-update overlays, and connection-time warnings. Enter schedules manually
+  or link an existing saved journey; this is not a booking or ticket import.
+- **Spotting:** 200 private sightings with registration/model, airline, airport,
+  date, notes, collections and photos. Browser resizing strips photo metadata;
+  each entry is limited to 512 KB. Search collections, airlines or aircraft.
+- **Airports:** 12 saved airport dashboards with tower/overhead links and saved
+  viewing preferences. Refresh loads existing traffic observations, mapped runways
+  and available METAR weather. Weather is cached for 15 minutes and retains its
+  original observation timestamp. Missing observations remain unavailable.
+- **Monitoring:** opt-in background checks for up to 10 saved journeys. The Node
+  worker runs every minute, schedules checks approximately every 15 minutes near
+  the journey date, and stops two days after that date. There are 30 background
+  attempts per user per UTC month; successful lookups also consume the existing
+  shared monthly detail allowance and global budget. Durable leases coordinate
+  workers across processes. The server must remain running while browsers close.
+- **Sharing:** server-generated, unguessable links lasting 1 hour, 1 day or 7 days.
+  Links can be revoked, are not indexed or cached, and stop working when the owner
+  loses Premium access. Tokens are hashed in storage and redacted from request
+  logs. Public pages show only the selected flight/date/route and verified status;
+  email addresses, notes, photos and unrelated journeys are excluded.
+- **Career:** personal flight results, visited airports and achievements for first
+  arrival, manual flying, soft touchdown, crosswind and precision landings. These
+  are self-reported entertainment results, not verified qualifications or rankings.
+  Existing airport-management cloud careers and challenges remain available.
+
+**Replays** now includes an airport/radius filter and approaching, moving-away or
+reported-ground filters. Open the filtered recording in the existing replay player
+and use its playback speeds. This works on recordings already collected/imported
+by the user; it does not create a historical traffic archive or acquire new data
+redistribution rights. Approaching/departing categories are geometric inferences.
+
+#### Flight simulator
+
+Open **/flight-simulator/** from the footer or the account's Simulator/Career tabs.
+The server checks Premium access. Choose departure and destination airports,
+Boeing 737-800, Cessna 172 or Citation V, plus a difficulty and challenge. Airports
+must have suitable mapped runways for the chosen aircraft; unavailable runways
+are rejected rather than fabricated. IAD → DCA is a useful short first flight.
+
+- **Easy:** gentler stall behavior, bank self-levelling, landing brakes and optional
+  full-route autopilot. Autopilot takes off, follows an approach intercept, corrects
+  the modeled crosswind, deploys gear/flaps, lands and stops. It is optional.
+- **Advanced:** manual pitch, bank, rudder, throttle, trim, gear, flaps and brakes.
+  Low airspeed and high pitch can stall; gear-up landings, excessive sink rate,
+  misalignment and runway excursions end the flight. No Advanced autopilot.
+- Hold W/S for pitch, A/D for bank, Q/E for rudder; use +/− for throttle, G for gear,
+  B for brakes and P for pause. Touch controls support holding; pitch/bank/rudder
+  buttons also respond to held Enter/Space. Throttle and trim are sliders.
+- Chase, front and bird views, airspeed/altitude/heading/vertical-speed readouts,
+  attitude and landing guidance are available. 4×/16× acceleration works in cruise;
+  approach and low-altitude flying automatically return to 1×. Hiding the page
+  pauses the simulation; press Resume when returning.
+- Save a completed or failed flight to the account career. Starting another flight
+  discards the current unsaved simulation. Career results sync; in-flight state
+  is not a resumable cloud save in this version.
+
+This is a simplified entertainment flight model using existing sourced aircraft
+assets and mapped airport geometry. Altitude is relative to a flat runway datum;
+terrain collisions, real aircraft performance certification, real-time ATC and
+procedurally complete airports are not simulated. Existing asset/map attribution
+remains visible. Flight simulation is separate from observed real-world aircraft.
+
+#### Notifications, deployment and remaining live-data setup
+
+Run `npm run db:migrate` for Neon before restarting Node; migration 002 adds
+server-only Premium state/leases. SQLite local test mode creates those tables
+locally. New account libraries use the existing revision/ownership/storage limits.
+Keep `.env` secrets out of source control and browser bundles.
+
+Optional push setup: run `npm run push:keys` yourself, store the generated public
+and private keys as `SKYWARD_VAPID_PUBLIC_KEY` / `SKYWARD_VAPID_PRIVATE_KEY`, and set
+`SKYWARD_VAPID_SUBJECT` to your real HTTPS origin. Users explicitly enable each
+browser from Monitoring. This uses standard Web Push and the existing service
+worker; support varies by browser and may require installing the app. Expired
+subscriptions are removed, delivery retries are bounded, and signing out removes
+this browser's account notification subscription. Other devices can be removed
+from the same account page. Only server-verified changes enter the push outbox.
+
+**Billing and flight-detail monitoring remain test mode.** Background test checks
+store synthetic examples and never manufacture live flight-change notifications.
+The push pipeline is implemented but requires your VAPID keys and a verified live
+flight-data integration to deliver real alerts. No live paid API usage, real
+subscription charge, email send or push send was performed during implementation.
+The free METAR endpoint is separate from the paid flight-detail allowance.
+
+Validation includes both SQLite and isolated Postgres account backends, privacy
+and expiry checks, background budgets, push endpoint validation and delivery
+fixtures, manual-control failure cases, and complete calm/crosswind autopilot
+flights for all three airframes. Browser checks cover the new account flows and
+Easy/Advanced controls at desktop and mobile sizes.

@@ -1,7 +1,7 @@
 import {AccountWorkspace} from './AccountWorkspace';
 import {accountChanged} from '../lib/accountLibrary';
 import {useEffect,useState} from 'react';
-import {accountRequest,type Account} from '../lib/membership';
+import {accountRequest,disconnectAccountNotifications,type Account} from '../lib/membership';
 export function MembershipPanel({openJourney}:{openJourney:(hex:string)=>Promise<void>}) {
   const [account,setAccount]=useState<Account|null>(null),[message,setMessage]=useState(''),[busy,setBusy]=useState(false),[register,setRegister]=useState(false),[recover,setRecover]=useState(false);
   const [resetToken,setResetToken]=useState(()=>new URLSearchParams(window.location.search).get('token')||'');
@@ -33,9 +33,9 @@ export function MembershipPanel({openJourney}:{openJourney:(hex:string)=>Promise
         {betterAuth&&!register&&!recover&&!resetToken&&<><button type="button" disabled={busy} onClick={()=>setRecover(true)}>Forgot password?</button><button type="button" disabled={busy} onClick={e=>{const form=e.currentTarget.closest('form');if(!form)return;const email=form.querySelector<HTMLInputElement>('input[name="email"]');if(!email?.reportValidity())return;void perform(async()=>{await accountRequest('/api/auth/send-verification-email',{email:email.value,callbackURL:window.location.origin+'/?account=return'});setMessage('If verification is needed, an email will arrive shortly.');});}}>Resend verification email</button></>}
         </div>
       </form>:<><p>{account.user.email} · <strong>{account.user.premium?'Premium · test':'Free'}</strong></p>
-        <div className="membership-actions"><button disabled={busy||!account.billingReady} onClick={()=>void perform(()=>billing('/api/billing/checkout'))}>Test premium checkout</button><button disabled={busy||!account.billingReady} onClick={()=>void perform(()=>billing('/api/billing/portal'))}>Manage subscription</button><button disabled={busy} onClick={()=>void perform(reload)}>Refresh subscription</button><button disabled={busy} onClick={()=>void perform(async()=>{await accountRequest(betterAuth?'/api/auth/sign-out':'/api/account/logout',{});accountChanged(true);await reload();})}>Sign out</button></div>
+        <div className="membership-actions"><button disabled={busy||!account.billingReady} onClick={()=>void perform(()=>billing('/api/billing/checkout'))}>Test premium checkout</button><button disabled={busy||!account.billingReady} onClick={()=>void perform(()=>billing('/api/billing/portal'))}>Manage subscription</button><button disabled={busy} onClick={()=>void perform(reload)}>Refresh subscription</button><button disabled={busy} onClick={()=>void perform(async()=>{await disconnectAccountNotifications();await accountRequest(betterAuth?'/api/auth/sign-out':'/api/account/logout',{});accountChanged(true);await reload();})}>Sign out</button></div>
         {!account.billingReady&&<p>Checkout setup is pending. No payment can be taken yet.</p>}
-        {account.usage&&<p>Monthly test lookups: {account.usage.requests} / {account.usage.limit}. Actual flight-data spend: $0. No automatic refresh.</p>}
+        {account.usage&&<p>Monthly test lookups: {account.usage.requests} / {account.usage.limit}. Actual flight-data spend: $0. Background checks run only for journeys enabled in Premium tools.</p>}
         {account.user.premium&&<p><a href="/airport-simulation/">Play airport simulator →</a></p>}
         <AccountWorkspace account={account} openJourney={openJourney}/>
       </>}
