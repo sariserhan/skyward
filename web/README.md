@@ -1295,3 +1295,26 @@ passenger data is used. Reduced-motion mode uses static smoke without the expand
 fireball. Mute/pause stops impact audio. Retry resets fuel, controls and effects;
 Choose another flight returns to setup, and Review flight dismisses the result.
 Career saves retain fictional occupant/fatality totals and fuel remaining.
+
+#### Simulated route vectors
+
+Tower/approach now gives spoken and written left/right heading instructions when
+an airborne aircraft deviates from its planned leg. Manual flight and Easy
+assistance use the same departure, intercept, alignment and final-approach
+waypoints. Route monitoring measures cross-track distance as well as heading
+error, with tighter tolerances on final. Crosswind compensation matches Easy
+assistance. **Request heading** asks for a current vector; **Read back** includes
+the assigned heading and altitude. The radio panel shows route deviation and the
+last assigned heading.
+
+Routine correction calls are spaced at least 18 simulated seconds apart. A new
+leg can get a vector after five seconds, and a stable return to the corridor
+gets a one-time confirmation after three seconds. These are game settings, not
+real ATC timing rules. Automatic calls never run on the ground or below 200 ft;
+fuel failure and unstable final approach suppress routine vectors so emergency
+and go-around instructions take priority. No telemetry is altered by radio calls.
+
+Wording follows the general heading-vector pattern in the
+[FAA vectoring phraseology](https://www.faa.gov/air_traffic/publications/atpubs/atc_html/chap5_section_6.html).
+The simulation uses rounded true headings from its geographic model, not magnetic
+headings, published procedures, obstacle clearance or real traffic separation.

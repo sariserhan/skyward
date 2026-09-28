@@ -6,8 +6,8 @@ const p={from:'AAA',to:'BBB',departure:runway,arrival:runway,aircraftType:'B738'
 test('Radio clears takeoff, reminds assigned altitude without frame spam, and warns of unstable landing',()=>{
  let s=initialFlight(p),r=stepRadio(initialRadio(),s,p);assert.match(r.calls.at(-1).text,/simulated takeoff/);assert.equal(stepRadio(r,s,p).calls.length,1);
  s={...s,ground:false,phase:'climb',altitude:2000,elapsed:30};r=stepRadio(r,s,p);assert.match(r.calls.at(-1).text,/Positive climb/);
- r=stepRadio(r,{...s,elapsed:60},p);assert.match(r.calls.at(-1).text,/climb to 3000/);const count=r.calls.length;assert.equal(stepRadio(r,{...s,elapsed:61},p).calls.length,count);
- r=stepRadio(r,{...s,altitude:4000,elapsed:90},p);assert.match(r.calls.at(-1).text,/descend to 3000/);
+ r=stepRadio(r,{...s,elapsed:60},p);assert.ok(r.calls.some(c=>/climb to 3000/.test(c.text)));const count=r.calls.length;assert.equal(stepRadio(r,{...s,elapsed:61},p).calls.length,count);
+ r=stepRadio(r,{...s,altitude:4000,elapsed:90},p);assert.ok(r.calls.some(c=>/descend to 3000/.test(c.text)));
  s={...s,...movePoint(runwayStart(runway),runwayHeading(runway)+180,1),heading:0,phase:'approach',altitude:300,elapsed:100,speed:220,gearPosition:0};r=stepRadio(r,s,p);r=stepRadio(r,{...s,elapsed:121},p);assert.match(r.calls.at(-1).text,/Go around/);
 });
 test('Height callouts happen once per approach and radio history remains bounded',()=>{
