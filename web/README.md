@@ -1223,3 +1223,42 @@ and expiry checks, background budgets, push endpoint validation and delivery
 fixtures, manual-control failure cases, and complete calm/crosswind autopilot
 flights for all three airframes. Browser checks cover the new account flows and
 Easy/Advanced controls at desktop and mobile sizes.
+
+#### Cockpit, sound, radio and ground contact
+
+The flight simulator starts in **Cockpit** view, with a live attitude display,
+airspeed, altitude, heading, vertical speed, runway-alignment guidance, engine
+power and gear indicators. Drag the yoke down to raise the nose, up to lower it,
+and sideways to bank; keyboard and the existing touch buttons remain available.
+Chase, Front and Bird views are still selectable.
+
+**Sound On/Off** and volume are in the mission panel. Engine/propeller tones,
+airflow, runway rumble, gear motor and stall warning are synthesized locally.
+Sound starts after the Start flight gesture; mute, pause, hidden tabs and leaving
+the flight stop playback. Tower speech uses available local English browser
+voices only. If no voice is available, the radio transcript remains usable.
+Audio failures must not stop the flight animation.
+
+**Tower radio is simulated**, with departure clearance, assigned-altitude
+reminders, approach guidance, unstable-approach go-around advice, height callouts
+and arrival messages. Repeat call and Read back controls are available. Set the
+practice altitude in the radio panel; Easy autopilot follows it during cruise.
+Go around applies power, takeoff flaps and climb attitude without teleporting the
+aircraft. It is not live ATC, traffic separation or real-world flight guidance.
+
+Ground controls now hold pitch and bank level at rest/taxi speed. Nose-up rotation
+requires airspeed near the modeled rotation threshold and builds gradually;
+forward elevator cannot push the nose into the runway. Braking and nose lowering
+continue through rollout. Jet engines take time to spool. Gear takes seven seconds
+to travel, flaps move progressively, and landing requires gear down and locked.
+The C172 has fixed gear; weight-on-wheels prevents retracting jet gear. Buttons and
+keyboard commands share these interlocks. Speedbrakes add drag, and jet reverse
+thrust is available only on the ground. Overspeed/configuration warnings are
+illustrative, not manufacturer-certified limits.
+
+These are game approximations, not a certified aerodynamic or aircraft-systems
+model. The flat runway datum, lack of terrain collisions, and other limitations
+above still apply. General ground/rotation concepts were checked against the
+[FAA Airplane Flying Handbook](https://www.faa.gov/regulations_policies/handbooks_manuals/aviation/airplane_handbook),
+particularly [Chapter 6](https://www.faa.gov/sites/faa.gov/files/regulations_policies/handbooks_manuals/aviation/airplane_handbook/07_afh_ch6.pdf);
+this simulator is not an FAA-approved training device or an aircraft flight manual.
