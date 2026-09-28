@@ -8,7 +8,7 @@ test('sourced aircraft have explicit type mappings, family aliases and honest un
  assert.equal(sourcedCatalog.length,62);
  for(const [type,id] of [['A320','a320'],['B738','b738'],['B788','b788'],['CRJ9','crj900'],['BCS3','cs300']]){assert.equal(sourcedModel(type).id,id);assert.equal(sourcedModel(type).match,'type');assert.ok(fleetUri({aircraftType:type,callsign:'THY1'}).startsWith('models/sourced/'));}
  assert.equal(sourcedModel('B77W').match,'family');assert.equal(sourcedModel('B77W').id,'b773');
- assert.equal(sourcedModel('B38M').id,'b39m');assert.equal(sourcedModel('B38M').match,'family');assert.equal(sourcedModel('ZZZZ'),null);assert.equal(fleetUri({aircraftType:'B38M',callsign:'RYR1'}),'models/sourced/branded/b39m-RYR-v1.gltf');
+ assert.equal(sourcedModel('B38M').id,'b39m');assert.equal(sourcedModel('B38M').match,'family');assert.equal(sourcedModel('ZZZZ'),null);assert.equal(fleetUri({aircraftType:'B38M',callsign:'RYR1'}),'models/sourced/branded/b39m-RYR-v1.gltf?tail=2');
 });
 test('every converted model has local buffers, bounded geometry, credits, license and editable source',()=>{
  const manifest=JSON.parse(readFileSync(new URL('models/sourced/manifest.json',base)));

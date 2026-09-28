@@ -913,3 +913,19 @@ QA uses fixture traffic on an isolated random port, leaving port 8000 untouched.
 Run `npm run test:customer` for the customer flows, or `npm run test:launch`
 for unit/server plus core and customer browser checks. Set `SKYWARD_QA_PYTHON`
 to your Playwright-enabled Python interpreter when needed.
+
+Pilot cockpit includes original synthesized engine and airflow audio, enabled by
+default, with a dedicated on/off switch and volume slider. Preferences stay on
+this device. Practice throttle changes the sound; live-follow ambience uses a
+rough speed-based mix, not reported engine settings. Cabin audio is unmounted
+while cockpit audio is active so the two do not overlap. Cockpit sound suspends
+in background tabs, obscured views and paused practice, and closes on cockpit
+exit. Browsers that block autoplay show an explicit enable control. No external
+recording, radio feed, media request or paid API is used for this audio.
+
+Tail-logo placement favors the upper fin, with clearance above the lower 30% of
+its usable surface and silhouette coverage checked on both faces. Decals use a
+small surface offset and alpha masking to avoid transparent-layer sorting and
+surface flicker. All sourced branding variants and illustrative fallback logos
+are regenerated locally; supplied full-aircraft livery textures remain intact.
+Model and shared-buffer URLs carry a tail revision so cached assets refresh.

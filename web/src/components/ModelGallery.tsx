@@ -13,7 +13,7 @@ export function ModelGallery({reducedMotion,observations=[]}:{reducedMotion:bool
  const [query,setQuery]=useState(''),[kind,setKind]=useState('all'),[selected,setSelected]=useState('source:a320'),[operator,setOperator]=useState('THY'),[ready,setReady]=useState(false),[message,setMessage]=useState(''),[orbit,setOrbit]=useState(false),[gearDemo,setGearDemo]=useState(false),[zoom,setZoom]=useState(1);
  const root=useRef<HTMLDivElement>(null),widget=useRef<Cesium.CesiumWidget|null>(null),model=useRef<Cesium.Model|null>(null),view=useRef({yaw:1.6,pitch:-.2,zoom:1,orbit:false,gearDemo:false});view.current.zoom=zoom;view.current.orbit=orbit&&!reducedMotion;view.current.gearDemo=gearDemo&&!reducedMotion;
  const chosen=models.find(m=>`${m.kind}:${m.id}`===selected)??models[0],livery=chosen.kind==='source'?liveries.find(l=>l.model===chosen.id&&l.operator===operator):null;
- const uri=chosen.kind==='fallback'?`models/fleet/${chosen.id}-${operator}-v4.gltf`:livery?.uri??(operator==='neutral'?chosen.uri:`models/sourced/branded/${chosen.id}-${operator}-v1.gltf`);
+ const uri=chosen.kind==='fallback'?`models/fleet/${chosen.id}-${operator}-v4.gltf?tail=2`:livery?.uri??(operator==='neutral'?chosen.uri:`models/sourced/branded/${chosen.id}-${operator}-v1.gltf?tail=2`);
  const rows=useMemo(()=>models.filter(m=>(kind==='all'||m.kind===kind)&&`${m.label} ${m.types}`.toLowerCase().includes(query.toLowerCase())),[query,kind]);
  useEffect(()=>{if(reducedMotion){setOrbit(false);setGearDemo(false);}},[reducedMotion]);
  useEffect(()=>{

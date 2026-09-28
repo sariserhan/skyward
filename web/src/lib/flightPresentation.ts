@@ -18,9 +18,9 @@ export function fleetProfile(type:string){
  if(/^B73|^B38|^B39/.test(t))return 'b737';if(/^E17|^E75|^CRJ|^BCS/.test(t))return 'regional';return 'generic';
 }
 export function fleetPaint(callsign:string){const p=callsign.trim().slice(0,3).toUpperCase();return ['THY','UAL','AAL','DAL','BAW','DLH','AFR','KLM','QTR','UAE','PGT','SWA','JBU','ETH','SAS','RYR','EZY','WZZ','SIA','CPA','ANA','JAL','QFA','ACA'].includes(p)?p:'neutral';}
-export function fallbackFleetUri(a:Pick<Aircraft,'aircraftType'|'callsign'>){return `models/fleet/${fleetProfile(a.aircraftType)}-${fleetPaint(a.callsign)}-v4.gltf`;}
+export function fallbackFleetUri(a:Pick<Aircraft,'aircraftType'|'callsign'>){return `models/fleet/${fleetProfile(a.aircraftType)}-${fleetPaint(a.callsign)}-v4.gltf?tail=2`;}
 export function fullLivery(a:Pick<Aircraft,'aircraftType'|'callsign'>){const id=sourcedModel(a.aircraftType)?.id,operator=fleetPaint(a.callsign);return fullLiveries.find(l=>l.model===id&&l.operator===operator)??null;}
-export function fleetUri(a:Pick<Aircraft,'aircraftType'|'callsign'>){const livery=fullLivery(a);if(livery)return livery.uri;const source=sourcedModel(a.aircraftType),paint=fleetPaint(a.callsign);return source?(paint==='neutral'?source.uri:`models/sourced/branded/${source.id}-${paint}-v1.gltf`):fallbackFleetUri(a);}
+export function fleetUri(a:Pick<Aircraft,'aircraftType'|'callsign'>){const livery=fullLivery(a);if(livery)return livery.uri;const source=sourcedModel(a.aircraftType),paint=fleetPaint(a.callsign);return source?(paint==='neutral'?source.uri:`models/sourced/branded/${source.id}-${paint}-v1.gltf?tail=2`):fallbackFleetUri(a);}
 export function bearing(a:{lon:number;lat:number},b:{lon:number;lat:number}){const rad=Math.PI/180,dl=(b.lon-a.lon)*rad,x=Math.sin(dl)*Math.cos(b.lat*rad),y=Math.cos(a.lat*rad)*Math.sin(b.lat*rad)-Math.sin(a.lat*rad)*Math.cos(b.lat*rad)*Math.cos(dl);return (Math.atan2(x,y)/rad+360)%360;}
 export function observedFrame(points:TrailPoint[],time:number){
  if(!points.length)return null;

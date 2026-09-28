@@ -74,7 +74,7 @@ for name,(L,span,dia,engines) in profiles.items():
             a=(x0,y,z0);b=(x1,y,z0);c=(x1,y,z1);d=(x0,y,z1)
             uv=[(0,1),(1,1),(1,0),(0,0)] if side<0 else [(1,1),(0,1),(0,0),(1,0)]
             tri(a,b,c,5,uv=uv[:3]);tri(a,c,d,5,uv=[uv[0],uv[2],uv[3]])
-        decal(-.447*L,-.39*L,r+L*.043,r+L*.100,side*.105)
+        decal(-.448*L,-.406*L,r+L*.069,r+L*.111,side*.12)
         decal(.19*L,.19*L+r*.85,-r*.42,r*.43,side*(r+.04))
     # A subtle operator-colored lower fuselage stripe; geometry follows the body.
     for side in [-1,1]:
@@ -115,9 +115,9 @@ for name,(L,span,dia,engines) in profiles.items():
     for airline,color in paints.items():
         rgb=[int(color[i:i+2],16)/255 for i in (0,2,4)];body=[.94,.95,.96] if airline!='SWA' else [.03,.16,.6]
         materials=[{'doubleSided':True,'pbrMetallicRoughness':{'baseColorFactor':c+[1],'metallicFactor':.18 if i!=6 else .7,'roughnessFactor':.3 if i!=3 else .17}} for i,c in enumerate([body,[.64,.68,.72],rgb,[.02,.055,.085],[.07,.08,.09],[1,1,1],[.36,.4,.44],rgb if airline!='neutral' else body])]
-        materials[5].update(alphaMode='BLEND');materials[5]['pbrMetallicRoughness'].update(metallicFactor=0,roughnessFactor=.75,baseColorTexture={'index':0})
+        materials[5].update(alphaMode='MASK',alphaCutoff=.08);materials[5]['pbrMetallicRoughness'].update(metallicFactor=0,roughnessFactor=.75,baseColorTexture={'index':0})
         main=[q for q in prims if q['material']!=4 and (airline!='neutral' or q['material']!=5)]
-        g={'asset':{'version':'2.0','generator':'Skyward original illustrative '+name+' profile; logos for operator identification'},'scene':0,'scenes':[{'nodes':[0,1]}],'nodes':[{'mesh':0},{'mesh':1,'name':'Gear','children':[2,3,4]}]+[{'mesh':2+i,'name':['WheelN','WheelL','WheelR'][i],'translation':[y,-r-1.6,x]} for i,(x,y) in enumerate(wheel_positions)],'meshes':[{'primitives':main},{'primitives':[q for q in prims if q['material']==4 and 'extras' not in q]}]+[{'primitives':[q for q in prims if q.get('extras',{}).get('wheel')==i]} for i in range(3)],'materials':materials,'buffers':[{'uri':name+'-v4.bin','byteLength':len(blob)}],'bufferViews':views,'accessors':access}
+        g={'asset':{'version':'2.0','generator':'Skyward original illustrative '+name+' profile; logos for operator identification'},'scene':0,'scenes':[{'nodes':[0,1]}],'nodes':[{'mesh':0},{'mesh':1,'name':'Gear','children':[2,3,4]}]+[{'mesh':2+i,'name':['WheelN','WheelL','WheelR'][i],'translation':[y,-r-1.6,x]} for i,(x,y) in enumerate(wheel_positions)],'meshes':[{'primitives':main},{'primitives':[q for q in prims if q['material']==4 and 'extras' not in q]}]+[{'primitives':[q for q in prims if q.get('extras',{}).get('wheel')==i]} for i in range(3)],'materials':materials,'buffers':[{'uri':name+'-v4.bin?tail=2','byteLength':len(blob)}],'bufferViews':views,'accessors':access}
         if airline!='neutral':g.update(images=[{'uri':'../../airlines/'+airline+'.png'}],textures=[{'source':0,'sampler':0}],samplers=[{'magFilter':9729,'minFilter':9987,'wrapS':33071,'wrapT':33071}])
         else:materials[5]['pbrMetallicRoughness'].pop('baseColorTexture')
         (out/(name+'-'+airline+'-v4.gltf')).write_text(json.dumps(g,separators=(',',':')))

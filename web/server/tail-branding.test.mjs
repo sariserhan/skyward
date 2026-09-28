@@ -4,7 +4,7 @@ import {readFileSync,existsSync} from 'node:fs';
 import {fleetUri,sourcedModel} from '../src/lib/flightPresentation.ts';
 const root=new URL('../public/',import.meta.url),report=JSON.parse(readFileSync(new URL('models/sourced/branded/manifest.json',root)));
 test('tail branding uses the operator and actual sourced model; unknown operators keep source paint',()=>{
- assert.match(fleetUri({aircraftType:'B77W',callsign:'THY123'}),/branded\/b773-THY-v1.gltf$/);
+ assert.match(fleetUri({aircraftType:'B77W',callsign:'THY123'}),/branded\/b773-THY-v1.gltf\?tail=2$/);
  assert.match(fleetUri({aircraftType:'B738',callsign:'UAL123'}),/liveries\/b738-UAL-v1.gltf$/);
  assert.equal(fleetUri({aircraftType:'A320',callsign:'UNKNOWN'}),sourcedModel('A320').uri);
 });
@@ -27,4 +27,8 @@ test('both fin faces receive readable, bounded UVs with opposite horizontal orie
   const positions=get(p.attributes.POSITION,3),normals=get(p.attributes.NORMAL,3),uv=get(p.attributes.TEXCOORD_0,2);assert.ok(normals.some(n=>n[0]>0)&&normals.some(n=>n[0]<0));
   for(let i=0;i<uv.length;i++){assert.ok(uv[i].every(v=>v>=-1e-5&&v<=1.00001));const side=normals[i][0],fraction=(positions[i][2]-(m.placement.z-m.placement.size/2))/m.placement.size;assert.ok(Math.abs(uv[i][0]-((side>0?1:0)-side*fraction))<1e-4);}
  }
+});
+
+test('logo patches sit above the lower fin and use stable depth-tested transparency',()=>{
+ for(const m of report.models){const b=m.finBounds,h=b.maxY-b.minY;assert.ok(m.placement.y-m.placement.size/2>=b.minY+h*.30-1e-6,m.id);assert.ok(m.placement.y>=b.minY+h*.55-1e-6,m.id);assert.ok(m.placement.y+m.placement.size/2<b.maxY,m.id);const g=JSON.parse(readFileSync(new URL(`models/sourced/branded/${m.id}-THY-v1.gltf`,root)));assert.equal(g.materials.at(-1).alphaMode,'MASK');assert.ok(g.buffers.at(-1).uri.endsWith('?tail=2'));}
 });

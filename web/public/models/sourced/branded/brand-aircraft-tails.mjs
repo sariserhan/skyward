@@ -34,16 +34,27 @@ for(const item of catalog){
  }
  if(!fins.length)throw Error(`No fin surface: ${item.id}`);
  const pts=fins.flat(),minY=Math.min(...pts.map(p=>p[1])),maxY=Math.max(...pts.map(p=>p[1])),minZ=Math.min(...pts.map(p=>p[2])),maxZ=Math.max(...pts.map(p=>p[2]));
- // Find a large square wholly within the fin silhouette, so no logo floats
- // outside swept edges. Logos are sampled unchanged, with separate UVs per side.
+ // Prefer the upper fin: low decals can disappear behind the horizontal
+ // stabilizer or fuselage. Require coverage on BOTH faces, with an inset.
+ const height=maxY-minY,width=maxZ-minZ,targetY=minY+height*.68;
+ const faces=[-1,1].map(side=>fins.filter(t=>(t.reduce((sum,p)=>sum+p[0],0)/3<centerX?-1:1)===side));
  let placement=null;
- search:for(let size=Math.min(maxY-minY,maxZ-minZ)*.65;size>.12;size*=.9){for(let y=minY+size*.65;y<=maxY-size*.65;y+=(maxY-minY)/16){for(let z=minZ+size*.65;z<=maxZ-size*.65;z+=(maxZ-minZ)/16){if([-.5,0,.5].every(dy=>[-.5,0,.5].every(dz=>fins.some(t=>inside(y+dy*size,z+dz*size,t))))){placement={y,z,size};break search;}}}}
+ for(let size=Math.min(height,width)*.65;size>.06;size*=.9){
+  let best=null,bestScore=Infinity;
+  const lowY=Math.max(minY+height*.30+size/2,minY+height*.55),highY=maxY-size*.55;
+  for(let y=highY;y>=lowY;y-=height/32){for(let z=minZ+size*.55;z<=maxZ-size*.55;z+=width/32){
+   if(!faces.every(face=>[-.5,-.25,0,.25,.5].every(dy=>[-.5,-.25,0,.25,.5].every(dz=>face.some(t=>inside(y+dy*size,z+dz*size,t))))))continue;
+   const score=Math.abs(y-targetY)/height+Math.abs(z-(minZ+maxZ)/2)/width*.1;
+   if(score<bestScore){best={y,z,size};bestScore=score;}
+  }}
+  if(best){placement=best;break;}
+ }
  if(!placement)throw Error(`No logo placement: ${item.id}`);
  const {y,z,size}=placement,paint=[],logo=[];
  for(const tri of fins){const side=tri.reduce((s,p)=>s+p[0],0)/3<centerX?-1:1;
   function emit(target,poly,offset,uv){for(let i=1;i<poly.length-1;i++)for(const p of [poly[0],poly[i],poly[i+1]])target.push({p:[p[0]+side*offset,p[1],p[2]],n:[side,0,0],uv:uv?[(side>0?1:0)-side*((p[2]-(z-size/2))/size),1-(p[1]-(y-size/2))/size]:[0,0]});}
-  emit(paint,tri,.012,false);
-  let poly=clip(tri,1,y-size/2,true);poly=clip(poly,1,y+size/2,false);poly=clip(poly,2,z-size/2,true);poly=clip(poly,2,z+size/2,false);emit(logo,poly,.028,true);
+  emit(paint,tri,.02,false);
+  let poly=clip(tri,1,y-size/2,true);poly=clip(poly,1,y+size/2,false);poly=clip(poly,2,z-size/2,true);poly=clip(poly,2,z+size/2,false);emit(logo,poly,.04,true);
  }
  if(!logo.some(v=>v.n[0]>0)||!logo.some(v=>v.n[0]<0))throw Error(`Missing logo side: ${item.id}`);
  const chunks=[],views=[],accessors=[];let byteOffset=0;
@@ -51,18 +62,18 @@ for(const item of catalog){
  const primitives=[paint,logo].map((rows,i)=>({attributes:{POSITION:attr(rows,'p',3),NORMAL:attr(rows,'n',3),...(i?{TEXCOORD_0:attr(rows,'uv',2)}:{})},material:g.materials.length+i}));
  const name=`${item.id}-tail-v1.bin`;await fs.writeFile(path.join(out,name),Buffer.concat(chunks));
  for(const [operator,color] of Object.entries(paints)){
-  const model=structuredClone(g);model.buffers=model.buffers.map(b=>({...b,uri:'../'+b.uri}));model.buffers.push({uri:name,byteLength:byteOffset});model.bufferViews.push(...views);model.accessors.push(...accessors);
+  const model=structuredClone(g);model.buffers=model.buffers.map(b=>({...b,uri:'../'+b.uri}));model.buffers.push({uri:name+'?tail=2',byteLength:byteOffset});model.bufferViews.push(...views);model.accessors.push(...accessors);
   const image=(model.images??=[]).length,texture=(model.textures??=[]).length,sampler=(model.samplers??=[]).length;
   model.images.push({uri:`../../../airlines/${operator}.png`});model.samplers.push({magFilter:9729,minFilter:9987,wrapS:33071,wrapT:33071});model.textures.push({source:image,sampler});
   const rgb=[0,2,4].map(i=>parseInt(color.slice(i,i+2),16)/255);
-  model.materials.push({name:'Operator tail paint',doubleSided:true,pbrMetallicRoughness:{baseColorFactor:[...rgb,1],metallicFactor:0,roughnessFactor:.65}},{name:'Operator logo identification',doubleSided:true,alphaMode:'BLEND',pbrMetallicRoughness:{baseColorTexture:{index:texture},metallicFactor:0,roughnessFactor:.7},emissiveFactor:[.18,.18,.18],emissiveTexture:{index:texture}});
+  model.materials.push({name:'Operator tail paint',doubleSided:true,pbrMetallicRoughness:{baseColorFactor:[...rgb,1],metallicFactor:0,roughnessFactor:.65}},{name:'Operator logo identification',doubleSided:true,alphaMode:'MASK',alphaCutoff:.08,pbrMetallicRoughness:{baseColorTexture:{index:texture},metallicFactor:0,roughnessFactor:.7},emissiveFactor:[.18,.18,.18],emissiveTexture:{index:texture}});
   const mesh=model.meshes.length,node=model.nodes.length;model.meshes.push({name:'Airline tail surface overlay',primitives});model.nodes.push({name:'AirlineTailBranding',mesh});model.scenes[model.scene??0].nodes.push(node);
   model.extras.skyward.changes+=' Added surface-following operator tail paint and unmodified identification-logo texture. Branding is illustrative, not a registration-specific livery.';model.extras.skyward.operator=operator;
   await fs.writeFile(path.join(out,`${item.id}-${operator}-v1.gltf`),JSON.stringify(model));
  }
- report.push({id:item.id,placement,finTriangles:fins.length,logoTriangles:logo.length/3,operators:Object.keys(paints)});console.log(item.id,placement,'triangles',fins.length,logo.length/3);
+ report.push({id:item.id,placement,finBounds:{minY,maxY,minZ,maxZ},finTriangles:fins.length,logoTriangles:logo.length/3,operators:Object.keys(paints)});console.log(item.id,placement,'triangles',fins.length,logo.length/3);
 }
-await fs.writeFile(path.join(out,'manifest.json'),JSON.stringify({description:'Surface overlays on original sourced fin geometry. Original PNG logos unchanged. Branding is illustrative.',sourceModelManifest:'../manifest.json',logoManifest:'../../../airlines/sources.json',models:report},null,2));
+await fs.writeFile(path.join(out,'manifest.json'),JSON.stringify({description:'Upper-fin overlays checked on both faces of original sourced fin geometry. Original PNG logos unchanged. Branding is illustrative.',sourceModelManifest:'../manifest.json',logoManifest:'../../../airlines/sources.json',models:report},null,2));
 console.log(`Branded ${report.length} sourced models for ${Object.keys(paints).length} operators.`);
 
 await fs.copyFile(fileURLToPath(import.meta.url),path.join(out,'brand-aircraft-tails.mjs'));
