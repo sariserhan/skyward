@@ -13,11 +13,11 @@ export function predictedLanding(a:Aircraft,now:number,route:FlightRoute|null|un
  if(!airport||!Number.isFinite(airport.elevationFt)||a.ground||a.positionWarning||a.targetKind!=='aircraft')return null;
  // With no route, a nearby tower can infer a final approach only from strict runway alignment
  // and a measured descent. An explicit unrelated/unverified route must never be overridden.
- const inferred=!route;
- if(route){if(route.status!=='PLAUSIBLE'||route.callsign!==a.callsign||route.airports.length!==2)return null;const arrival=route.airports[1];if(trackDistance(airport,arrival)>3||![arrival.iata,arrival.icao].includes(airport.id))return null;}
+ const inferred=!route||(route.status==='NOT_FOUND'&&route.callsign===a.callsign&&route.airports.length===0);
+ if(route&&!inferred){if(route.status!=='PLAUSIBLE'||route.callsign!==a.callsign||route.airports.length!==2)return null;const arrival=route.airports[1];if(trackDistance(airport,arrival)>3||![arrival.iata,arrival.icao].includes(airport.id))return null;}
  if(![a.lat,a.lon,a.altitude,a.observedAt,a.heading,a.groundSpeed,now].every(v=>typeof v==='number'&&Number.isFinite(v)))return null;
- const age=(now-a.observedAt!)/1000,agl=a.altitude!-airport.elevationFt!;
- if(age<15||agl<0||agl>6000||a.groundSpeed!<60||a.groundSpeed!>260||(a.verticalRate!==null&&a.verticalRate>150))return null;
+ const age=(now-a.observedAt!)/1000,rawAgl=a.altitude!-airport.elevationFt!,agl=Math.max(0,rawAgl);
+ if(age<0||rawAgl< -200||agl>6000||a.groundSpeed!<60||a.groundSpeed!>260||(a.verticalRate!==null&&a.verticalRate>150))return null;
  if(inferred&&(agl>3000||typeof a.verticalRate!=='number'||!Number.isFinite(a.verticalRate)||a.verticalRate>=-150))return null;
  const lon0=airport.lon,lat0=airport.lat,cos=Math.cos(lat0*radians);
  if(Math.abs(cos)<.01)return null;
@@ -31,11 +31,18 @@ export function predictedLanding(a:Aircraft,now:number,route:FlightRoute|null|un
    if(![...from,...to].every(Number.isFinite))continue;
    const start=local(...from),end=local(...to),length=Math.hypot(end.x-start.x,end.y-start.y);
    if(length<.25)continue;
-   const heading=bearing(geo(start),geo(end)),offset=Math.min(.18,length*.15),touch={x:start.x+(end.x-start.x)*offset/length,y:start.y+(end.y-start.y)*offset/length};
-   const distance=Math.hypot(touch.x-p0.x,touch.y-p0.y),headingError=Math.abs(wrap(a.heading!-heading)),alignment=Math.abs(wrap(bearing(geo(p0),geo(touch))-heading));
-   // Do not turn an overflight, departure, go-around or aircraft beyond the runway into a landing.
-   if(distance<.15||distance>12||headingError>35||alignment>30||agl>distance*650+300)continue;
-   if(inferred&&(distance>6||headingError>15||alignment>12))continue;
+   const heading=bearing(geo(start),geo(end)),ux=(end.x-start.x)/length,uy=(end.y-start.y)/length;
+   const along=(p0.x-start.x)*ux+(p0.y-start.y)*uy,cross=Math.abs((p0.x-start.x)*uy-(p0.y-start.y)*ux);
+   const headingError=Math.abs(wrap(a.heading!-heading));
+   // A fresh low fix can already be past the usual touchdown marker. Keep the
+   // target ahead, with room to roll out, rather than flying through the airport.
+   const overRunway=along>=0&&along<length*.65&&cross<Math.max(.025,runway.width/1852)&&agl<=180;
+   const offset=overRunway?Math.min(length*.72,Math.max(Math.min(.18,length*.15),along+Math.max(.04,agl/900))):Math.min(.18,length*.15);
+   const touch={x:start.x+ux*offset,y:start.y+uy*offset};
+   const distance=Math.hypot(touch.x-p0.x,touch.y-p0.y),alignment=Math.abs(wrap(bearing(geo(p0),geo(touch))-heading));
+   // Reject departures, go-arounds, overflights, and fixes beyond the runway.
+   if(distance>12||headingError>(overRunway?15:35)||(!overRunway&&alignment>30)||agl>distance*650+300)continue;
+   if(inferred&&(distance>6||headingError>15||(!overRunway&&alignment>12)))continue;
    const score=headingError+alignment+distance;
    if(!best||score<best.score)best={score,start,end,touch,heading,length,id:reverse?runway.id.split('/')[1]??runway.id:runway.id.split('/')[0]};
   }
@@ -62,7 +69,11 @@ export function predictedLanding(a:Aircraft,now:number,route:FlightRoute|null|un
   const h=elapsed;const height=Math.max(0,(2*h*h*h-3*h*h+1)*agl+(h*h*h-2*h*h+h)*slope);
   return {...base,...geo(p),altitude:airport.elevationFt!+height,ground:false,heading:(Math.atan2(dx,dy)/radians+360)%360,pitch:2+2*elapsed*elapsed*(3-2*elapsed),groundSpeed:a.groundSpeed!+(touchdownSpeed-a.groundSpeed!)*elapsed,landingPhase:'approach' as LandingPhase};
  }
- const taxi=planTaxi(airport,geo(start),geo(end));
+ const proposedTaxi=planTaxi(airport,geo(start),geo(end));
+ const touchAlong=((touch.x-start.x)*(end.x-start.x)+(touch.y-start.y)*(end.y-start.y))/length;
+ const taxiStop=proposedTaxi?local(proposedTaxi.stop.lon,proposedTaxi.stop.lat):null;
+ // Never reverse along the runway to reach an exit behind a late touchdown.
+ const taxi=taxiStop&&((taxiStop.x-start.x)*(end.x-start.x)+(taxiStop.y-start.y)*(end.y-start.y))/length>touchAlong+.08?proposedTaxi:null;
  const stop=taxi?local(taxi.stop.lon,taxi.stop.lat):{x:start.x+(end.x-start.x)*.85,y:start.y+(end.y-start.y)*.85},rollDistance=Math.hypot(stop.x-touch.x,stop.y-touch.y);
  const exitSpeed=taxi?taxiFrame(taxi,0).groundSpeed:0,rollSeconds=2*rollDistance/(touchdownSpeed+exitSpeed)*3600,t=clamp((age-approachSeconds)/rollSeconds,0,1),progress=(touchdownSpeed*t+(exitSpeed-touchdownSpeed)*t*t/2)/((touchdownSpeed+exitSpeed)/2);
  if(taxi&&age>=approachSeconds+rollSeconds){const ground=taxiFrame(taxi,age-approachSeconds-rollSeconds);return {...base,...ground,altitude:airport.elevationFt!,ground:true,pitch:0,landingPhase:(ground.parked?'parked':'taxi') as LandingPhase};}

@@ -45,3 +45,9 @@ test('incomplete globe surface samples cannot put tower traffic kilometers under
  for(const value of [undefined,NaN,Infinity,-10421,10000])assert.equal(surfaceHeight(value),0);
  for(const value of [0,-430,89,8849])assert.equal(surfaceHeight(value),value);
 });
+test('a late touchdown cannot taxi backward to an exit already passed',()=>{
+ const plane={...aircraft,lon:.016,altitude:330,verticalRate:-200};let previous=plane.lon;
+ for(let seconds=0;seconds<200;seconds++){
+  const frame=predictedLanding(plane,100000+seconds*1000,route,airport);assert.ok(frame);assert.ok(frame.lon>=previous-1e-8);assert.notEqual(frame.landingPhase,'taxi');previous=frame.lon;
+ }
+});

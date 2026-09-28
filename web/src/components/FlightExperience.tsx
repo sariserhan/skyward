@@ -1,6 +1,7 @@
 import {sceneViews,type FlightRequest,type FlightScene} from '../lib/watchDiscovery';
 import {aircraftAnimation} from '../lib/aircraftAnimation';
 import {surfaceHeight} from '../lib/surfaceHeight';
+import {sourcedGearClearance} from '../lib/landingGear';
 import {applyAircraftRig} from '../lib/aircraftRig';
 import {JourneyDetails} from './JourneyDetails';
 import {CabinPassengers} from './CabinPassengers';
@@ -53,7 +54,7 @@ export function FlightExperience(p:Props){
   const layout=()=>{const canvas=v.canvas.getBoundingClientRect(),panel=panelRef.current?.getBoundingClientRect();box=panel?{left:panel.left-canvas.left,top:panel.top-canvas.top,right:panel.right-canvas.left,bottom:panel.bottom-canvas.top}:null;layoutDirty=true;};
   const resize=new ResizeObserver(layout);resize.observe(v.canvas);if(panelRef.current)resize.observe(panelRef.current);layout();
   function gear(entity:Cesium.Entity,a:Aircraft,amount:number,speed:number,moving:boolean,heading?:number,flaps=amount*.5){
-   if(!entity.model||(sourcedModel(a.aircraftType)&&state.current.p.modelStage==='primary'))return;
+   if(!entity.model)return;
    applyAircraftRig(entity,elapsed.current,moving?speed:0,amount,0,flaps,heading);
   }
   let previousView:View='free',reattachTime=0;
@@ -104,7 +105,7 @@ export function FlightExperience(p:Props){
    if(fix){
     const landing='landingPhase' in fix&&!!fix.landingPhase;
     const ground=s.demo&&r?(surfaceHeight(v.scene.globe.getHeight(C.Cartographic.fromDegrees(r.a[0],r.a[1])))):landing?(surfaceHeight(v.scene.globe.getHeight(C.Cartographic.fromDegrees(fix.lon,fix.lat))))-(s.p.arrivalGeometry?.elevationFt??0)*.3048:fix.ground?(surfaceHeight(v.scene.globe.getHeight(C.Cartographic.fromDegrees(fix.lon,fix.lat))))-Math.max(0,fix.altitude)*.3048:0;
-    position=C.Cartesian3.fromDegrees(fix.lon,fix.lat,ground+Math.max(0,fix.altitude)*.3048+5);
+    position=C.Cartesian3.fromDegrees(fix.lon,fix.lat,ground+Math.max(0,fix.altitude)*.3048+(s.p.modelStage==='primary'?sourcedGearClearance(a.aircraftType):5));
     if(s.demo){
      if(!shown)shown=v.entities.add({id:'flight-simulation',model:{uri:import.meta.env.BASE_URL+(s.p.modelStage==='primary'?fleetUri(a):fallbackFleetUri(a)),minimumPixelSize:0,maximumScale:1,heightReference:C.HeightReference.NONE,shadows:C.ShadowMode.ENABLED},label:{text:'SIMULATION',font:'bold 14px sans-serif',fillColor:C.Color.ORANGE,pixelOffset:new C.Cartesian2(0,-65)}});
      if(shown.model?.uri?.getValue(v.clock.currentTime)!==import.meta.env.BASE_URL+(s.p.modelStage==='primary'?fleetUri(a):fallbackFleetUri(a)))shown.model!.uri=new C.ConstantProperty(import.meta.env.BASE_URL+(s.p.modelStage==='primary'?fleetUri(a):fallbackFleetUri(a)));
@@ -139,7 +140,7 @@ export function FlightExperience(p:Props){
  <p className="flight-mobile-hint">Scroll for camera controls and location map ↓</p>
  <p>{demo?`${airport?.id} · runway ${runways[runway]?.id} · 45-second illustration`:endpoints?`${endpoints[0].iata||endpoints[0].icao} → ${endpoints[1].iata||endpoints[1].icao} · route`:'Origin / destination not verified'}</p>
  <p className="flight-airframe"><strong>{aircraftNames[a.aircraftType]??asset?.label??profileNames[fleetProfile(a.aircraftType)]}</strong> · {a.aircraftType||'type unavailable'}<br/>{airline(a)}</p>
- {asset?<details className="model-source"><summary>Aircraft model &amp; livery details</summary><p>3D model: {asset.label}{asset.match==='family'?' · family match; variant details may differ':''}<br/><small>{fullLivery(a)?'Full community airline livery · may depict historical paint.':fleetPaint(a.callsign)!=='neutral'?'Airline tail branding applied · other paint retains the source scheme.':'Community aircraft model · original source paint.'} Branding is illustrative, not a registration-specific livery. {demo?'This source has no verified gear rig; its gear pose stays fixed.':''}</small><br/><a href={'sourceRepository' in asset&&asset.sourceRepository?asset.sourceRepository:`https://github.com/${asset.id==='b39m'||asset.id==='b3xm'?'REXO-77/737-MAX':'Flightradar24/fr24-3d-models'}`} target="_blank" rel="noreferrer">Model author sources</a> · <a href={`${import.meta.env.BASE_URL}models/sourced/manifest.json`} target="_blank" rel="noreferrer">Licenses &amp; editable sources</a>{fullLivery(a)&&<> · <a href={`${import.meta.env.BASE_URL}models/sourced/liveries/manifest.json`} target="_blank" rel="noreferrer">Livery sources</a></>}</p></details>:<p className="model-source">{p.modelStage!=='primary'?'Detailed model unavailable or slow · lightweight approximate representation.':`Approximate fallback model · no sourced model is available for ${a.aircraftType||'this type'}.`} Paint is illustrative. Gear and wheel motion are presentation only.</p>}
+ {asset?<details className="model-source"><summary>Aircraft model &amp; livery details</summary><p>3D model: {asset.label}{asset.match==='family'?' · family match; variant details may differ':''}<br/><small>{fullLivery(a)?'Full community airline livery · may depict historical paint.':fleetPaint(a.callsign)!=='neutral'?'Airline tail branding applied · other paint retains the source scheme.':'Community aircraft model · original source paint.'} Branding is illustrative, not a registration-specific livery. Gear deployment is illustrative; live gear configuration is unavailable.</small><br/><a href={'sourceRepository' in asset&&asset.sourceRepository?asset.sourceRepository:`https://github.com/${asset.id==='b39m'||asset.id==='b3xm'?'REXO-77/737-MAX':'Flightradar24/fr24-3d-models'}`} target="_blank" rel="noreferrer">Model author sources</a> · <a href={`${import.meta.env.BASE_URL}models/sourced/manifest.json`} target="_blank" rel="noreferrer">Licenses &amp; editable sources</a>{fullLivery(a)&&<> · <a href={`${import.meta.env.BASE_URL}models/sourced/liveries/manifest.json`} target="_blank" rel="noreferrer">Livery sources</a></>}</p></details>:<p className="model-source">{p.modelStage!=='primary'?'Detailed model unavailable or slow · lightweight approximate representation.':`Approximate fallback model · no sourced model is available for ${a.aircraftType||'this type'}.`} Paint is illustrative. Gear and wheel motion are presentation only.</p>}
  {!demo&&<p className="flight-location">{location?`${landing?'Near':'Reported position ·'} ${location.km} km ${location.direction} of ${location.city.name}, ${location.city.country}`:'City reference unavailable'}<br/><small>{(landing?presentation.lat:a.lat)?.toFixed(3)}°, {(landing?presentation.lon:a.lon)?.toFixed(3)}°</small></p>}
  {!demo&&<><div className="flight-readings"><span>{(landing?Math.round(presentation.altitude):a.altitude)?.toLocaleString()??'—'} <small>{landing?'ft':'ft reported'}</small></span><span>{(landing?Math.round(presentation.groundSpeed??0):a.groundSpeed)??'—'} <small>{landing?'kt':'kt reported'}</small></span></div></>}
 

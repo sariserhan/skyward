@@ -32,7 +32,6 @@ export function liveFrame(a:Aircraft,points:TrailPoint[],now:number,reduced=fals
   const t=Math.min(age/1000,limit),seconds=t-t*t/(2*limit),position=destination(a.lat,a.lon,a.heading,a.groundSpeed*seconds/3600);
   return {...frame,...position,groundSpeed:a.groundSpeed*(1-t/limit),estimated:age>0,predictionLimited:age>=limit*1000};
  }
- const landing=predictedLanding(a,now,route,arrivalGeometry);if(landing)return landing;
  let speed=finite(a.groundSpeed)&&a.groundSpeed>0&&a.groundSpeed<=1200?a.groundSpeed:null;
  let heading=finite(a.heading)&&a.heading>=0&&a.heading<=360?a.heading:null;
  const last=points.at(-1),previous=points.at(-2);
@@ -40,6 +39,7 @@ export function liveFrame(a:Aircraft,points:TrailPoint[],now:number,reduced=fals
   const distance=trackDistance(previous,last),derived=distance*3600000/(last.time-previous.time);
   if(distance>.001&&derived>0&&derived<=1200){speed??=derived;heading??=bearing(previous,last);}
  }
+ const landing=predictedLanding({...a,groundSpeed:speed,heading},now,route,arrivalGeometry);if(landing)return landing;
  if(speed===null||heading===null)return frame;
  // Infer short-lived turn trends only from three continuous, recent segments.
  let turnRate=0;const older=points.at(-3);

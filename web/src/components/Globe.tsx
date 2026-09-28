@@ -10,6 +10,7 @@ import {renderFailure} from '../lib/sessionHealth';
 import {installArrivalSpin} from '../lib/arrivalSpin';
 import {hasBaseImagery} from '../lib/nightMap';
 import {installAircraftLights} from '../lib/aircraftLights';
+import {installLandingGear,sourcedGearClearance} from '../lib/landingGear';
 import {installSolarLighting,sunDirectionFixed} from '../lib/solarLighting';
 import {trackDistance,coloredTrail} from '../lib/positionQuality';
 import {RouteMode} from './RouteMode';
@@ -339,7 +340,9 @@ export function Globe(p: Props) {
   },[ready,terrainActive]);
   useEffect(()=>{
     const v=viewer.current;if(!v||!ready)return;
-    return installAircraftLights(window.Cesium,v,()=>({aircraft:callbacks.current.camera.type==='tower'?callbacks.current.groundObservations:callbacks.current.aircraft,tower:callbacks.current.camera.type==='tower',selected:callbacks.current.selected,reduced:callbacks.current.preferences.reducedMotion||callbacks.current.preferences.batterySaver}));
+    const getState=()=>({aircraft:callbacks.current.camera.type==='tower'?callbacks.current.groundObservations:callbacks.current.aircraft,tower:callbacks.current.camera.type==='tower',selected:callbacks.current.selected,reduced:callbacks.current.preferences.reducedMotion||callbacks.current.preferences.batterySaver});
+    const lights=installAircraftLights(window.Cesium,v,getState),gear=installLandingGear(window.Cesium,v,getState);
+    return()=>{lights();gear();};
   },[ready]);
   useEffect(()=>{
     const v=viewer.current;if(!v||!ready)return;const C=window.Cesium;
@@ -497,12 +500,13 @@ export function Globe(p: Props) {
           const airport=(selected?s.arrivalGeometry:null)??(nearbyAirport?withAirportElevation(nearbyAirport):null);
           const fix=motion.sample(a,s.histories.get(a.hex)??[],Date.now(),false,selected?s.route:null,airport);if(!fix)continue;animatedIds.current.add(id);
           const displayAltitude=fix.ground?(surfaceHeight(v.scene.globe.getHeight(C.Cartographic.fromDegrees(fix.lon,fix.lat))))/.3048:fix.landingPhase?Math.max(0,fix.altitude-(airport?.elevationFt??0))+(surfaceHeight(v.scene.globe.getHeight(C.Cartographic.fromDegrees(fix.lon,fix.lat))))/.3048:fix.altitude;
-          const key=`${fix.lon}/${fix.lat}/${displayAltitude}`;const desired=C.Cartesian3.fromDegrees(fix.lon,fix.lat,Math.max(0,displayAltitude)*.3048+8);if(drawn.get(id)===key&&C.Cartesian3.equalsEpsilon(current,desired,0,.01))continue;drawn.set(id,key);
-          const pos=C.Cartesian3.fromDegrees(fix.lon,fix.lat,Math.max(0,displayAltitude)*.3048+8);
+          const clearance=String(e.model?.uri?.getValue(v.clock.currentTime)).includes('/models/sourced/')?sourcedGearClearance(a.aircraftType,8):8;
+          const key=`${fix.lon}/${fix.lat}/${displayAltitude}/${clearance}`;const desired=C.Cartesian3.fromDegrees(fix.lon,fix.lat,Math.max(0,displayAltitude)*.3048+clearance);if(drawn.get(id)===key&&C.Cartesian3.equalsEpsilon(current,desired,0,.01))continue;drawn.set(id,key);
+          const pos=C.Cartesian3.fromDegrees(fix.lon,fix.lat,Math.max(0,displayAltitude)*.3048+clearance);
           e.position=new C.ConstantPositionProperty(pos);
           const heading='heading' in fix?fix.heading:a.heading??0;
           const animation=aircraftAnimation.sample(e,{...fix,groundSpeed:fix.groundSpeed??a.groundSpeed??0},Date.now(),s.preferences.reducedMotion);
-          e.orientation=new C.ConstantProperty(C.Transforms.headingPitchRollQuaternion(pos,new C.HeadingPitchRoll((heading-90)*Math.PI/180,(fix.pitch??0)*Math.PI/180,-animation.bank*Math.PI/180)));if(e.model&&String(e.model.uri?.getValue(v.clock.currentTime)).includes('/models/fleet/'))applyAircraftRig(e,Date.now()/1000,fix.groundSpeed??a.groundSpeed??0,animation.gear,(fix.turnRate??0)*.1,animation.flaps,heading);
+          e.orientation=new C.ConstantProperty(C.Transforms.headingPitchRollQuaternion(pos,new C.HeadingPitchRoll((heading-90)*Math.PI/180,(fix.pitch??0)*Math.PI/180,-animation.bank*Math.PI/180)));if(e.model)applyAircraftRig(e,Date.now()/1000,fix.groundSpeed??a.groundSpeed??0,animation.gear,(fix.turnRate??0)*.1,animation.flaps,heading);
           if(e.billboard)e.billboard.rotation=new C.ConstantProperty(-heading*Math.PI/180);changed=true;
         }
       }

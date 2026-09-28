@@ -39,6 +39,6 @@ test('ground rig includes original flap hinges and wheel nodes without modifying
  const model=JSON.parse(readFileSync(new URL('../public/models/fleet/ground-b737.gltf',import.meta.url)));for(const name of ['Gear','WheelN','WheelL','WheelR','FlapL','FlapR'])assert.ok(model.nodes.some(n=>n.name===name));
 });
 test('supported rigs lower gear gradually and stopped wheels keep their rotation',async()=>{
- const C=await import('cesium');const {applyAircraftRig}=await import('../src/lib/aircraftRig.ts');globalThis.window={Cesium:C};const e=new C.Entity({model:{uri:'fixture.gltf'}}),time=C.JulianDate.now();
+ const C=await import('cesium');const {applyAircraftRig}=await import('../src/lib/aircraftRig.ts');globalThis.window={Cesium:C};const e=new C.Entity({model:{uri:'/watch/models/fleet/fixture.gltf'}}),time=C.JulianDate.now();
  applyAircraftRig(e,0,12,0,0,0,90);applyAircraftRig(e,1,12,1,0,1,100);const first=e.model.nodeTransformations.getValue(time);assert.ok(first.Gear.translation.y>0&&first.Gear.translation.y<3.5);const wheel=C.Quaternion.clone(first.WheelL.rotation);applyAircraftRig(e,2,0,1,0,1,100);const stopped=e.model.nodeTransformations.getValue(time);assert.ok(C.Quaternion.equals(stopped.WheelL.rotation,wheel));assert.ok(stopped.Gear.translation.y<first.Gear.translation.y);delete globalThis.window;
 });

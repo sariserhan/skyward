@@ -25,7 +25,7 @@ test('unrelated airports, wrong headings, climbs, high overflights and incomplet
  assert.equal(predictedLanding(a,160000,{...route,status:'UNVERIFIED'},airport),null);
  assert.equal(predictedLanding(a,160000,route,{...airport,elevationFt:undefined}),null);
  assert.equal(predictedLanding(a,160000,route,{...airport,id:'OTHER'}),null);
- assert.equal(predictedLanding(a,110000,route,airport),null);
+ assert.equal(predictedLanding(a,110000,route,airport).landingPhase,'approach');
  assert.equal(liveFrame(a,[],160000,true,route,airport).landingPhase,undefined);
 });
 test('fresh go-around and observed ground reports replace predicted landing; history remains observed',()=>{
@@ -60,4 +60,26 @@ test('approach keeps moving beyond old 30-second cap until touchdown',()=>{
   let previous=liveFrame(a,[],130000,false,context,airport);
   for(let now=130100;now<170000;now+=100){const next=liveFrame(a,[],now,false,context,airport);assert.equal(next.ground,false);assert.ok(trackDistance(previous,next)>.0001);assert.ok(next.altitude<previous.altitude);previous=next;}
  }
+});
+
+test('fresh low fixes past the touchdown marker still land and never reverse to an earlier exit',()=>{
+ for(const lon of [.002,.005,.012,.015])for(const altitude of [150,300,420]){
+  const plane={...a,lon,altitude,verticalRate:-200};let previous=lon;const phases=new Set();
+  for(let second=0;second<=180;second++){
+   const frame=predictedLanding(plane,plane.observedAt+second*1000,route,airport);
+   assert.ok(frame,`${lon}/${altitude}`);assert.ok(Number.isFinite(frame.lon));
+   assert.ok(frame.lon>=previous-1e-8);assert.ok(frame.lon<=.025*.85+1e-8);
+   previous=frame.lon;phases.add(frame.landingPhase);
+  }
+  assert.ok(phases.has('rollout'));assert.ok(phases.has('stopped'));
+ }
+ assert.equal(predictedLanding({...a,lon:.024,altitude:350},160000,route,airport),null);
+});
+test('missing route results permit strict final inference but conflicting results do not',()=>{
+ const unknown={...route,status:'NOT_FOUND',airports:[]};assert.equal(predictedLanding(a,115000,unknown,airport).landingPhase,'approach');
+ for(const patch of [{callsign:'OTHER'},{status:'POSITION_MISMATCH'},{airports:route.airports}])assert.equal(predictedLanding(a,115000,{...unknown,...patch},airport),null);
+});
+test('continuous observed history can supply missing heading and speed for a mapped landing',()=>{
+ const history=[{lat:0,lon:-.09,altitude:2300,time:85000,ground:false},{lat:0,lon:-.08,altitude:2200,time:100000,ground:false}];
+ assert.equal(liveFrame({...a,heading:null,groundSpeed:null},history,115000,false,route,airport).landingPhase,'approach');
 });

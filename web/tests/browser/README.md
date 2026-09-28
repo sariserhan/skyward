@@ -40,3 +40,11 @@ access enforcement, spending limits, and stopping/restarting an isolated server 
 the same port. Payment and flight data fixtures make no real purchases or paid
 provider calls. This is a local validation gate, not certification of a live billing
 setup or all browsers/devices; accounts and payments still remain test-only.
+
+`npm run test:landing` checks a low airborne observation already past the normal
+runway touchdown marker at IAD. It verifies sourced-model gear through an actual
+Cesium scene pick, then advances the fixture clock through rollout and mapped
+taxiing. Unit tests also cover barometric elevation offsets, missing route results,
+heading/speed derived from history, go-arounds, and exits behind a late touchdown.
+Gear deployment and the landing/taxi path are illustrative, not reported gear state
+or a confirmed runway/gate assignment. No live aviation API is needed.
