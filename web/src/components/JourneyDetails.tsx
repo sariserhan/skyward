@@ -13,7 +13,7 @@ export function JourneyDetails({aircraft:a,route,trail,now,reducedMotion=false}:
   const key=`${a.callsign.trim().toUpperCase()}:${a.hex.toLowerCase()}:${date}`;
   async function act(check=false){if(busy)return;setBusy(true);setMessage('');try{
     if(check){const result=await accountRequest<Detail>('/api/premium/details',{key});setDetails(result);}
-    else {await accountRequest('/api/journeys',{callsign:a.callsign,hex:a.hex,date,alerts:true});setSaved(true);setMessage('Journey saved. Alerts are recorded after verified detail checks.');}
+    else {await accountRequest('/api/journeys',{callsign:a.callsign,hex:a.hex,date,alerts:true,...(route?.status==='PLAUSIBLE'&&route.callsign===a.callsign&&route.airports.length===2?{from:route.airports[0].iata,to:route.airports[1].iata}:{})});setSaved(true);setMessage('Journey saved. Alerts are recorded after verified detail checks.');}
   }catch(e){setMessage(e instanceof Error?e.message:'Unable to complete this request.');}finally{setBusy(false);}}
   return <section className="journey-details" aria-label="Flight at a glance">
     <div className="journey-key-facts"><div><small>Destination</small><strong>{destination?.iata||destination?.icao||'Unconfirmed'}</strong></div><div><small>Rough arrival</small><strong>{eta?time(eta.time):'Unavailable'}</strong></div><div><small>Altitude</small><strong>{a.ground?'On ground':a.altitude===null?'Unknown':`${Math.round(a.altitude).toLocaleString()} ft`}</strong></div><div><small>Speed</small><strong>{a.groundSpeed===null?'Unknown':`${Math.round(a.groundSpeed)} kt`}</strong></div></div>

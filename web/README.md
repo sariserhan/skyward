@@ -650,7 +650,8 @@ No secrets go into `VITE_` variables, browser storage, committed files or chat.
 Checkout and Customer Portal use server-owned customer IDs. Premium verification
 queries Stripe directly on each premium request: the matching price, active
 subscription, unexpired item period and paid nonzero invoice must agree. A redirect,
-client flag, demo fixture or trial does not grant access. No webhook endpoint is
+client flag, demo fixture or trial does not grant access. Explicit loopback-only
+CLI test grants, described below, are a separate opt-in development mode. No webhook endpoint is
 needed for this request-time verification strategy. Provider outages fail closed;
 there is no stale entitlement cache. Configure `SKYWARD_PUBLIC_ORIGIN` before using
 checkout return URLs or posting any account mutations. Return links reopen the
@@ -940,3 +941,73 @@ Search combines callsign, airline, aircraft type, registration, origin and desti
 Camera-feed recovery retains the last successful fetch time and original observations, displays a compact retry countdown, and backs off repeated failures (70, 140, then 180 seconds, normal cycle 35 seconds). HTTP Retry-After seconds and dates take precedence; manual retries and reconnect events respect provider cooldowns. No paid APIs are introduced by these changes.
 
 Celestial selection applies a validated outward camera pose directly, with a pole-safe orthonormal orientation, instead of using an Earth-surface camera flight. Zoom controls preserve the sky selection and Back to Earth action. A failed transition attempts to restore the previous camera pose and reports locally; an isolated sky-tools boundary allows retry without unmounting the aircraft map. These safeguards do not claim to identify every browser-specific graphics failure.
+
+### Account dashboard and Premium libraries
+
+**Account & journeys** now contains Travel, Watchlist, Alerts, Viewing setups,
+Replays, Logbook and Simulator tabs.
+
+- **Free account watchlists:** 30 aircraft, synced on sign-in, window focus and
+  every minute while visible. Star changes save immediately. Guest stars remain
+  separate; **Import this browser’s watchlist** explicitly copies them into the
+  account. Logout restores the guest list, not the previous account’s data.
+- **Travel:** UTC upcoming/past journeys, optional origin/destination airports,
+  current-aircraft lookup, and on-demand detail checks. Test details remain a
+  separate synthetic example and never become the real journey’s flight status.
+- **Alerts:** private read/unread inbox for verified departure/arrival,
+  cancellation, gate/terminal changes and delays of five minutes or more.
+  Test data never generates real-flight alerts. Background live monitoring and
+  email/push delivery remain disconnected; preferences do not promise delivery.
+- **Premium viewing setups:** 10 snapshots of map/flight-camera settings,
+  bookmarks, favourites and cabin audio. Restore reloads the page; save active
+  recordings first. Revision checks protect against conflicting device edits.
+- **Premium replays:** 10 recordings, at most 2 MB each. Save a current recording
+  from Map tools → Record & replay → **Save replay to account**, or upload it in
+  Replays. Replay/download/delete work across devices. These are recorded
+  observations, not a provider’s historical archive.
+- **Premium logbook:** 500 manual trips with route, aircraft, duration and notes,
+  JSON export and totals. Distances are great-circle airport-centre distances.
+- **Premium flight cards:** download an SVG from a saved journey. Unverified
+  status remains labelled, no account email is exported, and the card is a
+  static snapshot rather than a public live-tracking endpoint.
+- **Premium simulator:** 5 cloud career slots, at most 16 MB each. Cloud saving
+  is explicit/manual; save before leaving. Game validation runs before restore.
+  Starter career, Dulles and Riverdale are joined by single-taxiway,
+  baggage-crunch and staffing-shortage challenges. Revision checks prevent
+  silently overwriting progress saved by another device.
+
+Libraries share the account SQLite database and are isolated by user. All
+Premium library reads/writes and simulator assets verify server-side access.
+Back up that database to preserve accounts and libraries. Upload sizes and
+item counts are bounded. Browser storage never grants Premium.
+Signup remains test-only; public email verification/password recovery are absent.
+
+#### Try Premium locally without a payment-provider account
+
+From `web`, stop your existing server yourself, then start:
+
+```sh
+SKYWARD_ACCOUNTS=test SKYWARD_LOCAL_PREMIUM=1 SKYWARD_PUBLIC_ORIGIN=http://localhost:8000 npm start
+```
+
+Open that exact origin and create a test account. In a second terminal from
+`web`, grant the account seven days of local test access:
+
+```sh
+SKYWARD_ACCOUNTS=test SKYWARD_LOCAL_PREMIUM=1 npm run premium:test -- grant you@example.com
+```
+
+Use **Refresh subscription**. Replace `grant` with `revoke` to revoke access.
+The command and server must use the same `SKYWARD_ACCOUNT_DB` if configured.
+This CLI-only grant is disabled by default and rejects non-loopback public
+origins. There is no browser/API endpoint for granting access. It enables no
+live paid data requests, email delivery or real payments. Normal startup ignores
+these grants. Existing Stripe test verification still works when configured.
+
+Build with `npm run build`. After game changes, export from the repo root:
+
+```sh
+godot --headless --path game --export-release Web
+```
+
+Restart Node after backend changes; retain the database and browser data.

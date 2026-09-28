@@ -1,3 +1,4 @@
+import {useAccountWatches} from './useAccountWatches';
 import {qualityRows} from './positionQuality';
 import {retainMotion} from './motionHistory';
 import { recordActivity, type ActivityBin } from './exploration';
@@ -5,9 +6,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Aircraft, AirportId, FeedResponse, TrailPoint } from '../types';
 import { appendTrail } from './aircraft';
 export type WatchItem = Pick<Aircraft, 'hex' | 'callsign' | 'registration' | 'aircraftType'>;
-function loadWatches(): WatchItem[] {
-  try { const data = JSON.parse(localStorage.getItem('skyward.watches.v1') ?? '[]'); return Array.isArray(data) ? data.filter(a => a && typeof a === 'object' && /^[a-f\d]{6}$/.test(a.hex) && ['callsign','registration','aircraftType'].every(key => typeof a[key] === 'string')).slice(0, 30) : []; } catch { return []; }
-}
 async function fetchFeed(url: string, signal: AbortSignal) {
   if(!navigator.onLine)throw new Error('Offline · waiting for connection.');
   const response = await fetch(url, { signal: AbortSignal.any([signal, AbortSignal.timeout(25000)]) });
@@ -23,7 +21,7 @@ export function useObservatory(airport: AirportId, alertsEnabled = false) {
   const [loading, setLoading] = useState(true);
   const [updatedAt, setUpdatedAt] = useState<number | null>(null);
   const [selectedError, setSelectedError] = useState('');
-  const [watches, setWatches] = useState<WatchItem[]>(loadWatches);
+  const {watches,toggleWatch,watchSyncError}=useAccountWatches();
   const [trail, setTrail] = useState<TrailPoint[]>([]);
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState('');
@@ -123,13 +121,6 @@ export function useObservatory(airport: AirportId, alertsEnabled = false) {
     finally { if (!controller.signal.aborted) setSearching(false); }
   }, [ingest, select]);
   useEffect(() => () => searchController.current?.abort(), []);
-  const toggleWatch = useCallback((a: WatchItem) => {
-    setWatches(previous => {
-      const next = previous.some(w => w.hex === a.hex) ? previous.filter(w => w.hex !== a.hex) : [...previous, { hex: a.hex, callsign: a.callsign, registration: a.registration, aircraftType: a.aircraftType }].slice(-30);
-      try { localStorage.setItem('skyward.watches.v1', JSON.stringify(next)); } catch { /* Private-mode storage can be disabled. */ }
-      return next;
-    });
-  }, []);
   const clearSelected = useCallback(() => { searchController.current?.abort(); setSearching(false); setSearchError(''); selectedRef.current = null; setSelected(null); setSelectedError(''); setTrail([]); }, []);
-  return { ingest, activity, histories:histories.current,motionHistories:motionHistories.current, observations, aircraft, selected, select, clearSelected, error, loading, updatedAt, selectedError, watches, toggleWatch, lookup, searching, searchError, trail, refresh: () => refreshRef.current() };
+  return { watchSyncError, ingest, activity, histories:histories.current,motionHistories:motionHistories.current, observations, aircraft, selected, select, clearSelected, error, loading, updatedAt, selectedError, watches, toggleWatch, lookup, searching, searchError, trail, refresh: () => refreshRef.current() };
 }

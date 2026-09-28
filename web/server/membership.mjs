@@ -1,3 +1,5 @@
+import {createAccountLibrary} from './account-library.mjs';
+import airports from '../data/airport-catalog.json' with {type:'json'};
 import {DatabaseSync} from 'node:sqlite';
 import {randomBytes, createHash, scrypt as scryptCallback, timingSafeEqual} from 'node:crypto';
 import {promisify} from 'node:util';
@@ -17,6 +19,7 @@ export function changesSince(before,after) {
   if(before.status!==after.status&&after.status)messages.push(after.status==='landed'?'Arrival reported':after.status==='en-route'?'Departure reported':`Flight status: ${after.status}`);
   for(const side of ['departure','arrival']) {
     const a=before[side],b=after[side];if(!a||!b)continue;
+    if(a.terminal&&b.terminal&&a.terminal!==b.terminal)messages.push(`${side==='departure'?'Departure':'Arrival'} terminal changed: ${a.terminal} → ${b.terminal}`);
     if(a.gate&&b.gate&&a.gate!==b.gate)messages.push(`${side==='departure'?'Departure':'Arrival'} gate changed: ${a.gate} → ${b.gate}`);
     if(a.estimatedAt&&b.estimatedAt&&b.estimatedAt-a.estimatedAt>=300000)messages.push(`${side==='departure'?'Departure':'Arrival'} estimate delayed by ${Math.round((b.estimatedAt-a.estimatedAt)/60000)} minutes`);
   }
@@ -29,6 +32,8 @@ export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now
   const parsed=new URL(origin);
   if(parsed.origin!==origin||!['https:','http:'].includes(parsed.protocol))throw Error('Use a canonical SKYWARD_PUBLIC_ORIGIN');
   if(enabled&&parsed.protocol!=='https:'&&!['localhost','127.0.0.1','[::1]'].includes(parsed.hostname))throw Error('Account cookies require HTTPS outside localhost');
+  const localPremium=enabled&&env.SKYWARD_LOCAL_PREMIUM==='1';
+  if(localPremium&&!['localhost','127.0.0.1','[::1]'].includes(parsed.hostname))throw Error('Local Premium testing requires a loopback public origin');
   const file=dbPath??(enabled?(env.SKYWARD_ACCOUNT_DB||'.local/accounts.sqlite'):':memory:');
   if(file!==':memory:')mkdirSync(dirname(file),{recursive:true,mode:0o700});
   const db=new DatabaseSync(file);if(file!==':memory:')chmodSync(file,0o600);
@@ -40,6 +45,7 @@ export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now
     CREATE TABLE IF NOT EXISTS journeys(user_id TEXT,key TEXT,body TEXT NOT NULL,PRIMARY KEY(user_id,key));
     CREATE TABLE IF NOT EXISTS checks(user_id TEXT,key TEXT,body TEXT NOT NULL,checked INTEGER,PRIMARY KEY(user_id,key));
     CREATE TABLE IF NOT EXISTS alerts(id INTEGER PRIMARY KEY,user_id TEXT,message TEXT,created INTEGER);
+    CREATE TABLE IF NOT EXISTS local_test_access(user_id TEXT PRIMARY KEY,expires INTEGER NOT NULL);
   `);
   const run=(sql,...args)=>db.prepare(sql).run(...args),get=(sql,...args)=>db.prepare(sql).get(...args);
   const limits={userRequests:integer(env.SKYWARD_MONTHLY_LOOKUPS,100),globalRequests:integer(env.SKYWARD_GLOBAL_LOOKUPS,1000),budgetMicros:integer(env.SKYWARD_BUDGET_MICROS,1000000),requestMicros:integer(env.SKYWARD_REQUEST_MICROS,1000)};
@@ -66,6 +72,7 @@ export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now
     } catch {fail(503,'Subscription service is unavailable. No premium access was granted.');}
   }
   async function entitlement(u) {
+    if(localPremium&&get('SELECT expires FROM local_test_access WHERE user_id=? AND expires>?',u.id,now()))return true;
     if(!billing||!u.customer)return false;
     const q=new URLSearchParams({customer:u.customer,status:'active',limit:'100','expand[]':'data.latest_invoice'});
     const subscriptions=await stripe(`subscriptions?${q}`);
@@ -83,8 +90,11 @@ export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now
       db.exec('COMMIT');
     }catch(e){db.exec('ROLLBACK');throw e;}
   }
+  const accountLibrary=createAccountLibrary(db,{now,entitlement});
   async function body(req) {
-    let raw='';for await(const chunk of req){raw+=chunk;if(Buffer.byteLength(raw)>8192)fail(413,'Request too large.');}
+    const maximum=req.url?.split('?')[0]==='/api/account/library'?17*1024*1024:8192;
+    const chunks=[];let bytes=0;for await(const chunk of req){bytes+=chunk.length;if(bytes>maximum)fail(413,'Request too large.');chunks.push(chunk);}
+    const raw=Buffer.concat(chunks).toString('utf8');
     try{const value=JSON.parse(raw||'{}');if(!value||typeof value!=='object'||Array.isArray(value))throw Error();return value;}catch{fail(400,'Invalid request.');}
   }
   async function handle(req,res,url) {
@@ -122,6 +132,7 @@ export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now
         }finally{inflight.delete(lock);}
       }
       if(!u)fail(401,'Sign in to continue.');
+      if(await accountLibrary(path,req.method,u,url,b,send))return true;
       if(path==='/api/account/logout'&&req.method==='POST'){run('DELETE FROM sessions WHERE token=?',digest(token(req)));cookie(res,'',0);send(200,{ok:true});return true;}
       if(path==='/api/billing/checkout'&&req.method==='POST') {
         if(inflight.has(u.id))fail(429,'A request is already running.');inflight.add(u.id);
@@ -143,8 +154,9 @@ export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now
         const callsign=flightCode(b.callsign),hex=String(b.hex||'').toLowerCase(),date=String(b.date||'');
         if(!/^[a-f0-9]{6}$/.test(hex)||!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Number.isFinite(Date.parse(date))||new Date(date).toISOString().slice(0,10)!==date)fail(400,'Choose a valid flight and date.');
         const k=`${callsign}:${hex}:${date}`;
+        const metadata={};for(const side of ['from','to']){const value=typeof b[side]==='string'?b[side].trim().toUpperCase():'';if(value&&!Object.hasOwn(airports,value))fail(400,'Choose an airport from the directory.');if(value)metadata[side]=value;}
         if(b.remove===true){run('DELETE FROM journeys WHERE user_id=? AND key=?',u.id,k);run('DELETE FROM checks WHERE user_id=? AND key=?',u.id,k);}
-        else {if(!get('SELECT key FROM journeys WHERE user_id=? AND key=?',u.id,k)&&get('SELECT COUNT(*) n FROM journeys WHERE user_id=?',u.id).n>=50)fail(429,'Keep up to 50 saved journeys.');run('INSERT INTO journeys VALUES(?,?,?) ON CONFLICT(user_id,key) DO UPDATE SET body=excluded.body',u.id,k,JSON.stringify({key:k,callsign,hex,date,alerts:b.alerts===true}));}
+        else {if(!get('SELECT key FROM journeys WHERE user_id=? AND key=?',u.id,k)&&get('SELECT COUNT(*) n FROM journeys WHERE user_id=?',u.id).n>=50)fail(429,'Keep up to 50 saved journeys.');run('INSERT INTO journeys VALUES(?,?,?) ON CONFLICT(user_id,key) DO UPDATE SET body=excluded.body',u.id,k,JSON.stringify({key:k,callsign,hex,date,...metadata,alerts:b.alerts===true}));}
         send(200,{ok:true});return true;
       }
       if(path==='/api/premium/details'&&req.method==='POST') {

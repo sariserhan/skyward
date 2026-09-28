@@ -10,6 +10,10 @@ config/name="BOARDING"
 run/main_scene="res://scenes/menu.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 
+[autoload]
+
+AccountCloudBridge="*res://scripts/cloud_bridge.gd"
+
 [display]
 
 window/size/viewport_width=1280

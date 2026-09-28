@@ -19,8 +19,8 @@ export function Upgrade({openJourney}:{openJourney:(hex:string)=>Promise<void>})
       <h2 id="upgrade-title">{accountOnly?'Your Skyward':'See more of every journey.'}</h2>
       <p id="upgrade-description">Go beyond the globe with richer flight details.</p>
       {!accountOnly&&<div className="upgrade-plans">
-        <section><h3>Free</h3><p>Your current experience</p><ul><li>Interactive globe and aircraft tracking</li><li>3D flight views</li><li>Existing free-feed observations</li></ul></section>
-        <section className="upgrade-premium"><h3>Premium</h3><p>Everything in Free, plus planned access to:</p><ul><li>Scheduled departure and arrival times</li><li>Gate and terminal details</li><li>Updated arrival estimates and flight status</li><li>Airport simulator access</li></ul><small>On-demand flight details with usage limits. Availability varies by flight.</small></section>
+        <section><h3>Free</h3><p>Your current experience</p><ul><li>Interactive globe and aircraft tracking</li><li>3D flight views</li><li>Existing free-feed observations</li><li>Account watchlist syncing</li></ul></section>
+        <section className="upgrade-premium"><h3>Premium</h3><p>Everything in Free, plus planned access to:</p><ul><li>Scheduled departure and arrival times</li><li>Gate and terminal details</li><li>Updated arrival estimates and flight status</li><li>Flight-change inbox after verified checks</li><li>Cloud replays and saved viewing setups</li><li>Personal flight logbook and shareable cards</li><li>Airport simulator and cloud career saves</li></ul><small>On-demand flight details with usage limits. Availability varies by flight.</small></section>
       </div>}
       {!accountOnly&&<PremiumPreview/>}<p className="upgrade-availability">Public subscriptions are coming soon. Test checkout is available only when configured; no real payment is taken.</p>
       <p className="upgrade-privacy">Passenger names and actual onboard counts are not included.</p>

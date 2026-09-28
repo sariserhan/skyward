@@ -124,3 +124,85 @@ test('Trials, unpaid invoices, wrong prices, expired periods and live subscripti
     }finally{await f.close();}
   }
 });
+
+test('Free watchlists sync across sessions, isolate accounts, and cannot store forged Premium data',async()=>{
+ const f=await fixture();try{
+  const a=await f.register(),b=await f.register('second@example.test');
+  const watch={hex:'aab812',callsign:'AAL6',registration:'N123',aircraftType:'B738'};
+  assert.equal((await f.call('/api/account/library',{kind:'watchlist',key:watch.hex,value:watch},a)).code,200);
+  const login=await f.call('/api/account/login',{email:'one@example.test',password:'correct horse battery staple'});
+  assert.equal((await f.call('/api/account/library?kind=watchlist',undefined,login.cookie)).body.items[0].value.callsign,'AAL6');
+  assert.equal((await f.call('/api/account/library?kind=watchlist',undefined,b)).body.items.length,0);
+  for(const kind of ['views','recordings','logbook','simulator']){
+   assert.equal((await f.call('/api/account/library?kind='+kind,undefined,a)).code,403);
+   assert.equal((await f.call('/api/account/library',{kind,key:'x',revision:0,value:{premium:true}},a)).code,403);
+  }
+  assert.equal((await f.call('/api/account/library?kind=watchlist')).code,401);
+  assert.equal((await f.call('/api/account/library?kind=__proto__',undefined,a)).code,400);
+  assert.equal((await f.call('/api/account/library',{kind:'watchlist',key:'000001',value:watch},a)).code,400);
+  assert.equal(f.requests.length,0);
+ }finally{await f.close();}
+});
+test('Premium libraries persist, enforce optimistic edits and validate viewing settings and logbooks',async()=>{
+ const dir=mkdtempSync(join(tmpdir(),'skyward-library-'));let f;try{
+  const dbPath=join(dir,'db.sqlite');f=await fixture({dbPath});const cookie=await f.register();await f.call('/api/billing/checkout',{},cookie);f.paid(true);
+  const payload={kind:'views',key:'home',revision:0,value:{name:'Home',settings:{'skyward.cabin-audio.v1':'off'}}};
+  assert.equal((await f.call('/api/account/library',payload,cookie)).body.revision,1);
+  assert.equal((await f.call('/api/account/library',payload,cookie)).code,409);
+  assert.equal((await f.call('/api/account/library',{...payload,revision:1,value:{settings:{'skyward_session':'forged'}}},cookie)).code,400);
+  assert.equal((await f.call('/api/account/library',{...payload,revision:1,value:{settings:{'skyward.map.v1':'null'}}},cookie)).code,400);
+  const log={kind:'logbook',key:'trip',revision:0,value:{date:'2026-09-28',from:'IAD',to:'LHR',durationMinutes:430,callsign:'BA216'}};
+  assert.equal((await f.call('/api/account/library',log,cookie)).code,200);
+  assert.equal((await f.call('/api/account/library',{...log,key:'bad',value:{...log.value,date:'2026-02-30'}},cookie)).code,400);
+  await f.close();f=await fixture({dbPath});f.paid(true);
+  assert.equal((await f.call('/api/account/library?kind=views&key=home',undefined,cookie)).body.revision,1);
+  assert.equal((await f.call('/api/account/library?kind=logbook',undefined,cookie)).body.items[0].value.to,'LHR');
+  assert.equal((await f.call('/api/account/library',{...payload,revision:1,remove:true},cookie)).code,200);
+  assert.equal((await f.call('/api/account/library?kind=views&key=home',undefined,cookie)).code,404);
+  f.paid(false);assert.equal((await f.call('/api/account/library?kind=logbook',undefined,cookie)).code,403);
+ }finally{if(f)await f.close();rmSync(dir,{recursive:true,force:true});}
+});
+test('Cloud recordings validate observed fixes; storage caps prevent unbounded libraries',async()=>{
+ const f=await fixture();try{
+  const c=await f.register();await f.call('/api/billing/checkout',{},c);f.paid(true);
+  const recording={format:'skyward-session',version:1,createdAt:NOW,name:'My flight',tracks:[{identity:{hex:'aab812',callsign:'AAL6'},points:[{lat:38.95,lon:-77.46,altitude:1000,time:NOW,ground:false}]}]};
+  assert.equal((await f.call('/api/account/library',{kind:'recordings',key:'one',revision:0,value:recording},c)).code,200);
+  const r=await f.call('/api/account/library?kind=recordings&key=one',undefined,c);assert.equal(r.body.value.tracks[0].points[0].time,NOW);
+  assert.equal((await f.call('/api/account/library',{kind:'recordings',key:'bad',revision:0,value:{...recording,tracks:[{...recording.tracks[0],points:[{lat:1000}]}]}},c)).code,400);
+  for(let i=0;i<10;i++)assert.equal((await f.call('/api/account/library',{kind:'views',key:'view-'+i,revision:0,value:{name:'View',settings:{}}},c)).code,200);
+  assert.equal((await f.call('/api/account/library',{kind:'views',key:'overflow',revision:0,value:{settings:{}}},c)).code,429);
+  assert.equal((await f.call('/api/account/library',{kind:'simulator',key:'bad',revision:0,value:{kind:'career',version:1}},c)).code,400);
+ }finally{await f.close();}
+});
+test('Dashboard distinguishes sample details from verified statuses; alerts read state stays private',async()=>{
+ const f=await fixture();try{
+  const a=await f.register(),b=await f.register('other@example.test');await f.call('/api/journeys',{...journey,from:'IAD',to:'LHR'},a);await f.call('/api/billing/checkout',{},a);f.paid(true);
+  await f.call('/api/premium/details',{key:journeyKey},a);
+  const dashboard=(await f.call('/api/account/dashboard',undefined,a)).body;
+  assert.equal(dashboard.journeys[0].from,'IAD');assert.equal(dashboard.journeys[0].details.mode,'demo');assert.equal(dashboard.alerts.length,0);
+  const uid=f.membership.db.prepare('SELECT id FROM users WHERE email=?').get('one@example.test').id;
+  f.membership.db.prepare('INSERT INTO alerts(user_id,message,created) VALUES(?,?,?)').run(uid,'Verified test event',NOW);
+  const alerts=(await f.call('/api/account/dashboard',undefined,a)).body.alerts;assert.equal(alerts[0].read,false);
+  await f.call('/api/account/alerts',{throughId:alerts[0].id},b);
+  assert.equal((await f.call('/api/account/dashboard',undefined,a)).body.alerts[0].read,false);
+  await f.call('/api/account/alerts',{throughId:alerts[0].id},a);
+  assert.equal((await f.call('/api/account/dashboard',undefined,a)).body.alerts[0].read,true);
+  assert.ok(f.requests.every(r=>r.url.startsWith('https://api.stripe.com/')));
+ }finally{await f.close();}
+});
+test('Verified terminal and cancellation changes produce understandable alerts',()=>{
+ assert.deepEqual(changesSince({status:'scheduled',departure:{terminal:'1'}},{status:'cancelled',departure:{terminal:'2'}}),['Flight status: cancelled','Departure terminal changed: 1 → 2']);
+});
+test('Local Premium testing is opt-in, loopback-only and cannot be granted by HTTP clients',async()=>{
+ assert.throws(()=>createMembership({env:{SKYWARD_ACCOUNTS:'test',SKYWARD_LOCAL_PREMIUM:'1',SKYWARD_PUBLIC_ORIGIN:'https://public.example'},dbPath:':memory:'}),/loopback/);
+ const f=await fixture({env:{SKYWARD_LOCAL_PREMIUM:'1',SKYWARD_PUBLIC_ORIGIN:'http://localhost:8000',STRIPE_SECRET_KEY:''}});try{
+  const r=await f.call('/api/account/register',{email:'local@example.test',password:'correct horse battery staple'},'',{Origin:'http://localhost:8000'});assert.equal(r.code,200);const c=r.cookie;
+  assert.equal((await f.call('/api/account',undefined,c)).body.user.premium,false);
+  assert.equal((await f.call('/api/account/grant',{premium:true},c,{Origin:'http://localhost:8000'})).code,404);
+  const u=f.membership.db.prepare('SELECT id FROM users').get();
+  f.membership.db.prepare('INSERT INTO local_test_access VALUES(?,?)').run(u.id,NOW+60000);
+  assert.equal((await f.call('/api/account',undefined,c)).body.user.premium,true);
+  f.membership.db.prepare('UPDATE local_test_access SET expires=?').run(NOW-1);
+  assert.equal((await f.call('/api/account',undefined,c)).body.user.premium,false);assert.equal(f.requests.length,0);
+ }finally{await f.close();}
+});
