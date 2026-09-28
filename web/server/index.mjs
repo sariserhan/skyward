@@ -12,9 +12,9 @@ import { fileURLToPath } from 'node:url';
 import { FeedClient, AIRPORTS, cameraAreaPath } from './feed.mjs';
 import { routePath } from './routes.mjs';
 import { airlabsPreview } from './airlabs.mjs';
-import {createMembership} from './membership.mjs';
+import {createConfiguredMembership} from './membership-config.mjs';
 import {simulatorPage} from './simulator.mjs';
-const membership=createMembership();
+const membership=await createConfiguredMembership();
 
 const here = dirname(fileURLToPath(import.meta.url));
 const webRoot = resolve(here, '../dist');
@@ -113,7 +113,7 @@ export const server = http.createServer(async (req, res) => {
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   // Let Node bind dual-stack localhost by default; explicit HOST remains supported.
   server.listen({port:Number(process.env.PORT ?? 8000), ...(process.env.HOST ? {host:process.env.HOST} : {}), ipv6Only:false}, () => console.log(`Skyward: http://localhost:${server.address().port}/ · airport simulation: /airport-simulation/`));
-  const stop = () => { server.close(() => process.exit(0)); setTimeout(() => process.exit(1), 10000).unref(); };
+  const stop = () => { server.close(() => { void Promise.resolve(membership.close()).then(() => process.exit(0), () => process.exit(1)); }); setTimeout(() => process.exit(1), 10000).unref(); };
   process.once('SIGTERM', stop); process.once('SIGINT', stop);
 }
 

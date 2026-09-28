@@ -1,8 +1,11 @@
 {
   "dependencies": {
     "astronomy-engine": "2.1.19",
+    "better-auth": "1.7.6",
     "cesium": "1.145.0",
     "lucide-react": "1.48.0",
+    "nodemailer": "10.0.12",
+    "pg": "8.23.0",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },
@@ -39,11 +42,14 @@
     "check:airlabs": "node scripts/check-airlabs.mjs",
     "start:airlabs-demo": "SKYWARD_AIRLABS_MODE=demo node server/index.mjs",
     "start:premium-test": "SKYWARD_ACCOUNTS=test node server/index.mjs",
-    "premium:usage": "node scripts/premium-usage.mjs",
+    "premium:usage": "node --env-file-if-exists=.env scripts/premium-usage.mjs",
     "test:views": "npm run build && node scripts/browser-tests.mjs --views",
     "test:customer": "npm run build && node scripts/browser-tests.mjs --customer",
     "test:launch": "npm test && npm run test:browser && npm run test:customer",
     "test:landing": "npm run build && node scripts/browser-tests.mjs --landing",
-    "premium:test": "node scripts/test-premium.mjs"
+    "premium:test": "node scripts/test-premium.mjs",
+    "db:migrate": "node --env-file-if-exists=.env scripts/migrate-neon.mjs",
+    "start:neon": "SKYWARD_ACCOUNTS=neon node --env-file-if-exists=.env server/index.mjs",
+    "test:neon": "node --test server/neon-membership.test.mjs"
   }
 }

@@ -622,7 +622,11 @@ Share view captures the current 3D camera position and selected aircraft. Reopen
 
 Timezone references are an ICAO- and coordinate-matched subset of OpenFlights (ODbL-1.0), separate from the airport directory. Refresh with `python3 scripts/import-airport-timezones.py`; provenance and input SHA-256 are in `data/airport-timezones-source.json`. Browser IANA data supplies current offsets/DST. Missing or unsupported zones remain unavailable.
 
-### Premium accounts, billing, journeys and flight alerts (test environment)
+### Legacy local accounts, billing, journeys and flight alerts (test environment)
+
+This section describes the SQLite test mode. The selected production stack is
+**Neon Postgres + Better Auth**; see its setup below. Billing and paid flight data
+remain test-only in both account modes.
 
 Start with `npm run start:premium-test` after `npm run build` (Node 24+).
 Set `SKYWARD_PUBLIC_ORIGIN` to the exact browser origin, e.g.
@@ -697,9 +701,9 @@ live detail source is connected. There is no background monitoring, email or pus
 service in this release; existing observation-based watch alerts remain separate.
 
 Before live customer launch: configure actual provider/account contracts and
-coverage, email verification and account recovery, live payment credentials and
+coverage, delivery testing for verification/recovery email, live payment credentials and
 prices, and a reviewed live-only premium data path. Current test sessions cannot
-access paid flight data. Accounts use salted scrypt hashes, revocable HTTP-only
+access paid flight data. Legacy SQLite test accounts use salted scrypt hashes, revocable HTTP-only
 sessions, HTTPS secure cookies, strict same-origin mutations, bounded request bodies
 and persistent request throttling. Local SQLite files contain account information:
 keep them private and back them up. No real subscription purchase was made by these
@@ -976,11 +980,13 @@ Replays, Logbook and Simulator tabs.
   baggage-crunch and staffing-shortage challenges. Revision checks prevent
   silently overwriting progress saved by another device.
 
-Libraries share the account SQLite database and are isolated by user. All
+Libraries use the selected account database (Neon Postgres or local test SQLite)
+and are isolated by user. All
 Premium library reads/writes and simulator assets verify server-side access.
 Back up that database to preserve accounts and libraries. Upload sizes and
 item counts are bounded. Browser storage never grants Premium.
-Signup remains test-only; public email verification/password recovery are absent.
+The SQLite mode is local testing only. Neon mode provides Better Auth signup,
+email verification and password recovery; configure SMTP before enabling it.
 
 #### Try Premium locally without a payment-provider account
 
@@ -1011,3 +1017,90 @@ godot --headless --path game --export-release Web
 ```
 
 Restart Node after backend changes; retain the database and browser data.
+
+
+### Neon Postgres + Better Auth (selected production account stack)
+
+Production account storage is Neon Postgres. Better Auth owns passwords, verified
+email identities and revocable cookie sessions; Skyward does not maintain a second
+production password/session system. Application tables reference Better Auth's
+user IDs, and every application query uses the authenticated user's ID.
+Free account watches, journeys, alerts, Premium libraries, simulator saves and
+usage limits are all stored in Postgres when `SKYWARD_ACCOUNTS=neon`.
+
+This is an integration prepared for deployment, **not a connected live deployment**.
+No Neon project, real mailbox, payment account or paid flight-data connection is
+created automatically. Billing remains Stripe **test mode**, with synthetic detail
+lookups and zero live aviation API spend. Passenger manifests remain unavailable.
+
+From `web/` with Node 24 or newer:
+
+```sh
+npm ci
+cp .env.example .env
+# Edit .env with your Neon connection strings, random secret and SMTP settings.
+npm run db:migrate
+npm run build
+npm run start:neon
+```
+
+- `DATABASE_URL`: Neon **pooled** Postgres connection URL for the running server.
+- `DATABASE_URL_UNPOOLED`: direct Neon URL for migrations (optional fallback is
+  `DATABASE_URL`). Run migrations once per deployment, before starting replicas.
+  The command applies the pinned Better Auth schema and the initial app schema;
+  rerunning it is safe. Back up/branch the database before future schema upgrades.
+- `BETTER_AUTH_SECRET`: generate a unique secret with `openssl rand -hex 48`.
+  Preserve it across restarts and replicas. Never prefix server secrets with `VITE_`.
+- `SKYWARD_PUBLIC_ORIGIN`: the exact URL visitors use. For SSH forwarding use
+  `http://localhost:8000` if that is the browser address. Deployed production must
+  use HTTPS and `NODE_ENV=production`; production refuses local SQLite accounts.
+- `SMTP_HOST`, `SMTP_PORT` (587 or 465), `SMTP_FROM`, and, if required,
+  `SMTP_USER` / `SMTP_PASSWORD`: configure a mailbox service and sender you control.
+  TLS and certificate validation are required. Failed delivery is logged without
+  addresses or tokens; users can resend verification or request another reset.
+- `SKYWARD_DB_POOL_SIZE`: defaults to 5 connections per process, capped at 20.
+  Remote database connections require TLS with certificate validation.
+
+The migration command does not send mail or require SMTP. The running Neon account
+server requires SMTP configuration. Secret-bearing `.env` files are gitignored.
+After configuring the account backend, restart Node yourself; frontend rebuilding
+alone cannot switch a running backend. Do not run two servers on port 8000.
+
+User flow: **Create account → verify email → sign in**. Forgot password sends a
+single-use reset link; a successful reset revokes old sessions. Signed-out visitors
+keep browser-local watches. Existing SQLite test identities/data remain in their
+local database and are not silently imported or treated as verified identities.
+Users can explicitly import their browser watchlist after signing in.
+
+Premium access remains server-verified through a Stripe sandbox subscription.
+`SKYWARD_LOCAL_PREMIUM` grants are intentionally rejected in Neon mode. Configure
+sandbox billing for Premium end-to-end tests; no production entitlement can be
+created from local storage or a request parameter. `npm run premium:usage` reads
+the selected backend and reports **reserved test budget**, not actual spending.
+
+Application writes enforce same-origin JSON requests, ownership and storage
+limits. Postgres transactions and transaction-scoped advisory locks serialize
+quota checks and revision updates across replicas. Better Auth's built-in auth
+rate limits remain enabled in the database. The server supplies the socket IP
+for auth limiting and ignores browser-supplied forwarding headers. Behind a
+reverse proxy this is the proxy IP: configure trusted proxy handling and edge
+limits before a multi-user public launch. Do not blindly trust forwarded headers.
+
+Before public release, verify real SMTP delivery, HTTPS/cookie behavior, Neon
+backup/restore and connection limits, host monitoring and the public-launch
+requirements above. Live payments and authorized paid-flight-data wiring are
+separate remaining work; this change does not turn either on.
+
+Validation:
+
+```sh
+npm test
+# Point ONLY at an isolated disposable Postgres database, never production:
+SKYWARD_TEST_DATABASE_URL='postgresql://USER:PASSWORD@localhost:PORT/testdb' npm run test:neon
+```
+
+The normal suite skips the database integration test unless that variable is set.
+The integration test runs real Better Auth migrations, signup, verification,
+sessions, recovery, ownership checks, concurrent revisions, test quotas and alerts.
+It captures email in memory and stubs Stripe; it never sends mail or calls a paid
+aviation API. Its test users and dependent application rows are cleaned up.

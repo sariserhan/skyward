@@ -3,7 +3,10 @@ import {accountChanged} from '../lib/accountLibrary';
 import {useEffect,useState} from 'react';
 import {accountRequest,type Account} from '../lib/membership';
 export function MembershipPanel({openJourney}:{openJourney:(hex:string)=>Promise<void>}) {
-  const [account,setAccount]=useState<Account|null>(null),[message,setMessage]=useState(''),[busy,setBusy]=useState(false),[register,setRegister]=useState(false);
+  const [account,setAccount]=useState<Account|null>(null),[message,setMessage]=useState(''),[busy,setBusy]=useState(false),[register,setRegister]=useState(false),[recover,setRecover]=useState(false);
+  const [resetToken,setResetToken]=useState(()=>new URLSearchParams(window.location.search).get('token')||'');
+  const betterAuth=account?.authProvider==='better-auth';
+  useEffect(()=>{if(resetToken){const url=new URL(window.location.href);url.searchParams.delete('token');history.replaceState(history.state,'',url);}},[resetToken]);
 
   async function reload() {
     const a=await accountRequest<Account>('/api/account');setAccount(a);
@@ -15,14 +18,22 @@ export function MembershipPanel({openJourney}:{openJourney:(hex:string)=>Promise
     <h3>Your account &amp; journeys</h3>
     {!account&&!message&&<p>Loading account…</p>}
     {account&&!account.enabled&&<p>Account signup and subscriptions are coming soon. Free exploration is available now.</p>}
-    {account?.enabled&&<><p className="account-test-note">Test environment · no real payments or live premium flight data.</p>
-      {!account.user?<form onSubmit={e=>{e.preventDefault();const form=e.currentTarget,data=new FormData(form);void perform(async()=>{await accountRequest(`/api/account/${register?'register':'login'}`,{email:data.get('email'),password:data.get('password')});form.reset();accountChanged();await reload();});}}>
-        <label>Email<input name="email" type="email" autoComplete="email" required maxLength={254}/></label>
-        <label>Password<input name="password" type="password" autoComplete={register?'new-password':'current-password'} required minLength={12} maxLength={128}/></label>
-        <small>Use 12–128 characters. Test accounts do not yet offer email verification or password recovery.</small>
-        <div className="membership-actions"><button disabled={busy} type="submit">{register?'Create test account':'Sign in'}</button><button type="button" disabled={busy} onClick={()=>setRegister(!register)}>{register?'Already registered?':'Create an account'}</button></div>
+    {account?.enabled&&<><p className="account-test-note">{betterAuth?'Billing is in test mode · no real payments or live premium flight data.':'Test environment · no real payments or live premium flight data.'}</p>
+      {!account.user||resetToken?<form onSubmit={e=>{e.preventDefault();const form=e.currentTarget,data=new FormData(form);void perform(async()=>{
+        if(betterAuth&&resetToken){await accountRequest('/api/auth/reset-password',{token:resetToken,newPassword:data.get('password')});setResetToken('');setRecover(false);accountChanged(true);await reload();setMessage('Password updated. Sign in with your new password.');form.reset();return;}
+        if(betterAuth&&recover){await accountRequest('/api/auth/request-password-reset',{email:data.get('email'),redirectTo:window.location.origin+'/?account=reset'});setMessage('If an account exists for this email, a reset link will arrive shortly.');return;}
+        await accountRequest(betterAuth?`/api/auth/${register?'sign-up':'sign-in'}/email`:`/api/account/${register?'register':'login'}`,{email:data.get('email'),password:data.get('password'),...(betterAuth?{name:data.get('name')||undefined,callbackURL:window.location.origin+'/?account=return'}:{})});
+        form.reset();accountChanged();await reload();if(betterAuth&&register){setRegister(false);setMessage('Check your email to verify your account, then sign in.');}
+      });}}>
+        {betterAuth&&register&&!recover&&!resetToken&&<label>Name<input name="name" autoComplete="name" required maxLength={100}/></label>}
+        {!resetToken&&<label>Email<input name="email" type="email" autoComplete="email" required maxLength={254}/></label>}
+        {(!recover||!!resetToken)&&<label>{resetToken?'New password':'Password'}<input name="password" type="password" autoComplete={register||resetToken?'new-password':'current-password'} required minLength={12} maxLength={128}/></label>}
+        <small>{betterAuth?'Verify your email before signing in. Use a password of 12–128 characters.':'Use 12–128 characters. Test accounts do not yet offer email verification or password recovery.'}</small>
+        <div className="membership-actions"><button disabled={busy} type="submit">{resetToken?'Save new password':recover?'Send reset link':register?(betterAuth?'Create account':'Create test account'):'Sign in'}</button><button type="button" disabled={busy} onClick={()=>{if(recover||resetToken){setRecover(false);setResetToken('');setRegister(false);}else setRegister(!register);}}>{recover||resetToken?'Back to sign in':register?'Already registered?':'Create an account'}</button>
+        {betterAuth&&!register&&!recover&&!resetToken&&<><button type="button" disabled={busy} onClick={()=>setRecover(true)}>Forgot password?</button><button type="button" disabled={busy} onClick={e=>{const form=e.currentTarget.closest('form');if(!form)return;const email=form.querySelector<HTMLInputElement>('input[name="email"]');if(!email?.reportValidity())return;void perform(async()=>{await accountRequest('/api/auth/send-verification-email',{email:email.value,callbackURL:window.location.origin+'/?account=return'});setMessage('If verification is needed, an email will arrive shortly.');});}}>Resend verification email</button></>}
+        </div>
       </form>:<><p>{account.user.email} · <strong>{account.user.premium?'Premium · test':'Free'}</strong></p>
-        <div className="membership-actions"><button disabled={busy||!account.billingReady} onClick={()=>void perform(()=>billing('/api/billing/checkout'))}>Test premium checkout</button><button disabled={busy||!account.billingReady} onClick={()=>void perform(()=>billing('/api/billing/portal'))}>Manage subscription</button><button disabled={busy} onClick={()=>void perform(reload)}>Refresh subscription</button><button disabled={busy} onClick={()=>void perform(async()=>{await accountRequest('/api/account/logout',{});accountChanged(true);await reload();})}>Sign out</button></div>
+        <div className="membership-actions"><button disabled={busy||!account.billingReady} onClick={()=>void perform(()=>billing('/api/billing/checkout'))}>Test premium checkout</button><button disabled={busy||!account.billingReady} onClick={()=>void perform(()=>billing('/api/billing/portal'))}>Manage subscription</button><button disabled={busy} onClick={()=>void perform(reload)}>Refresh subscription</button><button disabled={busy} onClick={()=>void perform(async()=>{await accountRequest(betterAuth?'/api/auth/sign-out':'/api/account/logout',{});accountChanged(true);await reload();})}>Sign out</button></div>
         {!account.billingReady&&<p>Checkout setup is pending. No payment can be taken yet.</p>}
         {account.usage&&<p>Monthly test lookups: {account.usage.requests} / {account.usage.limit}. Actual flight-data spend: $0. No automatic refresh.</p>}
         {account.user.premium&&<p><a href="/airport-simulation/">Play airport simulator →</a></p>}
