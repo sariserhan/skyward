@@ -25,7 +25,7 @@ export class SimulatorAudio {
   }
   await this.context.resume();
  }
- update(s:FlightState,type:AircraftType,volume:number,muted:boolean){const c=this.context;if(!c||!this.master)return;const at=c.currentTime;this.master.gain.setTargetAtTime(muted?0:volume*.22,at,.08);this.engine?.frequency.setTargetAtTime((type==='C172'?35:65)+s.enginePower*(type==='C172'?85:155),at,.15);this.engineGain?.gain.setTargetAtTime(s.fuelExhausted?s.enginePower*.35:.08+s.enginePower*.35,at,.15);this.wind?.gain.setTargetAtTime(Math.min(.35,s.speed/800),at,.1);this.rumble?.gain.setTargetAtTime(s.ground?Math.min(.6,s.speed/150):0,at,.12);this.gear?.gain.setTargetAtTime(Math.abs(Number(s.gear)-s.gearPosition)>.01?.08:0,at,.08);this.alarm?.gain.setTargetAtTime(s.warning.includes('STALL')?.17:0,at,.04);}
+ update(s:FlightState,type:AircraftType,volume:number,muted:boolean){const c=this.context;if(!c||!this.master)return;const at=c.currentTime;this.master.gain.setTargetAtTime(muted?0:volume*.22,at,.08);this.engine?.frequency.setTargetAtTime((type==='C172'?35:65)+s.enginePower*(type==='C172'?85:155),at,.15);this.engineGain?.gain.setTargetAtTime((s.fuelExhausted||s.engineRunning===false)?s.enginePower*.35:.08+s.enginePower*.35,at,.15);this.wind?.gain.setTargetAtTime(Math.min(.35,s.speed/800),at,.1);this.rumble?.gain.setTargetAtTime(s.ground?Math.min(.6,s.speed/150):0,at,.12);this.gear?.gain.setTargetAtTime(Math.abs(Number(s.gear)-s.gearPosition)>.01?.08:0,at,.08);this.alarm?.gain.setTargetAtTime(s.warning.includes('STALL')?.17:0,at,.04);}
  impact(volume:number,fatal:boolean){
   const c=this.context;if(!c||c.state!=='running')return;
   const duration=fatal?1.6:.5,buffer=c.createBuffer(1,Math.floor(c.sampleRate*duration),c.sampleRate),data=buffer.getChannelData(0);for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*Math.exp(-i/data.length*5);
@@ -35,7 +35,8 @@ export class SimulatorAudio {
   if(this.disposed||!('speechSynthesis' in window)||this.context?.state!=='running')return false;
   // Local voices avoid sending simulator text to an external speech service.
   const voices=window.speechSynthesis.getVoices(),voice=voices.find(v=>v.localService&&v.lang.startsWith('en'));if(!voice)return false;
-  try{this.cancelSpeech();const utterance=new SpeechSynthesisUtterance(text);utterance.voice=voice;utterance.rate=1.04;utterance.volume=volume;this.speech=utterance;window.speechSynthesis.speak(utterance);return true;}catch{this.speech=null;return false;}
+  if(this.speech&&window.speechSynthesis.speaking&&!/engines out|engine failure|stall|go around/i.test(text))return true;
+  try{this.cancelSpeech();const utterance=new SpeechSynthesisUtterance(text);utterance.voice=voice;utterance.rate=1.04;utterance.volume=volume;this.speech=utterance;utterance.onend=utterance.onerror=()=>{if(this.speech===utterance)this.speech=null;};window.speechSynthesis.speak(utterance);return true;}catch{this.speech=null;return false;}
  }
  cancelSpeech(){if(this.speech&&'speechSynthesis' in window){window.speechSynthesis.cancel();this.speech=null;}}
  suspend(){try{this.impactSource?.stop();}catch{}this.impactSource=null;this.cancelSpeech();if(this.context?.state==='running')void this.context.suspend();}

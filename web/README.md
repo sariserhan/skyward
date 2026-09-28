@@ -1346,8 +1346,8 @@ Choose **Training mission** before starting:
 
 Debriefs provide route playback, an altitude trace, speed/fuel readouts, warnings,
 practice suggestions and JSON download. Samples are bounded to 1,800 with adaptive
-sampling for long flights; the full replay stays in memory for the current flight.
-Career saves retain the lesson result and touchdown score, not the full replay.
+sampling for long flights; career saves retain the replay along with the lesson result and touchdown score.
+Reopen it from Saved training and replays on the simulator setup screen.
 
 After a successful landing, **Request taxi to stand** selects a connected route
 from the actual stopped position along the remaining mapped runway and taxiways.
@@ -1356,3 +1356,45 @@ acceleration and corner/parking deceleration. It cannot start with exhausted fue
 a missing route, or too little runway remaining to find a forward exit. At the
 stand, use **Shut down engines**. Missing geometry never generates an invented
 connection. Taxi time and fuel consumption are included in the flight record.
+
+
+### Controls, weather and saved practice
+
+- **Aircraft switches** in the cockpit control battery, engine start/stop,
+  navigation lights, landing lights and flaps. Free flight has an optional cold
+  start. Startup requires battery, fuel and idle ground throttle. Stopping an
+  airborne engine removes thrust and enters the existing glide model.
+- Free-flight weather controls set wind from a compass direction, gust amplitude,
+  turbulence, rain/wet braking and visibility. These are user-selected simulation
+  conditions, not fetched real weather. The C172, Citation and 737 have separate
+  rotation/control rates, gear drag, spool, braking and steering profiles; physics
+  remain simplified entertainment parameters.
+- **Restart on final approach** resets to a configured five-mile final (two miles
+  for engine-out practice), clears the old attempt and retains route and weather.
+  Save first to preserve an attempt. Practice resets do not earn a complete
+  traffic-pattern lesson credit.
+- **Manual taxi** can be selected before requesting a route after landing. Use
+  throttle, brakes and Q/E rudder (A/D also assists steering). The route stays
+  highlighted; speed/off-route warnings do not steer for you. Slow below 1 kt,
+  within 8 m of the assigned mapped stand, with brakes applied to park. Assisted
+  taxi remains the default. Both depend on connected mapped geometry.
+- **Joystick / gamepad** supports configurable axis/button indices, pitch invert,
+  sensitivity and dead zone. Throttle is opt-in; mappings are stored locally,
+  and controller input must be enabled each visit. Polling clears held buttons on
+  disconnect. Keyboard/touch input overrides the corresponding controller axis.
+  Browser/hardware mappings vary; press a device button to expose it to the page.
+- **Saved training and replays** shows lesson history, manual/assisted runs,
+  personal best touchdown scores and replays. Save results explicitly; they are
+  private account library entries, supported by both local dev accounts and Neon.
+  Up to 100 results, 512 KiB each, with at most 1,800 replay samples and 100 notes.
+  Lists omit replay payloads; opening a replay fetches that individual record.
+  Old results without a replay remain readable. Delete results to reclaim slots.
+- Reliability work reuses Cesium position/orientation properties, smooths external
+  camera distance/pitch changes, bounds frame catch-up and recording memory, and
+  avoids interrupting an active spoken call for routine radio messages. Emergency
+  messages still interrupt. Hidden tabs pause the simulation and suspend audio.
+
+Validation covers full takeoff-to-landing flows, a one-hour deterministic physics
+run with varying frame intervals, controller edge/dead-zone behavior, weather,
+manual/assisted taxi, replay input validation and browser save/reload. Physical
+joysticks and all browser/voice combinations still need hardware testing.

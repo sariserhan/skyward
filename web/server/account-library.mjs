@@ -1,10 +1,11 @@
+import {validateReplay,librarySummary} from './simulator-replay.mjs';
 import {validBackupValue} from '../src/lib/localBackup.ts';
 import {parseRecording} from '../src/lib/sessionRecording.ts';
 import airports from '../data/airport-catalog.json' with {type:'json'};
 const fail=(status,message)=>{throw Object.assign(Error(message),{status});};
 const text=(v,n=100)=>typeof v==='string'?v.trim().slice(0,n):'';
 const date=v=>typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v)&&Number.isFinite(Date.parse(v))&&new Date(v).toISOString().slice(0,10)===v;
-export const LIBRARY_LIMITS={watchlist:{count:30,bytes:1024,free:true},views:{count:10,bytes:65536},recordings:{count:10,bytes:2*1024*1024},logbook:{count:500,bytes:2048},simulator:{count:5,bytes:16*1024*1024},trips:{count:30,bytes:16384},journal:{count:200,bytes:512*1024},airports:{count:12,bytes:65536},missions:{count:100,bytes:8192}};
+export const LIBRARY_LIMITS={watchlist:{count:30,bytes:1024,free:true},views:{count:10,bytes:65536},recordings:{count:10,bytes:2*1024*1024},logbook:{count:500,bytes:2048},simulator:{count:5,bytes:16*1024*1024},trips:{count:30,bytes:16384},journal:{count:200,bytes:512*1024},airports:{count:12,bytes:65536},missions:{count:100,bytes:512*1024}};
 const setupKeys=new Set(['skyward.map.v1','skyward.flight-view.v1','skyward.camera-bookmarks.v1','skyward.favorites.v1','skyward.cabin-audio.v1']);
 export function validateLibrary(kind,value){
  if(!value||typeof value!=='object'||Array.isArray(value))fail(400,'Choose a valid saved item.');
@@ -41,8 +42,9 @@ export function validateLibrary(kind,value){
  }
  if(kind==='missions'){
   if(!Object.hasOwn(airports,value.from)||!Object.hasOwn(airports,value.to)||(value.from===value.to&&value.lesson!=='pattern')||!['easy','advanced'].includes(value.difficulty)||!['landed','crashed','aborted'].includes(value.result)||!Number.isFinite(value.duration)||value.duration<0||value.duration>86400||!Number.isFinite(value.touchdownRate)||Math.abs(value.touchdownRate)>20000)fail(400,'Invalid simulator result.');
-  const outcome={};
-  if(value.lesson!==undefined){if(!['free','takeoff','pattern','crosswind','glide'].includes(value.lesson))fail(400,'Invalid training lesson.');outcome.lesson=value.lesson;outcome.lessonCompleted=value.lessonCompleted===true;}
+  const outcome={practiceReset:value.practiceReset===true};
+  if(value.replay!==undefined)outcome.replay=validateReplay(value.replay);
+  if(value.lesson!==undefined){if(!['free','takeoff','pattern','crosswind','glide'].includes(value.lesson))fail(400,'Invalid training lesson.');outcome.lesson=value.lesson;outcome.lessonCompleted=value.lessonCompleted===true&&!outcome.practiceReset;}
   if(value.touchdownScore!==undefined){if(!Number.isInteger(value.touchdownScore)||value.touchdownScore<0||value.touchdownScore>100)fail(400,'Invalid touchdown score.');outcome.touchdownScore=value.touchdownScore;}
   if(value.occupants!==undefined||value.fatalities!==undefined){if(!Number.isInteger(value.occupants)||value.occupants<1||value.occupants>194||!Number.isInteger(value.fatalities)||value.fatalities<0||value.fatalities>value.occupants||(value.result!=='crashed'&&value.fatalities!==0))fail(400,'Invalid fictional occupant outcome.');outcome.occupants=value.occupants;outcome.fatalities=value.fatalities;}
   if(value.fuelRemainingKg!==undefined){if(!Number.isFinite(value.fuelRemainingKg)||value.fuelRemainingKg<0||value.fuelRemainingKg>20000)fail(400,'Invalid fuel remaining.');outcome.fuelRemainingKg=Math.round(value.fuelRemainingKg*10)/10;outcome.fuelExhausted=value.fuelExhausted===true;}
@@ -76,7 +78,7 @@ export function createAccountLibrary(db,{now,entitlement}){
   if(method==='GET'){
    const key=url.searchParams.get('key');
    if(key){const row=get('SELECT key,body,revision,updated FROM account_library WHERE user_id=? AND kind=? AND key=?',u.id,kind,key);if(!row)fail(404,'Saved item not found.');send(200,{...row,value:JSON.parse(row.body),body:undefined});}
-   else send(200,{items:db.prepare('SELECT key,body,revision,updated FROM account_library WHERE user_id=? AND kind=? ORDER BY updated DESC').all(u.id,kind).map(({body,...r})=>{const v=JSON.parse(body);return {...r,value:['recordings','simulator'].includes(kind)?undefined:v,name:v.name??v.career?.airport_name??v.callsign??kind,bytes:Buffer.byteLength(body)};}),limits:limit});
+   else send(200,{items:db.prepare('SELECT key,body,revision,updated FROM account_library WHERE user_id=? AND kind=? ORDER BY updated DESC').all(u.id,kind).map(({body,...r})=>{const v=JSON.parse(body);return {...r,value:['recordings','simulator'].includes(kind)?undefined:librarySummary(kind,v),name:v.name??v.career?.airport_name??v.callsign??kind,bytes:Buffer.byteLength(body)};}),limits:limit});
    return true;
   }
   if(method!=='POST')fail(405,'Method not allowed.');

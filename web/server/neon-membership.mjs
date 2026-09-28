@@ -1,3 +1,4 @@
+import {librarySummary} from './simulator-replay.mjs';
 import {developmentPremium} from './development-premium.mjs';
 import {postgresPremiumStore} from './premium-store.mjs';
 import {createPremiumTools} from './premium-tools.mjs';
@@ -43,7 +44,7 @@ export function createNeonMembership({env=process.env,pool=createNeonPool(env),s
   if(!limit)fail(400,'Unknown library.');if(!limit.free&&!await entitlement(u))fail(403,'Premium is required for this library.');
   if(method==='GET'){
    const key=url.searchParams.get('key');if(key){const r=await one('SELECT key,body,revision,updated FROM skyward_library WHERE user_id=$1 AND kind=$2 AND key=$3',[u.id,kind,key]);if(!r)fail(404,'Saved item not found.');return {key:r.key,value:r.body,revision:r.revision,updated:Number(r.updated)};}
-   return {items:(await rows('SELECT key,body,revision,updated FROM skyward_library WHERE user_id=$1 AND kind=$2 ORDER BY updated DESC',[u.id,kind])).map(r=>({key:r.key,revision:r.revision,updated:Number(r.updated),value:['recordings','simulator'].includes(kind)?undefined:r.body,name:r.body.name??r.body.career?.airport_name??r.body.callsign??kind,bytes:Buffer.byteLength(JSON.stringify(r.body))})),limits:limit};
+   return {items:(await rows('SELECT key,body,revision,updated FROM skyward_library WHERE user_id=$1 AND kind=$2 ORDER BY updated DESC',[u.id,kind])).map(r=>({key:r.key,revision:r.revision,updated:Number(r.updated),value:['recordings','simulator'].includes(kind)?undefined:librarySummary(kind,r.body),name:r.body.name??r.body.career?.airport_name??r.body.callsign??kind,bytes:Buffer.byteLength(JSON.stringify(r.body))})),limits:limit};
   }
   const key=typeof b.key==='string'?b.key.trim():'';if(!key||key.length>120||!/^[a-zA-Z0-9._:-]+$/.test(key))fail(400,'Invalid item key.');
   return transaction(`library:${u.id}:${kind}`,async db=>{

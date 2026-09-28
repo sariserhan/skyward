@@ -1,13 +1,15 @@
+import {weatherAt,type SimWeather} from './simulatorWeather.ts';
 import type {Runway} from '../types';
 export type Difficulty='easy'|'advanced';
 export type FlightPhase='ready'|'takeoff'|'climb'|'cruise'|'approach'|'landing'|'rollout'|'landed'|'crashed';
 export type AircraftType='B738'|'C172'|'C560';
 export const AIRFRAMES={B738:{name:'Boeing 737-800',rotate:140,stall:120,approach:145,cruise:260,acceleration:6,minRunway:1800},C172:{name:'Cessna 172',rotate:55,stall:48,approach:65,cruise:110,acceleration:3,minRunway:650},C560:{name:'Citation V',rotate:105,stall:95,approach:115,cruise:240,acceleration:5,minRunway:1400}};
 // Gameplay profiles, not operational fuel/load figures for a real aircraft.
+export const HANDLING={B738:{pitchRate:5.5,rollRate:14,braking:9,steering:8,spool:2.5,gearDrag:.4},C172:{pitchRate:8,rollRate:25,braking:7,steering:18,spool:.5,gearDrag:.25},C560:{pitchRate:6,rollRate:19,braking:8,steering:12,spool:1.8,gearDrag:.35}};
 export const FUEL_PROFILES={B738:{capacity:20000,burn:2600,glide:200,crew:6,passengers:162,maxPassengers:188},C172:{capacity:150,burn:24,glide:65,crew:1,passengers:2,maxPassengers:3},C560:{capacity:2500,burn:600,glide:125,crew:2,passengers:6,maxPassengers:7}};
 export interface Point {lat:number;lon:number;}
-export interface FlightPlan {lesson?:'free'|'takeoff'|'pattern'|'crosswind'|'glide';from:string;to:string;departure:Runway;arrival:Runway;difficulty:Difficulty;aircraftType:AircraftType;challenge:'calm'|'crosswind'|'precision';fuelPercent?:number;passengers?:number;}
-export interface FlightState extends Point {altitude:number;speed:number;heading:number;pitch:number;bank:number;verticalSpeed:number;throttle:number;assignedAltitude:number;gear:boolean;gearPosition:number;flaps:number;flapPosition:number;enginePower:number;fuelKg:number;fuelBurnKgHour:number;fuelExhausted:boolean;fatalCrash:boolean;speedbrake:boolean;reverse:boolean;brakes:boolean;trim:number;autopilot:boolean;assisted:boolean;ground:boolean;phase:FlightPhase;elapsed:number;distance:number;touchdownRate:number;warning:string;nav:'departure'|'intercept'|'align'|'base'|'final';navOrigin:Point;}
+export interface FlightPlan {coldStart?:boolean;weather?:SimWeather;lesson?:'free'|'takeoff'|'pattern'|'crosswind'|'glide';from:string;to:string;departure:Runway;arrival:Runway;difficulty:Difficulty;aircraftType:AircraftType;challenge:'calm'|'crosswind'|'precision';fuelPercent?:number;passengers?:number;}
+export interface FlightState extends Point {practiceReset:boolean;battery:boolean;engineRunning:boolean;navLights:boolean;landingLights:boolean;altitude:number;speed:number;heading:number;pitch:number;bank:number;verticalSpeed:number;throttle:number;assignedAltitude:number;gear:boolean;gearPosition:number;flaps:number;flapPosition:number;enginePower:number;fuelKg:number;fuelBurnKgHour:number;fuelExhausted:boolean;fatalCrash:boolean;speedbrake:boolean;reverse:boolean;brakes:boolean;trim:number;autopilot:boolean;assisted:boolean;ground:boolean;phase:FlightPhase;elapsed:number;distance:number;touchdownRate:number;warning:string;nav:'departure'|'intercept'|'align'|'base'|'final';navOrigin:Point;}
 export interface FlightInput {pitch:number;roll:number;rudder:number;}
 const rad=Math.PI/180,clamp=(n:number,a:number,b:number)=>Math.max(a,Math.min(b,n));
 export const headingError=(to:number,from:number)=>((to-from+540)%360)-180;
@@ -23,7 +25,7 @@ export function chooseRunway(runways:Runway[],toward:Point,departing:boolean,typ
  candidates.sort((a,b)=>Math.abs(headingError(runwayHeading(a),departing?headingTo(runwayStart(a),toward):headingTo(toward,runwayEnd(a))))-Math.abs(headingError(runwayHeading(b),departing?headingTo(runwayStart(b),toward):headingTo(toward,runwayEnd(b)))));
  if(!candidates.length)throw Error(`No mapped runway long enough for ${AIRFRAMES[type].name}. Try a smaller aircraft or another airport.`);return candidates[0];
 }
-export function initialFlight(plan:FlightPlan):FlightState{return {...movePoint(runwayStart(plan.departure),runwayHeading(plan.departure),.05),altitude:0,speed:0,heading:runwayHeading(plan.departure),pitch:0,bank:0,verticalSpeed:0,throttle:0,assignedAltitude:3000,gear:true,gearPosition:1,flaps:1,flapPosition:1,enginePower:0,fuelKg:FUEL_PROFILES[plan.aircraftType].capacity*clamp(plan.fuelPercent??75,0,100)/100,fuelBurnKgHour:0,fuelExhausted:false,fatalCrash:false,speedbrake:false,reverse:false,brakes:true,trim:0,autopilot:false,assisted:false,ground:true,phase:'ready',elapsed:0,distance:0,touchdownRate:0,warning:'Release brakes, set takeoff flaps and increase throttle.',nav:'departure',navOrigin:runwayStart(plan.departure)};}
+export function initialFlight(plan:FlightPlan):FlightState{return {practiceReset:false,battery:!plan.coldStart,engineRunning:!plan.coldStart,navLights:!plan.coldStart,landingLights:!plan.coldStart,...movePoint(runwayStart(plan.departure),runwayHeading(plan.departure),.05),altitude:0,speed:0,heading:runwayHeading(plan.departure),pitch:0,bank:0,verticalSpeed:0,throttle:0,assignedAltitude:3000,gear:true,gearPosition:1,flaps:1,flapPosition:1,enginePower:0,fuelKg:FUEL_PROFILES[plan.aircraftType].capacity*clamp(plan.fuelPercent??75,0,100)/100,fuelBurnKgHour:0,fuelExhausted:false,fatalCrash:false,speedbrake:false,reverse:false,brakes:true,trim:0,autopilot:false,assisted:false,ground:true,phase:'ready',elapsed:0,distance:0,touchdownRate:0,warning:'Release brakes, set takeoff flaps and increase throttle.',nav:'departure',navOrigin:runwayStart(plan.departure)};}
 export function navigationLeg(s:FlightState,p:FlightPlan){
  const runway=p.arrival,heading=runwayHeading(runway),offset=runwayOffset(s,runway);
  const target=s.nav==='departure'?movePoint(runwayEnd(p.departure),runwayHeading(p.departure),2):s.nav==='intercept'?movePoint(runwayStart(runway),heading+180,10):s.nav==='align'?movePoint(runwayStart(runway),heading+180,5):movePoint(runwayStart(runway),heading,Math.max(1000,offset.along+1000)/1852);
@@ -36,7 +38,8 @@ export function navigationLeg(s:FlightState,p:FlightPlan){
 export function navigationGuidance(s:FlightState,p:FlightPlan){
  const {origin,target}=navigationLeg(s,p),course=headingTo(s,target),legHeading=headingTo(origin,target),angularDistance=nauticalMiles(origin,s)/3440.065;
  const crossTrackNm=Math.asin(clamp(Math.sin(angularDistance)*Math.sin(headingError(headingTo(origin,s),legHeading)*rad),-1,1))*3440.065;
- const windCorrection=p.challenge==='crosswind'?Math.asin(clamp(12*Math.sin((runwayHeading(p.arrival)+90-course)*rad)/Math.max(30,s.speed),-.5,.5))/rad:0;
+ const wind=weatherAt(p.weather,s.elapsed,runwayHeading(p.arrival)+90,p.challenge==='crosswind'?12:0);
+ const windCorrection=Math.asin(clamp(wind.speed*Math.sin((wind.direction-course)*rad)/Math.max(30,s.speed),-.5,.5))/rad;
  const heading=(course-windCorrection+360)%360,error=headingError(heading,s.heading),limit=s.nav==='final'?.1:s.nav==='align'?.25:.6;
  return {heading,error,crossTrackNm,offRoute:Math.abs(crossTrackNm)>limit||Math.abs(error)>(s.nav==='final'?10:25),recovered:Math.abs(crossTrackNm)<limit*.5&&Math.abs(error)<8,leg:s.nav};
 }
@@ -49,10 +52,13 @@ export function commandFlight(s:FlightState,p:FlightPlan,patch:Partial<FlightSta
  if(p.aircraftType==='C172'||s.ground)delete next.gear;
  if(p.aircraftType==='C172')delete next.speedbrake;
  if(!s.ground||p.aircraftType==='C172')delete next.reverse;
+ if(next.engineRunning===true&&(!s.battery||s.fuelKg<=0||s.ground&&s.throttle>.15))delete next.engineRunning;
+ if(next.engineRunning===false)next.autopilot=false;
+ if(next.battery===false&&s.engineRunning===false)next.autopilot=false;
  if(next.throttle!==undefined)next.throttle=clamp(next.throttle,0,1);
  if(next.trim!==undefined)next.trim=clamp(next.trim,-10,10);
  if(next.flaps!==undefined)next.flaps=clamp(Math.round(next.flaps),0,2);
- if(next.autopilot&&(p.difficulty==='advanced'||s.fuelExhausted))delete next.autopilot;
+ if(next.autopilot&&(p.difficulty==='advanced'||s.fuelExhausted||s.engineRunning===false))delete next.autopilot;
  return {...s,...next};
 }
 export function goAround(s:FlightState,p:FlightPlan):FlightState {
@@ -64,9 +70,9 @@ export function stepFlight(previous:FlightState,p:FlightPlan,input:FlightInput,s
  const count=Math.max(1,Math.ceil(clamp(seconds,0,2)/.025)),dt=clamp(seconds,0,2)/count;
  for(let step=0;step<count;step++){
   if(['landed','crashed'].includes(s.phase))break;
-  const a=AIRFRAMES[p.aircraftType],r=p.arrival,offset=runwayOffset(s,r),destination=movePoint(runwayStart(r),runwayHeading(r),.18),distance=nauticalMiles(s,destination),intercept=movePoint(runwayStart(r),runwayHeading(r)+180,10),alignment=movePoint(runwayStart(r),runwayHeading(r)+180,5);
+  const a=AIRFRAMES[p.aircraftType],handling=HANDLING[p.aircraftType],wind=weatherAt(p.weather,s.elapsed,runwayHeading(p.arrival)+90,p.challenge==='crosswind'?12:0),r=p.arrival,offset=runwayOffset(s,r),destination=movePoint(runwayStart(r),runwayHeading(r),.18),distance=nauticalMiles(s,destination),intercept=movePoint(runwayStart(r),runwayHeading(r)+180,10),alignment=movePoint(runwayStart(r),runwayHeading(r)+180,5);
   s.elapsed+=dt;s.warning='';
-  if(s.fuelKg<=0){s.fuelKg=0;s.fuelExhausted=true;s.autopilot=false;}
+  if(s.fuelKg<=0){s.fuelKg=0;s.fuelExhausted=true;s.engineRunning=false;s.autopilot=false;}
   if(!s.ground){const before=s.nav;
    if(s.nav==='departure'&&s.altitude>800)s.nav='intercept';
    if(s.nav==='intercept'&&nauticalMiles(s,p.lesson==='pattern'?navigationLeg(s,p).target:intercept)<.45)s.nav='align';
@@ -87,35 +93,36 @@ export function stepFlight(previous:FlightState,p:FlightPlan,input:FlightInput,s
    }
   }else{
    if(s.ground){const canRotate=s.phase!=='rollout'&&!s.brakes&&s.speed>=a.rotate*.95;s.pitch=canRotate?clamp(s.pitch+(input.pitch*3-(!input.pitch?2:0))*dt,0,8):Math.max(0,s.pitch-5*dt);s.bank=0;}
-   else{s.pitch=clamp(s.pitch+(input.pitch*8+s.trim*.4)*dt,-20,25);s.bank=clamp(s.bank+input.roll*25*dt,-60,60);}
+   else{s.pitch=clamp(s.pitch+(input.pitch*handling.pitchRate+s.trim*.4)*dt,-20,25);s.bank=clamp(s.bank+input.roll*handling.rollRate*dt,-60,60);}
    if(p.difficulty==='easy'){if(!input.roll)s.bank*=Math.exp(-dt*.5);s.pitch=clamp(s.pitch,-10,15);}
-   if(s.ground)s.heading=(s.heading+(input.rudder+input.roll*.3)*Math.min(15,s.speed*.1)*dt+360)%360;
+   if(s.ground)s.heading=(s.heading+(input.rudder+input.roll*.3)*Math.min(handling.steering,s.speed*.6)*dt+360)%360;
   }
   if(p.aircraftType==='C172'){s.gear=true;s.speedbrake=false;s.reverse=false;}
   if(s.ground)s.gear=true;
   s.gearPosition=clamp((s.gearPosition??Number(s.gear))+clamp(Number(s.gear)-(s.gearPosition??Number(s.gear)),-dt/7,dt/7),0,1);
   s.flapPosition=clamp((s.flapPosition??s.flaps)+clamp(s.flaps-(s.flapPosition??s.flaps),-dt/4,dt/4),0,2);
-  const engineTarget=s.fuelExhausted?0:s.throttle;
-  s.enginePower=(s.enginePower??engineTarget)+(engineTarget-(s.enginePower??engineTarget))*(1-Math.exp(-dt/(p.aircraftType==='C172'?.5:2.5)));
-  s.fuelBurnKgHour=s.fuelExhausted?0:FUEL_PROFILES[p.aircraftType].burn*(.08+.92*s.enginePower);
+  const engineTarget=s.fuelExhausted||s.engineRunning===false?0:s.throttle;
+  s.enginePower=(s.enginePower??engineTarget)+(engineTarget-(s.enginePower??engineTarget))*(1-Math.exp(-dt/handling.spool));
+  s.fuelBurnKgHour=s.fuelExhausted||s.engineRunning===false?0:FUEL_PROFILES[p.aircraftType].burn*(.08+.92*s.enginePower);
   s.fuelKg=Math.max(0,s.fuelKg-s.fuelBurnKgHour*dt/3600);
-  if(s.fuelKg===0){s.fuelExhausted=true;s.autopilot=false;s.fuelBurnKgHour=0;}
+  if(s.fuelKg===0){s.fuelExhausted=true;s.engineRunning=false;s.autopilot=false;s.fuelBurnKgHour=0;}
   if(!s.ground)s.reverse=false;
-  const ground=s.ground,drag=.15+s.speed*.009+s.gearPosition*.4+s.flapPosition*.18+Math.max(0,s.pitch)*.07+(s.speedbrake?1.8:0);
-  const thrust=s.fuelExhausted?0:s.reverse&&ground&&p.aircraftType!=='C172'?-s.enginePower*a.acceleration*.65:s.enginePower*a.acceleration;
-  s.speed=clamp(s.speed+(thrust-drag+(s.fuelExhausted&&!ground?-Math.sin(s.pitch*rad)*19.06:0)-(ground&&s.brakes?9:0))*dt,0,a.cruise*1.6);
+  const ground=s.ground,drag=.15+s.speed*.009+s.gearPosition*handling.gearDrag+s.flapPosition*.18+Math.max(0,s.pitch)*.07+(s.speedbrake?1.8:0);
+  const thrust=s.fuelExhausted||s.engineRunning===false?0:s.reverse&&ground&&p.aircraftType!=='C172'?-s.enginePower*a.acceleration*.65:s.enginePower*a.acceleration;
+  s.speed=clamp(s.speed+(thrust-drag+((s.fuelExhausted||s.engineRunning===false)&&!ground?-Math.sin(s.pitch*rad)*19.06:0)-(ground&&s.brakes?handling.braking*(1-wind.rain*.3):0))*dt,0,a.cruise*1.6);
   const stallSpeed=a.stall*(1-s.flapPosition*.11)*Math.sqrt(1/Math.max(.5,Math.cos(s.bank*rad)));
   if(ground&&s.phase!=='rollout'&&s.speed>a.rotate&&s.pitch>3){s.ground=false;s.phase='climb';s.altitude=.1;}
   if(!s.ground){
    s.heading=(s.heading+((9.81*Math.tan(s.bank*rad)/Math.max(20,s.speed*.514444)/rad)+(s.autopilot?0:input.rudder*6))*dt+360)%360;
    let vs=s.speed*101.269*Math.sin(s.pitch*rad);
-   if(s.fuelExhausted)vs-=Math.max(250,s.speed*101.269/(p.aircraftType==='C172'?9:15));
+   if(s.fuelExhausted||s.engineRunning===false)vs-=Math.max(250,s.speed*101.269/(p.aircraftType==='C172'?9:15));
    if(s.speed<stallSpeed){s.warning='STALL — lower nose and add power';vs-=p.difficulty==='advanced'?1500:600;if(p.difficulty==='advanced')s.pitch-=4*dt;}
    if(p.difficulty==='advanced'&&s.pitch>18){s.warning='High angle of attack — lower nose';vs-=1200;}
    s.verticalSpeed+=(vs-s.verticalSpeed)*(1-Math.exp(-dt*2));s.altitude+=s.verticalSpeed/60*dt;
   }else{s.verticalSpeed=0;s.pitch=s.phase==='rollout'?Math.max(0,s.pitch-4*dt):Math.max(0,s.pitch);s.bank=0;s.altitude=0;}
+  if(!s.ground&&wind.turbulence&&!s.autopilot){s.bank+=Math.sin(s.elapsed*2.1)*wind.turbulence*3*dt;s.verticalSpeed+=Math.sin(s.elapsed*1.7)*wind.turbulence*80*dt;}
   const travel=s.speed*dt/3600;s={...s,...movePoint(s,s.heading,travel)};s.distance+=travel;
-  if(!s.ground&&p.challenge==='crosswind')s={...s,...movePoint(s,runwayHeading(r)+90,12*dt/3600)};
+  if(!s.ground&&wind.speed)s={...s,...movePoint(s,wind.direction,wind.speed*dt/3600)};
   if(s.altitude<=0&&!s.ground){
    const hit=runwayOffset(s,r),valid=hit.along>=0&&hit.along<=r.length&&Math.abs(hit.cross)<r.width/2&&Math.abs(headingError(s.heading,runwayHeading(r)))<12&&s.gear&&s.gearPosition>=.98&&Math.abs(s.bank)<10&&s.verticalSpeed> -(p.difficulty==='easy'?800:600)&&s.speed<a.approach*1.35;
    s.fatalCrash=!valid&&(s.verticalSpeed< -1000||s.speed>80);s.touchdownRate=s.verticalSpeed;s.pitch=clamp(s.pitch,0,8);s.bank=0;s.altitude=0;s.ground=true;s.phase=valid?'rollout':'crashed';s.warning=valid?'Touchdown. Idle throttle and apply brakes.':(!s.gear||s.gearPosition<.98)?'Gear-up landing. Restart and extend the gear before touchdown.':'Landing missed: check runway alignment, airspeed and descent rate.';
@@ -129,6 +136,7 @@ export function stepFlight(previous:FlightState,p:FlightPlan,input:FlightInput,s
  if(['landed','crashed'].includes(s.phase)){s.fuelBurnKgHour=0;if(s.phase==='crashed'){s.throttle=0;s.enginePower=0;}}
  if(!['landed','crashed'].includes(s.phase)){
   if(s.fuelExhausted)s.warning=s.ground?'Fuel exhausted — engines stopped. Re-plan with more fuel.':`ENGINE FAILURE — fuel exhausted. Glide near ${FUEL_PROFILES[p.aircraftType].glide} kt and find a runway.`;
+  else if(s.engineRunning===false)s.warning=s.ground?'Engine stopped. Battery on, throttle idle, then Start engine.':`ENGINE STOPPED — glide near ${FUEL_PROFILES[p.aircraftType].glide} kt. Restart if fuel and battery are available.`;
   else if(s.fuelKg/FUEL_PROFILES[p.aircraftType].capacity<.1&&!s.warning)s.warning='LOW FUEL — plan to land soon.';
  }
  return s;

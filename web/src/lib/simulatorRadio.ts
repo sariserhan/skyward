@@ -8,35 +8,35 @@ export function stepRadio(prev:RadioState,s:FlightState,p:FlightPlan,requestHead
  const emit=(speaker:RadioCall['speaker'],id:string,text:string)=>{next.calls=[...next.calls,{speaker,id,time:s.elapsed,text}].slice(-8);};
  const stage=s.ground?s.phase==='landed'?'landed':s.phase==='rollout'?'rollout':s.phase==='crashed'?'crashed':'departure':s.phase==='approach'||s.phase==='landing'?'approach':'airborne';
  if(stage!==prev.stage){next.stage=stage;next.lastReminder=s.elapsed;if(prev.stage===''||prev.stage==='departure')next.lastVector=s.elapsed;
-  if(stage==='departure'&&!s.fuelExhausted)emit('Tower','departure',`Skyward one, runway ${p.departure.id.split('/')[0]}, cleared for simulated takeoff. Climb and maintain ${next.altitude} feet above runway datum. Rotate at ${a.rotate} knots.`);
-  if(stage==='airborne'&&!s.fuelExhausted)emit('Tower','climb',`Positive climb. Maintain ${next.altitude} feet. Check landing gear and retract flaps as you accelerate.`);
+  if(stage==='departure'&&!s.fuelExhausted&&s.engineRunning!==false)emit('Tower','departure',`Skyward one, runway ${p.departure.id.split('/')[0]}, cleared for simulated takeoff. Climb and maintain ${next.altitude} feet above runway datum. Rotate at ${a.rotate} knots.`);
+  if(stage==='airborne'&&!s.fuelExhausted&&s.engineRunning!==false)emit('Tower','climb',`Positive climb. Maintain ${next.altitude} feet. Check landing gear and retract flaps as you accelerate.`);
   if(stage==='approach'){emit('Approach','approach',`Skyward one, runway ${p.arrival.id.split('/')[0]}. Follow the extended centreline and glide guidance. Target ${a.approach} knots. Check gear down and landing flaps.`);}
   if(stage==='rollout')emit('Tower','touchdown','Touchdown. Throttle idle, maintain centreline and brake. Stop on the runway in this simulation.');
   if(stage==='landed')emit('Tower','landed','Arrival complete. Parking brake set. Welcome to your destination.');
   if(stage==='crashed')emit('Flight deck','ended','Flight ended. Review your landing configuration and runway alignment.');
  }
- if(!s.fuelExhausted&&stage==='airborne'&&s.elapsed-next.lastReminder>25&&s.altitude>800){
+ if(!s.fuelExhausted&&s.engineRunning!==false&&stage==='airborne'&&s.elapsed-next.lastReminder>25&&s.altitude>800){
   const difference=s.altitude-next.altitude;
   emit('Tower','altitude-'+Math.floor(s.elapsed),Math.abs(difference)>250?`Skyward one, ${difference>0?'descend':'climb'} to ${next.altitude} feet. ${Math.abs(difference)>600?'Check your assigned altitude.':'Maintain your cleared altitude.'}`:`Skyward one, maintain ${next.altitude} feet. Altitude is good.`);next.lastReminder=s.elapsed;
  }
- if(!s.fuelExhausted&&stage==='approach'&&s.elapsed-next.lastReminder>20){
+ if(!s.fuelExhausted&&s.engineRunning!==false&&stage==='approach'&&s.elapsed-next.lastReminder>20){
   const off=runwayOffset(s,p.arrival),unstable=s.altitude<400&&(s.gearPosition<.98||s.speed>a.approach*1.2||Math.abs(off.cross)>p.arrival.width||Math.abs(headingError(s.heading,runwayHeading(p.arrival)))>20||s.verticalSpeed< -900);
   emit('Approach','final-'+Math.floor(s.elapsed),unstable?'Unstable approach. Go around, full power and climb.':`Continue approach runway ${p.arrival.id.split('/')[0]}. Keep the descent stable.`);next.lastReminder=s.elapsed;
  }
  const coach=(id:string,text:string)=>{if(!next.coached.includes(id)){next.coached.push(id);emit('Flight deck','coach-'+id,text);}};
- if(!s.fuelExhausted&&p.lesson!=='crosswind'&&p.lesson!=='glide'){
+ if(!s.fuelExhausted&&s.engineRunning!==false&&p.lesson!=='crosswind'&&p.lesson!=='glide'){
   if(stage==='departure'&&s.speed>=Math.min(30,a.rotate*.5))coach('airspeed','Airspeed alive. Maintain runway centreline.');
   if(stage==='departure'&&s.speed>=a.rotate)coach('rotate',`Rotate. Raise the nose gently at ${a.rotate} knots.`);
   if(!s.ground&&s.verticalSpeed>100&&s.altitude>100&&s.gear&&p.aircraftType!=='C172')coach('gear','Positive climb. Retract landing gear.');
   if(!s.ground&&s.altitude>500&&s.speed>a.rotate*1.15&&s.flaps>0)coach('flaps','Climb established. Retract flaps as you accelerate.');
  }
- const waiting=stage==='departure'&&s.speed<1&&!s.fuelExhausted&&!s.autopilot;
+ const waiting=stage==='departure'&&s.speed<1&&!s.fuelExhausted&&s.engineRunning!==false&&!s.autopilot;
  next.idleSince=waiting?(prev.idleSince??s.elapsed):null;
  if(next.idleSince!==null&&s.elapsed-next.idleSince>=12&&s.elapsed-prev.lastIdleReminder>=30){
   emit('Tower','runway-idle-'+Math.floor(s.elapsed),`Skyward one, you are still holding on the runway. ${s.brakes?'Release the brakes using the Release brakes button or press B, then smoothly increase throttle.':s.throttle<.5?'Brakes are released. Smoothly increase throttle to begin your takeoff roll.':'Check takeoff power and engine response before continuing.'}`);next.lastIdleReminder=s.elapsed;
  }
  const off=runwayOffset(s,p.arrival),unstable=stage==='approach'&&s.altitude<400&&(s.gearPosition<.98||s.speed>a.approach*1.2||Math.abs(off.cross)>p.arrival.width||Math.abs(headingError(s.heading,runwayHeading(p.arrival)))>20||s.verticalSpeed< -900);
- if(!s.ground&&!s.fuelExhausted&&!unstable&&s.altitude>=200&&!['crashed','landed'].includes(stage)){
+ if(!s.ground&&!s.fuelExhausted&&s.engineRunning!==false&&!unstable&&s.altitude>=200&&!['crashed','landed'].includes(stage)){
   const guidance=navigationGuidance(s,p),legChanged=guidance.leg!==prev.vectorLeg;
   if(guidance.recovered&&prev.offRoute)next.recoveredSince=prev.recoveredSince??s.elapsed;else next.recoveredSince=null;
   const recovered=next.recoveredSince!==null&&s.elapsed-next.recoveredSince>=3;
