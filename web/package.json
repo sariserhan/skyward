@@ -54,6 +54,7 @@
     "test:neon": "node --test server/neon-membership.test.mjs",
     "push:keys": "web-push generate-vapid-keys --json",
     "start:dev": "NODE_ENV=development SKYWARD_DEV_PREMIUM=1 SKYWARD_ACCOUNTS=test node --env-file-if-exists=.env server/index.mjs",
-    "start:neon:dev": "NODE_ENV=development SKYWARD_DEV_PREMIUM=1 SKYWARD_ACCOUNTS=neon node --env-file-if-exists=.env server/index.mjs"
+    "start:neon:dev": "NODE_ENV=development SKYWARD_DEV_PREMIUM=1 SKYWARD_ACCOUNTS=neon node --env-file-if-exists=.env server/index.mjs",
+    "test:weather": "npm run build && node scripts/browser-tests.mjs --weather"
   }
 }

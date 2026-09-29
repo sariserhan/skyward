@@ -1,3 +1,4 @@
+import {createWeatherMotion} from '../lib/weatherMotion';
 import {aircraftModelAttitude} from '../lib/aircraftAttitude';
 import {directedView,journeyPhase} from '../lib/arrivalExperience';
 import {sceneViews,type FlightRequest,type FlightScene} from '../lib/watchDiscovery';
@@ -100,7 +101,7 @@ export function FlightExperience(p:Props){
    }
    return blendBack<1||Math.abs(targetRange-cameraRange)>.05||Math.abs(((targetAngle-cameraAngle+540)%360)-180)>.02;
   }
-  let cameraMoving=true;const motion=sharedLiveMotion;
+  let cameraMoving=true;const motion=sharedLiveMotion,weatherMotion=createWeatherMotion();
   const tick=(now:number)=>{
    if(v.isDestroyed())return;frame.current=requestAnimationFrame(tick);if(document.hidden||state.current.p.suspended)return;if(last.current&&now-last.current<33)return;
    const s=state.current;controller.enableCollisionDetection=s.view==='free'||s.view==='route'?originalCollision:false;const dt=last.current?Math.min(.1,(now-last.current)/1000):.033;last.current=now;elapsed.current+=dt;
@@ -109,9 +110,10 @@ export function FlightExperience(p:Props){
    const fix=s.demo&&r?runwayFrame(r,s.demo,fraction):motion.sample(a,s.p.trail,Date.now(),s.p.reducedMotion,s.p.route,s.p.arrivalGeometry??(a.ground?s.p.geometry?.airports[0]:null));
    let heading=a.heading??0,pitch=0;if(fix&&'heading' in fix&&typeof fix.heading==='number')heading=fix.heading;if(fix&&'pitch' in fix)pitch=fix.pitch??0;
    const animation=actual&&fix?aircraftAnimation.sample(actual,{...fix,heading,groundSpeed:('groundSpeed' in fix?fix.groundSpeed:a.groundSpeed)??0},Date.now(),s.p.reducedMotion):{bank:0,gear:a.ground?1:0,flaps:0};
+   const rough=weatherMotion(v,fix?.lat??a.lat??0,fix?.lon??a.lon??0,(fix?.altitude??a.altitude??0)*.3048,(fix?.ground??a.ground)||!!s.demo,!!s.p.reducedMotion||window.matchMedia('(prefers-reduced-motion: reduce)').matches,now/1000);
    const movingWheels=!s.p.reducedMotion&&(!sourcedModel(a.aircraftType)||s.p.modelStage==='fallback')&&(s.demo?!!fix?.ground:(!!fix?.ground&&(!!fix&&'landingPhase' in fix&&!!fix.landingPhase||ageSeconds(a,Date.now())<=30)))&&(s.demo?s.playing:((fix&&'groundSpeed' in fix?fix.groundSpeed:a.groundSpeed)??0)>0);
-   const key=JSON.stringify([fix?.lon,fix?.lat,fix?.altitude,fix&&'groundClearance' in fix?fix.groundClearance:0,heading,pitch,a.callsign,a.aircraftType,a.ground,s.demo,s.view,s.cabinSide,s.side,s.distance,s.p.reducedMotion,fraction,gearCompression(s.demo?shown:actual)]);
-   if(key===drawn&&!cameraMoving&&!layoutDirty&&!movingWheels&&!(s.view==='orbit'&&!s.p.reducedMotion))return;drawn=key;layoutDirty=false;
+   const key=JSON.stringify([fix?.lon,fix?.lat,fix?.altitude,fix&&'groundClearance' in fix?fix.groundClearance:0,heading,pitch,rough.roll,rough.pitch,a.callsign,a.aircraftType,a.ground,s.demo,s.view,s.cabinSide,s.side,s.distance,s.p.reducedMotion,fraction,gearCompression(s.demo?shown:actual)]);
+   if(rough.strength<.001&&key===drawn&&!cameraMoving&&!layoutDirty&&!movingWheels&&!(s.view==='orbit'&&!s.p.reducedMotion))return;drawn=key;layoutDirty=false;
    let position=actual?.position?.getValue(v.clock.currentTime);
    if(fix){
     const landing='landingPhase' in fix&&!!fix.landingPhase;
@@ -124,13 +126,13 @@ export function FlightExperience(p:Props){
      shown.position=new C.ConstantPositionProperty(position);shown.orientation=new C.ConstantProperty(C.Transforms.headingPitchRollQuaternion(position,new C.HeadingPitchRoll((heading-90)*Math.PI/180,pitch*Math.PI/180,0)));
     }else{
      if(shown){v.entities.remove(shown);shown=undefined;}
-     if(actual){if(actual.model)actual.model.heightReference=new C.ConstantProperty(C.HeightReference.NONE);if(actual.billboard)actual.billboard.heightReference=new C.ConstantProperty(C.HeightReference.NONE);actual.position=new C.ConstantPositionProperty(position);actual.orientation=new C.ConstantProperty(C.Transforms.headingPitchRollQuaternion(position,new C.HeadingPitchRoll(...aircraftModelAttitude(heading,pitch,animation.bank))));}
+     if(actual){if(actual.model)actual.model.heightReference=new C.ConstantProperty(C.HeightReference.NONE);if(actual.billboard)actual.billboard.heightReference=new C.ConstantProperty(C.HeightReference.NONE);actual.position=new C.ConstantPositionProperty(position);actual.orientation=new C.ConstantProperty(C.Transforms.headingPitchRollQuaternion(position,new C.HeadingPitchRoll(...aircraftModelAttitude(heading,pitch+rough.pitch,animation.bank+rough.roll))));}
     }
    }
    if(!s.demo&&actual)gear(actual,a,animation.gear,fix&&'groundSpeed' in fix?fix.groundSpeed??0:a.groundSpeed??0,movingWheels,heading,animation.flaps,!!fix?.ground);
    if(s.view==='cockpit')v.camera.frustum.near=.2;else if(s.view!=='front'&&s.view!=='cabin'&&s.view!=='wing'&&s.view!=='tail')v.camera.frustum.near=originalNear;
    if(s.view==='free')previousView='free';
-   cameraMoving=!!position&&s.view!=='free'&&s.view!=='route'&&s.view!=='cockpit'?camera(position!,heading,s.view==='director'?directedView(fix&&'landingPhase' in fix&&fix.landingPhase?fix.landingPhase:fix?.ground?'taxi':undefined):s.view,dt):false;v.scene.requestRender();
+   cameraMoving=!!position&&s.view!=='free'&&s.view!=='route'&&s.view!=='cockpit'?camera(position!,heading,s.view==='director'?directedView(fix&&'landingPhase' in fix&&fix.landingPhase?fix.landingPhase:fix?.ground?'taxi':undefined):s.view,dt):false;if(['front','cabin','wing','tail'].includes(s.view)&&rough.strength>.001){v.camera.lookUp(rough.pitch*Math.PI/180*.5);v.camera.twistRight(rough.roll*Math.PI/180*.5);}v.scene.requestRender();
   };
   frame.current=requestAnimationFrame(tick);
   return()=>{cancelAnimationFrame(frame.current);resize.disconnect();v.canvas.removeEventListener('pointerdown',release);v.canvas.removeEventListener('wheel',release);v.canvas.removeEventListener('keydown',release);document.removeEventListener('visibilitychange',hidden);if(!v.isDestroyed()){controller.enableCollisionDetection=originalCollision;v.camera.frustum.near=originalNear;if(shown)v.entities.remove(shown);const a=state.current.p.aircraft?.hex===original?.hex?state.current.p.aircraft:original,e=a&&v.entities.getById(`aircraft-${a.hex}`);if(e&&a){e.show=true;gear(e,a,a.ground?1:0,0,false);}v.camera.lookAtTransform(C.Matrix4.IDENTITY);v.scene.requestRender();}};
