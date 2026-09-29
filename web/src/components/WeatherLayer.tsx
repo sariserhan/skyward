@@ -1,3 +1,4 @@
+import {tagRenderLayer} from '../lib/renderLayers';
 import {readRenderStats} from '../lib/renderDiagnostics';
 import {createWeatherSky,weatherSkyAmount} from '../lib/weatherSky';
 import {publishWeatherAudio,publishThunder,clearWeatherAudio} from '../lib/weatherAudio';
@@ -27,6 +28,7 @@ export function WeatherLayer(props:Props){
   void poll();const timer=setInterval(()=>void poll(),3000);return()=>{disposed=true;abort.abort();clearInterval(timer);report.current=null;};
  },[props.viewer,props.enabled,props.manual]);
  useEffect(()=>{const v=props.viewer;if(!v||!props.enabled||v.isDestroyed())return;const C=window.Cesium,volumes=v.scene.primitives.add(new C.PrimitiveCollection());
+  tagRenderLayer(volumes,'cloud collections');
   const canvas=document.createElement('canvas');canvas.className='weather-particles';canvas.setAttribute('aria-hidden','true');v.container.appendChild(canvas);const ctx=canvas.getContext('2d');if(!ctx){v.scene.primitives.remove(volumes);canvas.remove();return;}
   let windEast=0,windNorth=0;const moving=new Map<string,{primitive:Cesium.Primitive;lon:number;lat:number;height:number;opacity:number;wanted:boolean}>();
   const pending=new Map<string,Parameters<typeof addCloudVolume>[2]>();

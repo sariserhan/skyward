@@ -1,7 +1,8 @@
 """Original illustrative aircraft geometry; locally sourced logos identify operators.
 Coordinates: X nose, Y lateral, Z up; glTF +Z forward, +Y up.
 """
-import json, math, struct
+import json, math, struct, argparse
+parser=argparse.ArgumentParser();parser.add_argument("--profile");args=parser.parse_args()
 from pathlib import Path
 out=Path(__file__).resolve().parents[1]/'public/models/fleet';out.mkdir(parents=True,exist_ok=True)
 profiles={'a319':(34,34,4,2),'a320':(38,35,4,2),'a321':(45,36,4,2),'a220':(38,35,3.5,2),'b737':(40,35,3.8,2),'b737max':(40,36,3.8,2),'b757':(47,38,3.8,2),'b767':(55,48,5,2),'b777':(74,65,6.2,2),'b787':(63,60,5.8,2),'a330':(64,60,5.6,2),'a350':(67,65,6,2),'a380':(73,80,8,4),'b747':(71,65,6.5,4),'regional':(32,27,3,2),'bizjet':(22,21,2.5,2),'turboprop':(23,26,2.8,2),'light':(9,11,1.4,1),'generic':(40,36,4,2)}
@@ -9,8 +10,9 @@ paints={'neutral':'70899c','THY':'c81932','UAL':'2266bd','AAL':'397daf','DAL':'b
 profiles.update({'b772':(64,61,6.2,2),'b788':(57,60,5.8,2),'b78x':(68,60,5.8,2),'a35k':(74,65,6,2),'e190':(36,29,3,2),'crj':(36,25,2.7,2),'pc12':(14,16,1.5,1)})
 paints.update({'RYR': '16457c', 'EZY': 'f16b22', 'WZZ': 'c5197b', 'SIA': '172f5c', 'CPA': '126259', 'ANA': '234d9b', 'JAL': 'c81932', 'QFA': 'cb2033', 'ACA': 'b51c30'})
 for name,(L,span,dia,engines) in profiles.items():
+    if args.profile and name!=args.profile:continue
     family={'b772':'b777','b788':'b787','b78x':'b787','a35k':'a350'}.get(name,name)
-    r=dia/2;groups=[[] for _ in range(11)]
+    r=dia/2;groups=[[] for _ in range(11)];wing_groups=[]
     def tri(a,b,c,mat=0,normals=None,uv=None):
         u=[b[k]-a[k] for k in range(3)];v=[c[k]-a[k] for k in range(3)];n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];d=math.sqrt(sum(x*x for x in n)) or 1;n=tuple(x/d for x in n)
         for i,p in enumerate([a,b,c]):groups[mat].append((p,normals[i] if normals else n,uv[i] if uv else (0,0)))
@@ -31,11 +33,14 @@ for name,(L,span,dia,engines) in profiles.items():
     nose=[(.34,1),(.39,.91),(.44,.68),(.477,.38),(.5,.01)] if name.startswith('a') else [(.31,1),(.37,.96),(.425,.76),(.47,.39),(.5,.01)]
     tube([(x*L,rr*r,0,0) for x,rr in [(-.5,.015),(-.47,.22),(-.42,.48),(-.35,.8),(-.27,.98),(-.19,1)]+nose],ellipse=1.18 if name=='a380' else 1)
     for side in [-1,1]:
+        wing_start=[len(g) for g in groups]
         swept=name not in ['light','turboprop','pc12'];tipx=-.19*L if swept else -.03*L;wingz=-r*.45 if swept else r*.65
         foil([(.1*L,side*r*.75,wingz),(tipx,side*span*.45,.7),(tipx-.015*L,side*span*.5,1.4 if family in ['b787','a350'] else .9),(tipx-.07*L,side*span*.5,.9),(-.17*L,side*r,wingz)],.12)
         if family not in ['b777','b787','b767','b747','light','turboprop','pc12']:
             foil([(tipx,side*span*.48,1),(tipx-.055*L,side*span*.50,3.2), (tipx-.08*L,side*span*.50,3.0),(tipx-.075*L,side*span*.48,1)],.04,2)
         if name=='b737max':foil([(tipx,side*span*.48,.8),(tipx-.065*L,side*span*.51,-.9),(tipx-.085*L,side*span*.5,-.7),(tipx-.06*L,side*span*.48,.8)],.04,2)
+        wing_groups.append([(m,g[wing_start[m]:]) for m,g in enumerate(groups) if len(g)>wing_start[m]])
+        for m,g in enumerate(groups):del g[wing_start[m]:]
         tailz=r*1.8 if name in ['bizjet','crj','pc12'] else r*.4
         foil([(-.32*L,side*r*.5,tailz),(-.43*L,side*span*.18,tailz+.6),(-.49*L,side*span*.18,tailz+.6),(-.45*L,side*r*.4,tailz)],.08)
         for e in range(engines//2):
@@ -101,7 +106,7 @@ for name,(L,span,dia,engines) in profiles.items():
             quad(*points,8+wheel)
             for yy in [-.25,.25]:tri((0,yy,0),(radius*math.cos(a),yy,radius*math.sin(a)),(radius*math.cos(b),yy,radius*math.sin(b)),8+wheel)
     blob=bytearray();views=[];access=[];prims=[]
-    for mat,items in enumerate(groups):
+    for mat,items,wing in [(m,g,None) for m,g in enumerate(groups)]+[(m,g,side) for side,parts in enumerate(wing_groups) for m,g in parts]:
         if not items:continue
         attrs={}
         for key,idx in [('POSITION',0),('NORMAL',1),('TEXCOORD_0',2)]:
@@ -110,15 +115,23 @@ for name,(L,span,dia,engines) in profiles.items():
             views.append({'buffer':0,'byteOffset':len(blob),'byteLength':len(raw),'target':34962});blob.extend(raw);acc={'bufferView':len(views)-1,'componentType':5126,'count':len(rows),'type':'VEC'+str(dim)}
             if key=='POSITION':acc.update(min=[min(v[i] for v in rows) for i in range(3)],max=[max(v[i] for v in rows) for i in range(3)])
             access.append(acc);attrs[key]=len(access)-1
-        prims.append({'attributes':attrs,'material':min(mat,4) if mat>=8 else mat,**({'extras':{'wheel':mat-8}} if mat>=8 else {})})
+        prims.append({'attributes':attrs,'material':min(mat,4) if mat>=8 else mat,**({'extras':{'wing':wing}} if wing is not None else {'extras':{'wheel':mat-8}} if mat>=8 else {})})
     (out/(name+'-v4.bin')).write_bytes(blob)
     for airline,color in paints.items():
         rgb=[int(color[i:i+2],16)/255 for i in (0,2,4)];body=[.94,.95,.96] if airline!='SWA' else [.03,.16,.6]
         materials=[{'doubleSided':True,'pbrMetallicRoughness':{'baseColorFactor':c+[1],'metallicFactor':.18 if i!=6 else .7,'roughnessFactor':.3 if i!=3 else .17}} for i,c in enumerate([body,[.64,.68,.72],rgb,[.02,.055,.085],[.07,.08,.09],[1,1,1],[.36,.4,.44],rgb if airline!='neutral' else body])]
         materials[5].update(alphaMode='MASK',alphaCutoff=.08);materials[5]['pbrMetallicRoughness'].update(metallicFactor=0,roughnessFactor=.75,baseColorTexture={'index':0})
-        main=[q for q in prims if q['material']!=4 and (airline!='neutral' or q['material']!=5)]
-        g={'asset':{'version':'2.0','generator':'Skyward original illustrative '+name+' profile; logos for operator identification'},'scene':0,'scenes':[{'nodes':[0,1]}],'nodes':[{'mesh':0},{'mesh':1,'name':'Gear','children':[2,3,4]}]+[{'mesh':2+i,'name':['WheelN','WheelL','WheelR'][i],'translation':[y,-r-1.6,x]} for i,(x,y) in enumerate(wheel_positions)],'meshes':[{'primitives':main},{'primitives':[q for q in prims if q['material']==4 and 'extras' not in q]}]+[{'primitives':[q for q in prims if q.get('extras',{}).get('wheel')==i]} for i in range(3)],'materials':materials,'buffers':[{'uri':name+'-v4.bin?tail=2','byteLength':len(blob)}],'bufferViews':views,'accessors':access}
+        main=[q for q in prims if 'wing' not in q.get('extras',{}) and q['material']!=4 and (airline!='neutral' or q['material']!=5)]
+        g={'asset':{'version':'2.0','generator':'Skyward original illustrative '+name+' profile; logos for operator identification'},'scene':0,'scenes':[{'nodes':[0,1]}],'nodes':[{'mesh':0},{'mesh':1,'name':'Gear','children':[2,3,4]}]+[{'mesh':2+i,'name':['WheelN','WheelL','WheelR'][i],'translation':[y,-r-1.6,x]} for i,(x,y) in enumerate(wheel_positions)],'meshes':[{'primitives':main},{'primitives':[q for q in prims if q['material']==4 and 'extras' not in q]}]+[{'primitives':[q for q in prims if q.get('extras',{}).get('wheel')==i]} for i in range(3)],'materials':materials,'buffers':[{'uri':name+'-v4.bin?tail=2&rig=1','byteLength':len(blob)}],'bufferViews':views,'accessors':access}
+        for side in range(2):
+            node=len(g['nodes']);mesh=len(g['meshes']);g['scenes'][0]['nodes'].append(node);g['nodes'].append({'mesh':mesh,'name':['FlexWingL','FlexWingR'][side]});g['meshes'].append({'primitives':[q for q in prims if q.get('extras',{}).get('wing')==side]})
         if airline!='neutral':g.update(images=[{'uri':'../../airlines/'+airline+'.png'}],textures=[{'source':0,'sampler':0}],samplers=[{'magFilter':9729,'minFilter':9987,'wrapS':33071,'wrapT':33071}])
         else:materials[5]['pbrMetallicRoughness'].pop('baseColorTexture')
         (out/(name+'-'+airline+'-v4.gltf')).write_text(json.dumps(g,separators=(',',':')))
-print('Generated',len(profiles),'enhanced profiles with shared buffers and operator decals.')
+    template=json.loads((out/(name+'-THY-v4.gltf')).read_text())
+    for path in out.glob(name+'-*-v4.gltf'):
+        if path.name==name+'-neutral-v4.gltf':continue
+        existing=json.loads(path.read_text())
+        for key in ['scene','scenes','nodes','meshes','buffers','bufferViews','accessors']:existing[key]=template[key]
+        path.write_text(json.dumps(existing,separators=(',',':')))
+print('Generated',1 if args.profile else len(profiles),'enhanced profiles with shared buffers and operator decals.')

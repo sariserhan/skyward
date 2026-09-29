@@ -1,3 +1,4 @@
+import {runwaySurfaceCorners,runwaySurfaceMaterial} from '../lib/runwaySurface';
 import {airportStandDetails} from '../lib/airportScenery';
 import {installRunwayLights} from '../lib/installRunwayLights';
 import {useEffect,useState} from 'react';
@@ -15,7 +16,9 @@ export function AirportDetailLayer({viewer,airports,enabled,lightingEnabled=enab
  useEffect(()=>{if(!viewer||viewer.isDestroyed()||!lightingEnabled)return;return installRunwayLights(window.Cesium,viewer,airports,{quality,reduced:()=>reduced});},[viewer,airports,lightingEnabled,quality,reduced]);
  useEffect(()=>{const v=viewer;if(!v||v.isDestroyed()||!enabled||!nearby)return;const C=window.Cesium,source=new C.CustomDataSource('mapped-airport-detail');let alive=true;const resample:Array<()=>void>=[];let terrainTimer:ReturnType<typeof setTimeout>|undefined;
  void v.dataSources.add(source).then(()=>{if(!alive&&!v.isDestroyed())v.dataSources.remove(source,true);});
+ const pavement=runwaySurfaceMaterial(C,v);
  for(const airport of airports.slice(0,2)){
+  if(quality!=='low')for(const [i,runway] of airport.runways.slice(0,6).entries()){const corners=runwaySurfaceCorners(runway);if(corners.length)source.entities.add({id:`runway-surface-${airport.id}-${i}`,name:'Illustrative runway surface',polygon:{hierarchy:C.Cartesian3.fromDegreesArray(corners.flat()),material:pavement,stRotation:Math.atan2(runway.b[1]-runway.a[1],(runway.b[0]-runway.a[0])*Math.cos(airport.lat*Math.PI/180))-Math.PI/2,distanceDisplayCondition:new C.DistanceDisplayCondition(0,6500)}});}
 
   for(const [i,stand] of airportStandDetails(airport,quality==='low'?4:16).entries()){
    const height=(p:[number,number])=>surfaceHeight(v.scene.globe.getHeight(C.Cartographic.fromDegrees(...p)));

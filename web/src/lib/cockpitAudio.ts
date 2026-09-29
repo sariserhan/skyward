@@ -1,3 +1,4 @@
+import {readAudioMix,onAudioMix} from './audioMix.ts';
 import {aircraftFamily,propulsionSound} from './aircraftSound.ts';
 export type CockpitCue='gear'|'touchdown'|'turbulence'|500|100|50|40|30|20|10;
 export interface AudioFlight {turbulence?:number;agl:number|null;ground:boolean;gear:boolean|null;at:number;}
@@ -22,16 +23,17 @@ export function cockpitAudioSettings(type:string,input:CockpitAudioInput){
 }
 /** Original illustrative engine/ventilation sound. No media or provider requests. */
 export function createCockpitSound(type:string){
- let context:AudioContext|null=null,master:GainNode|null=null,low:BiquadFilterNode|null=null,humGain:GainNode|null=null;
+ let context:AudioContext|null=null,master:GainNode|null=null,low:BiquadFilterNode|null=null,humGain:GainNode|null=null,airGain:GainNode|null=null,beatDepth:GainNode|null=null;
  let disposed=false,wantsPlayback=false,input:CockpitAudioInput={speed:null,throttle:null,volume:.3};
  const sources:AudioScheduledSourceNode[]=[],oscillators:OscillatorNode[]=[],nodes:AudioNode[]=[];
- const update=(next:CockpitAudioInput)=>{input=next;if(!context||!master||!low||!humGain||context.state==='closed')return;const settings=cockpitAudioSettings(type,next),t=context.currentTime;master.gain.setTargetAtTime(wantsPlayback?settings.volume:0,t,.15);low.frequency.setTargetAtTime(settings.wind,t,.4);humGain.gain.setTargetAtTime(settings.hum,t,.25);oscillators.forEach((o,i)=>o.frequency.setTargetAtTime(settings.frequency*(i?1.51:1),t,.4));};
+ const update=(next:CockpitAudioInput)=>{input=next;if(!context||!master||!low||!humGain||context.state==='closed')return;const settings=cockpitAudioSettings(type,next),t=context.currentTime;master.gain.setTargetAtTime(wantsPlayback?settings.volume:0,t,.15);low.frequency.setTargetAtTime(settings.wind,t,.4);humGain.gain.setTargetAtTime(settings.hum*readAudioMix().engine,t,.25);beatDepth?.gain.setTargetAtTime(settings.hum*propulsionSound(type).depth*readAudioMix().engine,t,.25);airGain?.gain.setTargetAtTime(readAudioMix().cabin,t,.25);oscillators.forEach((o,i)=>o.frequency.setTargetAtTime(settings.frequency*(i?1.51:1),t,.4));};
+ const stopMix=onAudioMix(()=>update(input));
  function initialize(){
   const c=new AudioContext();context=c;master=c.createGain();master.gain.value=0;master.connect(c.destination);low=c.createBiquadFilter();low.type='lowpass';low.frequency.value=500;const high=c.createBiquadFilter();high.type='highpass';high.frequency.value=35;
   const buffer=c.createBuffer(1,c.sampleRate*4,c.sampleRate),data=buffer.getChannelData(0);let seed=8173;for(let i=0;i<data.length;i++){seed=(Math.imul(seed,1664525)+1013904223)>>>0;data[i]=seed/2147483648-1;}
-  const noise=c.createBufferSource();noise.buffer=buffer;noise.loop=true;noise.connect(low).connect(high).connect(master);noise.start();sources.push(noise);
+  const noise=c.createBufferSource();noise.buffer=buffer;noise.loop=true;airGain=c.createGain();nodes.push(airGain);noise.connect(low).connect(high).connect(airGain).connect(master);noise.start();sources.push(noise);
   humGain=c.createGain();humGain.gain.value=.07;humGain.connect(master);for(let i=0;i<2;i++){const o=c.createOscillator();o.type=propulsionSound(type).wave;o.connect(humGain);o.start();oscillators.push(o);sources.push(o);}nodes.push(master,low,high,humGain);
-  const signature=propulsionSound(type);if(signature.beat){const beat=c.createOscillator(),depth=c.createGain();beat.frequency.value=signature.beat;depth.gain.value=cockpitAudioSettings(type,input).hum*signature.depth;beat.connect(depth).connect(humGain.gain);beat.start();sources.push(beat);nodes.push(depth);}
+  const signature=propulsionSound(type);if(signature.beat){const beat=c.createOscillator(),depth=c.createGain();beat.frequency.value=signature.beat;beatDepth=depth;depth.gain.value=cockpitAudioSettings(type,input).hum*signature.depth;beat.connect(depth).connect(humGain.gain);beat.start();sources.push(beat);nodes.push(depth);}
   update(input);
  }
  const cue=(kind:CockpitCue)=>{
@@ -41,5 +43,5 @@ export function createCockpitSound(type:string){
   gain.gain.setValueAtTime(.001,t);gain.gain.linearRampToValueAtTime(kind==='touchdown'?.8:.3,t+.04);gain.gain.exponentialRampToValueAtTime(.001,t+duration);
   o.connect(gain).connect(master);sources.push(o);o.onended=()=>{o.disconnect();gain.disconnect();const index=sources.indexOf(o);if(index>=0)sources.splice(index,1);};o.start();o.stop(t+duration);
  };
- return {update,cue,start:async()=>{if(disposed)return;wantsPlayback=true;if(!context)initialize();const c=context!;await c.resume();if(disposed||!wantsPlayback){if(c.state!=='closed')await c.suspend();return;}update(input);},pause:()=>{wantsPlayback=false;if(context&&context.state!=='closed'){master!.gain.value=0;void context.suspend().catch(()=>{});}},dispose:()=>{disposed=true;wantsPlayback=false;for(const source of sources){try{source.stop();}catch{}source.disconnect();}for(const node of nodes)node.disconnect();if(context&&context.state!=='closed')void context.close().catch(()=>{});context=null;}};
+ return {update,cue,start:async()=>{if(disposed)return;wantsPlayback=true;if(!context)initialize();const c=context!;await c.resume();if(disposed||!wantsPlayback){if(c.state!=='closed')await c.suspend();return;}update(input);},pause:()=>{wantsPlayback=false;if(context&&context.state!=='closed'){master!.gain.value=0;void context.suspend().catch(()=>{});}},dispose:()=>{disposed=true;stopMix();wantsPlayback=false;for(const source of sources){try{source.stop();}catch{}source.disconnect();}for(const node of nodes)node.disconnect();if(context&&context.state!=='closed')void context.close().catch(()=>{});context=null;}};
 }

@@ -51,6 +51,7 @@ import {nearbyModelIds,modelBudget,modelRange,modelOpacity} from '../lib/modelBu
 import {TowerView} from './TowerView';
 import {sharedLiveMotion} from '../lib/liveMotion';
 import {airportPoints,type Movement} from '../lib/exploration';
+import {qualityEvent} from '../lib/qualityEvents';
 import { createOpenTerrain } from '../lib/openTerrain';
 import { addTerrainAirport } from '../lib/terrainAirport';
 import { fleetUri,fallbackFleetUri,sourcedModel } from '../lib/flightPresentation';
@@ -370,7 +371,8 @@ export function Globe(p: Props) {
     const v=viewer.current;if(!v||!ready)return;
     if(!terrainActive){v.terrainProvider=new window.Cesium.EllipsoidTerrainProvider();v.scene.requestRender();return;}
     const terrain=createOpenTerrain(()=>setTerrainError(true),()=>{if(!v.isDestroyed())v.scene.requestRender();});v.terrainProvider=terrain.provider;v.scene.requestRender();
-    return()=>terrain.dispose();
+    const warm=()=>{const arrival=callbacks.current.arrivalGeometry;if(arrival)terrain.warm(arrival.lon,arrival.lat);};warm();const timer=setInterval(warm,15000);
+    return()=>{clearInterval(timer);terrain.dispose();};
   },[ready,terrainActive]);
   useEffect(()=>{
     const v=viewer.current;if(!v||!ready)return;
@@ -393,7 +395,7 @@ export function Globe(p: Props) {
     const v=viewer.current;if(!v||!ready||!p.preferences.autoQuality||p.preferences.quality==='low')return;
     let previous=0,frame=0;const samples:number[]=[];const start=performance.now();let reported=false;
     // Sample the browser animation clock, not intentional request-render idle intervals.
-    const sample=(now:number)=>{if(document.hidden||now-start<15000){previous=0;samples.length=0;}else{const gap=previous?now-previous:0;previous=now;if(gap<=0||gap>=1000)samples.length=0;else{samples.push(gap);if(samples.length>90)samples.shift();const next=suggestedQuality(p.preferences.quality,samples);if(next&&!reported){reported=true;callbacks.current.onAutomaticQuality(next);}}}if(!reported)frame=requestAnimationFrame(sample);};
+    const sample=(now:number)=>{if(document.hidden||now-start<6000){previous=0;samples.length=0;}else{const gap=previous?now-previous:0;previous=now;if(gap<=0||gap>=1000)samples.length=0;else{samples.push(gap);if(samples.length>90)samples.shift();const next=suggestedQuality(p.preferences.quality,samples);if(next&&!reported){reported=true;callbacks.current.onAutomaticQuality(next);}}}if(!reported)frame=requestAnimationFrame(sample);};
     frame=requestAnimationFrame(sample);return()=>cancelAnimationFrame(frame);
   },[ready,p.preferences.autoQuality,p.preferences.quality]);
   useEffect(() => {
@@ -548,7 +550,7 @@ export function Globe(p: Props) {
       }
       if(Date.now()-lastLabels>500){
         lastLabels=Date.now();readyModels.current.clear();
-        const fail=(id:string)=>{const attempt=modelAttempts.current.get(id);if(!attempt||attempt.stage==='marker')return;modelAttempts.current.set(id,failedModel(attempt,Date.now()));const entity=v.entities.getById(id);if(entity)entity.model=undefined;readyModels.current.delete(id);rendered.current.delete(id);setModelRevision(n=>n+1);};
+        const fail=(id:string)=>{const attempt=modelAttempts.current.get(id);if(!attempt||attempt.stage==='marker')return;qualityEvent('model','failed',`Rendering failed; ${attempt.stage} fallback`);modelAttempts.current.set(id,failedModel(attempt,Date.now()));const entity=v.entities.getById(id);if(entity)entity.model=undefined;readyModels.current.delete(id);rendered.current.delete(id);setModelRevision(n=>n+1);};
         for(let i=0;i<v.scene.primitives.length;i++){const primitive=v.scene.primitives.get(i);if(!(primitive instanceof C.Model)||typeof primitive.id?.id!=='string')continue;const id=primitive.id.id;if(primitive.ready&&primitive.show)readyModels.current.add(id);if(!watchedModels.current.has(primitive)){watchedModels.current.add(primitive);primitive.errorEvent.addEventListener(()=>{if(!v.isDestroyed()&&v.scene.primitives.contains(primitive))fail(id);});}}
         for(const [id,attempt] of modelAttempts.current){const entity=v.entities.getById(id);if(!entity?.model||!entity.show)continue;if(readyModels.current.has(id)){if(!attempt.ready)modelLoadStats(v,readRenderStats(v).pendingModels,readRenderStats(v).slowModels,Date.now()-attempt.since);attempt.ready=true;}else if(modelTimedOut(attempt,Date.now()))fail(id);}
         const loading=[...modelAttempts.current.entries()].filter(([id,a])=>v.entities.getById(id)?.model&&!a.ready);modelLoadStats(v,loading.length,loading.filter(([,a])=>Date.now()-a.since>5000).length);

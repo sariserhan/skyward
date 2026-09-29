@@ -64,6 +64,8 @@
     "test:release": "node scripts/release-check.mjs",
     "test:visual": "npm run build && node scripts/browser-tests.mjs --visual-tour",
     "test:account-recovery": "npm run build && node scripts/browser-tests.mjs --account-recovery",
-    "test:scenery": "npm run build && node scripts/browser-tests.mjs --scenery"
+    "test:scenery": "npm run build && node scripts/browser-tests.mjs --scenery",
+    "test:devices": "npm run build && node scripts/device-release.mjs",
+    "test:performance": "npm run build && node scripts/browser-tests.mjs --performance-capture"
   }
 }

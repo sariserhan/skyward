@@ -343,3 +343,7 @@ body>.cesium-credit-lightbox-overlay .cesium-credit-lightbox-close{min-width:36p
 
 .topbar nav .discover-trigger{color:var(--mint);line-height:1.35;text-align:left}.topbar nav .discover-trigger svg{flex-shrink:0}.statusbar .watching-trigger[aria-pressed=true]{color:var(--mint);border-color:#5a9387}
 @media(max-width:759px){.topbar nav{gap:10px}.topbar nav .discover-trigger{max-width:140px}.topbar nav .discover-trigger span{max-width:115px}}
+
+.globe-utilities .utility-dialog section{position:static;width:auto;max-height:none;overflow:visible;box-shadow:none;margin:12px 0}.audio-mixer{font-size:12px;max-width:100%}.audio-mixer summary{cursor:pointer;padding:8px 0}.audio-mixer fieldset{min-width:0;padding:8px;border:1px solid #41616c}.audio-mixer input[type=range]{width:120px;min-width:50px;padding:0}.audio-mixer output{min-width:34px}.utility-dialog dl{overflow-wrap:anywhere}
+
+.performance-monitor .utility-dialog dt,.performance-monitor .utility-dialog dd{margin:0;align-self:center}.performance-monitor .utility-dialog dl{row-gap:12px}.performance-monitor .utility-dialog dd{text-align:right}

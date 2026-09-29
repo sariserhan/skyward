@@ -272,3 +272,12 @@ results and the editor and saves PNGs. Under a virtual framebuffer:
 ```sh
 xvfb-run -a -s "-screen 0 1280x800x24" godot --path game --script tests/screenshot.gd -- /abs/output/dir
 ```
+
+### Measure your own device
+
+Open **Map tools → Performance → Record performance** for a local 30-second
+capture. Close the monitor to explore, then reopen it to download the report.
+Nothing is uploaded. **Sound mix** provides separate engine, cabin, weather and
+radio levels. See [visual realism](docs/visual-realism.md) for the current scenery,
+arrival preparation and supported aircraft-motion details, and
+[customer readiness](docs/customer-readiness.md) for the device release matrix.

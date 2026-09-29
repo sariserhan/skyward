@@ -85,3 +85,11 @@ conditions and the Neon integration remain separate checks.
 
 The release runner includes these new flows. Review the
 [customer readiness matrix](../../../docs/customer-readiness.md) before release.
+
+`npm run test:performance` exercises opt-in recording, cancellation, closing the
+monitor while exploring, reopening it, JSON download and sound-mix persistence.
+The recording uses real browser timing, not a shortened test-only duration.
+`npm run test:devices` runs recovery, Premium, performance and landing flows across
+installed Chromium/Firefox/WebKit and writes an explicit release matrix. Limit it
+with `npm run test:devices -- --browser=chromium`. Missing engines are BLOCKED and
+produce a nonzero exit status. No browsers are installed automatically.

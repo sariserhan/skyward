@@ -56,3 +56,41 @@ these changes repeatable. This pass recorded approximately 150–267 ms median a
 not smooth rendering and is not a representative hardware-GPU benchmark; no
 performance pass or improvement claim is inferred from it. See
 [customer readiness](customer-readiness.md) for remaining validation.
+
+## Performance and arrival refinement pass
+
+- **Map tools → Performance → Record performance** captures 30 visible seconds.
+  Close the monitor to explore; reopen it to download the result. Cancellation,
+  page visibility, viewer disposal and a bounded sample buffer are handled locally.
+  Nothing is uploaded or written to the account database. Reports include frame
+  percentiles, CPU render-submission wall time, supported browser long tasks,
+  enabled model/layer counts and recent quality events. These measurements identify
+  possible contributors; they do not measure GPU execution or prove layer causality.
+- Automatic quality starts its sustained-frame check after six seconds of warmup
+  instead of fifteen. Existing background model/detail limits act first; the
+  watched aircraft remains protected. Session reductions do not overwrite saved
+  preferences. Disabling automatic quality still disables preset reduction.
+- Selected destinations prepare geometry within 150 nautical miles instead of 30.
+  With open terrain enabled, two destination tiles (levels 9 and 11) warm through
+  the existing bounded cache when visible demand leaves capacity. This does not
+  download an entire approach corridor or guarantee all future scenery is loaded.
+  Speculative terrain failures do not switch the visible globe to flat terrain.
+- Balanced/high graphics add mapped-runway asphalt grain, illustrative rubber
+  deposits and rain-responsive wet patches with a restrained specular response.
+  Low graphics omit this layer. It is not measured pavement condition, standing
+  water depth or a physically accurate reflection simulation.
+- Regenerated original fallback 787 meshes have separate wing nodes and restrained
+  flex. Verified A319/A320 engine nodes receive a very small illustrative vibration.
+  Other community wing rigs are untouched. Sourced gear overlays now steer the
+  nose wheels, complementing existing wheel inertia and braking compression.
+- **Sound mix** controls engine, cabin, weather and radio independently. Generated
+  cabin audio blends approach and rollout profiles through gain ramps; prerecorded
+  cabin files remain one mixed channel. Existing sound switches and autoplay
+  restrictions still apply. Safety/cockpit effect chimes retain their own volume.
+- A development-only **Flight quality dashboard** in Performance shows bounded
+  session events for missing models, terrain/destination failures, sustained frame
+  pressure and controlled-arrival transitions. The local capture includes these
+  events in production too. This is instrumentation, not a complete physics audit.
+
+Validation uses fixture traffic and software-rendered Chromium. No claim of MSFS
+visual parity, guaranteed 60 fps, or validated physical-device performance is made.

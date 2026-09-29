@@ -1,3 +1,4 @@
+import {tagRenderLayer} from '../lib/renderLayers';
 import {readRenderStats} from '../lib/renderDiagnostics';
 import {buildingAppearance} from '../lib/buildingAppearance';
 import {useEffect,useState} from 'react';
@@ -34,6 +35,7 @@ export function CityBuildings({viewer:v,enabled,quality,terrain,airports,airport
    }
    if(instances.length){const appearance=buildingAppearance(C,buildings[0]?.rings[0]?.[0]?.[0]??0,buildings[0]?.rings[0]?.[0]?.[1]??0);appearance.material!.uniforms.visibility=replace?1:0;
     const mesh=v!.scene.primitives.add(new C.Primitive({geometryInstances:instances,appearance,asynchronous:true,allowPicking:false}));
+    tagRenderLayer(mesh,'city building tiles');
     (replace&&meshes.has(key)?replacements:meshes).set(key,mesh);if(!replace)fades.set(mesh,0);
    }
    v!.scene.requestRender();

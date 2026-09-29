@@ -1,3 +1,4 @@
+import {qualityEvent} from './qualityEvents.ts';
 /** Bounded, low-concurrency cache warming; selection takes priority over traffic. */
 export function createModelWarmup(base:string){
  const completed=new Set<string>(),queued=new Set<string>(),queue:string[]=[],failed=new Map<string,number>();
@@ -12,7 +13,7 @@ export function createModelWarmup(base:string){
   for(const path of urls){const asset=new URL(path,url);if(asset.origin!==location.origin)continue;const r=await fetch(asset,options);if(!r.ok)throw Error('Dependency unavailable');await r.arrayBuffer();}
  }
  function pump(){if(disposed||active||!queue.length)return;const uri=queue.shift()!;queued.delete(uri);active=uri;
-  void warm(uri).then(()=>{completed.add(uri);if(completed.size>24)completed.delete(completed.values().next().value!);failed.delete(uri);}).catch(()=>{failed.set(uri,Date.now()+30000);if(failed.size>24)failed.delete(failed.keys().next().value!);}).finally(()=>{active=null;pump();});
+  void warm(uri).then(()=>{completed.add(uri);if(completed.size>24)completed.delete(completed.values().next().value!);failed.delete(uri);}).catch(()=>{if(!disposed)qualityEvent('model','failed','Model warmup or dependency unavailable');failed.set(uri,Date.now()+30000);if(failed.size>24)failed.delete(failed.keys().next().value!);}).finally(()=>{active=null;pump();});
  }
  return {add(uri:string,priority=false){
   if(disposed||active===uri)return;

@@ -1,3 +1,4 @@
+import {readAudioMix,onAudioMix} from './audioMix.ts';
 /** Shared visual-weather cues. Audio consumers never make weather requests. */
 export type WeatherAudioCue={rain:number;storm:boolean;strike?:{id:number;at:number;distance:number}};
 const cues=new WeakMap<object,WeatherAudioCue>();
@@ -10,9 +11,10 @@ export function thunderProfile(distance:number){const metres=Math.max(0,Number.i
 export function createWeatherSound(){
  let context:AudioContext|null=null,master:GainNode|null=null,rainGain:GainNode|null=null,rainSource:AudioBufferSourceNode|null=null,buffer:AudioBuffer|null=null;
  let playing=false,disposed=false,rain=0,storm=false;const rumbles=new Set<AudioBufferSourceNode>();
+ const stopMix=onAudioMix(()=>{if(context&&master&&context.state!=='closed')master.gain.setTargetAtTime(.45*readAudioMix().weather,context.currentTime,.3);});
  const stopThunder=()=>{for(const source of rumbles){try{source.stop();}catch{}source.disconnect();}rumbles.clear();};
  function initialize(){
-  context=new AudioContext();master=context.createGain();master.gain.value=.45;master.connect(context.destination);
+  context=new AudioContext();master=context.createGain();master.gain.value=.45*readAudioMix().weather;master.connect(context.destination);
   buffer=context.createBuffer(1,context.sampleRate*10,context.sampleRate);const samples=buffer.getChannelData(0);let seed=73419;
   for(let i=0;i<samples.length;i++){seed=(Math.imul(seed,1664525)+1013904223)>>>0;samples[i]=seed/2147483648-1;}
   rainSource=context.createBufferSource();rainSource.buffer=buffer;rainSource.loop=true;
@@ -28,6 +30,6 @@ export function createWeatherSound(){
   },
   async start(){if(disposed)return;playing=true;if(!context)initialize();await context!.resume();if(!playing||disposed){if(context?.state!=='closed')void context?.suspend();}},
   pause(){playing=false;stopThunder();if(context&&context.state!=='closed')void context.suspend();},
-  dispose(){disposed=true;playing=false;stopThunder();rainSource?.stop();rainSource?.disconnect();if(context&&context.state!=='closed')void context.close();context=null;}
+  dispose(){disposed=true;stopMix();playing=false;stopThunder();rainSource?.stop();rainSource?.disconnect();if(context&&context.state!=='closed')void context.close();context=null;}
  };
 }

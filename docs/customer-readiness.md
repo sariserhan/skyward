@@ -23,3 +23,44 @@ Before public release, run the same scenes on real desktop and mobile GPUs,
 exercise cold caches and constrained networks, complete the existing Neon/Better
 Auth integration test against a disposable database, and verify account recovery
 through an owned mailbox. Keep development Premium disabled on public services.
+
+## Repeatable device release matrix
+
+Run from `web` (requires Python Playwright and the selected browsers installed):
+
+```sh
+SKYWARD_QA_PYTHON=/path/to/python npm run test:devices
+# Or one engine:
+SKYWARD_QA_PYTHON=/path/to/python npm run test:devices -- --browser=chromium
+```
+
+The runner checks account recovery, Premium recording access, opt-in performance
+capture, and landing/cockpit flows. It records PASS, FAIL or BLOCKED per engine in
+`release-matrix.json` under the printed artifact directory. Missing browser
+engines fail the matrix rather than silently substituting Chromium. Mobile
+viewports in these flows are emulation, not actual phone testing.
+
+Before release, record the following on physical hardware. Do not check a row
+based only on headless or emulated results:
+
+| Device/browser | Globe/flight/cockpit | Landing + taxi | Audio + background resume | Recovery + Premium | 30s capture | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| Desktop Chrome, hardware GPU | — | — | — | — | — | Not tested |
+| Desktop Firefox, hardware GPU | — | — | — | — | — | Not tested |
+| macOS Safari | — | — | — | — | — | Not tested |
+| iPhone Safari | — | — | — | — | — | Not tested |
+| Android Chrome | — | — | — | — | — | Not tested |
+
+Include OS/browser version, GPU/device, display size, network, aircraft/airport,
+quality setting and artifact path with each result. Verify one dense city, rain,
+night approach, aircraft switch, recovery after network interruption and return
+from background. Set a real-device frame-time budget from these captures before
+claiming a performance target. Neon/SMTP/live payment checks remain separate.
+
+Latest local refinement evidence: production build passed; 385 unit checks passed,
+with the Neon integration skipped. Chromium fixtures passed performance recording
+(including closing/reopening the monitor), scenery streaming and runway material
+rendering, weather audio lifecycle, a rendered fallback 787 flex rig, account
+recovery, Premium recording access and watched landing/taxi. Firefox and WebKit
+matrix probes returned BLOCKED because those engines are not installed. This does
+not change the physical-device statuses above.

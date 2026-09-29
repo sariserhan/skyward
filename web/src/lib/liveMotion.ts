@@ -1,3 +1,4 @@
+import {qualityEvent} from './qualityEvents.ts';
 import {syntheticFrame} from './syntheticTraffic.ts';
 import {WatchedArrival} from './watchedArrival.ts';
 import {predictedLanding,type LandingPhase} from './landingPrediction.ts';
@@ -94,7 +95,7 @@ export class LiveMotion {
  sample(a:Aircraft,points:TrailPoint[],now:number,reduced=false,route?:FlightRoute|null,arrivalGeometry?:AirportGeometry|null){
   if(a.simulation)return syntheticFrame(a,now);
   const controlled=!reduced?this.watchedArrival.sample(a,now,route,arrivalGeometry,this.frames.get(a.hex)?.frame):null;
-  if(controlled){this.frames.set(a.hex,{signature:'controlled',frame:controlled,start:now,duration:2000,verticalDuration:2000,dx:0,dy:0,dz:0,dh:0});return controlled;}
+  if(controlled){const previous=this.frames.get(a.hex)?.frame;if(previous?.landingPhase!==controlled.landingPhase){qualityEvent('arrival','ready',`Presentation phase: ${controlled.landingPhase??'airborne'}`);if(previous?.ground&&!controlled.ground)qualityEvent('arrival','warning','Ground-to-air transition during controlled arrival');}this.frames.set(a.hex,{signature:'controlled',frame:controlled,start:now,duration:2000,verticalDuration:2000,dx:0,dy:0,dz:0,dh:0});return controlled;}
   let target=liveFrame(a,points,now,reduced,route,arrivalGeometry);if(!target)return null;
   const anchor=this.approaches.get(a.hex);
   if(anchor&&!reduced&&arrivalGeometry?.id===anchor.airport.id&&a.callsign===anchor.aircraft.callsign&&a.targetKind==='aircraft'&&(a.groundSpeed===null||(a.groundSpeed>=0&&a.groundSpeed<=260))&&!a.ground&&!a.positionWarning&&(a.verticalRate??0)<=150&&a.altitude!==null&&a.lat!==null&&a.lon!==null&&a.observedAt!==null&&a.observedAt>=anchor.aircraft.observedAt!&&a.observedAt-anchor.aircraft.observedAt!<=120000){

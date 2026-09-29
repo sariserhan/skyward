@@ -1,3 +1,4 @@
+import {qualityEvent} from './qualityEvents.ts';
 import type * as Cesium from 'cesium';
 // Mapzen/Terrarium open elevation; no key, account, trial, or billable endpoint.
 export const TERRAIN_ROOT='https://s3.amazonaws.com/elevation-tiles-prod/terrarium';
@@ -6,7 +7,7 @@ export function createOpenTerrain(failed:()=>void, updated:()=>void) {
   const C=window.Cesium, controller=new AbortController();
   let active=0,disposed=false,reported=false;
   const cache=new Map<string,Float32Array>(),pending=new Map<string,Promise<Float32Array>>();
-  const load=(x:number,y:number,z:number):Promise<Float32Array>|undefined=>{
+  const load=(x:number,y:number,z:number,prefetch=false):Promise<Float32Array>|undefined=>{
     const key=`${z}/${x}/${y}`;
     if(cache.has(key))return Promise.resolve(cache.get(key)!);
     if(pending.has(key))return pending.get(key);
@@ -28,7 +29,7 @@ export function createOpenTerrain(failed:()=>void, updated:()=>void) {
         }
         cache.set(key,heights);if(cache.size>128)cache.delete(cache.keys().next().value!);return heights;
       }finally{bitmap.close();}
-    })().catch(()=>{if(!disposed&&!reported){reported=true;failed();}return new Float32Array(65*65);}).finally(()=>{active--;pending.delete(key);if(!disposed)updated();});
+    })().catch(()=>{if(!disposed&&!reported&&!prefetch){reported=true;qualityEvent('terrain','failed','Elevation request or decoding failed');failed();}return new Float32Array(65*65);}).finally(()=>{active--;pending.delete(key);if(!disposed)updated();});
     pending.set(key,job);return job;
   };
   const provider=new C.CustomHeightmapTerrainProvider({width:65,height:65,tilingScheme:new C.WebMercatorTilingScheme(),callback:load,
@@ -37,5 +38,9 @@ export function createOpenTerrain(failed:()=>void, updated:()=>void) {
     const heights=load(x,y,level);if(!heights)return undefined;
     return heights.then(buffer=>new C.HeightmapTerrainData({buffer,width:65,height:65,childTileMask:level>=12?0:15}));
   };
-  return {provider:provider as Cesium.TerrainProvider,dispose:()=>{disposed=true;controller.abort();cache.clear();}};
+  return {provider:provider as Cesium.TerrainProvider,warm:(lon:number,lat:number)=>{
+    if(active>2||disposed||!Number.isFinite(lon)||!Number.isFinite(lat))return;
+    const scheme=new C.WebMercatorTilingScheme(),point=C.Cartographic.fromDegrees(lon,Math.max(-85,Math.min(85,lat)));
+    for(const z of [9,11]){const tile=scheme.positionToTileXY(point,z);if(tile)void load(tile.x,tile.y,z,true);}
+  },dispose:()=>{disposed=true;controller.abort();cache.clear();}};
 }

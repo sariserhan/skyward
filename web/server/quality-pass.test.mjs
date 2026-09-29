@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {normalizeAudioMix} from '../src/lib/audioMix.ts';
+import {timingSummary} from '../src/lib/performanceCapture.ts';
+import {runwaySurfaceCorners} from '../src/lib/runwaySurface.ts';
+import {qualityEvent,qualityEvents} from '../src/lib/qualityEvents.ts';
+import {cabinSoundProfile} from '../src/lib/cabinAudio.ts';
+test('capture retains severe stalls and reports percentiles without invalid timings',()=>{assert.deepEqual(timingSummary([16,16,3000,NaN,-1]),{samples:3,p50:16,p95:3000,over50:1});assert.equal(timingSummary([]).samples,0);});
+test('audio mixer clamps persisted data and phase profiles distinguish approach and reverse rollout',()=>{assert.deepEqual(normalizeAudioMix({engine:3,cabin:-4,weather:NaN,radio:0}),{engine:1,cabin:0,weather:1,radio:0});assert.equal(normalizeAudioMix(null).engine,1);assert.ok(cabinSoundProfile({ground:true,speed:120,phase:'rollout'}).engine>cabinSoundProfile({ground:true,speed:15,phase:'taxi'}).engine);});
+test('runway wear footprint stays on mapped pavement across the dateline',()=>{const r={a:[179.99,0],b:[-179.99,0],length:2222,width:40};const p=runwaySurfaceCorners(r);assert.equal(p.length,4);assert.ok(p.every(([lon,lat])=>Math.abs(lon)>179&&Math.abs(lat)<.001));assert.equal(runwaySurfaceCorners({...r,width:0}).length,0);});
+test('quality log is bounded and copied, not a durable record of aircraft',()=>{for(let i=0;i<80;i++)qualityEvent('model','failed','Fixture');assert.equal(qualityEvents().length,60);qualityEvents()[0].detail='Changed';assert.equal(qualityEvents()[0].detail,'Fixture');});
+test('787 flex nodes contain real geometry separated from the fuselage',()=>{const d=JSON.parse(readFileSync(new URL('../public/models/fleet/b787-neutral-v4.gltf',import.meta.url)));for(const name of ['FlexWingL','FlexWingR']){const n=d.nodes.find(n=>n.name===name);assert.ok(n&&d.meshes[n.mesh].primitives.length);assert.ok(d.scenes[0].nodes.includes(d.nodes.indexOf(n)));}assert.ok(d.meshes[0].primitives.every(p=>p.extras?.wing===undefined));});

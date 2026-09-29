@@ -10,6 +10,7 @@ def run(page):
  page.evaluate("__viewer.camera.setView({destination:Cesium.Cartesian3.fromDegrees(-77.44,38.95,1400),orientation:{heading:0,pitch:-1.2,roll:0}});__viewer.scene.requestRender()")
  page.wait_for_function("__viewer.scene.primitives._primitives.some(p=>p.appearance?.material?.type==='SkywardBuildingFade'&&p.appearance.material.uniforms.visibility<1)",timeout=30000)
  page.wait_for_function("__viewer.dataSources._dataSources.some(s=>s.name==='mapped-airport-detail'&&s.entities.values.some(e=>e.id.startsWith('illustrative-bridge-')))")
+ page.wait_for_function("__viewer.dataSources._dataSources.some(s=>s.entities.values.some(e=>e.id.startsWith('runway-surface-')))")
  page.wait_for_timeout(3000)
  assert page.evaluate("__viewer.scene.primitives._primitives.some(p=>p.appearance?.material?.type==='SkywardBuildingFade'&&p.appearance.material.uniforms.visibility===1)")
  page.screenshot(path=str(f.ARTIFACTS/'scenery-detail.jpg'),type='jpeg',quality=75)

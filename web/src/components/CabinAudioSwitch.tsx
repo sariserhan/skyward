@@ -1,3 +1,4 @@
+import {AudioMixer} from './AudioMixer';
 import {readWeatherAudio} from '../lib/weatherAudio';
 import {useEffect,useRef,useState} from 'react';
 import {createCabinSound,readCabinAudio,saveCabinAudio,type CabinSound,type CabinSource,type CabinFlight} from '../lib/cabinAudio';
@@ -17,5 +18,5 @@ export function CabinAudioSwitch({viewer,source,suspended=false,ground=false,spe
  },[url,aircraftType]);
  useEffect(()=>{sound.current?.update({ground,speed,phase});},[ground,speed,phase]);
  useEffect(()=>{saveCabinAudio(enabled);if(!enabled||suspended)sound.current?.pause();else if(!document.hidden)void sound.current?.start().then(()=>setNeedsGesture(false)).catch(()=>setNeedsGesture(true));},[enabled,suspended]);
- return <button className="quiet-button cabin-audio-switch" role="switch" aria-label="Cabin audio" aria-checked={enabled} title={needsGesture?'Interact with the page to allow sound':'Toggle cabin audio'} onClick={()=>setEnabled(value=>!value)}>Cabin audio: {enabled?'On':'Off'}</button>;
+ return <><button className="quiet-button cabin-audio-switch" role="switch" aria-label="Cabin audio" aria-checked={enabled} title={needsGesture?'Interact with the page to allow sound':'Toggle cabin audio'} onClick={()=>setEnabled(value=>!value)}>Cabin audio: {enabled?'On':'Off'}</button><AudioMixer/></>;
 }
