@@ -174,6 +174,13 @@ Aprons use concrete slab shading and become darker and less rough in rain.
 **Selected gate** focuses the selected flight's assigned stand. Boarding bridges
 anchor to nearby mapped terminal walls; docking and stand clearance markings are
 illustrative. Bridges retract outside the at-gate phases.
+Aircraft and service vehicles use swept clearance against mapped building footprints,
+including their size. Unsafe movement holds outside the wall rather than cutting through it.
+This is a visual fail-safe; it does not repair the underlying taxi graph or certify clearance
+against unmapped structures. Pushback tugs connect near the nose gear during the initial
+outbound leg. High-visibility marshallers and parked police/ambulance vehicles are illustrative.
+Bridges pivot at terminal anchors and extend toward the model's approximate front-left door;
+737/A321 door coordinates come from the model's named door meshes; other types use scaled estimates.
 Static scenery is batched by material and local area to reduce scene overhead;
 aircraft, service vehicles, bridges, and sequenced lights stay independently animated.
 Use **Hide setup** above the game for more viewport space. Progress sync and local

@@ -46,6 +46,7 @@ var material_cache: Dictionary = {}
 var pavement_cache: Dictionary = {}
 var asphalt: NoiseTexture2D
 var static_batch_stats := {}
+var clearance := AirportClearance.new()
 var route_overlay: Node3D
 
 func _ready() -> void:
@@ -305,6 +306,7 @@ func _build_world() -> void:
 	bridges.clear()
 	arrival_starts.clear()
 	bound_sim = sim
+	clearance.setup(sim.airside.config)
 	desk.gate_choice.clear(); desk.runway_choice.clear(); desk.strips.order.clear()
 	desk.via.clear(); desk.radar.route.clear(); desk.route_flight=""
 	desk._stop_speech()
@@ -406,13 +408,18 @@ func _build_world() -> void:
 		var base := Vector3(anchor.x,4,anchor.z)
 		var direction := (Vector3(at.x,4,at.z)-base).normalized()
 		var home := base+direction*9
-		var bridge := _box(world,home,Vector3(18,3,4),Color("b8c1c1"))
+		var bridge := Node3D.new()
+		world.add_child(bridge)
+		bridge.position=base
 		bridge.rotation.y=atan2(-direction.z,direction.x)
+		var tunnel:=_box(bridge,Vector3(9,0,0),Vector3(18,2.6,2.8),Color("8d9da1"))
+		for side in [-1,1]:
+			_box(tunnel,Vector3(0,.2,side*1.43),Vector3(17,1.1,.05),Color("365765"))
+		var cabin:=_box(bridge,Vector3(18,0,0),Vector3(3,3.0,3.8),Color("b0babc"))
+		_box(cabin,Vector3(1.55,0,0),Vector3(.35,2.7,3.4),Color("303b40"))
+		_box(cabin,Vector3(0,-2.1,0),Vector3(.4,2,2),Color("53676c"))
 		_box(world,base-Vector3.UP*2,Vector3(1,4,1),Color("697b80"))
-		for offset in [-6,-2,2,6]:
-			_box(bridge,Vector3(offset,.25,-2.05),Vector3(2.8,1.2,.08),Color("426f80"))
-		_box(bridge,Vector3(-6,-2,0),Vector3(.5,2,2.5),Color("657980"))
-		bridges[gate] = {"node":bridge,"home":bridge.position,"base":base,"angle":bridge.rotation.y}
+		bridges[gate] = {"node":bridge,"home":home,"base":base,"angle":bridge.rotation.y,"tunnel":tunnel,"cabin":cabin,"reach":18.0}
 	detail_scene.setup(self)
 	static_batch_stats = AirportStaticScenery.batch(world, detail_scene.decorations)
 	apply_weather()
@@ -479,7 +486,9 @@ func _aircraft(f: AirportFlight) -> Node3D:
 	plane.scale *= k
 	plane.position = -bounds.get_center()*k
 	plane.position.y = -bounds.position.y*k+1.9
-	if bounds.size.x>bounds.size.z: plane.rotation.y = PI/2
+	# These four imported assets face +Z; simulation, gear and door offsets use -Z.
+	plane.rotation.y = PI
+	body.set_meta("front_door",_front_door(plane,body,type,length))
 	var gear := Node3D.new()
 	gear.name = "DisplayGear"
 	body.add_child(gear)
@@ -548,6 +557,8 @@ func _process(delta: float) -> void:
 	if not is_visible_in_tree() or sim == null: return
 	if sim != bound_sim: _build_world()
 	if not sim.airside.enabled(): return
+	if status.text.begins_with("Ground clearance hold"):
+		status.text="Right-drag: orbit · middle-drag: pan · wheel: zoom · click aircraft: select"
 	for f: AirportFlight in sim.flight_order:
 		if f.status == "scheduled": continue
 		if f.status == "departed":
@@ -564,6 +575,13 @@ func _process(delta: float) -> void:
 		var body: Node3D = models[f.id]
 		body.visible = true
 		var target := _pose(f)
+		var radius_m := float(body.get_meta("length",40))*.53
+		if fresh and not clearance.clear(target,radius_m):
+			var placement:=clearance.safe_position(target,radius_m)
+			if not placement.ok:
+				body.visible=false
+				continue
+			target=placement.position
 		var motion := target-body.position
 		if f.status in ["approaching","landed"] and body.position.y>1 and target.y<=.2 and not body.has_meta("touchdown"):
 			body.set_meta("touchdown",true)
@@ -575,11 +593,20 @@ func _process(delta: float) -> void:
 		gear.scale.y = lerpf(gear.scale.y,.02 if retract else 1.0,1-exp(-delta*2))
 		gear.visible = gear.scale.y>.04
 		if fresh: body.position = target
-		else: body.position = body.position.lerp(target,1-exp(-delta*5))
-		if Vector2(motion.x,motion.z).length()>.2:
+		else:
+			var requested:=body.position.lerp(target,1-exp(-delta*5))
+			body.position=clearance.sweep(body.position,requested,radius_m)
+			body.set_meta("clearance_hold",body.position.distance_to(requested)>.05)
+			if bool(body.get_meta("clearance_hold",false)) and f.id==selected_id:
+				status.text="Ground clearance hold: mapped building blocks this movement."
+		if f.status in AirportSimulation.AT_GATE_STATES:
+			var anchor:=_terminal_anchor(body.position)
+			var towards:=anchor-body.position
+			body.rotation.y=atan2(-towards.x,-towards.z)
+		if Vector2(motion.x,motion.z).length()>.2 and not f.status in AirportSimulation.AT_GATE_STATES:
 			var heading:=atan2(-motion.x,-motion.z)
 			var pushback:=sim.turnaround.task(f,Turnaround.PUSHBACK_OP)
-			if pushback!=null and pushback.status==TurnaroundTask.RUNNING: heading+=PI
+			if (pushback!=null and pushback.status==TurnaroundTask.RUNNING) or (f.status=="taxiing_out" and f.taxi_leg==0 and target.y<1): heading+=PI
 			body.set_meta("steering",clampf(angle_difference(body.rotation.y,heading),-.45,.45))
 			body.rotation.y = lerp_angle(body.rotation.y,heading,1-exp(-delta*2))
 		body.rotation.x=lerpf(body.rotation.x,clampf(atan2(motion.y,maxf(.1,Vector2(motion.x,motion.z).length())),-.09,.12) if target.y>2 else 0.0,1-exp(-delta*2))
@@ -593,19 +620,26 @@ func _process(delta: float) -> void:
 	for gate in bridges:
 		var record: Dictionary = bridges[gate]
 		var occupant: String=sim.airport.gates[gate].occupied_by_flight_id
-		var goal: Vector3=record.home
-		var extension:=1.0
+		var reach:=18.0
 		var angle: float=record.angle
+		var rise:=0.0
+		var docking_heading:=NAN
 		if models.has(occupant) and sim.airport.flights[occupant].status in AirportSimulation.AT_GATE_STATES:
 			var aircraft: Node3D=models[occupant]
 			var base: Vector3=record.base
-			var door:=aircraft.position+aircraft.basis*Vector3(-2,4,-float(aircraft.get_meta("length",40))*.28)
-			goal=(base+door)*.5
-			extension=clampf(base.distance_to(door)/18.0,.3,4.0)
-			angle=atan2(-(door-base).z,(door-base).x)
-		record.node.position=record.node.position.lerp(goal,1-exp(-delta))
-		record.node.scale.x=lerpf(record.node.scale.x,extension,1-exp(-delta))
+			var door: Vector3=aircraft.position+aircraft.basis*aircraft.get_meta("front_door",Vector3(-2.2,4,-15))
+			var delta_door:=door-aircraft.basis.x*1.8-base
+			docking_heading=aircraft.rotation.y
+			reach=clampf(Vector2(delta_door.x,delta_door.z).length(),3,72)
+			angle=atan2(-delta_door.z,delta_door.x)
+			rise=delta_door.y
+		record.reach=lerpf(record.reach,reach,1-exp(-delta))
 		record.node.rotation.y=lerp_angle(record.node.rotation.y,angle,1-exp(-delta))
+		record.tunnel.scale.x=sqrt(record.reach*record.reach+rise*rise)/18.0
+		record.tunnel.rotation.z=atan2(rise,record.reach)
+		record.tunnel.position=Vector3(record.reach*.5,rise*.5,0)
+		record.cabin.position=Vector3(record.reach,rise,0)
+		record.cabin.rotation.y=docking_heading-record.node.rotation.y if not is_nan(docking_heading) else 0.0
 	var target := center
 	if camera_mode in ["Follow","Tower"] and models.has(selected_id) and models[selected_id].visible: target = models[selected_id].position
 	var desired: Vector3
@@ -713,3 +747,19 @@ func _terminal_anchor(at: Vector3) -> Vector3:
 				best=gap
 				nearest=Vector3(hit.x,0,hit.y)
 	return nearest if best<100 else at+Vector3(21,0,10)
+
+func _front_door(plane: Node3D, body: Node3D, type: String, length: float) -> Vector3:
+	var name := "doorLF" if type=="737" else "DoorL1_001" if type=="A321" else ""
+	if not name.is_empty():
+		var door := plane.find_child(name,true,false)
+		if door != null:
+			var nodes := door.find_children("*","MeshInstance3D",true,false)
+			if door is MeshInstance3D: nodes.append(door)
+			var found := false
+			var box := AABB()
+			for node: MeshInstance3D in nodes:
+				var bounds: AABB=(body.global_transform.affine_inverse()*node.global_transform)*node.get_aabb()
+				box=box.merge(bounds) if found else bounds
+				found=true
+			if found: return box.get_center()
+	return Vector3(-2.7 if type=="787" else -2.0,4.8 if type=="787" else 4.0,-length*.38)

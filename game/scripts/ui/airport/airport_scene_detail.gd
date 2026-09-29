@@ -11,14 +11,17 @@ var last_tick := -1
 var strobes: Array[Node3D]=[]
 var floodlights: Array[SpotLight3D]=[]
 var roof_units := 0
+var staff: Dictionary = {}
+var standby: Array[Node3D] = []
 
 func setup(owner_view: Airport3D) -> void:
 	view=owner_view
-	decorations.clear(); vehicles.clear(); puddle_materials.clear(); strobes.clear(); rain=null; floodlights.clear(); roof_units=0
+	decorations.clear(); vehicles.clear(); puddle_materials.clear(); strobes.clear(); rain=null; floodlights.clear(); roof_units=0; staff.clear(); standby.clear()
 	var sim:=view.sim
 	if not sim.airside.enabled(): return
 	_mapped_terminals()
 	_apron_lighting()
+	_standby_vehicles()
 	# Match terminal detail to the scenario footprint, retaining mapped Dulles buildings.
 	if sim.airside.config.has("terminal_zone"):
 		var z: Dictionary=sim.airside.config.terminal_zone
@@ -83,6 +86,15 @@ func _vehicle(color: Color,kind: String) -> Node3D:
 	view._box(root,Vector3(0,1,0),Vector3(2.2,1.4,4.3),color)
 	view._box(root,Vector3(0,2,-1),Vector3(2,1.2,1.5),Color("c5d3d5"))
 	view._box(root,Vector3(0,2,-1.78),Vector3(1.7,.6,.06),Color("24414e"))
+	if kind=="ambulance":
+		view._box(root,Vector3(0,2.3,1),Vector3(2.4,2.8,3),Color("e0e5df"))
+		for side in [-1,1]:
+			view._box(root,Vector3(side*1.23,2.5,1),Vector3(.03,.35,1.4),Color("d95046"))
+			view._box(root,Vector3(side*1.24,2.5,1),Vector3(.03,1.3,.35),Color("d95046"))
+	if kind in ["police","ambulance"]:
+		view._box(root,Vector3(-.5,2.9,-1),Vector3(.7,.25,.4),Color("427ecf"))
+		view._box(root,Vector3(.5,2.9,-1),Vector3(.7,.25,.4),Color("d55a51"))
+		view._label(kind.to_upper(),Vector3(0,4,0),root)
 	if "fuel" in kind: view._box(root,Vector3(0,2.3,1),Vector3(1.8,1.3,2.5),Color("c5c9c1"))
 	if "cater" in kind: view._box(root,Vector3(0,3,1),Vector3(2.4,3,3),Color("e5e2d6"))
 	if "baggage" in kind:
@@ -106,6 +118,7 @@ func update(delta: float) -> void:
 		rain.emitting=TowerOperations.weather(sim).wet and view.quality<2
 	for node in decorations: node.visible=view.quality<2 and view.camera.position.distance_to(node.position)<5000
 	var active: Dictionary={}
+	var active_staff: Dictionary={}
 	for f: AirportFlight in sim.flight_order:
 		if not view.models.has(f.id): continue
 		var plane: Node3D=view.models[f.id]
@@ -126,8 +139,32 @@ func update(delta: float) -> void:
 			var progress:=clampf(float(sim.clock.tick-task.start_tick)/duration,0,1)
 			var travel:=clampf(progress/.12,0,1)*(1-clampf((progress-.88)/.12,0,1))
 			var offset:=Vector3(10+posmod(id.hash(),3)*4,0,5+(1-travel)*35)
-			if task.kind=="pushback": offset=Vector3(0,0,-15)
-			vehicle.position=plane.position+plane.basis*offset; vehicle.position.y=0; vehicle.rotation.y=plane.rotation.y
+			if task.kind=="pushback": offset=Vector3(0,0,-float(plane.get_meta("length",40))*.3-5)
+			var desired:=plane.position+plane.basis*offset
+			desired.y=0
+			_place_ground(vehicle,desired,10.5 if "baggage" in task.type else 4.0)
+			vehicle.rotation.y=plane.rotation.y
+		if f.status=="taxiing_out" and f.taxi_leg==0 and plane.position.y<1:
+			var id: String="tow:"+f.id
+			active[id]=true
+			if not vehicles.has(id):
+				vehicles[id]=_vehicle(Color("d8a348"),"pushback")
+				view._box(vehicles[id],Vector3(0,.7,4),Vector3(.15,.15,5),Color("a9b3a7"))
+			var tug: Node3D=vehicles[id]
+			var desired:=plane.position+plane.basis*Vector3(0,0,-float(plane.get_meta("length",40))*.3-5)
+			desired.y=0
+			_place_ground(tug,desired,4)
+			tug.rotation.y=plane.rotation.y
+		if f.status in AirportSimulation.AT_GATE_STATES:
+			active_staff[f.id]=true
+			if not staff.has(f.id): staff[f.id]=_worker()
+			var worker: Node3D=staff[f.id]
+			var desired:=plane.position+plane.basis*Vector3(7,0,-float(plane.get_meta("length",40))*.25)
+			desired.y=0
+			_place_ground(worker,desired,1)
+			worker.rotation.y=plane.rotation.y+PI
+			worker.get_node("LeftArm").rotation.z=.6+sin(tick*2)*.25
+			worker.get_node("RightArm").rotation.z=-.6-sin(tick*2)*.25
 		var beacon:=plane.get_node_or_null("Beacon")
 		if beacon!=null: beacon.visible=fmod(tick,1.2)<.15 and not f.status in AirportSimulation.AT_GATE_STATES
 		var previous: Vector3=plane.get_meta("last_ground_position",plane.position)
@@ -145,6 +182,9 @@ func update(delta: float) -> void:
 			if moving and not f.status in AirportSimulation.AT_GATE_STATES: fan.rotate_object_local(fan.get_meta("axis",Vector3.BACK),delta*25)
 	for id in vehicles.keys():
 		if not active.has(id): vehicles[id].queue_free(); vehicles.erase(id)
+
+	for id in staff.keys():
+		if not active_staff.has(id): staff[id].queue_free(); staff.erase(id)
 
 func rig(body: Node3D,length: float) -> void:
 	body.set_meta("detailed_model",body.get_child(0))
@@ -246,3 +286,38 @@ func _apron_lighting() -> void:
 		light.light_color=Color("fff0d3"); light.light_energy=2.5
 		light.shadow_enabled=false; light.visible=view.night
 		floodlights.append(light)
+
+func _place_ground(node: Node3D, desired: Vector3, radius: float) -> void:
+	if not node.has_meta("ground_placed"):
+		var placement:=view.clearance.safe_position(desired,radius)
+		node.visible=placement.ok
+		if not placement.ok: return
+		node.position=placement.position
+		node.set_meta("ground_placed",true)
+	else: node.position=view.clearance.sweep(node.position,desired,radius)
+
+func _worker() -> Node3D:
+	var root:=Node3D.new(); view.world.add_child(root)
+	view._box(root,Vector3(0,1.15,0),Vector3(.5,.65,.28),Color("cedb39"))
+	view._box(root,Vector3(0,1.1,-.15),Vector3(.5,.08,.03),Color("e6ece5"))
+	for side in [-1,1]:
+		view._box(root,Vector3(side*.14,.4,0),Vector3(.19,.8,.22),Color("293a46"))
+		var arm:=view._box(root,Vector3(side*.35,1.25,0),Vector3(.16,.6,.18),Color("cedb39"))
+		arm.name="LeftArm" if side<0 else "RightArm"
+	view._box(root,Vector3(0,1.65,0),Vector3(.27,.3,.27),Color("c49d80"))
+	view._box(root,Vector3(0,1.83,0),Vector3(.34,.12,.34),Color("f4db62"))
+	return root
+
+func _standby_vehicles() -> void:
+	var index:=0
+	for gate in view.bridges:
+		if index>=2: break
+		var stand:=view._point(view.sim.airside.config.stands[gate])
+		var anchor: Vector3=view.bridges[gate].base
+		var away:=Vector3(stand.x-anchor.x,0,stand.z-anchor.z).normalized()
+		var side:=Vector3(-away.z,0,away.x)
+		var vehicle:=_vehicle(Color("e5e7df") if index==0 else Color("2d4a68"),"ambulance" if index==0 else "police")
+		_place_ground(vehicle,stand+side*38+away*18,5)
+		vehicle.rotation.y=atan2(-side.x,-side.z)
+		standby.append(vehicle)
+		index+=1
