@@ -1483,3 +1483,25 @@ fades outside the local patch and stops above 25 km above the ground. Low
 quality animates at up to 10 fps, other modes at up to 20 fps. Reduced motion
 keeps the surface still. Unsupported graphics or unavailable tiles retain the
 base map; no paid service is called.
+
+## Watched arrival completion
+
+Opening Flight view arms arrival animation for that aircraft only. A descending
+aircraft near an eligible mapped runway (normally within 6–8 nautical miles)
+can transition into a continuous approach, gear deployment, touchdown, rollout,
+taxi and parking. If the displayed aircraft has already overshot, it turns to
+intercept final rather than jumping backward. Late observations cannot rewind
+an acquired animation. **Return to live tracking**, closing Flight view, or
+selecting another aircraft releases control. Source observations remain intact.
+
+The arrival status and cockpit identify this as animation. Runway and stand
+choices are unconfirmed. Mapped connected taxi routes are preferred; missing
+coverage uses a clearly labeled illustrative exit, pavement and parking stand,
+not an operational clearance or verified airport layout. Airports without usable
+runway geometry cannot acquire this mode. Unverified two-stop route hints may
+identify the destination, but still require nearby descending approach evidence.
+
+Regression coverage includes a captured KAL2129 Narita approach, delayed and
+contradictory fixes, base-leg interception, prior overshoot, visible sourced-model
+gear, gradual altitude correction and fallback parking. Browser replay:
+`python3 tests/browser/watched-arrival.py` (after building; requires Playwright).

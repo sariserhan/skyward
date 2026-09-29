@@ -22,7 +22,7 @@ test('landing trajectory is continuous across touchdown and rollout completion',
 });
 test('unrelated airports, wrong headings, climbs, high overflights and incomplete data never trigger a landing',()=>{
  for(const patch of [{heading:270},{verticalRate:1200},{altitude:30000},{ground:true},{heading:null},{groundSpeed:null},{groundSpeed:400},{positionWarning:'Suspect fix'},{targetKind:'vehicle'},{callsign:'OTHER'},{lon:.05}])assert.equal(predictedLanding({...a,...patch},160000,route,airport),null,JSON.stringify(patch));
- assert.equal(predictedLanding(a,160000,{...route,status:'UNVERIFIED'},airport),null);
+ assert.equal(predictedLanding(a,160000,{...route,status:'UNVERIFIED'},airport).landingPhase,'approach');
  assert.equal(predictedLanding(a,160000,route,{...airport,elevationFt:undefined}),null);
  assert.equal(predictedLanding(a,160000,route,{...airport,id:'OTHER'}),null);
  assert.equal(predictedLanding(a,110000,route,airport).landingPhase,'approach');

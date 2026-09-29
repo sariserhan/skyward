@@ -55,7 +55,7 @@ def run(page):
     page.evaluate('Date.now=window.__movingClock')
     page.screenshot(path=str(f.ARTIFACTS / ('multistop-landing-gear.jpg' if multi else 'landing-gear.jpg')), type='jpeg', quality=75)
     flight = page.get_by_role('region', name='Passenger flight view')
-    assert 'Predicted landing' in flight.inner_text()
+    assert 'Arrival animation' in flight.inner_text()
     uri = page.evaluate("__viewer.entities.getById('aircraft-abcdef').model.uri.getValue(__viewer.clock.currentTime)")
     assert '/models/sourced/' in uri, uri
     for shift in [10000, 30000, 90000, 180000]:
@@ -67,7 +67,7 @@ def run(page):
           return {lon:C.Math.toDegrees(p.longitude),lat:C.Math.toDegrees(p.latitude),height:p.height};})()""")
         assert pose['lat'] < 38.9707, pose
         assert (1 < pose['height'] < 2 if multi else 2 < pose['height'] < 4.5), pose
-    assert 'taxiing toward' in flight.inner_text(), flight.inner_text()
+    assert any(phase in page.locator('.flight-motion-status').inner_text() for phase in ['taxi', 'parked']), flight.inner_text()
     assert not errors, errors
     assert not page.locator('.recovery-screen,.cesium-widget-errorPanel').count()
     page.set_viewport_size({'width': 390, 'height': 844})

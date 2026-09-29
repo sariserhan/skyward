@@ -22,5 +22,5 @@ test('gear family layouts vary and renderer budgets shrink under frame pressure'
 test('returning ground observations settle vertically instead of snapping from an approach',()=>{
  const motion=new LiveMotion(),a={hex:'abcdef',targetKind:'aircraft',lat:0,lon:0,altitude:500,heading:90,groundSpeed:140,verticalRate:-500,ground:false,observedAt:100000};motion.sample(a,[],100000);
  const ground={...a,ground:true,altitude:0,groundSpeed:40,observedAt:101000};const start=motion.sample(ground,[],101000,false,null,{elevationFt:300,runways:[]});assert.ok(start.groundClearance>=190&&start.groundClearance<=200);
- assert.equal(motion.sample(ground,[],110000,false,null,{elevationFt:300,runways:[]}).groundClearance,0);
+ let previous=start.groundClearance;for(let now=101100;now<=117000;now+=100){const next=motion.sample(ground,[],now,false,null,{elevationFt:300,runways:[]}).groundClearance;assert.ok(next<=previous&&previous-next<=2.1);previous=next;}assert.equal(previous,0);
 });

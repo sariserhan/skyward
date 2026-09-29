@@ -1,3 +1,4 @@
+import {arrivalParking} from './arrivalParking.ts';
 import {landingRouteMode} from './landingRoute.ts';
 import {planTaxi,taxiFrame} from './taxiRoute.ts';
 import type {Aircraft,AirportGeometry,FlightRoute} from '../types.ts';
@@ -9,7 +10,7 @@ type Point={x:number;y:number};
 const approachArcs=new WeakMap<AirportGeometry,Map<string,number[]>>();
 export type LandingPhase='approach'|'rollout'|'stopped'|'taxi'|'parked';
 /** A presentation trajectory only. Never persist this as an aircraft observation. */
-export function predictedLanding(a:Aircraft,now:number,route:FlightRoute|null|undefined,airport:AirportGeometry|null|undefined){
+export function predictedLanding(a:Aircraft,now:number,route:FlightRoute|null|undefined,airport:AirportGeometry|null|undefined,completeArrival=false){
  if(!airport||!Number.isFinite(airport.elevationFt)||a.ground||a.positionWarning||a.targetKind!=='aircraft')return null;
  const mode=landingRouteMode(a.callsign,route,airport);if(!mode)return null;
  const inferred=mode==='inferred';
@@ -67,7 +68,7 @@ export function predictedLanding(a:Aircraft,now:number,route:FlightRoute|null|un
   const h=elapsed;const height=Math.max(0,(2*h*h*h-3*h*h+1)*agl+(h*h*h-2*h*h+h)*slope);
   return {...base,...geo(p),altitude:airport.elevationFt!+height,ground:false,heading:(Math.atan2(dx,dy)/radians+360)%360,pitch:2+2*elapsed*elapsed*(3-2*elapsed),groundSpeed:a.groundSpeed!+(touchdownSpeed-a.groundSpeed!)*elapsed,landingPhase:'approach' as LandingPhase};
  }
- const proposedTaxi=planTaxi(airport,geo(start),geo(end));
+ const proposedTaxi=planTaxi(airport,geo(start),geo(end))??(completeArrival?arrivalParking(airport,geo(start),geo(end)):null);
  const touchAlong=((touch.x-start.x)*(end.x-start.x)+(touch.y-start.y)*(end.y-start.y))/length;
  const taxiStop=proposedTaxi?local(proposedTaxi.stop.lon,proposedTaxi.stop.lat):null;
  // Never reverse along the runway to reach an exit behind a late touchdown.

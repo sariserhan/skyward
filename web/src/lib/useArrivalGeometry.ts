@@ -9,7 +9,7 @@ const cache=new Map<string,AirportGeometry>();
 export function useArrivalGeometry(a:Aircraft|null,route:FlightRoute|null){
  const identity=a?`${a.hex}/${a.callsign}`:'';
  const [state,setState]=useState<{id:string;identity:string;geometry:AirportGeometry}|null>(null);
- const end=route?.status==='PLAUSIBLE'&&route.callsign===a?.callsign&&route.airports.length===2?route.airports[1]:null;
+ const end=route&&['PLAUSIBLE','UNVERIFIED'].includes(route.status)&&route.callsign===a?.callsign&&route.airports.length===2?route.airports[1]:null;
  let id=end&&a?.lat!=null&&a.lon!=null&&trackDistance({lat:a.lat,lon:a.lon},end)<30?Object.entries(AIRPORTS).find(([id,row])=>id===end.iata||row.icao===end.icao)?.[0]:undefined;
  // Missing routes and listed intermediate stops use only the closest eligible airport for
  // a low, descending aircraft; predictedLanding still requires runway alignment.
