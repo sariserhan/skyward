@@ -94,7 +94,10 @@ func _vehicle(color: Color,kind: String) -> Node3D:
 	if kind in ["police","ambulance"]:
 		view._box(root,Vector3(-.5,2.9,-1),Vector3(.7,.25,.4),Color("427ecf"))
 		view._box(root,Vector3(.5,2.9,-1),Vector3(.7,.25,.4),Color("d55a51"))
-		view._label(kind.to_upper(),Vector3(0,4,0),root)
+		var label:=view._label(kind.to_upper(),Vector3(0,4,0),root)
+		label.pixel_size=.03
+		label.font_size=20
+		label.visibility_range_end=250
 	if "fuel" in kind: view._box(root,Vector3(0,2.3,1),Vector3(1.8,1.3,2.5),Color("c5c9c1"))
 	if "cater" in kind: view._box(root,Vector3(0,3,1),Vector3(2.4,3,3),Color("e5e2d6"))
 	if "baggage" in kind:

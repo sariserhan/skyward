@@ -161,6 +161,24 @@ Current validation and limitations: [docs/status.md](docs/status.md).
 
 Full product spec: [spec.md](spec.md). Design decisions: [docs/DECISIONS.md](docs/DECISIONS.md).
 
+## Real-airport controller scenarios
+
+Select **Istanbul (IST)**, **London Heathrow (LHR)**, **Amsterdam Schiphol (AMS)**,
+or **Dulles** in `/airport-simulation/`, then choose **Start scenario**. The game
+menu also offers these airports. Each new airport has 12 active mapped stands
+and 14 fictional flights. IST has six active runways, LHR two, and AMS four;
+Schiphol's other saved runways are excluded from operations until their access
+connections can be validated. All three reuse the globe's saved terminal,
+apron and taxiway geometry. Facility coverage is partial.
+
+`python3 tools/make_mapped_airports.py` rebuilds the three added scenarios offline.
+The importer retains the connected taxi network, selects parking-path endpoints,
+and rejects building-conflicting segments using 34 m clearance. Runway access
+links are approximate, bounded to 450 m and checked for building clearance.
+This is game routing, not certified airport operating data. The passenger-flow
+view is a schematic. Source counts and import decisions are recorded in
+[the import report](docs/mapped-airports-import.json).
+
 ## Dulles airport prototype
 
 Dulles is the first scenario choice in `/airport-simulation/`. Choose **Start scenario**,

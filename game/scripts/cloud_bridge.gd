@@ -60,6 +60,7 @@ func _process(delta: float) -> void:
 		"scenario":
 			var scenarios := {
 				"starter": AirportLaunch.STARTER, "dulles": AirportLaunch.DULLES,
+				"istanbul": "res://configs/airports/ist.json", "heathrow": "res://configs/airports/lhr.json", "schiphol": "res://configs/airports/ams.json",
 				"sandbox": AirportLaunch.SANDBOX,
 				"taxiway": "res://configs/airports/riverdale_single_taxiway.json",
 				"baggage": "res://configs/airports/riverdale_baggage_crunch.json",

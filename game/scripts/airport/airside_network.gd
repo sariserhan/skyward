@@ -96,10 +96,11 @@ func _find(from: String, to: String, aircraft_class: String) -> Array:
 	if not nodes.has(from) or not nodes.has(to): return []
 	var distance := {from: 0}
 	var previous := {}
-	var pending: Array = [from]
+	var pending: Array = [[0,from]]
 	while not pending.is_empty():
-		pending.sort_custom(func(a, b): return distance[a] < distance[b] or (distance[a] == distance[b] and a < b))
-		var current: String = pending.pop_front()
+		var entry: Array = _heap_pop(pending)
+		var current: String = entry[1]
+		if int(entry[0]) != int(distance[current]): continue
 		if current == to:
 			var legs: Array = []
 			var node := to
@@ -118,7 +119,7 @@ func _find(from: String, to: String, aircraft_class: String) -> Array:
 			if candidate < int(distance.get(next, 1 << 60)):
 				distance[next] = candidate
 				previous[next] = [link[0], link[1], current]
-				if not next in pending: pending.append(next)
+				_heap_push(pending,[candidate,next])
 	return []
 
 
@@ -280,3 +281,29 @@ static func valid_definition(airside: Dictionary) -> bool:
 		if not r is Dictionary or runway_ids.has(r.get("id", "")) or not airside.nodes.has(r.get("a", "")) or not airside.nodes.has(r.get("b", "")): return false
 		runway_ids[r.id] = true
 	return true
+
+## Stable min-heap keeps Dijkstra's original cost/node-id tie order without
+## repeatedly sorting the entire frontier at major international airports.
+static func _heap_before(a: Array, b: Array) -> bool:
+	return int(a[0])<int(b[0]) or (int(a[0])==int(b[0]) and str(a[1])<str(b[1]))
+static func _heap_push(heap: Array, value: Array) -> void:
+	heap.append(value)
+	var index:=heap.size()-1
+	while index>0:
+		var parent: int=(index-1)/2
+		if not _heap_before(heap[index],heap[parent]): break
+		var swap: Array=heap[parent]; heap[parent]=heap[index]; heap[index]=swap
+		index=parent
+static func _heap_pop(heap: Array) -> Array:
+	var result: Array=heap[0]
+	var last: Array=heap.pop_back()
+	if heap.is_empty(): return result
+	heap[0]=last
+	var index:=0
+	while index*2+1<heap.size():
+		var child:=index*2+1
+		if child+1<heap.size() and _heap_before(heap[child+1],heap[child]): child+=1
+		if not _heap_before(heap[child],heap[index]): break
+		var swap: Array=heap[index]; heap[index]=heap[child]; heap[child]=swap
+		index=child
+	return result

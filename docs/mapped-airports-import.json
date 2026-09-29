@@ -1,0 +1,203 @@
+[
+  {
+    "airport": "IST",
+    "source": "web/public/data/airports/IST.json",
+    "source_timestamp": "2026-09-27T02:40:00.136602+00:00",
+    "active_runways": 6,
+    "source_runways": 6,
+    "active_gates": [
+      "A10",
+      "A11",
+      "A2",
+      "A3",
+      "A5",
+      "A6",
+      "A7",
+      "A8",
+      "B10A",
+      "B10B",
+      "B12A",
+      "B12B"
+    ],
+    "source_gates": 87,
+    "building_clearance_rejected_segments": 127,
+    "surfaces": 512,
+    "edges": 3493,
+    "approximate_runway_links": [
+      {
+        "runway": "09/27",
+        "endpoint": "A",
+        "length_m": 74.4
+      },
+      {
+        "runway": "09/27",
+        "endpoint": "B",
+        "length_m": 240.3
+      },
+      {
+        "runway": "16L/34R",
+        "endpoint": "A",
+        "length_m": 8.7
+      },
+      {
+        "runway": "16L/34R",
+        "endpoint": "B",
+        "length_m": 8.4
+      },
+      {
+        "runway": "16R/34L",
+        "endpoint": "A",
+        "length_m": 28.3
+      },
+      {
+        "runway": "16R/34L",
+        "endpoint": "B",
+        "length_m": 12.1
+      },
+      {
+        "runway": "17L/35R",
+        "endpoint": "A",
+        "length_m": 12.6
+      },
+      {
+        "runway": "17L/35R",
+        "endpoint": "B",
+        "length_m": 12.7
+      },
+      {
+        "runway": "17R/35L",
+        "endpoint": "A",
+        "length_m": 12.4
+      },
+      {
+        "runway": "17R/35L",
+        "endpoint": "B",
+        "length_m": 13.5
+      },
+      {
+        "runway": "18/36",
+        "endpoint": "A",
+        "length_m": 13.6
+      },
+      {
+        "runway": "18/36",
+        "endpoint": "B",
+        "length_m": 15.5
+      }
+    ]
+  },
+  {
+    "airport": "LHR",
+    "source": "web/public/data/airports/LHR.json",
+    "source_timestamp": "2026-09-27T02:40:00.136602+00:00",
+    "active_runways": 2,
+    "source_runways": 2,
+    "active_gates": [
+      "11",
+      "223",
+      "408",
+      "409",
+      "412",
+      "422",
+      "423",
+      "424",
+      "425",
+      "A1",
+      "B32",
+      "B33"
+    ],
+    "source_gates": 147,
+    "building_clearance_rejected_segments": 168,
+    "surfaces": 246,
+    "edges": 1157,
+    "approximate_runway_links": [
+      {
+        "runway": "09L/27R",
+        "endpoint": "A",
+        "length_m": 1.6
+      },
+      {
+        "runway": "09L/27R",
+        "endpoint": "B",
+        "length_m": 56.4
+      },
+      {
+        "runway": "09R/27L",
+        "endpoint": "A",
+        "length_m": 0.7
+      },
+      {
+        "runway": "09R/27L",
+        "endpoint": "B",
+        "length_m": 24.1
+      }
+    ]
+  },
+  {
+    "airport": "AMS",
+    "source": "web/public/data/airports/AMS.json",
+    "source_timestamp": "2026-09-27T02:40:00.136602+00:00",
+    "active_runways": 4,
+    "source_runways": 6,
+    "active_gates": [
+      "B1",
+      "B13",
+      "B16",
+      "B23",
+      "B24",
+      "C10",
+      "C11",
+      "C12",
+      "D10",
+      "D12",
+      "D2",
+      "D48"
+    ],
+    "source_gates": 140,
+    "building_clearance_rejected_segments": 93,
+    "surfaces": 279,
+    "edges": 1208,
+    "approximate_runway_links": [
+      {
+        "runway": "04/22",
+        "endpoint": "A",
+        "length_m": 125.2
+      },
+      {
+        "runway": "04/22",
+        "endpoint": "B",
+        "length_m": 21.3
+      },
+      {
+        "runway": "09/27",
+        "endpoint": "A",
+        "length_m": 37.2
+      },
+      {
+        "runway": "09/27",
+        "endpoint": "B",
+        "length_m": 34.1
+      },
+      {
+        "runway": "18C/36C",
+        "endpoint": "A",
+        "length_m": 50.3
+      },
+      {
+        "runway": "18C/36C",
+        "endpoint": "B",
+        "length_m": 23.7
+      },
+      {
+        "runway": "18L/36R",
+        "endpoint": "A",
+        "length_m": 14.7
+      },
+      {
+        "runway": "18L/36R",
+        "endpoint": "B",
+        "length_m": 344.5
+      }
+    ]
+  }
+]

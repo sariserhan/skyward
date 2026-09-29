@@ -75,6 +75,15 @@ func _build() -> void:
 	var home: VBoxContainer = pages.home
 	continue_button = _button(home, "CONTINUE", _continue)
 	_button(home, "WASHINGTON DULLES · REAL AIRPORT", func(): _show("dulles"))
+	var real_airport_row := HBoxContainer.new()
+	home.add_child(real_airport_row)
+	var real_airport_choice := OptionButton.new()
+	real_airport_choice.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	for airport_name in ["Istanbul · IST", "London Heathrow · LHR", "Amsterdam Schiphol · AMS"]: real_airport_choice.add_item(airport_name)
+	real_airport_row.add_child(real_airport_choice)
+	_button(real_airport_row,"PLAY AIRPORT",func():
+		var code: String=["ist","lhr","ams"][real_airport_choice.selected]
+		AirportLaunch.open(get_tree(),AirportLaunch.start_new("res://configs/airports/"+code+".json",42,{"mode":"sandbox","name":real_airport_choice.get_item_text(real_airport_choice.selected)})))
 	_button(home, "NEW CAREER", func(): _show("new"))
 	_button(home, "SANDBOX · RIVERDALE INTERNATIONAL", func():
 		AirportLaunch.open(get_tree(), AirportLaunch.start_new(AirportLaunch.SANDBOX, -1, {"mode": "sandbox", "name": "Riverdale International"})))

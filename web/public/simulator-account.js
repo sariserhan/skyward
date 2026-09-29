@@ -11,7 +11,7 @@
   const data=await response.json();if(!response.ok)throw Error(data.error||'Cloud save unavailable.');return data;
  }
  function command(action,value){return new Promise((resolve,reject)=>{
-  const id=crypto.randomUUID(),timer=setTimeout(()=>{pending=null;reject(Error('Simulator did not respond. Wait for it to finish loading.'));},15000);
+  const id=crypto.randomUUID(),timer=setTimeout(()=>{pending=null;reject(Error('Simulator did not respond. Wait for it to finish loading.'));},action==='scenario'?90000:15000);
   pending={id,resolve:v=>{clearTimeout(timer);pending=null;resolve(v);},reject:e=>{clearTimeout(timer);pending=null;reject(e);}};
   document.querySelector('iframe').contentWindow.postMessage({type:'skyward-game-command',id,action,value},location.origin);
  });}
@@ -28,5 +28,5 @@
  byId('cloud-export').onclick=()=>void run(async()=>{const value=await command('snapshot'),url=URL.createObjectURL(new Blob([JSON.stringify(value)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='skyward-career.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);status.textContent='Full backup exported to this device.';});
  byId('cloud-save').onclick=()=>void run(async()=>{const snapshot=await command('snapshot'),c=snapshot.career;if(!c)throw Error('Start a career before saving progress.');const value={kind:'career-progress',version:1,career_id:c.career_id,airport_name:c.airport_name,day:c.day,cash_cents:c.cash_cents,phase:c.phase,mode:c.mode,difficulty:c.difficulty};const key=current?.key||crypto.randomUUID();const saved=await api({kind:'simulator',key,revision:current?.revision??0,value});current={key,revision:saved.revision};await refresh();status.textContent='Progress summary saved to your account. Export a backup to resume the full game elsewhere.';});
  byId('cloud-load').onclick=()=>{if(confirm('Replace the current game with this cloud save? Unsaved progress will be lost.'))void run(()=>load(slots.value));};
- byId('cloud-start').onclick=()=>{if(confirm('Start this scenario? Export a full backup first to preserve the current game.'))void run(async()=>{await command('scenario',byId('cloud-scenario').value);current=null;slots.value='';status.textContent='Scenario started. Save a progress summary to your account or export a full backup.';});};
+ byId('cloud-start').onclick=()=>{if(confirm('Start this scenario? Export a full backup first to preserve the current game.'))void run(async()=>{status.textContent='Opening '+byId('cloud-scenario').selectedOptions[0].textContent+'…';await command('scenario',byId('cloud-scenario').value);current=null;slots.value='';status.textContent='Scenario started. Save a progress summary to your account or export a full backup.';});};
 })();
