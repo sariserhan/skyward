@@ -278,21 +278,27 @@ export function Globe(p: Props) {
     const v=viewer.current;if(!v||!ready)return;const C=window.Cesium;let last='';
     const publish=()=>{
       if(v.isDestroyed()||document.hidden)return;
-      // Do not queue shifting regions during the arrival spin or a manual pan.
-      // A following camera still refreshes its changing footprint periodically.
-      if(cameraMoving.current&&!callbacks.current.following)return;
+      // Suppress global arrival-spin requests, but keep local traffic updating
+      // even during a long pan or when Cesium misses a moveEnd event.
+      if(cameraMoving.current&&!callbacks.current.following&&v.camera.positionCartographic.height>800000)return;
       const canvas=v.canvas,points:{lat:number;lon:number}[]=[];let center:{lat:number;lon:number}|null=null;
       for(const [x,y] of [[.5,.5],[.04,.04],[.96,.04],[.96,.96],[.04,.96],[.5,.04],[.96,.5],[.5,.96],[.04,.5]]){
         const p=v.camera.pickEllipsoid(new C.Cartesian2(canvas.clientWidth*x,canvas.clientHeight*y),v.scene.globe.ellipsoid);if(!p)continue;
         const c=C.Cartographic.fromCartesian(p),pt={lat:C.Math.toDegrees(c.latitude),lon:C.Math.toDegrees(c.longitude)};points.push(pt);if(x===.5&&y===.5)center=pt;
       }
       if(!center&&points.length)center=points[0];
-      const tower=callbacks.current.camera.type==='tower'?callbacks.current.geometry?.airports[0]:null;
-      const a=tower?cameraArea({lat:tower.lat,lon:tower.lon},[]):center?cameraArea(center,points,points.length<9||v.camera.positionCartographic.height>800000):null;
+      // A low camera looking along/above the horizon may have no Earth picks.
+      // Use its actual position, never the selected airport's geometry.
+      const position=v.camera.positionCartographic;
+      if((!center&&position.height<800000)||callbacks.current.camera.type==='tower')center={lat:C.Math.toDegrees(position.latitude),lon:C.Math.toDegrees(position.longitude)};
+      const a=center?cameraArea(center,points,points.length<9||position.height>800000):null;
       const key=areaKey(a)+String(a?.limited);if(key!==last){last=key;callbacks.current.onTrafficArea(a);}
     };
-    let settled:ReturnType<typeof setTimeout>;const remove=v.camera.moveEnd.addEventListener(()=>{clearTimeout(settled);settled=setTimeout(publish,400);});const timer=setInterval(publish,5000),start=setTimeout(publish,750);
-    return()=>{remove();clearTimeout(settled);clearInterval(timer);clearTimeout(start);};
+    let settled:ReturnType<typeof setTimeout>;
+    const schedule=()=>{clearTimeout(settled);settled=setTimeout(publish,450);};
+    const remove=v.camera.moveEnd.addEventListener(schedule),changed=v.camera.changed.addEventListener(schedule);
+    const timer=setInterval(publish,3000),start=setTimeout(publish,750);
+    return()=>{remove();changed();clearTimeout(settled);clearInterval(timer);clearTimeout(start);};
   },[ready,p.mode,p.camera.type]);
   useEffect(() => {
     const v=viewer.current; if(!ready || !v) return;
