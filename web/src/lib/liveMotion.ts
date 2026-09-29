@@ -1,3 +1,4 @@
+import {syntheticFrame} from './syntheticTraffic.ts';
 import {WatchedArrival} from './watchedArrival.ts';
 import {predictedLanding,type LandingPhase} from './landingPrediction.ts';
 import type {Aircraft,TrailPoint,FlightRoute,AirportGeometry} from '../types.ts';
@@ -5,7 +6,7 @@ import {bearing} from './flightPresentation.ts';
 import {contiguous,trackDistance} from './positionQuality.ts';
 const wrap=(n:number)=>((n+540)%360+360)%360-180;
 const finite=(n:unknown):n is number=>typeof n==='number'&&Number.isFinite(n);
-export interface LiveFrame {arrivalAnimation?:boolean;arrivalElevationFt?:number;arrivalRejoin?:boolean;lon:number;lat:number;altitude:number;heading:number;time:number;ground:boolean;groundClearance?:number;estimated:boolean;age:number;turnRate?:number;verticalRate?:number;correcting?:boolean;predictionLimited?:boolean;landingPhase?:LandingPhase;runway?:string;groundSpeed?:number;pitch?:number;gate?:string;}
+export interface LiveFrame { simulated?:boolean;simulationElevationFt?:number;gear?:number;arrivalAnimation?:boolean;arrivalElevationFt?:number;arrivalRejoin?:boolean;lon:number;lat:number;altitude:number;heading:number;time:number;ground:boolean;groundClearance?:number;estimated:boolean;age:number;turnRate?:number;verticalRate?:number;correcting?:boolean;predictionLimited?:boolean;landingPhase?:LandingPhase;runway?:string;groundSpeed?:number;pitch?:number;gate?:string;}
 function destination(lat:number,lon:number,heading:number,nm:number){
  const r=Math.PI/180,p=lat*r,l=lon*r,h=heading*r,d=nm/3440.065;
  const y=Math.asin(Math.max(-1,Math.min(1,Math.sin(p)*Math.cos(d)+Math.cos(p)*Math.sin(d)*Math.cos(h))));
@@ -13,6 +14,7 @@ function destination(lat:number,lon:number,heading:number,nm:number){
 }
 /** Display-only dead reckoning. Never write the result to observation/history stores. */
 export function liveFrame(a:Aircraft,points:TrailPoint[],now:number,reduced=false,route?:FlightRoute|null,arrivalGeometry?:AirportGeometry|null):LiveFrame|null{
+ if(a.simulation)return syntheticFrame(a,now);
  if(!finite(now)||!finite(a.lat)||!finite(a.lon)||Math.abs(a.lat)>90||Math.abs(a.lon)>180||!finite(a.observedAt)||a.observedAt>now+5000)return null;
  const age=Math.max(0,now-a.observedAt),frame:LiveFrame={lat:a.lat,lon:a.lon,altitude:finite(a.altitude)?a.altitude:0,heading:finite(a.heading)?a.heading:0,time:a.observedAt,ground:a.ground,estimated:false,age};
  if(reduced||(a.targetKind&&a.targetKind!=='aircraft'))return frame;
@@ -67,6 +69,7 @@ export function liveFrame(a:Aircraft,points:TrailPoint[],now:number,reduced=fals
  return {...frame,...position,altitude,heading:bearing(position,next),estimated:age>0,predictionLimited:age>0&&age/1000>=limit,turnRate:turnRate*(1-trendSeconds/30),verticalRate:vertical*(1-trendSeconds/30)};
 }
 export function liveMotionStatus(a:Aircraft,points:TrailPoint[],now:number,reduced=false,route?:FlightRoute|null,arrivalGeometry?:AirportGeometry|null,displayed?:LiveFrame|null){
+ if(a.simulation)return 'Skyward · Simulated flight · '+(a.simulation.phase);
  if(displayed?.arrivalAnimation)return displayed.arrivalRejoin?'Arrival animation · turning to intercept final approach':`Arrival animation · ${displayed.landingPhase} · runway ${displayed.runway??'selected'}${displayed.gate?' · '+displayed.gate:''} · runway and stand unconfirmed`;
  if(reduced)return 'Reduced motion · showing received positions';
  if(a.ground)return now-(a.observedAt??0)>8000?'On ground · awaiting position update':'Ground tracking · short motion estimate';
@@ -89,6 +92,7 @@ export class LiveMotion {
 
  private frames=new Map<string,{signature:string;frame:LiveFrame;start:number;duration:number;verticalDuration:number;dx:number;dy:number;dz:number;dh:number}>();
  sample(a:Aircraft,points:TrailPoint[],now:number,reduced=false,route?:FlightRoute|null,arrivalGeometry?:AirportGeometry|null){
+  if(a.simulation)return syntheticFrame(a,now);
   const controlled=!reduced?this.watchedArrival.sample(a,now,route,arrivalGeometry,this.frames.get(a.hex)?.frame):null;
   if(controlled){this.frames.set(a.hex,{signature:'controlled',frame:controlled,start:now,duration:2000,verticalDuration:2000,dx:0,dy:0,dz:0,dh:0});return controlled;}
   let target=liveFrame(a,points,now,reduced,route,arrivalGeometry);if(!target)return null;

@@ -1,8 +1,9 @@
 import type {Aircraft,TrailPoint} from '../types.ts';
 import {liveFrame} from './liveMotion.ts';
 export const STALE_AFTER_MS=120000;
-export function staleAircraft(a:Aircraft,now:number){return a.observedAt===null||!Number.isFinite(a.observedAt)||now-a.observedAt>STALE_AFTER_MS||a.observedAt>now+5000;}
+export function staleAircraft(a:Aircraft,now:number){return !a.simulation&&(a.observedAt===null||!Number.isFinite(a.observedAt)||now-a.observedAt>STALE_AFTER_MS||a.observedAt>now+5000);}
 export function aircraftFreshness(a:Aircraft,points:TrailPoint[],now:number,reduced=false){
+ if(a.simulation)return {state:'simulated',label:'Skyward · Simulated flight',color:'#55e3b6'};
  const frame=liveFrame(a,points,now,reduced);
  if(frame?.estimated)return {state:'estimated',label:`Estimated movement${staleAircraft(a,now)?' · stale fix; uncertainty increasing':''}${a.positionWarning?' · suspect update excluded':''}`,color:staleAircraft(a,now)?'#e5b97b':'#bba9ef'};
  if(a.positionWarning)return {state:'suspect',label:'Position quality · '+a.positionWarning,color:'#e5b97b'};

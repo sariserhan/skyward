@@ -11,10 +11,11 @@ export function JourneyDetails({aircraft:a,route,trail,now,reducedMotion=false}:
   const destination=route?.status==='PLAUSIBLE'&&route.callsign===a.callsign?route.airports.at(-1):null;
   const eta=roughArrival(a,route,now);
   const key=`${a.callsign.trim().toUpperCase()}:${a.hex.toLowerCase()}:${date}`;
-  async function act(check=false){if(busy)return;setBusy(true);setMessage('');try{
+  async function act(check=false){if(a.simulation)return;if(busy)return;setBusy(true);setMessage('');try{
     if(check){const result=await accountRequest<Detail>('/api/premium/details',{key});setDetails(result);}
     else {await accountRequest('/api/journeys',{callsign:a.callsign,hex:a.hex,date,alerts:true,...(route?.status==='PLAUSIBLE'&&route.callsign===a.callsign&&route.airports.length===2?{from:route.airports[0].iata,to:route.airports[1].iata}:{})});setSaved(true);setMessage('Journey saved. Alerts are recorded after verified detail checks.');}
   }catch(e){setMessage(e instanceof Error?e.message:'Unable to complete this request.');}finally{setBusy(false);}}
+  if(a.simulation)return <section className="journey-details simulation-note" aria-label="Flight at a glance"><strong>Skyward · Simulated flight</strong><p>{a.simulation.from} → {a.simulation.to} · {a.simulation.phase}</p><p>Fictional aircraft, itinerary and airport movements. No real passenger or airline record exists for this flight.</p></section>;
   return <section className="journey-details" aria-label="Flight at a glance">
     <div className="journey-key-facts"><div><small>Destination</small><strong>{destination?.iata||destination?.icao||'Unconfirmed'}</strong></div><div><small>Rough arrival</small><strong>{eta?time(eta.time):'Unavailable'}</strong></div><div><small>Altitude</small><strong>{a.ground?'On ground':a.altitude===null?'Unknown':`${Math.round(a.altitude).toLocaleString()} ft`}</strong></div><div><small>Speed</small><strong>{a.groundSpeed===null?'Unknown':`${Math.round(a.groundSpeed)} kt`}</strong></div></div>
     <p className="journey-motion">{aircraftFreshness(a,trail,now,reducedMotion).label} · {eta?'Arrival uses distance and current speed; not an airline ETA.':'Arrival estimate needs a recent position and plausible route.'}</p>

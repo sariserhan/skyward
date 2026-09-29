@@ -34,7 +34,7 @@ export function useObservatory(airport: AirportId, alertsEnabled = false) {
   const searchController = useRef<AbortController | null>(null);
   const refreshRef = useRef<() => void>(() => {});
   const ingest = useCallback((rows: Aircraft[]) => {
-    rows=qualityRows(rows,accepted.current);
+    rows=qualityRows(rows.filter(a=>!a.simulation&&!a.hex.startsWith('skyward-')),accepted.current);
     retainMotion(motionHistories.current,rows,selectedRef.current?.hex);
     for (const a of rows) {
       const old=recent.current.get(a.hex);

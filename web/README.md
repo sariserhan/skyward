@@ -1653,45 +1653,35 @@ metrics authentication and cockpit browser checks. See
 [production deployment](../deployment/README.md) for the container, systemd/HTTPS
 examples, monitoring and current single-process feed capacity limit.
 
-### Empty coverage and optional Skyward traffic
+### Automatic Skyward traffic in sparse airport views
 
-When the camera area has no received aircraft, coverage distinguishes loading,
-failed requests and successful empty results. The panel suggests nearby recent
-observations and airports when this session has them. “Try Skyward simulated
-traffic” starts a separate, opt-in scene at the nearest catalog airport. It never
-turns on automatically or feeds synthetic rows into tracking, alerts, account
-watchlists or observation recordings.
+In airport-scale views (camera radius at most 100 nm), fewer than ten recent
+observed aircraft automatically triggers a fictional Skyward population up to
+20 total aircraft. Ten or more observations removes the supplemental population.
+Green airplane icons and Skyward callsigns distinguish fictional flights; the
+coverage banner explains the difference. No demo button or separate scene is
+required. Selecting a Skyward aircraft opens the same flight view, route, cabin,
+cockpit and camera controls as observed aircraft.
 
-Six fictional Skyward flights use random aircraft profiles and airport pairs.
-Airport activity demonstrates a local arrival/turnaround/departure circuit. A
-conservative scheduler reserves the whole movement area for one flight at a time;
-other aircraft fly separated holding lanes. Stands are assigned separately.
-“Watch next arrival” follows the next reserved flight; “Skip wait” explicitly
-advances the fictional clock. This is illustrative activity, not real ATC or a
-certified separation model. It intentionally prioritizes separation over density.
+The population includes approaches, departures, airborne journeys, taxiing and
+parked aircraft. Routes use randomly distributed, range-constrained airport
+pairs and compatible mapped runways, with illustrative taxi/stand fallback
+geometry where needed. If no suitable destination geometry is available, the
+itinerary is a local airport circuit. Selected flights continue through the journey and a return leg. Unselected
+flights that leave the local region are replenished. This is visual simulation,
+not actual airport operations or a certified aircraft-separation model.
 
-“Fly complete journey” switches the selected aircraft to a full origin-to-
-destination trip: boarding, pushback, taxi, runway departure, climb, cruise,
-descent, landing and parking. The other local demo aircraft are hidden in this
-mode. Destinations are constrained by illustrative aircraft range; incompatible
-runways show an explanation rather than forcing a landing. Progress, fleet seed,
-speed and camera save on this device (bounded, validated `skyward.demo.v2.*`
-records). Reopen the optional demo at the same airport to resume. Time pauses
-while the demo is closed or the page is hidden; no server runs a background fleet.
+Boeing 737, Boeing 787 and Airbus A320 profiles use the existing licensed detailed
+meshes with Skyward paint and tail logos. `node scripts/brand-skyward-sourced.mjs`
+regenerates these derivatives; their original model licenses and attribution in
+`public/models/sourced` continue to apply. Smaller-airport compatible profiles use
+our existing Skyward models. No real airline identity is attached to these flights.
 
-Six profiles have different approach/rotation/cruise speeds, runway requirements,
-taxi turn rounding, turnaround durations and gear motion. Mapped taxi connections
-are used where available, but rounded paths and stand assignments are illustrative;
-missing paths use disclosed fallback geometry. Ground activity includes animated
-baggage vehicles, boarding stairs and a pushback tug. Models are our original
-illustrative profiles with rigged gear and Skyward tail/fuselage branding, not
-manufacturer CAD or a real airline livery. Regenerate branding with
-`scripts/brand-demo-fleet.py` using Python Playwright/Chromium.
-
-Side, cockpit, cabin, tower and free cameras share the current synthetic pose.
-The demo cockpit shows instruments but does not offer manual flight control;
-use the separate flight simulator for that. Switching to observed flights,
-replay, airport tools or another airport removes the demo source and camera.
+Synthetic identifiers are separate from ICAO addresses and have no observation
+timestamps. They never enter observation recordings, account watchlists, received
+position histories or paid aviation lookups. Replay and airport demonstrations
+suspend automatic population. Aircraft controls retain the same practice-only
+behavior as the normal watched-flight cockpit.
 
 Real observed tracking remains free where feeds provide positions. Premium
 currently supplies protected, on-demand flight details through the existing paid
@@ -1715,8 +1705,7 @@ its own validated integration and usage budget before advertising that capabilit
   simulator state and can highlight the corresponding control. Sound follows the
   existing simulator audio setting; the coach does not take control of the plane.
 - `npm run test:release` runs unit/security checks, a production build, public
-  route/account checks, globe/customer flows, optional demo isolation, complete
-  journey persistence, cameras, reviewed report exports, desktop/mobile mode
+  route/account checks, globe/customer flows, automatic population thresholds and shared cameras, reviewed report exports, desktop/mobile mode
   transitions, guided-flight/preset/watchlist controls, watched landing and accelerated soak tests. Set `SKYWARD_QA_PYTHON` if needed. The report
   defaults to the system temp directory (`skyward-release-check.json`). No deploy
   occurs. The soak covers an accelerated six-hour timestamp span, not six hours
