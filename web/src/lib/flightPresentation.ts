@@ -1,3 +1,4 @@
+import typeDetails from './aircraftTypeDetails.json' with {type:'json'};
 import {contiguous} from './positionQuality.ts';
 import fullLiveries from './fullLiveries.json' with {type:'json'};
 import {sourcedModel} from './sourcedModels.ts';
@@ -5,6 +6,7 @@ export {sourcedModel} from './sourcedModels.ts';
 import type {Aircraft, TrailPoint, Runway} from '../types';
 export function fleetProfile(type:string){
  const t=type.trim().toUpperCase();
+ const detail=typeDetails[t as keyof typeof typeDetails];if(detail)return detail.profile;
  const variants:Record<string,string>={B772:'b772',B77L:'b772',B788:'b788',B78X:'b78x',A35K:'a35k',E190:'e190',E195:'e190',E290:'e190',E295:'e190',CRJ7:'crj',CRJ9:'crj',CRJX:'crj',PC12:'pc12'};if(variants[t])return variants[t];
  if(/^A319/.test(t))return 'a319';if(/^BCS/.test(t))return 'a220';
  if(/^B38M|^B39M|^B37M/.test(t))return 'b737max';if(/^B75/.test(t))return 'b757';if(/^B76/.test(t))return 'b767';

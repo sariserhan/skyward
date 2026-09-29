@@ -21,3 +21,8 @@ test('ASV706 known A321 resolves unspecified category without turning ground equ
  assert.equal(targetKind('C2','A321'),'vehicle');assert.equal(targetKind('C3','A321'),'fixed');assert.equal(targetKind('A0','ZZZZ'),'unknown');
  assert.equal(qualityRows([{...row,targetKind:'vehicle'}],new Map(),1000)[0].targetKind,'vehicle');
 });
+
+test('recognized private jets and propeller types are aircraft even without a dedicated model',()=>{
+ for(const type of ['C25B','GLF6','GLEX','CL35','LJ45','FA7X','PC24','BE20','B350','DHC6','C172','B407','C421']){assert.equal(targetKind('A0',type),'aircraft',type);assert.equal(targetKind('C1',type),'vehicle');}
+ assert.equal(targetKind('A0','ZZZZ'),'unknown');
+});

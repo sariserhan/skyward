@@ -1,0 +1,278 @@
+{
+  "A342": {
+    "name": "Airbus A340-200",
+    "profile": "generic"
+  },
+  "A345": {
+    "name": "Airbus A340-500",
+    "profile": "generic"
+  },
+  "B190": {
+    "name": "Beechcraft 1900",
+    "profile": "turboprop"
+  },
+  "B350": {
+    "name": "Beechcraft King Air 350",
+    "profile": "turboprop"
+  },
+  "B407": {
+    "name": "Bell 407",
+    "profile": "generic"
+  },
+  "B731": {
+    "name": "Boeing 737-100",
+    "profile": "b737"
+  },
+  "B732": {
+    "name": "Boeing 737-200",
+    "profile": "b737"
+  },
+  "B733": {
+    "name": "Boeing 737-300",
+    "profile": "b737"
+  },
+  "B734": {
+    "name": "Boeing 737-400",
+    "profile": "b737"
+  },
+  "B735": {
+    "name": "Boeing 737-500",
+    "profile": "b737"
+  },
+  "B741": {
+    "name": "Boeing 747-100",
+    "profile": "b747"
+  },
+  "B742": {
+    "name": "Boeing 747-200",
+    "profile": "b747"
+  },
+  "B743": {
+    "name": "Boeing 747-300",
+    "profile": "b747"
+  },
+  "B74S": {
+    "name": "Boeing 747SP",
+    "profile": "b747"
+  },
+  "BE20": {
+    "name": "Beechcraft King Air 200",
+    "profile": "turboprop"
+  },
+  "BE30": {
+    "name": "Beechcraft King Air 300",
+    "profile": "turboprop"
+  },
+  "C150": {
+    "name": "Cessna 150",
+    "profile": "light"
+  },
+  "C152": {
+    "name": "Cessna 152",
+    "profile": "light"
+  },
+  "C172": {
+    "name": "Cessna 172 Skyhawk",
+    "profile": "light"
+  },
+  "C177": {
+    "name": "Cessna 177 Cardinal",
+    "profile": "light"
+  },
+  "C180": {
+    "name": "Cessna 180 Skywagon",
+    "profile": "light"
+  },
+  "C185": {
+    "name": "Cessna 185 Skywagon",
+    "profile": "light"
+  },
+  "C206": {
+    "name": "Cessna 206 Stationair",
+    "profile": "light"
+  },
+  "C210": {
+    "name": "Cessna 210 Centurion",
+    "profile": "light"
+  },
+  "C25A": {
+    "name": "Cessna Citation CJ2",
+    "profile": "bizjet"
+  },
+  "C25B": {
+    "name": "Cessna Citation CJ3",
+    "profile": "bizjet"
+  },
+  "C25C": {
+    "name": "Cessna Citation CJ4",
+    "profile": "bizjet"
+  },
+  "C25M": {
+    "name": "Cessna Citation M2",
+    "profile": "bizjet"
+  },
+  "C310": {
+    "name": "Cessna 310",
+    "profile": "light"
+  },
+  "C340": {
+    "name": "Cessna 340",
+    "profile": "light"
+  },
+  "C402": {
+    "name": "Cessna 402",
+    "profile": "light"
+  },
+  "C414": {
+    "name": "Cessna 414 Chancellor",
+    "profile": "light"
+  },
+  "C421": {
+    "name": "Cessna 421 Golden Eagle",
+    "profile": "light"
+  },
+  "C500": {
+    "name": "Cessna Citation I",
+    "profile": "bizjet"
+  },
+  "C501": {
+    "name": "Cessna Citation I/SP",
+    "profile": "bizjet"
+  },
+  "C510": {
+    "name": "Cessna Citation Mustang",
+    "profile": "bizjet"
+  },
+  "C525": {
+    "name": "Cessna CitationJet",
+    "profile": "bizjet"
+  },
+  "C551": {
+    "name": "Cessna Citation II/SP",
+    "profile": "bizjet"
+  },
+  "C680": {
+    "name": "Cessna Citation Sovereign",
+    "profile": "bizjet"
+  },
+  "C68A": {
+    "name": "Cessna Citation Latitude",
+    "profile": "bizjet"
+  },
+  "C700": {
+    "name": "Cessna Citation Longitude",
+    "profile": "bizjet"
+  },
+  "CL30": {
+    "name": "Bombardier Challenger 300",
+    "profile": "bizjet"
+  },
+  "CL35": {
+    "name": "Bombardier Challenger 350",
+    "profile": "bizjet"
+  },
+  "CL60": {
+    "name": "Bombardier Challenger 600 family",
+    "profile": "bizjet"
+  },
+  "DHC6": {
+    "name": "De Havilland DHC-6 Twin Otter",
+    "profile": "turboprop"
+  },
+  "E50P": {
+    "name": "Embraer Phenom 100",
+    "profile": "bizjet"
+  },
+  "E550": {
+    "name": "Embraer Legacy 500",
+    "profile": "bizjet"
+  },
+  "E55P": {
+    "name": "Embraer Phenom 300",
+    "profile": "bizjet"
+  },
+  "F2TH": {
+    "name": "Dassault Falcon 2000",
+    "profile": "bizjet"
+  },
+  "F900": {
+    "name": "Dassault Falcon 900",
+    "profile": "bizjet"
+  },
+  "FA7X": {
+    "name": "Dassault Falcon 7X",
+    "profile": "bizjet"
+  },
+  "FA8X": {
+    "name": "Dassault Falcon 8X",
+    "profile": "bizjet"
+  },
+  "GL5T": {
+    "name": "Bombardier Global 5000",
+    "profile": "bizjet"
+  },
+  "GL7T": {
+    "name": "Bombardier Global 7500",
+    "profile": "bizjet"
+  },
+  "GLEX": {
+    "name": "Bombardier Global Express",
+    "profile": "bizjet"
+  },
+  "GLF4": {
+    "name": "Gulfstream IV",
+    "profile": "bizjet"
+  },
+  "GLF5": {
+    "name": "Gulfstream V",
+    "profile": "bizjet"
+  },
+  "GLF6": {
+    "name": "Gulfstream G650",
+    "profile": "bizjet"
+  },
+  "LJ31": {
+    "name": "Learjet 31",
+    "profile": "bizjet"
+  },
+  "LJ35": {
+    "name": "Learjet 35",
+    "profile": "bizjet"
+  },
+  "LJ45": {
+    "name": "Learjet 45",
+    "profile": "bizjet"
+  },
+  "LJ60": {
+    "name": "Learjet 60",
+    "profile": "bizjet"
+  },
+  "PC24": {
+    "name": "Pilatus PC-24",
+    "profile": "bizjet"
+  },
+  "RJ1H": {
+    "name": "Avro RJ100",
+    "profile": "regional"
+  },
+  "RJ70": {
+    "name": "Avro RJ70",
+    "profile": "regional"
+  },
+  "RJ85": {
+    "name": "Avro RJ85",
+    "profile": "regional"
+  },
+  "SF34": {
+    "name": "Saab 340",
+    "profile": "turboprop"
+  },
+  "SF50": {
+    "name": "Cirrus Vision Jet",
+    "profile": "bizjet"
+  },
+  "SW4": {
+    "name": "Swearingen Metro",
+    "profile": "turboprop"
+  }
+}

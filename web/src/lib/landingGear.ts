@@ -9,7 +9,7 @@ const compressionByBody=new WeakMap<Cesium.Entity,number>();
 export const gearCompression=(body:Cesium.Entity|undefined)=>body?compressionByBody.get(body)??0:0;
 type Gear={main:number[];nose:number[];strut:number;radius:number};
 // Fixed gear, skids, gliders and taildraggers keep their authored configuration.
-const authoredGear=new Set(['ask21','pa28','pa32','c182','c208','dr40','ec35','gazl','p40','pa18','pa22','sr22','dhc4']);
+const authoredGear=new Set(['ask21','pa28','pa32','c182','c208','dr40','ec35','gazl','b407','p40','pa18','pa22','sr22','dhc4']);
 export function sourcedGearAnchors(type:string){const source=sourcedModel(type);return source&&!authoredGear.has(source.id)?(anchors as Record<string,Gear>)[source.id]:undefined;}
 export function sourcedGearClearance(type:string,fallback=5){
  const gear=sourcedGearAnchors(type);

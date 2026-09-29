@@ -1522,3 +1522,29 @@ Cabin ambience follows the displayed flight state: airborne airflow fades into
 speed-dependent rolling noise on touchdown, softens while taxiing, and leaves
 quiet ventilation and a low hum when parked. Audio parameters transition smoothly
 without restarting the sound, and the On/Off preference remains unchanged.
+
+
+### Expanded aircraft catalog
+
+The catalog contains 64 authored 3D models. Bell 407 and Cessna 421 Golden Eagle
+are the latest additions, imported from the pinned
+[FlightAirMap model collection](https://github.com/Ysurac/FlightAirMap-3dmodels).
+Their editable source files, original credits and GPL-2.0 license documents are
+included under `public/models/sourced/source/flightairmap/`; the manifest records
+source URLs and hashes.
+
+116 aircraft type codes resolve to exact or explicitly labeled family models.
+166 type codes are recognized overall, including more Citations, Gulfstreams,
+Challengers, Learjets, Falcons, Phenoms, King Airs and light propeller aircraft.
+Recognition does not imply a dedicated 3D model: the other 50 types use a named,
+class-appropriate fallback. Variant names remain separate from the geometry
+used for a family match. Rotor/propeller animation is not added by this import.
+
+To reproduce these imports and their gear/light anchors from the repository root:
+
+```sh
+node web/scripts/import-flightairmap-models.mjs
+node web/scripts/prepare-aircraft-lights.mjs
+npm --prefix web run build
+npm --prefix web test
+```

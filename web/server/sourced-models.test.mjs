@@ -2,10 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync,existsSync} from 'node:fs';
 import {sourcedCatalog,sourcedModel} from '../src/lib/sourcedModels.ts';
-import {fleetUri,fallbackFleetUri} from '../src/lib/flightPresentation.ts';
+import {fleetUri,fallbackFleetUri,fleetProfile} from '../src/lib/flightPresentation.ts';
 const base=new URL('../public/',import.meta.url);
 test('sourced aircraft have explicit type mappings, family aliases and honest unsupported-type fallbacks',()=>{
- assert.equal(sourcedCatalog.length,62);
+ assert.equal(sourcedCatalog.length,64);
  for(const [type,id] of [['A320','a320'],['B738','b738'],['B788','b788'],['CRJ9','crj900'],['BCS3','cs300']]){assert.equal(sourcedModel(type).id,id);assert.equal(sourcedModel(type).match,'type');assert.ok(fleetUri({aircraftType:type,callsign:'THY1'}).startsWith('models/sourced/'));}
  assert.equal(sourcedModel('B77W').match,'family');assert.equal(sourcedModel('B77W').id,'b773');
  assert.equal(sourcedModel('B38M').id,'b39m');assert.equal(sourcedModel('B38M').match,'family');assert.equal(sourcedModel('ZZZZ'),null);assert.equal(fleetUri({aircraftType:'B38M',callsign:'RYR1'}),'models/sourced/branded/b39m-RYR-v1.gltf?tail=2');
@@ -39,4 +39,20 @@ test('new collection bakes node transforms so Cesium bounds enclose the whole ai
   assert.ok(Math.abs(max-min-m.length)<.02,`${m.id}: entire fuselage must contribute to bounds`);
   assert.ok(Math.abs(min+max)<.01,`${m.id}: horizontal origin must remain centered`);
  }
+});
+
+test('new helicopter and twin-prop assets resolve exactly; older variants remain family matches',()=>{
+ for(const type of ['B407','C421']){assert.equal(sourcedModel(type).match,'type');assert.ok(existsSync(new URL(sourcedModel(type).uri,base)));}
+ for(const type of ['B733','B742','RJ85','A342','C551'])assert.equal(sourcedModel(type).match,'family');
+});
+
+test('expanded variants retain their actual names and appropriate fallback classes',async()=>{
+ const {aircraftNames}=await import('../src/lib/aircraft.ts');
+ assert.equal(aircraftNames.B733,'Boeing 737-300');
+ assert.equal(aircraftNames.B74S,'Boeing 747SP');
+ assert.equal(fleetProfile('B733'),'b737');
+ assert.equal(fleetProfile('GLF6'),'bizjet');
+ assert.equal(fleetProfile('DHC6'),'turboprop');
+ assert.equal(fleetProfile('C172'),'light');
+ assert.equal(sourcedModel('GLF6'),null);
 });

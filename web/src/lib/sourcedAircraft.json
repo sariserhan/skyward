@@ -384,6 +384,26 @@
     "sourceRepository": "https://github.com/FGMEMBERS/Falcon-50"
   },
   {
+    "id": "b407",
+    "label": "Bell 407",
+    "types": [
+      "B407"
+    ],
+    "uri": "models/sourced/b407-v1.gltf",
+    "length": 13.05,
+    "sourceRepository": "https://github.com/Ysurac/FlightAirMap-3dmodels"
+  },
+  {
+    "id": "c421",
+    "label": "Cessna 421 Golden Eagle",
+    "types": [
+      "C421"
+    ],
+    "uri": "models/sourced/c421-v1.gltf",
+    "length": 11.02,
+    "sourceRepository": "https://github.com/Ysurac/FlightAirMap-3dmodels"
+  },
+  {
     "id": "atr72",
     "label": "ATR 72-500",
     "types": [

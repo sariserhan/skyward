@@ -1,3 +1,4 @@
+import typeDetails from './aircraftTypeDetails.json' with {type:'json'};
 import {sourcedModel} from './sourcedModels.ts';
 // readsb emitter categories: A1–A7 aircraft; B1/B2/B6/B7 airborne classes;
 // C1/C2 surface vehicles; C3–C5 obstructions. Known model types resolve unspecified categories.
@@ -9,6 +10,6 @@ export function targetKind(category:unknown, type:unknown) {
  if(/^A[1-7]$/.test(c)||/^B[1267]$/.test(c))return 'aircraft';
  if(t==='TWR')return 'fixed';
  if(t==='GRND')return 'vehicle';
- if(sourcedModel(t))return 'aircraft';
+ if(sourcedModel(t)||Object.hasOwn(typeDetails,t))return 'aircraft';
  return 'unknown';
 }

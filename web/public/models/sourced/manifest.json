@@ -682,6 +682,38 @@
       ]
     },
     {
+      "id": "b407",
+      "label": "Bell 407",
+      "types": [
+        "B407"
+      ],
+      "uri": "models/sourced/b407-v1.gltf",
+      "length": 13.05,
+      "rotation": 0,
+      "license": "GPL-2.0",
+      "sourceUrl": "https://github.com/Ysurac/FlightAirMap-3dmodels/blob/0906d9ba1bdd906ce45807e45ed706c09912db19/b407/glTF2/B407.glb",
+      "editableSources": [
+        "models/sourced/source/flightairmap/b407/b407.blend"
+      ],
+      "sourceRepository": "https://github.com/Ysurac/FlightAirMap-3dmodels"
+    },
+    {
+      "id": "c421",
+      "label": "Cessna 421 Golden Eagle",
+      "types": [
+        "C421"
+      ],
+      "uri": "models/sourced/c421-v1.gltf",
+      "length": 11.02,
+      "rotation": 0,
+      "license": "GPL-2.0",
+      "sourceUrl": "https://github.com/Ysurac/FlightAirMap-3dmodels/blob/0906d9ba1bdd906ce45807e45ed706c09912db19/c421/glTF2/C421.glb",
+      "editableSources": [
+        "models/sourced/source/flightairmap/c421/c421.blend"
+      ],
+      "sourceRepository": "https://github.com/Ysurac/FlightAirMap-3dmodels"
+    },
+    {
       "id": "atr72",
       "label": "ATR 72-500",
       "types": [
@@ -1881,6 +1913,54 @@
       "bytes": 491
     },
     {
+      "path": "source/flightairmap/b407/upstream-COPYING",
+      "sourceUrl": "https://raw.githubusercontent.com/FGMEMBERS/bell407/934e469483db7b1bc5eb1339070003a1b0ffd429/COPYING",
+      "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643",
+      "bytes": 18092
+    },
+    {
+      "path": "source/flightairmap/b407/upstream-README.md",
+      "sourceUrl": "https://raw.githubusercontent.com/FGMEMBERS/bell407/934e469483db7b1bc5eb1339070003a1b0ffd429/README.md",
+      "sha256": "b5e38b20a8093d647809f40c26e82aa6da3837d9fc83d4d5eeb7c2f501ac0565",
+      "bytes": 426
+    },
+    {
+      "path": "source/flightairmap/c421/upstream-COPYING",
+      "sourceUrl": "https://raw.githubusercontent.com/FGMEMBERS/Cessna-421-Golden-Eagle/7ed263927c6536e34910c48defdea6e7026e0452/COPYING",
+      "sha256": "dcc100d4161cc0b7177545ab6e47216f84857cda3843847c792a25289852dcaa",
+      "bytes": 18007
+    },
+    {
+      "path": "source/flightairmap/c421/upstream-README.txt",
+      "sourceUrl": "https://raw.githubusercontent.com/FGMEMBERS/Cessna-421-Golden-Eagle/7ed263927c6536e34910c48defdea6e7026e0452/README.txt",
+      "sha256": "2ac087317b104b4ea1a9a48e2f92aeed33b3114e1dae6a8dd8e04d14883f1eab",
+      "bytes": 1306
+    },
+    {
+      "path": "source/flightairmap/b407/B407.glb",
+      "sourceUrl": "https://raw.githubusercontent.com/Ysurac/FlightAirMap-3dmodels/0906d9ba1bdd906ce45807e45ed706c09912db19/b407/glTF2/B407.glb",
+      "sha256": "ab0aa17c9edbeda7b9a20a0acd23e6918b2a9aa38f0d592b42db13aab9acc585",
+      "bytes": 3050816
+    },
+    {
+      "path": "source/flightairmap/b407/b407.blend",
+      "sourceUrl": "https://raw.githubusercontent.com/Ysurac/FlightAirMap-3dmodels/0906d9ba1bdd906ce45807e45ed706c09912db19/b407/b407.blend",
+      "sha256": "1706cb004dc841eb4ad080227ac47cee51d8de9e3b742f3012f127b269fe2405",
+      "bytes": 1908661
+    },
+    {
+      "path": "source/flightairmap/c421/C421.glb",
+      "sourceUrl": "https://raw.githubusercontent.com/Ysurac/FlightAirMap-3dmodels/0906d9ba1bdd906ce45807e45ed706c09912db19/c421/glTF2/C421.glb",
+      "sha256": "511839e11d7d03bf67e43a0434f30f16dd0b86f85baeb429197229e08db58a45",
+      "bytes": 1605364
+    },
+    {
+      "path": "source/flightairmap/c421/c421.blend",
+      "sourceUrl": "https://raw.githubusercontent.com/Ysurac/FlightAirMap-3dmodels/0906d9ba1bdd906ce45807e45ed706c09912db19/c421/c421.blend",
+      "sha256": "387e16a413aa230b8b7394ad728d283b2e5de04e5d43d7bb79df082f0286c488",
+      "bytes": 2472276
+    },
+    {
       "path": "source/flightairmap/atr72/AT75.glb",
       "sourceUrl": "https://raw.githubusercontent.com/Ysurac/FlightAirMap-3dmodels/0906d9ba1bdd906ce45807e45ed706c09912db19/atr72/glTF2/AT75.glb",
       "sha256": "52ec4c85143390e11b00a6c690c4b93189c646800e04d1fd2e3ac1f14f4e347a",
@@ -2019,10 +2099,10 @@
       "bytes": 18332
     },
     {
-      "path": "source/flightairmap/e190/e170.blend",
-      "sourceUrl": "https://raw.githubusercontent.com/Ysurac/FlightAirMap-3dmodels/0906d9ba1bdd906ce45807e45ed706c09912db19/e190/e170.blend",
-      "sha256": "11dfb8d6025498e6e5f6191203dd99336c26437c0ceec3c7e398a180e40a3fae",
-      "bytes": 2287456
+      "path": "source/flightairmap/e190/e190.blend",
+      "sourceUrl": "https://raw.githubusercontent.com/Ysurac/FlightAirMap-3dmodels/0906d9ba1bdd906ce45807e45ed706c09912db19/e190/e190.blend",
+      "sha256": "dfa21dfa104dfdf19be2bb6b283afa37b128f07e96250a1290b6a36711427cf9",
+      "bytes": 2311816
     },
     {
       "path": "source/flightairmap/e190/e175e2.blend",
@@ -2031,10 +2111,10 @@
       "bytes": 2860108
     },
     {
-      "path": "source/flightairmap/e190/e190.blend",
-      "sourceUrl": "https://raw.githubusercontent.com/Ysurac/FlightAirMap-3dmodels/0906d9ba1bdd906ce45807e45ed706c09912db19/e190/e190.blend",
-      "sha256": "dfa21dfa104dfdf19be2bb6b283afa37b128f07e96250a1290b6a36711427cf9",
-      "bytes": 2311816
+      "path": "source/flightairmap/e190/e170.blend",
+      "sourceUrl": "https://raw.githubusercontent.com/Ysurac/FlightAirMap-3dmodels/0906d9ba1bdd906ce45807e45ed706c09912db19/e190/e170.blend",
+      "sha256": "11dfb8d6025498e6e5f6191203dd99336c26437c0ceec3c7e398a180e40a3fae",
+      "bytes": 2287456
     },
     {
       "path": "source/flightairmap/e190/e175.blend",
@@ -2259,16 +2339,16 @@
       "bytes": 165961
     },
     {
-      "path": "source/flightairmap/b707/LICENCE.txt",
-      "sourceUrl": "https://raw.githubusercontent.com/Ysurac/FlightAirMap-3dmodels/0906d9ba1bdd906ce45807e45ed706c09912db19/b707/LICENCE.txt",
-      "sha256": "46d1316cfd45dd703ecfaf5be8f998c29fc94185719d76b7fd439389cdcbd34f",
-      "bytes": 55340
-    },
-    {
       "path": "source/flightairmap/b707/misc.png.001.png",
       "sourceUrl": "https://raw.githubusercontent.com/Ysurac/FlightAirMap-3dmodels/0906d9ba1bdd906ce45807e45ed706c09912db19/b707/misc.png.001.png",
       "sha256": "1c9c429bb6f15f4564e5b40c91ab201244bae8e83a619e5d48fe07bcf4402023",
       "bytes": 288196
+    },
+    {
+      "path": "source/flightairmap/b707/LICENCE.txt",
+      "sourceUrl": "https://raw.githubusercontent.com/Ysurac/FlightAirMap-3dmodels/0906d9ba1bdd906ce45807e45ed706c09912db19/b707/LICENCE.txt",
+      "sha256": "46d1316cfd45dd703ecfaf5be8f998c29fc94185719d76b7fd439389cdcbd34f",
+      "bytes": 55340
     },
     {
       "path": "source/flightairmap/b707/707.blend",

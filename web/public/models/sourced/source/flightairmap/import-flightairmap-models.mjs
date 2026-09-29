@@ -15,6 +15,8 @@ const repo='https://github.com/Ysurac/FlightAirMap-3dmodels';
 const raw=`https://raw.githubusercontent.com/Ysurac/FlightAirMap-3dmodels/${commit}/`;
 const out=path.join(root,'public/models/sourced');
 const definitions=[
+ ['b407','Bell 407',['B407'],'b407','B407'],
+ ['c421','Cessna 421 Golden Eagle',['C421'],'c421','C421'],
  ['atr72','ATR 72-500',['AT75'],'atr72','AT75','GPL-3.0'],
  ['c182','Cessna 182 Skylane',['C182'],'c182','C182'],
  ['c208','Cessna 208 Caravan',['C208'],'c208','C208'],
@@ -51,6 +53,19 @@ async function download(remote,local){
  files.push({path:local,sourceUrl:raw+remote,sha256:createHash('sha256').update(data).digest('hex'),bytes:data.length});return data;
 }
 await download('README.md','source/flightairmap/README.md');
+// The converted model folders omit licenses; retain their pinned FlightGear originals.
+for(const [dir,repository,revision,readme] of [
+ ['b407','bell407','934e469483db7b1bc5eb1339070003a1b0ffd429','README.md'],
+ ['c421','Cessna-421-Golden-Eagle','7ed263927c6536e34910c48defdea6e7026e0452','README.txt'],
+])for(const name of ['COPYING',readme]){
+ const sourceUrl=`https://raw.githubusercontent.com/FGMEMBERS/${repository}/${revision}/${name}`;
+ const response=await fetch(sourceUrl,{signal:AbortSignal.timeout(30000)});if(!response.ok)throw Error(`Missing upstream license/credits: ${sourceUrl}`);
+ const data=Buffer.from(await response.arrayBuffer()),local=`source/flightairmap/${dir}/upstream-${name}`;
+ if(name==='COPYING'&&!data.toString().includes('GNU GENERAL PUBLIC LICENSE'))throw Error('Unexpected model license');
+ await fs.mkdir(path.dirname(path.join(out,local)),{recursive:true});await fs.writeFile(path.join(out,local),data);
+ files.push({path:local,sourceUrl,sha256:createHash('sha256').update(data).digest('hex'),bytes:data.length});
+}
+
 const models=[];
 for(const [id,label,types,sourceDir,code,license='GPL-2.0'] of definitions){
  const data=await download(`${sourceDir}/glTF2/${code}.glb`,`source/flightairmap/${sourceDir}/${code}.glb`);
