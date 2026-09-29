@@ -3,10 +3,11 @@ import {useEffect,useRef,useState} from 'react';
 type Position={x:number;y:number;width:number};
 let savedPosition:Position|null=null;
 /** Keeps flight content mounted while moving or minimizing its panel. */
-export function FloatingPanelControls({title}:{title:string}){
+export function FloatingPanelControls({title,minimizeRequest=false}:{title:string;minimizeRequest?:boolean}){
  const bar=useRef<HTMLDivElement>(null),position=useRef<Position|null>(savedPosition);
  const drag=useRef<{id:number;x:number;y:number;left:number;top:number}|null>(null);
  const [minimized,setMinimized]=useState(false),[moved,setMoved]=useState(!!savedPosition);
+ useEffect(()=>{if(minimizeRequest)setMinimized(true);},[minimizeRequest]);
  const panel=()=>bar.current?.parentElement;
  const place=(next:Position)=>{
   const el=panel(),parent=el?.offsetParent;if(!el||!(parent instanceof HTMLElement))return;
