@@ -1,0 +1,57 @@
+import {AIRPORTS,FeedClient,cameraAreaPath,searchPath} from './feed.mjs';
+import {HubFeed} from './hub-feed.mjs';
+const distance=(a,b)=>{const r=Math.PI/180,s=Math.sin((b.lat-a.lat)*r/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin((b.lon-a.lon)*r/2)**2;return 6880.13*Math.asin(Math.min(1,Math.sqrt(s)));};
+const positioned=a=>Number.isFinite(a.lat)&&Number.isFinite(a.lon)&&Math.abs(a.lat)<=90&&Math.abs(a.lon)<=180&&Number.isFinite(a.observedAt);
+export function mergeFeeds(results,now=Date.now()){
+ const rows=new Map(),sources=[];
+ for(const {id,data} of results){
+  sources.push(id);
+  for(const row of data.aircraft){
+   if(!/^[a-f0-9]{6}$/i.test(row.hex)||row.observedAt!==null&&(!Number.isFinite(row.observedAt)||row.observedAt>now+5000||row.observedAt<now-300000))continue;
+   const a={...row,hex:row.hex.toLowerCase(),positionSource:id},old=rows.get(a.hex);
+   if(!old){rows.set(a.hex,a);continue;}
+   if(positioned(old)&&!positioned(a))continue;
+   if(!positioned(a)&&!positioned(old))continue;
+   if(positioned(old)&&a.observedAt<=old.observedAt)continue;
+   // Keep a coherent whole fix. Never average coordinates or combine velocity
+   // from a different observation. Suspect source changes retain the prior fix.
+   if(positioned(old)&&distance(old,a)>5+Math.abs(a.observedAt-old.observedAt)/3600000*1500){rows.set(a.hex,{...old,positionWarning:'Conflicting feed position excluded'});continue;}
+   rows.set(a.hex,{...a,registration:a.registration||old.registration,aircraftType:a.aircraftType||old.aircraftType});
+  }
+ }
+ return {source:sources.length>1?'Combined aircraft observations':results[0]?.data.source??'Aircraft observations',fetchedAt:Math.min(...results.map(r=>r.data.fetchedAt)),sourceAt:Math.max(...results.map(r=>r.data.sourceAt)),aircraft:[...rows.values()],sources};
+}
+export class CombinedFeed {
+ constructor(primary,secondary=[]){this.primary=primary;this.providers=[{id:'adsblol',name:'ADSB.lol',url:'https://www.adsb.lol/',license:'ODbL-1.0',client:primary},...secondary];this.health=new Map();}
+ get stats(){const stats={started:0,failed:0,cacheHits:0,totalMs:0,lastSuccessAt:null,lastPositionAt:null};for(const {client} of this.providers){for(const k of ['started','failed','cacheHits','totalMs'])stats[k]+=client.stats?.[k]??0;for(const k of ['lastSuccessAt','lastPositionAt'])if(client.stats?.[k])stats[k]=Math.max(stats[k]??0,client.stats[k]);}return stats;}
+ get pending(){return new Map(this.providers.flatMap(p=>[...(p.client.pending??[])].map(([key,value])=>[p.id+key,value])));}
+ get sources(){return this.providers.map(({client,...p})=>({...p,...this.health.get(p.id)}));}
+ route(...args){return this.primary.route(...args);}
+ area(id){if(!Object.hasOwn(AIRPORTS,id))throw Error('Unknown airport');return this.cameraArea(AIRPORTS[id].lat,AIRPORTS[id].lon,100);}
+ async combine(method,args){
+  const results=await Promise.allSettled(this.providers.map(async p=>{try{const data=await p.client[method](...args);this.health.set(p.id,{available:true,lastSuccessAt:data.fetchedAt});return {id:p.id,data};}catch(e){this.health.set(p.id,{available:false,lastSuccessAt:this.health.get(p.id)?.lastSuccessAt??null});throw e;}}));
+  const good=results.flatMap(r=>r.status==='fulfilled'?[r.value]:[]);
+  if(!good.length)throw results.find(r=>r.status==='rejected').reason;
+  return {...mergeFeeds(good),partial:good.length<this.providers.length,failedSources:results.flatMap((r,i)=>r.status==='rejected'?[this.providers[i].id]:[])};
+ }
+ cameraArea(lat,lon,radius){cameraAreaPath(lat,lon,radius);return this.combine('cameraArea',[lat,lon,radius]);}
+ search(kind,query){searchPath(kind,query);return this.combine('search',[kind,query]);}
+ close(){for(const p of this.providers)p.client.close?.();}
+}
+export function configuredFeed({env=process.env,fetchImpl=fetch,connect}={}){
+ const extra=[];
+ if(env.SKYWARD_ADSBFI_ENABLED==='1'){
+  if(env.SKYWARD_ADSBFI_COMMERCIAL_PERMISSION!=='confirmed')throw Error('ADSB.fi requires confirmed commercial permission before activation.');
+  const client=new FeedClient((input,options)=>{
+   const u=new URL(input),point=u.pathname.match(/^\/v2\/point\/([^/]+)\/([^/]+)\/([^/]+)$/);
+   const path=point?`/v3/lat/${point[1]}/lon/${point[2]}/dist/${point[3]}`:u.pathname.replace('/v2/reg/','/v2/registration/');
+   return fetchImpl('https://opendata.adsb.fi/api'+path,options);
+  });
+  extra.push({id:'adsbfi',name:'adsb.fi',url:'https://www.adsb.fi/',license:'Separate commercial permission',client});
+ }
+ if(env.SKYWARD_ADSBHUB_ENABLED==='1'){
+  if(env.SKYWARD_ADSBHUB_ACCESS!=='confirmed'||env.SKYWARD_ADSBHUB_TIMESTAMPS!=='UTC')throw Error('ADSBHub requires confirmed receiver/IP access and verified UTC stream timestamps.');
+  extra.push({id:'adsbhub',name:'ADSBHub',url:'https://www.adsbhub.org/',license:'Contributor data-sharing terms',client:new HubFeed({connect})});
+ }
+ return new CombinedFeed(new FeedClient(fetchImpl),extra);
+}

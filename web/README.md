@@ -1583,3 +1583,48 @@ and `npm --prefix web run build`. Browser QA covers desktop/mobile search,
 phase groups, saved routes, input validation, synthetic isolation and verified
 click-through to Flight view. Discovery tests use deterministic feed fixtures;
 live availability varies with receiver and route-service coverage.
+
+
+### Combined observation feeds
+
+The server now routes camera areas, airport traffic, aircraft lookups and Trip
+follower through `CombinedFeed`. Each enabled network has independent request
+serialization, caching and backoff. Duplicate hex identifiers become one whole
+observation, choosing the newer valid position; coordinates and velocities are
+not averaged. Large conflicting position jumps keep the earlier fix with a
+quality warning. Observations over five minutes old or more than five seconds
+in the future are excluded from the merged response. Unknown timestamps never
+replace known positions. Each fix carries `positionSource` for diagnostics.
+If every source fails the request fails; one successful source can still serve
+traffic with `partial` and `failedSources` metadata. `/api/feed-sources` lists
+only configured sources, and Connection health reports their availability.
+Source links appear under About the data, not as map advertisements.
+
+**Activation status: only ADSB.lol is enabled by default.** This change does not
+claim additional real coverage without an additional authorized source. No paid
+API, account registration or provider contact is performed automatically.
+
+Prepared optional integrations:
+
+- **adsb.fi:** public v3 regional queries and v2 aircraft lookups. Its published
+  terms limit default access to personal/noncommercial use. Obtain permission
+  covering Skyward before setting `SKYWARD_ADSBFI_ENABLED=1` and
+  `SKYWARD_ADSBFI_COMMERCIAL_PERMISSION=confirmed`.
+  Terms: https://github.com/adsbfi/opendata/blob/main/README.md
+- **ADSBHub:** SBS TCP stream at `data.adsbhub.org:5002`. Their terms require
+  contributing receiver data and IP access; commercial reuse is allowed. After
+  obtaining access and verifying the stream uses UTC generated-message times,
+  set `SKYWARD_ADSBHUB_ENABLED=1`, `SKYWARD_ADSBHUB_ACCESS=confirmed`, and
+  `SKYWARD_ADSBHUB_TIMESTAMPS=UTC`. Missing/invalid timestamps are rejected,
+  metadata-only messages never refresh position age, dead streams fail explicitly,
+  and reconnects back off to 60 seconds. The local snapshot is bounded to 30,000
+  aircraft and serves only positions under two minutes old. Stream integration
+  is fixture-tested; production stream access has not been available to test.
+  Terms: https://www.adsbhub.org/howtogetdata.php
+
+The confirmation flags document operator-supplied access; they do not grant it.
+ADSB.fi is tested with mocked documented payloads and has not been activated.
+OpenSky and other networks without suitable access have not been wired or enabled.
+Adding sources can improve coverage but shared receivers mean extra sources do
+not necessarily supply extra aircraft. Restart the server after configuration
+changes. Verify additional coverage and source attribution before production use.
