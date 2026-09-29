@@ -171,6 +171,13 @@ The 3D view opens at the mapped concourses; **Concourse** returns to that camera
 Right-drag to orbit, middle-drag (or Shift+right-drag) to pan, and scroll to zoom.
 Leaving a preset camera preserves the current target; **Orbit** restores the full-airport view.
 Aprons use concrete slab shading and become darker and less rough in rain.
+**Selected gate** focuses the selected flight's assigned stand. Boarding bridges
+anchor to nearby mapped terminal walls; docking and stand clearance markings are
+illustrative. Bridges retract outside the at-gate phases.
+Static scenery is batched by material and local area to reduce scene overhead;
+aircraft, service vehicles, bridges, and sequenced lights stay independently animated.
+Use **Hide setup** above the game for more viewport space. Progress sync and local
+backup controls are under **Save & backups**.
 Building footprints come from OSM, with tagged heights/levels where available and
 fallback heights otherwise. Facades are illustrative: these are not photogrammetry
 or detailed architectural models. Other globe airports are not yet playable controller scenarios.

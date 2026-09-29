@@ -44,6 +44,7 @@ var airport_sound: AirportSound
 var material_cache: Dictionary = {}
 var pavement_cache: Dictionary = {}
 var asphalt: NoiseTexture2D
+var static_batch_stats := {}
 var route_overlay: Node3D
 
 func _ready() -> void:
@@ -57,6 +58,16 @@ func _ready() -> void:
 			if mode == "Orbit" or mode == "Top": center = airport_center; distance = radius*1.1
 			camera_mode = mode)
 		tools.add_child(button)
+	var gate_camera := Button.new()
+	gate_camera.text = "Selected gate"
+	gate_camera.tooltip_text = "Inspect the assigned stand of the selected flight."
+	gate_camera.pressed.connect(func():
+		if sim == null or not sim.airport.flights.has(selected_id): return
+		var gate: String = sim.airport.flights[selected_id].assigned_gate_id
+		if not sim.airside.config.get("stands", {}).has(gate): return
+		concourse_position = _point(sim.airside.config.stands[gate])
+		camera_mode = "Concourse")
+	tools.add_child(gate_camera)
 	skip_idle = Button.new()
 	skip_idle.text = "Next arrival"
 	skip_idle.tooltip_text = "Skip quiet time only when every flight is still scheduled."
@@ -384,16 +395,32 @@ func _build_world() -> void:
 		if not sim.airport.gates.has(gate): continue
 		var at := _point(sim.airside.config.stands[gate])
 		_label(gate, at+Vector3.UP*12)
-		_line(at-Vector3(0,0,25),at+Vector3(0,0,25),.5,Color("ddbd5c"),.3)
+		var anchor := _terminal_anchor(at)
+		var towards := Vector3(anchor.x-at.x,0,anchor.z-at.z).normalized()
+		if towards.length_squared()<.1: towards=Vector3.FORWARD
+		var across := Vector3(-towards.z,0,towards.x)
+		_line(at-towards*30+Vector3.UP*.32,at+towards*8+Vector3.UP*.32,.35,Color("ddbd5c"),.04)
+		_line(at-across*5+Vector3.UP*.33,at+across*5+Vector3.UP*.33,.4,Color("ddbd5c"),.04)
+		# Illustrative stand clearance lines, not surveyed parking limits.
+		for side in [-1,1]:
+			var a: Vector3 = at+across*side*24-towards*26+Vector3.UP*.32
+			var b: Vector3 = at+across*side*24+towards*14+Vector3.UP*.32
+			_line(a,b,.25,Color("c7c6ba"),.04)
 		if sim.airside.config.has("terminal_zone"):
 			var z: Dictionary = sim.airside.config.terminal_zone
 			_line(at+Vector3(24,4,12),Vector3(at.x+24,4,z.y0+23),5,Color("9faeaf"),7)
-		var bridge := _box(world,at+Vector3(12,4,10),Vector3(18,3,4),Color("b8c1c1"))
+		var base := Vector3(anchor.x,4,anchor.z)
+		var direction := (Vector3(at.x,4,at.z)-base).normalized()
+		var home := base+direction*9
+		var bridge := _box(world,home,Vector3(18,3,4),Color("b8c1c1"))
+		bridge.rotation.y=atan2(-direction.z,direction.x)
+		_box(world,base-Vector3.UP*2,Vector3(1,4,1),Color("697b80"))
 		for offset in [-6,-2,2,6]:
 			_box(bridge,Vector3(offset,.25,-2.05),Vector3(2.8,1.2,.08),Color("426f80"))
 		_box(bridge,Vector3(-6,-2,0),Vector3(.5,2,2.5),Color("657980"))
-		bridges[gate] = {"node":bridge,"home":bridge.position}
+		bridges[gate] = {"node":bridge,"home":bridge.position,"base":base,"angle":bridge.rotation.y}
 	detail_scene.setup(self)
+	static_batch_stats = AirportStaticScenery.batch(world, detail_scene.decorations)
 	apply_weather()
 	desk.weather_choice.select(TowerOperations.WEATHER.keys().find(str(sim.config.get("tower_weather","Clear"))))
 	desk.level.select(int(sim.config.get("tower_difficulty",0)))
@@ -565,13 +592,13 @@ func _process(delta: float) -> void:
 		var occupant: String=sim.airport.gates[gate].occupied_by_flight_id
 		var goal: Vector3=record.home
 		var extension:=1.0
-		var angle:=0.0
-		if models.has(occupant):
+		var angle: float=record.angle
+		if models.has(occupant) and sim.airport.flights[occupant].status in AirportSimulation.AT_GATE_STATES:
 			var aircraft: Node3D=models[occupant]
-			var base: Vector3=record.home+Vector3(9,0,0)
+			var base: Vector3=record.base
 			var door:=aircraft.position+aircraft.basis*Vector3(-2,4,-float(aircraft.get_meta("length",40))*.28)
 			goal=(base+door)*.5
-			extension=base.distance_to(door)/18.0
+			extension=clampf(base.distance_to(door)/18.0,.3,4.0)
 			angle=atan2(-(door-base).z,(door-base).x)
 		record.node.position=record.node.position.lerp(goal,1-exp(-delta))
 		record.node.scale.x=lerpf(record.node.scale.x,extension,1-exp(-delta))
@@ -667,3 +694,19 @@ func _free_camera() -> void:
 	yaw = atan2(offset.x,offset.z)
 	elevation = clampf(asin(clampf(offset.y/distance,-1,1)),.1,1.5)
 	camera_mode = "Orbit"
+
+func _terminal_anchor(at: Vector3) -> Vector3:
+	var nearest := at+Vector3(21,0,10)
+	var best := INF
+	for surface in sim.airside.config.get("surfaces", []):
+		if surface.kind != "terminal": continue
+		var points: Array = surface.points
+		for i in points.size():
+			var a := Vector2(points[i][0],points[i][1])
+			var b := Vector2(points[(i+1)%points.size()][0],points[(i+1)%points.size()][1])
+			var hit := Geometry2D.get_closest_point_to_segment(Vector2(at.x,at.z),a,b)
+			var gap := hit.distance_to(Vector2(at.x,at.z))
+			if gap<best:
+				best=gap
+				nearest=Vector3(hit.x,0,hit.y)
+	return nearest if best<100 else at+Vector3(21,0,10)

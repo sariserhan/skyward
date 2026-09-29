@@ -40,9 +40,15 @@ scripts=${*:-"tests/airport_ui_smoke.gd tests/terminal_ui_smoke.gd tests/m3_demo
 failed=0
 for script in $scripts; do
 	echo "== $script"
-	if ! xvfb-run -a -s "-screen 0 1280x800x24" godot --path . --audio-driver Dummy --script "$script"; then
+	check_log=$(mktemp)
+	if xvfb-run -a -s "-screen 0 1280x800x24" godot --path . --audio-driver Dummy --script "$script" >"$check_log" 2>&1; then
+		# Godot may exit zero after a script fails to compile or a callback errors.
+		if grep -Eq 'SCRIPT ERROR:|^ERROR:' "$check_log"; then failed=$((failed + 1)); fi
+	else
 		failed=$((failed + 1))
 	fi
+	cat "$check_log"
+	rm -f "$check_log"
 done
 echo "Rendered checks: $failed failed"
 exit "$failed"

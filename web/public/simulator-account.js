@@ -2,6 +2,8 @@
 (()=>{
  const byId=id=>document.getElementById(id),status=byId('cloud-status'),slots=byId('cloud-slots');
  let ready=false,busy=false,current=null,pending=null;
+ const setup=byId('simulator-setup'),toggle=byId('toggle-setup');
+ if(setup&&toggle)toggle.onclick=()=>{setup.hidden=!setup.hidden;toggle.setAttribute('aria-expanded',String(!setup.hidden));toggle.textContent=setup.hidden?'Show setup':'Hide setup';};
  const buttons=['cloud-save','cloud-load','cloud-start','cloud-export'];
  function enabled(){for(const id of buttons)byId(id).disabled=!ready||busy;}
  async function api(body,key){

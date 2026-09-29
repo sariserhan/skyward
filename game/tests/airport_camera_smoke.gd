@@ -12,6 +12,13 @@ func _process(_delta: float) -> bool:
 	if frame == 90:
 		var view: Airport3D = main.map3d
 		if view.camera_mode != "Concourse": failures += 1
+		if view.static_batch_stats.get("source_meshes",0) <= view.static_batch_stats.get("batches",0): failures += 1
+		for gate in view.bridges:
+			var bridge: Dictionary = view.bridges[gate]
+			if not is_instance_valid(bridge.node) or bridge.node.is_queued_for_deletion(): failures += 1
+			var stand := view._point(view.sim.airside.config.stands[gate])
+			if bridge.base.distance_to(stand)>101: failures += 1
+		print("Static scenery batching: ",view.static_batch_stats)
 		var target := view.camera_target
 		var before := view.camera.position.distance_to(target)
 		var wheel := InputEventMouseButton.new()
