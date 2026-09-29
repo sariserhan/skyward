@@ -1,0 +1,10 @@
+newmtl mat0
+Kd 1.0 1.0 1.0
+d 1.0
+Ns 45
+map_Kd Fuel_Truck_Short_VolvoFM_cargo.png
+newmtl mat1
+Kd 1.0 1.0 1.0
+d 1.0
+Ns 45
+map_Kd Fuel_Truck_Short_VolvoFM.png

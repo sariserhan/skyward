@@ -415,8 +415,18 @@ func _build_world() -> void:
 		var tunnel:=_box(bridge,Vector3(9,0,0),Vector3(18,2.6,2.8),Color("8d9da1"))
 		for side in [-1,1]:
 			_box(tunnel,Vector3(0,.2,side*1.43),Vector3(17,1.1,.05),Color("365765"))
+		# Structural glazing ribs and the flexible docking bellows remain parented
+		# to the moving bridge, so extension and door alignment are preserved.
+		for rib in range(-8,9,2):
+			for side in [-1,1]:
+				_box(tunnel,Vector3(rib,.2,side*1.47),Vector3(.075,1.25,.09),Color("aab4b5"))
 		var cabin:=_box(bridge,Vector3(18,0,0),Vector3(3,3.0,3.8),Color("b0babc"))
 		_box(cabin,Vector3(1.55,0,0),Vector3(.35,2.7,3.4),Color("303b40"))
+		for rib in 5:
+			for side in [-1,1]:
+				_box(cabin,Vector3(1.4+rib*.075,0,side*1.73),Vector3(.035,2.75,.09),Color("566064"))
+		for side in [-1,1]:
+			_box(cabin,Vector3(.25,.25,side*1.92),Vector3(1.9,1.2,.04),Color("365765"))
 		_box(cabin,Vector3(0,-2.1,0),Vector3(.4,2,2),Color("53676c"))
 		_box(world,base-Vector3.UP*2,Vector3(1,4,1),Color("697b80"))
 		bridges[gate] = {"node":bridge,"home":home,"base":base,"angle":bridge.rotation.y,"tunnel":tunnel,"cabin":cabin,"reach":18.0}

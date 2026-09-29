@@ -1,15 +1,21 @@
 shader_type spatial;
 render_mode cull_disabled;
 varying vec3 p;
-varying float roof;
-void vertex(){p=VERTEX;roof=abs(NORMAL.y);}
+varying vec3 surface_normal;
+void vertex(){p=VERTEX;surface_normal=NORMAL;}
 void fragment(){
- vec2 uv=p.xz;
- vec2 seams=min(fract(uv/3.0),1.0-fract(uv/3.0))*3.0;
- float aa=max(length(fwidth(uv)),0.02);
- float joint=(1.0-smoothstep(0.02,0.02+aa,min(seams.x,seams.y)))*min(1.0,0.05/aa);
- float stain=sin(uv.x*0.035)*sin(uv.y*0.043)*0.015;
- vec3 roofing=vec3(0.23,0.25,0.255)+stain-joint*0.08;
- ALBEDO=mix(vec3(0.40,0.43,0.44),roofing,step(0.5,roof));
- ROUGHNESS=0.83;
+ bool roof=abs(surface_normal.y)>.5;
+ vec2 uv=roof?p.xz:vec2(dot(p.xz,vec2(-surface_normal.z,surface_normal.x)),p.y);
+ vec2 size=roof?vec2(3.0):vec2(4.0,1.2);
+ vec2 seams=min(fract(uv/size),1.0-fract(uv/size))*size;
+ float aa=max(length(fwidth(uv)),.02);
+ float joint=(1.0-smoothstep(.015,.015+aa,min(seams.x,seams.y)))*min(1.0,.05/aa);
+ float stain=sin(uv.x*.035)*sin(uv.y*.043)*.02;
+ float streak=pow(.5+.5*sin(uv.x*3.3+sin(uv.x*.7)),12.0)*.022;
+ vec3 roofing=vec3(.23,.25,.255)+stain-joint*.08;
+ vec3 cladding=vec3(.47,.49,.49)+stain-joint*.10-streak;
+ ALBEDO=roof?roofing:cladding;
+ ROUGHNESS=roof?.84:.64;
+ METALLIC=roof?.12:.24;
+ AO=1.0-joint*.2;
 }

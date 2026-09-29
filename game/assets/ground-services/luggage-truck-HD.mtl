@@ -1,0 +1,10 @@
+newmtl mat0
+Kd 1.0 1.0 1.0
+d 1.0
+Ns 45
+map_Kd DFZ30.png
+newmtl mat1
+Kd 0.8 0.8 0.8
+d 1.0
+Ns 45
+map_Kd DFZ30_glass.png

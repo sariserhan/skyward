@@ -21,6 +21,7 @@ func setup(owner_view: Airport3D) -> void:
 	if not sim.airside.enabled(): return
 	_mapped_terminals()
 	_apron_lighting()
+	_stand_surface_detail()
 	_standby_vehicles()
 	# Match terminal detail to the scenario footprint, retaining mapped Dulles buildings.
 	if sim.airside.config.has("terminal_zone"):
@@ -82,6 +83,10 @@ func apply_weather() -> void:
 	if rain!=null: rain.emitting=w.wet
 
 func _vehicle(color: Color,kind: String) -> Node3D:
+	var detailed := AirportGroundEquipment.create(kind)
+	if detailed != null:
+		view.world.add_child(detailed)
+		return detailed
 	var root:=Node3D.new(); view.world.add_child(root)
 	view._box(root,Vector3(0,1,0),Vector3(2.2,1.4,4.3),color)
 	view._box(root,Vector3(0,2,-1),Vector3(2,1.2,1.5),Color("c5d3d5"))
@@ -145,8 +150,16 @@ func update(delta: float) -> void:
 			if task.kind=="pushback": offset=Vector3(0,0,-float(plane.get_meta("length",40))*.3-5)
 			var desired:=plane.position+plane.basis*offset
 			desired.y=0
-			_place_ground(vehicle,desired,10.5 if "baggage" in task.type else 4.0)
+			_place_ground(vehicle,desired,8.0 if "baggage" in task.type else 5.2 if "fuel" in task.type else 4.0)
 			vehicle.rotation.y=plane.rotation.y
+			if task.kind in ["baggage_load","baggage_unload"]:
+				var loader_id: String=id+":belt"
+				active[loader_id]=true
+				if not vehicles.has(loader_id): vehicles[loader_id]=_vehicle(Color.WHITE,"belt")
+				var loader: Node3D=vehicles[loader_id]
+				loader.visible=vehicle.visible
+				_place_ground(loader,plane.position+plane.basis*Vector3(4.5,0,8),4.2)
+				loader.rotation.y=plane.rotation.y+PI/2
 		if f.status=="taxiing_out" and f.taxi_leg==0 and plane.position.y<1:
 			var id: String="tow:"+f.id
 			active[id]=true
@@ -324,3 +337,25 @@ func _standby_vehicles() -> void:
 		vehicle.rotation.y=atan2(-side.x,-side.z)
 		standby.append(vehicle)
 		index+=1
+
+## Illustrative equipment bays and drainage details, aligned with active stands.
+func _stand_surface_detail() -> void:
+	for gate in view.bridges:
+		var base: Vector3=view.bridges[gate].base
+		var stand:=view._point(view.sim.airside.config.stands[gate])
+		var forward:=Vector3(stand.x-base.x,0,stand.z-base.z).normalized()
+		var side:=Vector3(-forward.z,0,forward.x)
+		var center:=stand+side*15+forward*9
+		center.y=.23
+		if not view.clearance.clear(center,8): continue
+		for edge in [-1,1]:
+			for i in range(0,12,3):
+				var a: Vector3=center+side*edge*3+forward*(i-6)
+				view._line(a,a+forward*1.5,.14,Color("ccc8b3"),.025)
+			view._line(center+forward*edge*6-side*3,center+forward*edge*6+side*3,.14,Color("ccc8b3"),.025)
+		# Recessed grate and narrow slots; geometry joins the static scenery batches.
+		var drain:=center+side*4
+		view._line(drain-forward*2,drain+forward*2,.5,Color("323b3b"),.02)
+		for i in 12:
+			var at:=drain+forward*(float(i)/3.0-1.8)
+			view._line(at-side*.23,at+side*.23,.055,Color("7c8987"),.035)

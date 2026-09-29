@@ -69,3 +69,9 @@ The passenger-flow/baggage ownership cycle was removed, and cabin event handlers
 This covers an initial playable implementation across the ten improvement areas. It does not establish hyper-realistic scenery or Airport Control 27 feature parity: bespoke airport assets, verified bridge/tower locations, ground-vehicle road traffic, procedural IFR/SID/STAR control, advanced aircraft performance and real recorded multi-speaker radio remain further work.
 
 Additional checks: `tests/airport_controller_smoke.gd` exercises clearance → arrival → held route → resume, weather controls, service vehicles, panel drag/minimize and audio cleanup. `tests/test_tower_control.gd` now also covers route editing, weather timing/persistence, runway preferences, score events, invalid controller settings and reference release.
+
+## Detailed ground equipment and surfaces
+
+Baggage tasks now display imported, textured luggage tractors towing two open carts, plus a separate belt loader. Pushback uses a detailed tow tractor, and fueling uses a modeled tanker with cab and curved tank. These are static meshes from the FlightGear scenery collection, converted using `tools/import_ground_services.py`; editable originals, license, attribution and pinned provenance are retained in `game/assets/ground-services/`. Vehicle wheels and trailer steering are not separately rigged yet. Emergency and catering vehicles still use the older illustrative geometry.
+
+Aprons now show filtered aggregate grain, slab joints, mottling and patchy wet roughness. Buildings have metal-panel seams and subtle streaking; moving bridges have glazing ribs and docking-bellows detail. Active stands receive illustrative service-bay markings and drainage grates where building clearance permits. These details are not surveyed airport infrastructure. The terminal footprints remain mapped extrusions, not photogrammetry.

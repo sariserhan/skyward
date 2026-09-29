@@ -1,0 +1,12 @@
+{
+  "repository": "https://raw.githubusercontent.com/mherweg/d-laser-fgtools/",
+  "revision": "f2e7ff3c8b37e985041c68a58e68c51cfdb631eb",
+  "sha256": {
+    "DFZ30.png": "6e862ed10cb33a822a3c6064cbdee2f073c5f9e76a366db073d7f7bd9ca1ca4d",
+    "DFZ30_glass.png": "6b305fd4920264507ab2b5fb3885fc63901ecf86fe17953216208b2f6809f567",
+    "Fuel_Truck_Short_VolvoFM.png": "d99dc8e9228d383cf339b71180afec56fa8cdbaf944b6ed8e4001809e59a08a2",
+    "Fuel_Truck_Short_VolvoFM_cargo.png": "98cc397ca76487e9e8a5f8511ecc97f586364013720bcd1fb0b5a13ecac60ab2",
+    "baggage_trailer.png": "f4a2d45389da0db6f23004338f862f914632937c3ba07375242f444cc96d9b5e",
+    "belt_loader.png": "da4b07e25ca2d87a3aaaf60796709e4e6b3967a6c2c5634a5e919cee731fe10f"
+  }
+}

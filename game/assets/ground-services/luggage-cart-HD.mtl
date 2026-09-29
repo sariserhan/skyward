@@ -1,0 +1,5 @@
+newmtl mat0
+Kd 1.0 1.0 1.0
+d 1.0
+Ns 45
+map_Kd baggage_trailer.png
