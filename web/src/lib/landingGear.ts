@@ -40,25 +40,25 @@ export function installLandingGear(C:typeof Cesium,v:Cesium.Viewer,getState:()=>
     const entry:Entry={body,parts:[],gear,extension:0,angle:0,compression:0};
     const legs=[gear.nose,gear.main,[-gear.main[0],gear.main[1],gear.main[2]]];
     const layout=gearLayout(a!.aircraftType);
-    type Part={kind:'strut'|'wheel'|'door';leg:number;dx:number;dz:number};
+    type Part={kind:'strut'|'piston'|'axle'|'wheel'|'hub'|'door';leg:number;dx:number;dz:number};
     const specs:Part[]=legs.flatMap((_,leg)=>{
-     const parts:Part[]=[{kind:'strut',leg,dx:0,dz:0},{kind:'door',leg,dx:0,dz:0}];
+     const parts:Part[]=[{kind:'strut',leg,dx:0,dz:0},{kind:'piston',leg,dx:0,dz:0},{kind:'axle',leg,dx:0,dz:0},{kind:'door',leg,dx:0,dz:0}];
      const axles=leg?layout.axles:1,paired=leg?layout.paired:true;
-     for(let axle=0;axle<axles;axle++)for(const side of paired?[-1,1]:[0])parts.push({kind:'wheel',leg,dx:side*gear.radius*.6,dz:(axle-(axles-1)/2)*gear.radius*2.4});
+     for(let axle=0;axle<axles;axle++)for(const side of paired?[-1,1]:[0]){const dz=(axle-(axles-1)/2)*gear.radius*2.4;parts.push({kind:'wheel',leg,dx:side*gear.radius*.7,dz},{kind:'hub',leg,dx:side*gear.radius*1.13,dz});};
      return parts;
     });
     const extension=(leg:number)=>(legs[leg][1]-Math.min(gear.main[1],gear.nose[1])+gear.strut-entry.compression)*entry.extension;
     entry.parts=specs.map((part,i)=>v.entities.add({id:`landing-gear-${body.id}-${i}`,show:false,
      position:new C.CallbackPositionProperty((time,result)=>{
       const matrix=time&&body.computeModelMatrix(time);if(!matrix)return undefined;
-      const leg=legs[part.leg],drop=part.kind==='door'?0:extension(part.leg)/(part.kind==='strut'?2:1),offset=[leg[0]+part.dx,leg[1]-drop,leg[2]+part.dz];
+      const leg=legs[part.leg],drop=part.kind==='door'?0:extension(part.leg)/(part.kind==='strut'?2:part.kind==='piston'?1.3:1),offset=[leg[0]+part.dx,leg[1]-drop,leg[2]+part.dz];
       return C.Matrix4.multiplyByPoint(matrix,C.Cartesian3.fromArray(lightAnchorToBody(offset)),result??new C.Cartesian3());
      },false),orientation:new C.CallbackProperty((time,result)=>{
       const base=body.orientation?.getValue(time);if(!base)return undefined;
-      const angle=part.kind==='wheel'?entry.angle:part.kind==='door'?entry.extension*1.3:0;
+      const angle=(part.kind==='wheel'||part.kind==='hub')?entry.angle:part.kind==='door'?entry.extension*1.3:0;
       return C.Quaternion.multiply(base,C.Quaternion.fromAxisAngle(part.kind==='door'?C.Cartesian3.UNIT_X:C.Cartesian3.UNIT_Y,angle),result??new C.Quaternion());
      },false),
-     ...(part.kind==='strut'?{cylinder:{length:new C.CallbackProperty(()=>extension(part.leg),false),topRadius:gear.radius*.15,bottomRadius:gear.radius*.12,material:C.Color.SILVER}}:part.kind==='door'?{box:{dimensions:new C.Cartesian3(gear.radius*2.8,gear.radius,gear.radius*.08),material:C.Color.LIGHTGRAY}}:{ellipsoid:{radii:new C.Cartesian3(gear.radius,gear.radius*.42,gear.radius),material:new C.StripeMaterialProperty({orientation:C.StripeOrientation.VERTICAL,evenColor:C.Color.fromCssColorString('#15181c'),oddColor:C.Color.fromCssColorString('#434951'),repeat:6}),stackPartitions:8,slicePartitions:12}})}));
+     ...(part.kind==='strut'||part.kind==='piston'?{cylinder:{length:new C.CallbackProperty(()=>extension(part.leg)*(part.kind==='piston'?.45:.7),false),topRadius:gear.radius*(part.kind==='piston'?.11:.19),bottomRadius:gear.radius*(part.kind==='piston'?.11:.17),material:C.Color.fromCssColorString(part.kind==='piston'?'#dce4e8':'#7f8b94')}}:part.kind==='axle'?{box:{dimensions:new C.Cartesian3(gear.radius*Math.max(1,layout.axles)*2.3,gear.radius*1.9,gear.radius*.22),material:C.Color.fromCssColorString('#69757d')}}:part.kind==='hub'?{ellipsoid:{radii:new C.Cartesian3(gear.radius*.53,gear.radius*.06,gear.radius*.53),material:C.Color.fromCssColorString('#abb5bc'),stackPartitions:12,slicePartitions:20}}:part.kind==='door'?{box:{dimensions:new C.Cartesian3(gear.radius*2.8,gear.radius,gear.radius*.08),material:C.Color.LIGHTGRAY}}:{ellipsoid:{radii:new C.Cartesian3(gear.radius,gear.radius*.42,gear.radius),material:C.Color.fromCssColorString('#171a1d'),stackPartitions:16,slicePartitions:24}})}));
     entries.set(body.id,entry);
    }
    for(const [id,entry] of entries)if(!keep.has(id)){removeEntry(entry);entries.delete(id);}

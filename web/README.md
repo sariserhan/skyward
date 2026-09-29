@@ -1506,3 +1506,14 @@ Regression coverage includes a captured KAL2129 Narita approach, delayed and
 contradictory fixes, base-leg interception, prior overshoot, visible sourced-model
 gear, gradual altitude correction and fallback parking. Browser replay:
 `python3 tests/browser/watched-arrival.py` (after building; requires Playwright).
+
+## Landing gear and touchdown presentation
+
+Community-model gear overlays use dark tires, metal hubs, axle beams and separate
+strut/piston sections with extension and ground compression. Wheel counts follow
+the existing family layout; this is illustrative gear rather than engineering CAD.
+Actively watched flights emit one brief, world-anchored tire-smoke puff on a
+gear-down airborne-to-ground transition above 35 kt. Cabin audio controls the
+synthesized tire chirp and thump. Reduced motion suppresses smoke; initial ground
+selection, taxi and gear-up contact do not trigger it. The simulator shares the
+smoke effect and adds a touchdown thump through its existing sound controls.

@@ -27,10 +27,10 @@ test('moving gear follows the current airframe pose without a frame delay and cl
  const aircraft={hex:'abcdef',aircraftType:'B738',ground:false};let cleanup;
  try{
   applyAircraftRig(body,0,140,1,0,.7,90);cleanup=installLandingGear(C,viewer,()=>({aircraft:[aircraft],selected:aircraft}));event.raiseEvent();
-  const wheels=entities.values.filter(e=>e.ellipsoid);assert.equal(wheels.length,6);assert.ok(wheels.every(w=>w.position.isConstant===false));
+  const wheels=entities.values.filter(e=>{const r=e.ellipsoid?.radii?.getValue(time);return r&&r.y/r.x>.3;});assert.equal(entities.values.filter(e=>e.ellipsoid).length,12);assert.equal(wheels.length,6);assert.ok(wheels.every(w=>w.position.isConstant===false));
   const rotation=C.Quaternion.clone(wheels[0].orientation.getValue(time));
   applyAircraftRig(body,1,80,1,0,.7,90,true);seconds+=100;event.raiseEvent();assert.ok(!C.Quaternion.equals(rotation,wheels[0].orientation.getValue(time)));
-  assert.equal(entities.values.filter(e=>e.box).length,3);
+  assert.equal(entities.values.filter(e=>e.box).length,6);
   const first=wheels[0].position.getValue(time),delta=new C.Cartesian3(20,30,40);
   body.position.setValue(C.Cartesian3.add(position,delta,new C.Cartesian3()));
   const next=wheels[0].position.getValue(time);assert.ok(C.Cartesian3.equalsEpsilon(C.Cartesian3.subtract(next,first,new C.Cartesian3()),delta,0,1e-8));

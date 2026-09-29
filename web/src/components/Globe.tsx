@@ -1,3 +1,5 @@
+import {installTouchdownEffects} from '../lib/touchdownEffects';
+import {readCabinAudio} from '../lib/cabinAudio';
 import {WaterSurface} from './WaterSurface';
 import {CityBuildings} from './CityBuildings';
 import {airportBuildingHeight} from '../lib/airportBuildings';
@@ -86,7 +88,7 @@ export function Globe(p: Props) {
   const callbacks = useRef(p); callbacks.current = p;
   const facilities = useRef(new Map<string, FacilityTarget>());
   const selectRef = useRef(p.select); selectRef.current = p.select;
-  const [flightOpen,setFlightOpen]=useState(false);
+  const [flightOpen,setFlightOpen]=useState(false);const flightOpenRef=useRef(false);flightOpenRef.current=flightOpen;
   const [modelCameraRevision,setModelCameraRevision]=useState(0);
   const cameraMoving=useRef(false);
 
@@ -352,7 +354,8 @@ export function Globe(p: Props) {
     const v=viewer.current;if(!v||!ready)return;
     const getState=()=>({aircraft:callbacks.current.camera.type==='tower'?callbacks.current.groundObservations:callbacks.current.aircraft,tower:callbacks.current.camera.type==='tower',selected:callbacks.current.selected,quality:callbacks.current.preferences.quality,reduced:callbacks.current.preferences.reducedMotion||callbacks.current.preferences.batterySaver});
     const lights=installAircraftLights(window.Cesium,v,getState),gear=installLandingGear(window.Cesium,v,getState);
-    return()=>{lights();gear();};
+    const touchdown=installTouchdownEffects(window.Cesium,v,()=>({id:flightOpenRef.current&&callbacks.current.selected?`aircraft-${callbacks.current.selected.hex}`:null,type:callbacks.current.selected?.aircraftType??'',audio:flightOpenRef.current&&readCabinAudio(),reduced:callbacks.current.preferences.reducedMotion}));
+    return()=>{touchdown();lights();gear();};
   },[ready]);
   useEffect(()=>{
     const v=viewer.current;if(!v||!ready)return;const C=window.Cesium;
