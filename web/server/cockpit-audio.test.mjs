@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {cockpitAudioSettings,createCockpitSound} from '../src/lib/cockpitAudio.ts';
+import {cockpitAudioSettings,createCockpitSound,cockpitCues} from '../src/lib/cockpitAudio.ts';
 test('cockpit ambience responds to practice throttle and distinguishes propeller profiles',()=>{
  const base={speed:150,throttle:0,volume:.3};
  assert.ok(cockpitAudioSettings('B738',{...base,throttle:1}).frequency>cockpitAudioSettings('B738',base).frequency);
@@ -15,3 +15,5 @@ test('disposing during a pending audio start cannot revive playback or leak a co
  globalThis.AudioContext=class{state='suspended';sampleRate=8;currentTime=0;destination={};createGain=node;createBiquadFilter=node;createBufferSource=node;createOscillator=node;createBuffer(){return{getChannelData:()=>new Float32Array(32)}};resume(){return new Promise(resolve=>{resolveResume=resolve;});}async suspend(){suspended++;this.state='suspended';}async close(){closed++;this.state='closed';}};
  try{const sound=createCockpitSound('B738');const pending=sound.start();sound.dispose();resolveResume();await pending;assert.equal(closed,1);assert.equal(stopped,3);assert.equal(suspended,0);await sound.start();assert.equal(closed,1);}finally{globalThis.AudioContext=original;}
 });
+
+test("turbulence cue only occurs on airborne threshold entry, not continually or on the ground",()=>{const before={agl:3000,ground:false,gear:false,at:1000,turbulence:.3},after={...before,at:1200,turbulence:.8};assert.deepEqual(cockpitCues(before,after),["turbulence"]);assert.deepEqual(cockpitCues(after,{...after,at:1400}),[]);assert.ok(!cockpitCues(before,{...after,ground:true}).includes("turbulence"));});

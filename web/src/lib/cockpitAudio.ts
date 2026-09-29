@@ -1,14 +1,15 @@
-export type CockpitCue='gear'|'touchdown'|500|100|50|40|30|20|10;
-export interface AudioFlight {agl:number|null;ground:boolean;gear:boolean|null;at:number;}
+export type CockpitCue='gear'|'touchdown'|'turbulence'|500|100|50|40|30|20|10;
+export interface AudioFlight {turbulence?:number;agl:number|null;ground:boolean;gear:boolean|null;at:number;}
 export function cockpitCues(previous:AudioFlight|null,next:AudioFlight):CockpitCue[]{
  if(!previous||next.at-previous.at>5000||next.at<=previous.at)return [];
  const cues:CockpitCue[]=[];
+ if(!next.ground&&(next.turbulence??0)>=.55&&(previous.turbulence??0)<.55)cues.push('turbulence');
  if(previous.gear!==null&&next.gear!==null&&previous.gear!==next.gear)cues.push('gear');
  if(!previous.ground&&next.ground&&previous.agl!==null&&previous.agl<100)cues.push('touchdown');
  if(!next.ground&&previous.agl!==null&&next.agl!==null&&previous.agl-next.agl<150){const crossed=([500,100,50,40,30,20,10] as const).filter(h=>previous.agl!>h&&next.agl!<=h);if(crossed.length)cues.push(crossed.at(-1)!);}
  return cues;
 }
-export interface CockpitAudioInput {speed:number|null;throttle:number|null;volume:number;}
+export interface CockpitAudioInput {turbulence?:number;speed:number|null;throttle:number|null;volume:number;}
 const clamp=(n:number,min:number,max:number)=>Math.max(min,Math.min(max,n));
 export function cockpitAudioSettings(type:string,input:CockpitAudioInput){
  const prop=/^(AT[47]|DH8|DHC|C1[578]|C208|PA[234]|PC12|BE[23]|B350|SR2)/i.test(type);
@@ -16,7 +17,7 @@ export function cockpitAudioSettings(type:string,input:CockpitAudioInput){
  const base=piston?30:prop?38:business?65:heavy?34:48,range=piston?28:prop?42:business?80:heavy?45:62;
  const speed=Number.isFinite(input.speed)?clamp(input.speed!,0,600):0;
  const power=input.throttle!==null&&Number.isFinite(input.throttle)?clamp(input.throttle,0,1):clamp(.25+speed/700,.25,.85);
- return {frequency:base+power*range,hum:prop?.12:.07,wind:350+speed*2,volume:Number.isFinite(input.volume)?clamp(input.volume,0,1)*.18:0};
+ return {frequency:base+power*range,hum:prop?.12:.07,wind:350+speed*2+clamp(input.turbulence??0,0,1)*1200,volume:Number.isFinite(input.volume)?clamp(input.volume,0,1)*.18:0};
 }
 /** Original illustrative engine/ventilation sound. No media or provider requests. */
 export function createCockpitSound(type:string){
@@ -32,8 +33,8 @@ export function createCockpitSound(type:string){
  }
  const cue=(kind:CockpitCue)=>{
   if(!context||!master||!wantsPlayback||context.state!=='running')return;
-  const c=context,t=c.currentTime,o=c.createOscillator(),gain=c.createGain(),duration=kind==='gear'?1.1:kind==='touchdown'?.55:.16;
-  o.type=kind==='gear'?'triangle':'sine';o.frequency.setValueAtTime(kind==='gear'?95:kind==='touchdown'?65:700,t);o.frequency.exponentialRampToValueAtTime(kind==='gear'?42:kind==='touchdown'?25:500,t+duration);
+  const c=context,t=c.currentTime,o=c.createOscillator(),gain=c.createGain(),duration=kind==='gear'?1.1:kind==='touchdown'?.55:kind==='turbulence'?.65:.16;
+  o.type=kind==='gear'?'triangle':'sine';o.frequency.setValueAtTime(kind==='gear'?95:kind==='touchdown'?65:kind==='turbulence'?520:700,t);o.frequency.exponentialRampToValueAtTime(kind==='gear'?42:kind==='touchdown'?25:kind==='turbulence'?390:500,t+duration);
   gain.gain.setValueAtTime(.001,t);gain.gain.linearRampToValueAtTime(kind==='touchdown'?.8:.3,t+.04);gain.gain.exponentialRampToValueAtTime(.001,t+duration);
   o.connect(gain).connect(master);sources.push(o);o.onended=()=>{o.disconnect();gain.disconnect();const index=sources.indexOf(o);if(index>=0)sources.splice(index,1);};o.start();o.stop(t+duration);
  };

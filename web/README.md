@@ -1725,3 +1725,15 @@ contain personal information and should be reviewed before sharing.
 The Premium preview includes a Free/Premium comparison, explicit unavailable
 fields and coverage/lookup-limit caveats. Opening it makes no paid aviation
 request and does not start checkout.
+
+### Thunderstorm presentation
+
+Nearby thunderstorm reports enable geographically anchored branching strikes,
+cloud glow, a return stroke and a weaker restrike. New strikes begin after a
+short delay and recur irregularly; cloud-obscured strikes show illumination.
+These are illustrative effects, not measured lightning locations. Lightning
+and weather-effect toggles, reduced motion, stale reports and zoom limits still
+apply. Strong weather produces gust-modulated aircraft and cockpit motion;
+grounded aircraft remain steady. Watched-flight cockpit audio adds stronger
+airflow and an entry chime with a 30-second cooldown, plus a visible turbulence
+message. This is a simulation cue, not an aircraft-reported emergency warning.

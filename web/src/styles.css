@@ -316,3 +316,5 @@ body>.cesium-credit-lightbox-overlay .cesium-credit-lightbox-close{min-width:36p
 
 
 .simulated-flight-upgrade{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;margin:10px 0;padding:10px;border:1px solid #4da991;border-radius:8px;background:#103d39;color:#e3fff4;font-size:11px;line-height:1.4;box-sizing:border-box}.simulated-flight-upgrade strong,.simulated-flight-upgrade span{display:block}.simulated-flight-upgrade span{margin-top:3px;color:#bbd8d0}.simulated-flight-upgrade button{background:#9be7c8;color:#092820;border:1px solid #baffdf;font-size:11px;font-weight:600;white-space:normal;max-width:110px;min-height:40px;padding:7px 10px;cursor:pointer}.cockpit-mode .simulated-flight-upgrade{margin:0 0 5px;pointer-events:auto}.cockpit-mode .simulated-flight-upgrade strong{font-size:11px;color:#e3fff4}
+
+.turbulence-caution{display:block;width:100%;color:#ffd59b;font-size:10px;padding:5px 7px;border-left:2px solid #e5ac60;background:#392d1dc9}
