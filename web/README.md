@@ -1430,3 +1430,28 @@ METARs report cloud bases (converted from AGL feet to MSL metres), not cloud
 volumes. Cloud thickness, placement, and lightning are illustrative; this is not
 live lightning-location data, weather radar, or a navigation-grade weather model.
 No new paid service or key is needed. Supplier names are not added to the map UI.
+
+## 3D city buildings
+
+Map tools → Layers → **3D city buildings** (on by default) streams nearby
+OpenMapTiles building footprints from the free OpenFreeMap public service. No
+account, API key, billing integration, or paid fallback is used. The TileJSON
+endpoint resolves the current planet snapshot; the browser downloads tiles
+directly. Attribution is attached to the map while the layer is enabled.
+
+Buildings appear below approximately 18 km above local terrain in 3D globe,
+tower, and watched-flight views. Coverage and mapped heights vary: these are
+footprint extrusions, not photogrammetry. Missing heights use a 9 m illustrative
+default; tile-provided render heights can also be inferred. Courtyard holes and
+base heights are retained, tile buffers are clipped, and existing airport
+buildings take precedence. Open terrain places buildings at sampled local
+elevation; sloping foundations and detailed roofs are not modeled.
+
+A dedicated worker fetches and decodes at most two tiles concurrently. Only the
+nearest 4 tiles (Low) or 9 tiles (Balanced/High) are rendered, with per-tile caps
+of 250/600/1,000 building parts, favoring taller structures. Parsed cache: 24
+tiles; failed tile retry: 60 seconds. Zooming out, switching to 2D, or disabling
+the layer releases its meshes. External data failure does not stop the globe
+or aircraft. Public hosting has no SLA; this is not guaranteed city coverage.
+
+Sources: https://openfreemap.org/ and https://openmaptiles.org/docs/schema/
