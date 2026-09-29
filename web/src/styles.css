@@ -340,3 +340,6 @@ body>.cesium-credit-lightbox-overlay .cesium-credit-lightbox-close{min-width:36p
 
 .cockpit-round-dials>div{flex:1;aspect-ratio:1;width:auto;height:auto;min-width:0;max-width:82px}
 @media(max-width:600px){.cockpit-round-dials{gap:4px;padding:7px 4px}.cockpit-round-dials>div{border-width:3px}.cockpit-round-dials b{font-size:11px}.cockpit-round-dials small{font-size:7px}}
+
+.topbar nav .discover-trigger{color:var(--mint);line-height:1.35;text-align:left}.topbar nav .discover-trigger svg{flex-shrink:0}.statusbar .watching-trigger[aria-pressed=true]{color:var(--mint);border-color:#5a9387}
+@media(max-width:759px){.topbar nav{gap:10px}.topbar nav .discover-trigger{max-width:140px}.topbar nav .discover-trigger span{max-width:115px}}
