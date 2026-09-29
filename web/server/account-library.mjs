@@ -23,7 +23,8 @@ export function validateLibrary(kind,value){
   const from=text(value.from,4).toUpperCase(),to=text(value.to,4).toUpperCase();
   if(!date(value.date)||!Object.hasOwn(airports,from)||!Object.hasOwn(airports,to)||from===to)fail(400,'Choose a date and two different airports from the directory.');
   if(!Number.isFinite(value.durationMinutes)||value.durationMinutes<0||value.durationMinutes>1500)fail(400,'Duration must be between 0 and 1,500 minutes.');
-  return {date:value.date,from,to,callsign:text(value.callsign,16),aircraftType:text(value.aircraftType,20),registration:text(value.registration,32),durationMinutes:Math.round(value.durationMinutes),notes:text(value.notes,500)};
+  if(value.experience!==undefined&&!['flown','watched'].includes(value.experience))fail(400,'Choose flown or watched.');
+  return {experience:value.experience??'flown',date:value.date,from,to,callsign:text(value.callsign,16),aircraftType:text(value.aircraftType,20),registration:text(value.registration,32),durationMinutes:Math.round(value.durationMinutes),notes:text(value.notes,500)};
  }
  if(kind==='trips'){
   if(!Array.isArray(value.legs)||!value.legs.length||value.legs.length>12)fail(400,'A trip needs 1–12 legs.');

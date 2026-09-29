@@ -14,7 +14,7 @@ const fail=(status,message)=>{throw Object.assign(Error(message),{status});};
 const customerId=v=>typeof v==='string'?v:v?.id;
 const integer=(v,fallback)=>{const n=Number(v??fallback);if(!Number.isSafeInteger(n)||n<1)throw Error('Invalid premium limit');return n;};
 
-export function createNeonMembership({env=process.env,pool=createNeonPool(env),sendEmail,fetchImpl=fetch,now=Date.now}={}) {
+export function createNeonMembership({env=process.env,pool=createNeonPool(env),sendEmail,fetchImpl=fetch,now=Date.now,observations=()=>[]}={}) {
  const devPremium=developmentPremium(env);
  const {origin}=neonConfig(env),auth=createNeonAuth(pool,{env,sendEmail}),authHandler=toNodeHandler(auth);
  const rows=async(sql,args=[],db=pool)=>(await db.query(sql,args)).rows;
@@ -71,7 +71,7 @@ export function createNeonMembership({env=process.env,pool=createNeonPool(env),s
      const result={...airlabsPreview('demo'),requestedJourney:saved,checkedAt:now(),message:'Synthetic example DEMO101. Not live data for your saved journey.'};await db.query('INSERT INTO skyward_checks VALUES($1,$2,$3,$4) ON CONFLICT(user_id,key) DO UPDATE SET body=excluded.body,checked=excluded.checked',[u.id,saved.key,JSON.stringify(result),now()]);return result;
     });return {...result,usage:await usage(u)};
  }
- const premium=createPremiumTools({store:postgresPremiumStore(pool,transaction),entitlement,env,now,userById:async id=>{const u=await one('SELECT id,email FROM "user" WHERE id=$1 AND "emailVerified"=true',[id]);if(!u)return null;return {...u,customer:(await one('SELECT stripe_customer FROM skyward_profiles WHERE user_id=$1',[id]))?.stripe_customer};},readJourney:async(id,key)=>{const r=await one('SELECT j.body,c.body AS detail FROM skyward_journeys j LEFT JOIN skyward_checks c ON j.user_id=c.user_id AND j.key=c.key WHERE j.user_id=$1 AND j.key=$2',[id,key]);return r?{...r.body,details:r.detail}:null;},lookup});
+ const premium=createPremiumTools({store:postgresPremiumStore(pool,transaction),observations,listJourneys:async id=>(await rows('SELECT j.body,c.body AS detail FROM skyward_journeys j LEFT JOIN skyward_checks c ON j.user_id=c.user_id AND j.key=c.key WHERE j.user_id=$1',[id])).map(r=>({...r.body,details:r.detail})),entitlement,env,now,userById:async id=>{const u=await one('SELECT id,email FROM "user" WHERE id=$1 AND "emailVerified"=true',[id]);if(!u)return null;return {...u,customer:(await one('SELECT stripe_customer FROM skyward_profiles WHERE user_id=$1',[id]))?.stripe_customer};},readJourney:async(id,key)=>{const r=await one('SELECT j.body,c.body AS detail FROM skyward_journeys j LEFT JOIN skyward_checks c ON j.user_id=c.user_id AND j.key=c.key WHERE j.user_id=$1 AND j.key=$2',[id,key]);return r?{...r.body,details:r.detail}:null;},lookup});
  async function handle(req,res,url){
   if(await premium.publicHandle(req,res,url))return true;
   if(url.pathname.startsWith('/api/auth/')){res.setHeader('Cache-Control','no-store');req.headers['x-skyward-client-ip']=req.socket.remoteAddress||'127.0.0.1';await authHandler(req,res);return true;}
@@ -94,8 +94,8 @@ export function createNeonMembership({env=process.env,pool=createNeonPool(env),s
    if(path==='/api/journeys'&&req.method==='GET'){send(200,{journeys:(await rows('SELECT body FROM skyward_journeys WHERE user_id=$1 ORDER BY key DESC',[u.id])).map(r=>r.body),alerts:(await rows('SELECT id,message,created FROM skyward_alerts WHERE user_id=$1 ORDER BY id DESC LIMIT 50',[u.id])).map(a=>({...a,created:Number(a.created)}))});return true;}
    if(path==='/api/journeys'&&req.method==='POST'){
         if(b.remove!==true&&!await entitlement(u))fail(403,'Premium is required to save journeys.');
-    const callsign=flightCode(b.callsign),hex=String(b.hex||'').toLowerCase(),date=String(b.date||'');if(!/^[a-f0-9]{6}$/.test(hex)||!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Number.isFinite(Date.parse(date))||new Date(date).toISOString().slice(0,10)!==date)fail(400,'Choose a valid flight and date.');
-    const k=`${callsign}:${hex}:${date}`,metadata={};for(const side of ['from','to']){const v=typeof b[side]==='string'?b[side].trim().toUpperCase():'';if(v&&!Object.hasOwn(airports,v))fail(400,'Choose an airport from the directory.');if(v)metadata[side]=v;}
+    const callsign=flightCode(b.callsign),hex=String(b.hex||'').toLowerCase(),date=String(b.date||'');if(hex&&!/^[a-f0-9]{6}$/.test(hex)||!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Number.isFinite(Date.parse(date))||new Date(date).toISOString().slice(0,10)!==date)fail(400,'Choose a valid flight and date.');
+    const k=`${callsign}:${hex||'unassigned'}:${date}`,metadata={};for(const side of ['from','to']){const v=typeof b[side]==='string'?b[side].trim().toUpperCase():'';if(v&&!Object.hasOwn(airports,v))fail(400,'Choose an airport from the directory.');if(v)metadata[side]=v;}
     await transaction(`journeys:${u.id}`,async db=>{if(b.remove===true){await db.query('DELETE FROM skyward_journeys WHERE user_id=$1 AND key=$2',[u.id,k]);return;}const old=await one('SELECT key FROM skyward_journeys WHERE user_id=$1 AND key=$2',[u.id,k],db);if(!old&&Number((await one('SELECT COUNT(*) n FROM skyward_journeys WHERE user_id=$1',[u.id],db)).n)>=50)fail(429,'Keep up to 50 saved journeys.');await db.query('INSERT INTO skyward_journeys VALUES($1,$2,$3) ON CONFLICT(user_id,key) DO UPDATE SET body=excluded.body',[u.id,k,JSON.stringify({key:k,callsign,hex,date,...metadata,alerts:b.alerts===true})]);});send(200,{ok:true});return true;
    }
    if(path==='/api/premium/details'&&req.method==='POST'){send(200,await lookup(u,b.key));return true;}
@@ -108,7 +108,7 @@ export function createNeonMembership({env=process.env,pool=createNeonPool(env),s
   const notifications=[];
   await transaction(`check:${userId}:${journeyKey}`,async db=>{
    const j=await one('SELECT body FROM skyward_journeys WHERE user_id=$1 AND key=$2 FOR UPDATE',[userId,journeyKey],db),saved=j?.body,f=result.flight;
-   if(!saved||!f||f.callsign!==saved.callsign||f.hex!==saved.hex||!Number.isFinite(Date.parse(f.departure?.scheduledAt))||new Date(f.departure.scheduledAt).toISOString().slice(0,10)!==saved.date)return;
+   if(!saved||!f||f.callsign!==saved.callsign||f.hex!==saved.hex||!Number.isFinite((typeof f.departure?.scheduledAt==='number'?f.departure.scheduledAt:Date.parse(f.departure?.scheduledAt)))||new Date(f.departure.scheduledAt).toISOString().slice(0,10)!==saved.date)return;
    const prior=(await one('SELECT body FROM skyward_checks WHERE user_id=$1 AND key=$2',[userId,journeyKey],db))?.body;
    if(prior?.mode==='live'&&result.fetchedAt<=prior.fetchedAt)return;
    if(saved.alerts&&prior?.mode==='live')for(const message of changesSince(prior.flight,f)){await db.query('INSERT INTO skyward_alerts(user_id,message,created) VALUES($1,$2,$3)',[userId,`${saved.callsign}: ${message}`,now()]);notifications.push(`${saved.callsign}: ${message}`);}

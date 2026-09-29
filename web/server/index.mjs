@@ -22,12 +22,12 @@ import { airlabsPreview } from './airlabs.mjs';
 import {createConfiguredMembership} from './membership-config.mjs';
 import {createAirportWeather} from './airport-weather.mjs';
 import {simulatorPage} from './simulator.mjs';
-const membership=await createConfiguredMembership();
+const feed = configuredFeed();
+const membership=await createConfiguredMembership({observations:()=>{const rows=new Map();for(const p of feed.providers)for(const item of p.client.cache.values())for(const a of item.value?.aircraft??[]){if((a.observedAt??0)>(rows.get(a.hex)?.observedAt??0))rows.set(a.hex,a);}return [...rows.values()];}});
 
 const here = dirname(fileURLToPath(import.meta.url));
 const webRoot = resolve(here, '../dist');
 const gameRoot = resolve(here, '../../dist/web');
-const feed = configuredFeed();
 const tripDiscovery=createTripDiscovery(feed);
 const airportWeather=createAirportWeather();
 const localWeather=createLocalWeather();
@@ -37,7 +37,7 @@ const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'application/javascri
 function json(res, code, value) { res.writeHead(code, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(value)); }
 export const server = http.createServer(async (req, res) => {
   operations.observe(res);
-  if(process.env.SKYWARD_ACCESS_LOG==='1'){const start=Date.now();res.once('finish',()=>console.log(`${req.method} ${req.url?.startsWith('/share/')?'/share/[redacted]':req.url?.split('?')[0]} ${res.statusCode} ${Date.now()-start}ms`));}
+  if(process.env.SKYWARD_ACCESS_LOG==='1'){const start=Date.now();res.once('finish',()=>console.log(`${req.method} ${(req.url?.startsWith('/share/')||req.url?.startsWith('/api/watch-room/'))?'/private-link/[redacted]':req.url?.split('?')[0]} ${res.statusCode} ${Date.now()-start}ms`));}
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('X-Frame-Options', 'SAMEORIGIN');

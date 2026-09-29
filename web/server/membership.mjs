@@ -19,7 +19,7 @@ const customerId=value=>typeof value==='string'?value:value?.id;
 export {changesSince} from './flight-alerts.mjs';
 import {changesSince} from './flight-alerts.mjs';
 
-export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now, dbPath}={}) {
+export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now, observations=()=>[], dbPath}={}) {
   if(env.NODE_ENV==='production'&&env.SKYWARD_ACCOUNTS==='test')throw Error('Production accounts must use Neon and Better Auth.');
   const devPremium=developmentPremium(env);
   const enabled=env.SKYWARD_ACCOUNTS==='test';
@@ -98,7 +98,7 @@ export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now
           run('INSERT INTO checks VALUES(?,?,?,?) ON CONFLICT(user_id,key) DO UPDATE SET body=excluded.body,checked=excluded.checked',u.id,saved.key,JSON.stringify(result),now());
     return {...result,usage:usage(u)};
   }
-  const premium=createPremiumTools({store:sqlitePremiumStore(db),entitlement,env,now,userById:id=>get('SELECT * FROM users WHERE id=?',id),readJourney:(id,key)=>{const j=get('SELECT body FROM journeys WHERE user_id=? AND key=?',id,key),c=get('SELECT body FROM checks WHERE user_id=? AND key=?',id,key);return j?{...JSON.parse(j.body),details:c?JSON.parse(c.body):null}:null;},lookup});
+  const premium=createPremiumTools({store:sqlitePremiumStore(db),observations,listJourneys:id=>db.prepare('SELECT j.body,c.body AS detail FROM journeys j LEFT JOIN checks c ON j.user_id=c.user_id AND j.key=c.key WHERE j.user_id=?').all(id).map(r=>({...JSON.parse(r.body),details:r.detail?JSON.parse(r.detail):null})),entitlement,env,now,userById:id=>get('SELECT * FROM users WHERE id=?',id),readJourney:(id,key)=>{const j=get('SELECT body FROM journeys WHERE user_id=? AND key=?',id,key),c=get('SELECT body FROM checks WHERE user_id=? AND key=?',id,key);return j?{...JSON.parse(j.body),details:c?JSON.parse(c.body):null}:null;},lookup});
   const accountLibrary=createAccountLibrary(db,{now,entitlement});
   async function body(req) {
     const maximum=req.url?.split('?')[0]==='/api/account/library'?64*1024:8192;
@@ -172,8 +172,8 @@ export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now
       if(path==='/api/journeys'&&req.method==='POST') {
         if(b.remove!==true&&!await entitlement(u))fail(403,'Premium is required to save journeys.');
         const callsign=flightCode(b.callsign),hex=String(b.hex||'').toLowerCase(),date=String(b.date||'');
-        if(!/^[a-f0-9]{6}$/.test(hex)||!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Number.isFinite(Date.parse(date))||new Date(date).toISOString().slice(0,10)!==date)fail(400,'Choose a valid flight and date.');
-        const k=`${callsign}:${hex}:${date}`;
+        if(hex&&!/^[a-f0-9]{6}$/.test(hex)||!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Number.isFinite(Date.parse(date))||new Date(date).toISOString().slice(0,10)!==date)fail(400,'Choose a valid flight and date.');
+        const k=`${callsign}:${hex||'unassigned'}:${date}`;
         const metadata={};for(const side of ['from','to']){const value=typeof b[side]==='string'?b[side].trim().toUpperCase():'';if(value&&!Object.hasOwn(airports,value))fail(400,'Choose an airport from the directory.');if(value)metadata[side]=value;}
         if(b.remove===true){run('DELETE FROM journeys WHERE user_id=? AND key=?',u.id,k);run('DELETE FROM checks WHERE user_id=? AND key=?',u.id,k);}
         else {if(!get('SELECT key FROM journeys WHERE user_id=? AND key=?',u.id,k)&&get('SELECT COUNT(*) n FROM journeys WHERE user_id=?',u.id).n>=50)fail(429,'Keep up to 50 saved journeys.');run('INSERT INTO journeys VALUES(?,?,?) ON CONFLICT(user_id,key) DO UPDATE SET body=excluded.body',u.id,k,JSON.stringify({key:k,callsign,hex,date,...metadata,alerts:b.alerts===true}));}

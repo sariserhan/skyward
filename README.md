@@ -380,3 +380,11 @@ Additional deterministic browser checks (after `npm --prefix web run build`, usi
 The airport simulator now opens on **3D Tower**. Use **Next arrival** to skip quiet startup time, **3D focus** to expand the airfield, and **Orbit / Tower / Follow / Top** to change cameras. Enable **Manual tower** to issue landing/takeoff clearances; taxi holds stop at the next node without bypassing traffic reservations. Day/night lighting, community aircraft models, mapped taxi geometry and illustrative terminal/bridge details share the existing simulation. See [the airport-control milestone](docs/airport-control.md) for controls, verification and the remaining gap to a high-fidelity ATC simulator. Existing saves and the 2D Airfield/Terminal views remain supported.
 
 The **Tower desk** adds simulated surface radar, draggable flight strips, taxi-route previews and application, gate/runway assignments, wind guidance, local weather presets, coached training and a controller score. Enable **Radio speech** for browser tower/pilot readbacks or **Airport sound** for synthesized ambience. Scenery now includes surface details, terminal windows and approach lighting; actual turnaround tasks drive service vehicles, while aircraft have display gear/flap/fan animation. High/Balanced/Low detail and frame-time diagnostics are in the desk. [Controller instructions and fidelity limits](docs/airport-control.md#controller-expansion).
+
+Premium journey tools now include family flight groups, a personal flight passport,
+observation-based spotter rules, private watch-together rooms, and cinematic replay
+highlights with local video export. Open **Account → Premium tools**; recordings
+remain under **Explore tools → Sessions**. See [Premium experience](docs/premium-experience.md)
+for usage, limits and availability. Live flight-status monitoring remains test-only
+until an authorized status source is connected; private rooms currently require a
+single server instance and expire after two hours.

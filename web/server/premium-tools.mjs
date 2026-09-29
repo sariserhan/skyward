@@ -1,3 +1,4 @@
+import {createPremiumExtras} from './premium-extras.mjs';
 import {randomBytes,createHash} from 'node:crypto';
 import webpush from 'web-push';
 const fail=(status,message)=>{throw Object.assign(Error(message),{status});};
@@ -9,11 +10,13 @@ export function validSubscription(value){
  if(url.protocol!=='https:'||url.port||url.username||url.password||!hosts.some(h=>url.hostname===h||h==='wns.windows.com'&&url.hostname.endsWith('.'+h))||url.href.length>2048||!value.keys||!/^[-_A-Za-z0-9]{87}$/.test(value.keys.p256dh)||!/^[-_A-Za-z0-9]{22}$/.test(value.keys.auth))fail(400,'Unsupported push subscription.');
  return {endpoint:url.href,keys:{p256dh:value.keys.p256dh,auth:value.keys.auth}};
 }
-export function createPremiumTools({store,entitlement,userById,readJourney,lookup,env=process.env,now=Date.now,sendPush=webpush.sendNotification}){
+export function createPremiumTools({store,entitlement,userById,readJourney,lookup,listJourneys,observations,env=process.env,now=Date.now,sendPush=webpush.sendNotification}){
  const vapid=env.SKYWARD_VAPID_PUBLIC_KEY&&env.SKYWARD_VAPID_PRIVATE_KEY&&env.SKYWARD_VAPID_SUBJECT?{subject:env.SKYWARD_VAPID_SUBJECT,publicKey:env.SKYWARD_VAPID_PUBLIC_KEY,privateKey:env.SKYWARD_VAPID_PRIVATE_KEY}:null;
  const month=()=>new Date(now()).toISOString().slice(0,7),monthlyLimit=30;
  async function eligible(id){const u=await userById(id);return u&&await entitlement(u)?u:null;}
+ const extras=createPremiumExtras({store,entitlement,userById,readJourney,listJourneys,observations,notifyVerified,now,env});
  async function handle(path,method,u,b){
+  const extra=await extras.handle(path,method,u,b);if(extra)return extra;
   if(!['/api/premium/monitoring','/api/premium/notifications','/api/premium/shares'].includes(path))return null;
   if(path.endsWith('/notifications')&&method==='POST'&&b.remove){await store.drop(u.id,'push',String(b.key||''));return {ok:true};}
   if(!await entitlement(u))fail(403,'Premium is required for this feature.');
@@ -21,7 +24,7 @@ export function createPremiumTools({store,entitlement,userById,readJourney,looku
    if(method==='GET')return {items:await store.list(u.id,'monitor'),mode:'test',monthlyLimit,used:(await store.get(u.id,'monitor-budget',month()))?.used??0,intervalMinutes:15};
    const key=String(b.key||''),j=await readJourney(u.id,key);if(!j)fail(404,'Save this journey first.');
    if(b.enabled===false){await store.drop(u.id,'monitor',key);return {ok:true};}
-   const date=Date.parse(j.date);if(!Number.isFinite(date)||date+2*86400000<now())fail(400,'Choose a current or upcoming journey.');
+   const date=Date.parse(j.date);if(!Number.isFinite(date)||date+2*86400000<now()||date>now()+366*86400000)fail(400,'Choose a current or upcoming journey.');
    await store.put(u.id,'monitor',key,{enabled:true,nextAt:Math.max(now(),date-12*3600000),endsAt:date+2*86400000,lastChecked:null,message:'Queued for a synthetic test check. No live flight alerts are generated.'},10);return {ok:true};
   }
   if(path.endsWith('/notifications')){
@@ -38,6 +41,7 @@ export function createPremiumTools({store,entitlement,userById,readJourney,looku
   const token=randomBytes(32).toString('hex'),key=digest(token),expires=now()+b.hours*3600000;await store.put(u.id,'share',key,{journeyKey:j.key,expires},20);return {url:'/share/'+token,key,expires};
  }
  async function publicHandle(req,res,url){
+  if(await extras.publicHandle(req,res,url))return true;
   if(!url.pathname.startsWith('/share/'))return false;
   res.setHeader('Cache-Control','private, no-store');res.setHeader('Referrer-Policy','no-referrer');res.setHeader('X-Robots-Tag','noindex, nofollow');res.setHeader('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'");
   let status=404,content='<h1>This flight link is unavailable.</h1><p>It may have expired or been revoked.</p>';
@@ -46,7 +50,7 @@ export function createPremiumTools({store,entitlement,userById,readJourney,looku
    const token=url.pathname.slice(7);if(!/^[a-f0-9]{64}$/.test(token))throw Error();
    if(!await store.claim(`share-view:${digest(req.socket.remoteAddress||'local')}`,now(),1000))fail(429,'Please wait before refreshing.');
    const record=await store.find('share',digest(token));if(!record||record.value.expires<=now()||!await eligible(record.userId))throw Error();
-   const j=await readJourney(record.userId,record.value.journeyKey);if(!j)throw Error();const verified=j.details?.mode==='live'&&j.details?.status==='MATCHED_RECENT_AIRCRAFT',f=verified?j.details.flight:null;
+   const j=await readJourney(record.userId,record.value.journeyKey);if(!j)throw Error();const verified=j.details?.mode==='live'&&['MATCHED_RECENT_AIRCRAFT','MATCHED_DATED_FLIGHT'].includes(j.details?.status),f=verified?j.details.flight:null;
    status=200;content=`<p>Skyward · Shared flight</p><h1>${escape(j.callsign)}</h1><h2>${escape(j.from||'Unknown origin')} → ${escape(j.to||'Unknown destination')}</h2><p>${escape(j.date)} · ${escape(f?.status||'Flight status not verified')}</p><p>${f?'Last verified check: '+escape(new Date(j.details.fetchedAt).toISOString()):'This is a saved journey, not a confirmed live flight update.'}</p>${f?`<p>Departure gate: ${escape(f.departure?.gate||'Not supplied')} · Arrival gate: ${escape(f.arrival?.gate||'Not supplied')}</p>`:''}<p>Link expires ${escape(new Date(record.value.expires).toISOString())}</p><a href="/">Explore Skyward</a>`;
   }catch(e){if(e.status){status=e.status;content=`<h1>${escape(e.message)}</h1>`;}}
   res.writeHead(status,{'Content-Type':'text/html; charset=utf-8'});res.end(req.method==='HEAD'?undefined:`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Shared flight · Skyward</title><style>body{background:#09141c;color:#edf4f6;font:18px/1.6 system-ui;max-width:680px;margin:10vh auto;padding:24px}a{color:#b4f3dc}h1{font-size:48px}</style><main>${content}</main></html>`);return true;
@@ -57,6 +61,7 @@ export function createPremiumTools({store,entitlement,userById,readJourney,looku
  }
  let running=false;
  async function tick(){if(running)return;running=true;try{
+  await extras.tick();
   for(const r of await store.scan('monitor')){
    if(r.value.nextAt>now()||!r.value.enabled)continue;
    if(!await store.claim(`monitor:${r.userId}`,now(),60000))continue;
