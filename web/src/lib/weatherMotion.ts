@@ -2,6 +2,7 @@ import {cloudThickness,reportDistanceKm,type WeatherReport} from './localWeather
 
 // Presentation only: surface weather cannot measure turbulence along a flight track.
 const reports=new WeakMap<object,WeatherReport>();
+export const readPublishedWeather=(viewer:object)=>reports.get(viewer);
 export function publishWeather(viewer:object,report:WeatherReport|null){if(report)reports.set(viewer,report);else reports.delete(viewer);}
 export function weatherRoughness(report:WeatherReport|null|undefined,lat:number,lon:number,altitudeM:number,ground:boolean,now=Date.now()){
  if(!report||ground||now-report.observedAt>7200000||report.observedAt-now>300000||reportDistanceKm(report,{lat,lon})>150)return 0;

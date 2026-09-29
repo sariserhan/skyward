@@ -347,3 +347,7 @@ body>.cesium-credit-lightbox-overlay .cesium-credit-lightbox-close{min-width:36p
 .globe-utilities .utility-dialog section{position:static;width:auto;max-height:none;overflow:visible;box-shadow:none;margin:12px 0}.audio-mixer{font-size:12px;max-width:100%}.audio-mixer summary{cursor:pointer;padding:8px 0}.audio-mixer fieldset{min-width:0;padding:8px;border:1px solid #41616c}.audio-mixer input[type=range]{width:120px;min-width:50px;padding:0}.audio-mixer output{min-width:34px}.utility-dialog dl{overflow-wrap:anywhere}
 
 .performance-monitor .utility-dialog dt,.performance-monitor .utility-dialog dd{margin:0;align-self:center}.performance-monitor .utility-dialog dl{row-gap:12px}.performance-monitor .utility-dialog dd{text-align:right}
+
+.flight-voices{font-size:12px;padding:8px 0;border-top:1px solid #3b5968;max-width:100%}.flight-voices summary{cursor:pointer;padding:5px 0}.flight-voices p{margin:8px 0;line-height:1.5}.flight-voices small{display:block;color:#a8c2d0;line-height:1.5}.flight-voices .flight-buttons{flex-wrap:wrap;margin:7px 0}
+.cockpit-mode:has(.flight-voices){max-height:calc(50% - 110px);overflow:auto;overscroll-behavior:contain;pointer-events:auto;scrollbar-gutter:stable}
+@media(max-width:759px){.cockpit-mode:has(.flight-voices){max-height:calc(50% - 94px)}}

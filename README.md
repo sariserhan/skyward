@@ -281,3 +281,20 @@ Nothing is uploaded. **Sound mix** provides separate engine, cabin, weather and
 radio levels. See [visual realism](docs/visual-realism.md) for the current scenery,
 arrival preparation and supported aircraft-motion details, and
 [customer readiness](docs/customer-readiness.md) for the device release matrix.
+
+### Tower dialogue and captain announcements
+
+In Flight view, open **Flight voices · Simulation** and enable **Tower dialogue**
+and/or **Captain**. The controls also appear in the cockpit. Captain messages use
+available route information, the displayed flight phase and nearby weather reports.
+At the onset of the turbulence effect, the captain asks passengers to fasten their
+seat belts and the crew to secure the cabin. Hysteresis and a three-minute cooldown
+prevent repeated warnings. **Captain update** requests a fresh briefing.
+
+These are scripted, simulated voices, not a real aircraft's radio or cabin audio.
+No gate, landing clearance or arrival time is invented. Local English system
+voices are used without a paid service; if none is installed, a transcript is shown.
+Enable voices with a click each time you enter a flight. Volume follows **Radio**
+and **Cabin** in Sound mix. Backgrounding or leaving the view stops its speech.
+The flight simulator also offers captain announcements alongside its existing
+simulated tower instructions.
