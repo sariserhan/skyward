@@ -11,7 +11,7 @@ def run(page):
  page.route('**/api/route?*',f.mock);page.route('**/api/search?*',f.mock);page.route('**/api/status',f.mock)
  page.goto(f.URL+'/#airport=TAS');page.get_by_role('button',name='Try Skyward simulated traffic',exact=True).click(timeout=30000)
  demo=page.get_by_role('region',name='Skyward simulated traffic');expect(demo).to_be_visible();expect(demo).to_contain_text('Fictional flights at TAS');expect(demo.locator('li')).to_have_count(6)
- page.wait_for_function("__viewer.dataSources.getByName('skyward-fictional-traffic')[0]?.entities.values.length===6")
+ page.wait_for_function("__viewer.dataSources.getByName('skyward-fictional-traffic')[0]?.entities.values.filter(e=>e.model).length===6")
  assert page.evaluate("__viewer.entities.values.filter(e=>e.id.startsWith('aircraft-')).length")==0
  demo.locator('li button').first.click();page.wait_for_timeout(2000)
  page.wait_for_function("__viewer.trackedEntity?.id==='skyward-demo-0'")

@@ -1663,14 +1663,35 @@ turns on automatically or feeds synthetic rows into tracking, alerts, account
 watchlists or observation recordings.
 
 Six fictional Skyward flights use random aircraft profiles and airport pairs.
-They demonstrate arrival, rollout, taxi, gate service, pushback, departure and an
-airborne circuit. The route label is a fictional itinerary; the animation is a
-local circuit, not a simulated intercontinental flight. A mapped taxi connection
-is used where available; missing geometry uses a visibly disclosed illustrative
-stand/route. An airport without usable runway geometry cannot start the demo.
-Models are our original illustrative profiles with rigged gear and Skyward tail
-and fuselage branding, not manufacturer CAD or a real airline livery. Regenerate
-branding with `scripts/brand-demo-fleet.py` using Python Playwright/Chromium.
+Airport activity demonstrates a local arrival/turnaround/departure circuit. A
+conservative scheduler reserves the whole movement area for one flight at a time;
+other aircraft fly separated holding lanes. Stands are assigned separately.
+“Watch next arrival” follows the next reserved flight; “Skip wait” explicitly
+advances the fictional clock. This is illustrative activity, not real ATC or a
+certified separation model. It intentionally prioritizes separation over density.
+
+“Fly complete journey” switches the selected aircraft to a full origin-to-
+destination trip: boarding, pushback, taxi, runway departure, climb, cruise,
+descent, landing and parking. The other local demo aircraft are hidden in this
+mode. Destinations are constrained by illustrative aircraft range; incompatible
+runways show an explanation rather than forcing a landing. Progress, fleet seed,
+speed and camera save on this device (bounded, validated `skyward.demo.v2.*`
+records). Reopen the optional demo at the same airport to resume. Time pauses
+while the demo is closed or the page is hidden; no server runs a background fleet.
+
+Six profiles have different approach/rotation/cruise speeds, runway requirements,
+taxi turn rounding, turnaround durations and gear motion. Mapped taxi connections
+are used where available, but rounded paths and stand assignments are illustrative;
+missing paths use disclosed fallback geometry. Ground activity includes animated
+baggage vehicles, boarding stairs and a pushback tug. Models are our original
+illustrative profiles with rigged gear and Skyward tail/fuselage branding, not
+manufacturer CAD or a real airline livery. Regenerate branding with
+`scripts/brand-demo-fleet.py` using Python Playwright/Chromium.
+
+Side, cockpit, cabin, tower and free cameras share the current synthetic pose.
+The demo cockpit shows instruments but does not offer manual flight control;
+use the separate flight simulator for that. Switching to observed flights,
+replay, airport tools or another airport removes the demo source and camera.
 
 Real observed tracking remains free where feeds provide positions. Premium
 currently supplies protected, on-demand flight details through the existing paid
@@ -1694,9 +1715,23 @@ its own validated integration and usage budget before advertising that capabilit
   simulator state and can highlight the corresponding control. Sound follows the
   existing simulator audio setting; the coach does not take control of the plane.
 - `npm run test:release` runs unit/security checks, a production build, public
-  route/account checks, globe/customer flows, optional demo isolation, guided-flight/preset/watchlist controls, watched
-  landing and accelerated soak tests. Set `SKYWARD_QA_PYTHON` if needed. The report
+  route/account checks, globe/customer flows, optional demo isolation, complete
+  journey persistence, cameras, reviewed report exports, desktop/mobile mode
+  transitions, guided-flight/preset/watchlist controls, watched landing and accelerated soak tests. Set `SKYWARD_QA_PYTHON` if needed. The report
   defaults to the system temp directory (`skyward-release-check.json`). No deploy
   occurs. The soak covers an accelerated six-hour timestamp span, not six hours
   of wall-clock observation. Production Neon integration tests still need a test
   database; the normal suite reports those skips explicitly.
+
+### Reviewed problem reports and Premium comparison
+
+“Report a problem” collects a description and an optional, editable diagnostic
+snapshot. Users review it before copying/downloading JSON. There is no report
+submission endpoint or automatic sending; share the exported file with support.
+The initial diagnostic snapshot excludes account details, credentials, precise
+map coordinates, query strings and browsing history. User-entered text can still
+contain personal information and should be reviewed before sharing.
+
+The Premium preview includes a Free/Premium comparison, explicit unavailable
+fields and coverage/lookup-limit caveats. Opening it makes no paid aviation
+request and does not start checkout.
