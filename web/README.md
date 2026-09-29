@@ -1455,3 +1455,14 @@ the layer releases its meshes. External data failure does not stop the globe
 or aircraft. Public hosting has no SLA; this is not guaranteed city coverage.
 
 Sources: https://openfreemap.org/ and https://openmaptiles.org/docs/schema/
+
+## Cockpit windshield weather
+
+Watched-flight pilot view and simulator cockpit share a rain-on-glass layer.
+Existing nearby, current weather reports (or manual simulator weather) drive
+rain below the inferred cloud top; no additional API request is made. **Wipers**
+offers Auto, Off, Slow and Fast. Generic twin blades clear droplets in their
+actual swept sectors; unswept glass remains wet. Instruments stay unobscured.
+Simulator/practice pause freezes the effect; reduced motion parks the blades
+and clears the view without animated sweeps. This is a visual effect, not
+an aircraft-specific windshield or weather physics model.
