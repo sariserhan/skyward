@@ -1,14 +1,132 @@
-# RIVERDALE / BOARDING
+# Skyward
 
-The new **Skyward flight observatory** runs at http://localhost:8000/
-with free community aircraft observations, a 3D globe, a 2D map, and Dulles /
-Istanbul airport views. See [web/README.md](web/README.md) for launch instructions,
-features, data sources and limitations. The original game runs at http://localhost:8000/airport-simulation/.
+A browser flight observatory and flight simulator built with React, TypeScript,
+Vite, CesiumJS and Node.js. Explore the globe, follow aircraft, inspect airports,
+or fly an aircraft with Easy or Advanced controls. This repository also preserves
+the Godot airport operations and boarding game.
+
+## Quick start
+
+Use **Node.js 24 or newer**. From the repository root:
+
+```sh
+npm --prefix web ci
+npm --prefix web run build
+npm --prefix web run start:dev
+```
+
+Open **http://localhost:8000/** and keep the server running. `/watch/` redirects
+to the homepage. `start:dev` enables the development Premium override with local
+test accounts; it does not enable paid aviation API access or real payments.
+Use `npm --prefix web start` to run without the development Premium override.
+
+For frontend hot reload, keep the Node server running and run
+`npm --prefix web run dev` in a second terminal. Open the URL Vite prints; it
+proxies `/api` requests to port 8000. After changing backend code or environment
+settings, restart the Node server.
+
+Optional local configuration belongs in **web/.env.local**, using
+[web/.env.example](web/.env.example) as the field reference. Do not overwrite an
+existing configuration or commit credentials. The startup scripts load `.env`
+then `.env.local`; process environment variables take precedence.
+
+When accessing a headless server, run this on **your own computer**, replacing
+`USER@SERVER` with your SSH destination:
+
+```sh
+ssh -N -L 8000:127.0.0.1:8000 USER@SERVER
+```
+
+Then open `http://localhost:8000/` on that computer. Check
+`http://localhost:8000/healthz` if the page does not load; this checks the app,
+not aircraft-feed coverage.
+
+## Current experience
+
+- **Globe and airport exploration:** satellite/atlas views, camera-area traffic,
+  a worldwide airport directory, mapped runways and facilities, tower views,
+  airport traffic panels and trip following.
+- **Aircraft viewing:** sourced aircraft models and liveries where available,
+  family fallbacks, side/front/bird's-eye/cabin/cockpit cameras, animated gear,
+  propellers, rotors, navigation lights and aircraft-specific sound.
+- **Weather and lighting:** report-driven clouds, rain, snow, thunder and
+  illustrative turbulence; sun-aware 3D cloud volumes, day/night lighting,
+  aircraft paint highlights, and procedural building facades with night windows.
+- **Smoother scene preparation:** gradual cloud transitions, bounded model
+  preloading that prioritizes the selected aircraft, and retained recent weather
+  during temporary refresh failures.
+- **Simulation:** flyable aircraft with Easy/Advanced controls, training,
+  fuel, simulated radio guidance and landing/taxi practice. The separate Godot
+  airport game is at `/airport-simulation/` when its web export is available.
+- **Accounts and Premium:** local test mode and a Neon PostgreSQL + Better Auth
+  account path; Premium gates for simulators, recording, account libraries and
+  configured paid flight details. Checkout remains test-only.
+
+For richer scenery choose **Map tools → Layers → Performance preset → High
+detail**. It enables satellite imagery, approximate terrain, structures, sharper
+shadows and additional edge smoothing. Automatic quality reduction remains
+available for slower devices.
+
+Observed positions, estimated movement and fictional Skyward traffic are distinct.
+Coverage is incomplete, and a Premium subscription does not guarantee worldwide
+real-time coverage. Landing, taxi, weather volumes and building facades are
+illustrative; this is an entertainment product, not navigation software. Actual
+passenger manifests are unavailable. See the [visual realism notes](docs/visual-realism.md)
+for implemented improvements and the remaining gap with detailed flight simulators.
+
+## Development and validation
+
+```sh
+npm --prefix web test             # unit and server tests
+npm --prefix web run build        # TypeScript checks and production bundle
+npm --prefix web run test:browser # deterministic browser regression
+npm --prefix web run test:weather # report-driven weather rendering
+npm --prefix web run test:cockpit # cockpit loading and recovery
+npm --prefix web run test:landing # watched landing and taxi regression
+```
+
+Browser checks require Python Playwright and its Chromium installation. Set
+`SKYWARD_QA_PYTHON` to the interpreter containing Playwright when necessary.
+They use isolated servers and save evidence outside the repository. Headless
+Chromium checks do not establish real-device GPU performance or Safari/Firefox
+compatibility. See [browser testing](web/tests/browser/README.md).
+
+## Documentation
+
+- [Web application guide](web/README.md): configuration, features, data sources,
+  Premium, accounts and implementation history.
+- [Visual realism](docs/visual-realism.md): clouds, aircraft materials, scenery
+  and rendering limitations.
+- [Deployment guide](deployment/README.md): the current persistent Node service
+  and production setup. Deployment has not been performed; Cloudflare-specific
+  hosting, R2 and D1 are not implied by the current implementation.
+- [Game spec](spec.md), [airport architecture](docs/architecture.md),
+  [game status](docs/status.md), and [design decisions](docs/DECISIONS.md).
+
+## Layout
+
+```
+game/        Godot 4 project (GDScript)
+  scripts/airport/ headless airport world, entities, clock and events
+  scripts/sim/   preserved headless boarding engine (no Node dependencies)
+  scripts/ui/    rendering and UI
+  configs/       aircraft, scenarios, simulation constants (JSON)
+  tests/         headless test harness
+docs/        spec, simulation notes, roadmap, decisions
+web/         Skyward observatory (React, Cesium, Node; free community data)
+```
+
+## Godot game requirements
+
+Godot **4.7.2-stable** (pinned in `.godot-version`). Put the binary on your
+PATH as `godot`.
+
+## Godot airport operations game
 
 A Godot airport operations simulator with a preserved aircraft boarding engine.
 The default scene runs Riverdale International: manage gate conflicts while
 fictional flights land, taxi, turn around and depart. Airport M0–M12 and M13 part 1 are
-implemented. Arriving aircraft carry real passengers, who deboard row by row and
+implemented. Arriving aircraft carry simulated passengers, who deboard row by row and
 either leave the airport or connect: they walk to another gate and board
 another flight, as the same person. Departing passengers clear
 security and board through the preserved cabin simulation. Aircraft turnaround
@@ -39,24 +157,6 @@ Airport architecture: [docs/architecture.md](docs/architecture.md).
 Current validation and limitations: [docs/status.md](docs/status.md).
 
 Full product spec: [spec.md](spec.md). Design decisions: [docs/DECISIONS.md](docs/DECISIONS.md).
-
-## Layout
-
-```
-game/        Godot 4 project (GDScript)
-  scripts/airport/ headless airport world, entities, clock and events
-  scripts/sim/   preserved headless boarding engine (no Node dependencies)
-  scripts/ui/    rendering and UI
-  configs/       aircraft, scenarios, simulation constants (JSON)
-  tests/         headless test harness
-docs/        spec, simulation notes, roadmap, decisions
-web/         Skyward observatory (React, Cesium, Node; free community data)
-```
-
-## Requirements
-
-Godot **4.7.2-stable** (pinned in `.godot-version`). Put the binary on your
-PATH as `godot`.
 
 ## Dulles airport prototype
 

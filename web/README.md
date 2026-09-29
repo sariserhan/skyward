@@ -1,8 +1,14 @@
 # Skyward flight observatory
 
-A customer-preview flight observatory. React + Cesium render a satellite globe
-and a lightweight atlas; a Node server queries ADSB.lol. No account or key is
-required for the current local preview. Public launch requirements are below.
+Skyward combines a React/Cesium globe, camera-area aircraft observations,
+worldwide airport exploration, watched-flight cameras and an entertainment flight
+simulator. Vite builds the frontend; a persistent Node server serves the app and
+API. The original Godot airport simulation is a separate web export.
+
+Free observations need no paid aviation key. Premium features and accounts have
+local development/test modes; the selected production account integration uses
+Neon PostgreSQL and Better Auth. Deployment and live billing are not completed.
+See the [root quick start](../README.md) and [visual realism notes](../docs/visual-realism.md).
 
 ## Run locally
 
@@ -11,8 +17,13 @@ Use Node 24 or newer. From this directory:
 ```sh
 npm ci
 npm run build
-npm start
+npm run start:dev
 ```
+
+`start:dev` unlocks development Premium using local test accounts. It does not
+activate paid feeds or real billing. Use `npm start` without that override, or
+`npm run start:neon:dev` with your configured Neon/Better Auth development setup.
+Optional secrets belong in `.env.local`; use `.env.example` as the reference.
 
 Open **http://localhost:8000/**. `/watch/` redirects to this homepage. Keep the server running.
 The exported Godot game is at **http://localhost:8000/airport-simulation/** when
@@ -22,52 +33,60 @@ Port 8000 must be available. `PORT` and `HOST` can override the server binding.
 For frontend development, keep the Node server running and use `npm run dev`;
 Vite proxies `/api` to port 8000.
 
-## Use
+## Current features and controls
 
-- Satellite imagery is the default. Open Layers for the Atlas fallback, airport structures, gates/labels, and reference grid. Preferences are saved on this device. Imagery is historical photography, not live video. The scale is approximate at the bottom-center latitude.
-- Use the help button for touch, mouse and keyboard instructions. Aircraft selection is independent from camera following.
-- Airport facilities can be filtered by name; traffic can be filtered to ground or airborne observations. These filters never infer scheduled arrivals or departures.
-
-- Choose Dulles (IAD) or Istanbul (IST) for observations within 100 nautical miles.
-  Click its map marker or airport card to open mapped facilities and live nearby traffic. The airport panel shows observations within 5 nautical miles; the sidebar retains the 100-nautical-mile airspace.
-- Select an aircraft to inspect its reported position, altitude, ground speed, heading, type and callsign. Selection leaves the camera free. Press Follow to lock on, and drag/scroll or press Following · stop to release it. Switch between 3D globe and 2D map.
-- Drag with the left mouse button (or one finger) to spin/pan. Scroll or pinch to zoom; right-drag, middle-drag or Ctrl-drag to tilt/orbit. Buttons rotate left/right, restore north and toggle overhead/tilted views. Focus the canvas for arrow-key rotation, +/- zoom, N for north and T for tilt. Double-click no longer silently enables tracking.
-- In airport view, choose a runway, terminal or gate to zoom to its mapped position. Gate markers and building/runway surfaces are clickable. Map clicks on overlapping airport/aircraft markers favor airports at globe scale; use the aircraft list for individual flight selection.
-- Filter Turkish Airlines locally, or enter an exact ATC callsign, registration,
-  or ICAO hex and press Search worldwide. Ticket flight numbers can differ from
-  ATC callsigns. A nearby aircraft is not necessarily arriving at that airport.
-- Star an aircraft to save its identifier in this browser. During the current
-  session, recorded fixes can be replayed and downloaded as JSON. This is not a
-  historical flight archive. A watch follows an airframe identifier, which can
-  operate different flights later.
+- Search the worldwide airport directory or move the camera to explore an area.
+  Traffic queries follow the visible region; selecting an airport does not lock
+  coverage to that airport. Missing observations do not mean empty airspace.
+- Select an aircraft, then **Flight view** for side, front, bird's-eye, cabin and
+  pilot cockpit cameras. Drag/pinch to move the globe; right-drag or Ctrl-drag to
+  tilt. **Reset view** and **View angle** restore an easier perspective.
+- Open **Map tools → Layers** to choose satellite/atlas imagery, terrain,
+  buildings and graphics quality. **Performance preset → High detail** enables
+  terrain, structures, satellite imagery, sharper shadows and edge smoothing.
+  Preferences remain on this device; automatic quality reduction is available.
+- Nearby and horizon clouds now share a sun-lit 3D volume renderer, with gradual
+  fades and bounded creation work. Aircraft paint gains more natural highlights.
+  Mapped airport/city extrusions have procedural facades and night windows.
+- Recent nearby weather reports drive rain, snow, grey/white clouds and storm
+  effects. Cabin rain/thunder mixes follow the audio control. Weather controls
+  and reduced-motion preferences can suppress effects.
+- Sourced aircraft and liveries are used where available; family or generated
+  models remain fallbacks. Model preloading prioritizes the selected aircraft.
+- Tower views, airport facilities and trip following expose available traffic
+  and route context. Flyable aircraft offer Easy/Advanced controls and training;
+  the Godot airport game requires its separate export.
+- Free watchlists remain local. Session recording, Premium libraries and account
+  writes are gated; development Premium is available through `start:dev`.
 
 ## Data and limitations
 
-Positions refresh about every 25 seconds while the page is visible. Requests are
-shared, cached for 20 seconds, serialized with at least 1.1 seconds between query
-starts, and use a 12-second timeout. Failed feeds retain the selected observation
-with its original timestamp. Aircraft do not move through coverage gaps. Last
-fixes become amber after 30 seconds and show a signal gap after two minutes.
-Trails omit missing altitude and break across gaps longer than two minutes;
-replay steps through recorded fixes without inventing movement. Trails are
-bounded to 250 aircraft and 1,440 points each; up to 30 identifiers are saved.
+The renderer keeps aircraft moving between observations using estimated motion.
+Observed timestamps remain intact; animation is not a new API position. Watched
+arrival completion can illustrate landing, rollout, taxi and parking without
+confirmed runway, gate or gear-state data. Fictional Skyward traffic may fill
+sparse airport scenes and remains distinct from real aircraft observations.
 
-The position feed does not provide confirmed routes, destination, ETA or gate assignments. Selecting a callsign now performs a separate ADSB.lol route lookup; its origin, destination and any intermediate stops are labeled as a callsign route record, not a confirmed current flight plan. A dashed route line is an estimate, not an observed track. Position mismatches are called out and not drawn. If the plausibility service fails, the provider’s own public Virtual Radar Server standing-data service is used, explicitly UNVERIFIED; unavailable routes stay unavailable. Route responses are cached for five minutes and the failed plausibility service backs off for one minute. No paid provider or key was introduced.
-Runway alignment is a geometric estimate and is explicitly labeled as inferred.
-Reported barometric altitude is used for visualization, not surveyed height.
-The generic aircraft mesh and extruded building heights are illustrative, not
-exact replicas. Istanbul now includes six OurAirports runways plus OpenStreetMap gate nodes, taxiways, aprons and building footprints. Dulles has four mapped runways and 130 mapped gates; Istanbul has 87 mapped gates. These are mapped features, not a guarantee of complete airport inventory or live gate occupancy. Ocean and
-surface receiver coverage may be incomplete. No historical takeoff can be shown
-unless this session observed it.
+Free and configured paid feeds have different coverage and limits. Premium access
+does not guarantee complete, instantaneous worldwide traffic. Requests are
+cached, deduplicated and bounded; actual behavior depends on the configured feed,
+view and account. Callsign routes can be incomplete or unverified and are not
+confirmed flight plans. Actual passenger manifests are unavailable.
 
-The community API has dynamic rate limits and no availability guarantee. The
-current provider source describes free access and possible future API-key
-requirements. Satellite tiles come directly from Esri World Imagery, with the
-service's current attribution displayed by Cesium. This is an externally hosted
-basemap; public accessibility is not evidence of unrestricted commercial rights.
-No paid account, Cesium ion terrain, or production imagery entitlement is configured.
-The atlas remains available on imagery failure; Retry imagery reconnects without
-losing the selected airport. The default globe uses an ellipsoid; optional Open terrain streams approximate elevation without a key or account. It is not surveyed airport terrain.
+Weather is based on nearby recent surface reports, not measured clouds, winds
+aloft or lightning locations. The global cloud overview is a report-derived
+illustration. Recent reports can be retained during refresh failures, with age
+and distance limits; unknown weather is not assumed clear.
+
+Scenery uses historical imagery, mapped footprints and approximate terrain.
+Procedural windows, inferred building heights, generic models and fallback
+liveries are illustrative. This is not photogrammetry or MSFS-quality worldwide
+scenery. Facade details preserve the mapped footprint rather than claiming an
+exact building replica. High detail increases GPU and bandwidth demand; real
+mobile GPU and cross-browser validation remain necessary.
+
+See [visual realism](../docs/visual-realism.md) for the rendering changes and
+remaining work, and the source/attribution section below for asset provenance.
 
 ## Customer preview and public launch
 
@@ -90,7 +109,8 @@ public service. Before public launch:
    current Safari/Firefox and real mobile GPU behavior. The local verification
    uses Chromium with desktop and mobile viewports, not physical devices.
 5. Set a support contact and customer terms/privacy information for the chosen
-   operator. There is no invented company identity, billing or user account system.
+   operator. Accounts and test checkout exist, but a live billing launch and operator details
+   still require configuration.
 
 The server now sends nosniff, same-origin frame protection, a referrer policy,
 and disabled camera/microphone/geolocation permissions. Hashed frontend assets
@@ -99,7 +119,8 @@ limited to 16 queued/in-flight distinct requests, and expire after 15 seconds in
 the queue. Overload returns an explicit error. SIGTERM/SIGINT drain connections
 with a 10-second shutdown deadline. Feed/route browser requests time out at 25
 seconds, geometry at 20 seconds, and the app has a recoverable error screen.
-Watchlists and layer preferences are stored in browser localStorage. There are no
+Free watchlists and layer preferences are stored in browser localStorage; Premium
+account libraries support server persistence. There are no
 analytics trackers; imagery requests expose the viewer's IP to the imagery service.
 
 No public deployment or provider agreement was performed as part of this pass.
@@ -138,7 +159,14 @@ Geography and the generic mesh can be regenerated with the two Python scripts in
 The visual concept and implementation tokens are in `design/`.
 
 
-## No-payment exploration release
+## Implementation history
+
+The sections below record successive releases and may describe behavior later
+replaced by another entry. The current overview above and application code take
+precedence; early references to generated-only models, motion holds or test-only
+auth are historical.
+
+### Initial no-payment exploration release
 
 - **Show full route** frames the aircraft and both endpoints of an available two-airport callsign route. Multi-leg ambiguity and mismatches still prevent treating a route as the current itinerary.
 - **Facility categories** narrow terminals, runways and gates. Selected facilities receive a mint marker and footprint/runway outline; a gate highlights its location, not an invented gate polygon.
@@ -1835,3 +1863,19 @@ Below storm clouds, the sky gradually desaturates and dims, obscuring the Sun,
 Moon and planets. Light rain preserves blue sky and more sunlight. Climbing above
 the inferred cloud top restores the normal sky. These are illustrative effects
 from nearby surface reports, not measured cloud/strike geometry or aircraft audio.
+
+### Sun-aware scenery and realism improvements
+
+The current renderer uses sun-aware volumetric near/horizon clouds, warmer sunset
+aircraft lighting, weather-softened light and paint highlights. Mapped airport and
+city buildings have distance-faded procedural windows and sparse night lighting;
+terrain-clamped airport polygons receive the same treatment. High detail selects
+the existing satellite, terrain and structures layers with 4x MSAA and 2048-pixel
+shadow maps where supported.
+
+Cloud creation is spread across frames and old volumes fade out. Model preloading
+uses a bounded recent-use cache, prioritizes selected aircraft, handles binary
+glTF, bounds request time and permits retries. Weather refresh failures can retain
+a still-valid report, marked refresh-delayed. These changes introduce no paid
+services or database writes. See [visual realism](../docs/visual-realism.md) for
+validation and limitations.
