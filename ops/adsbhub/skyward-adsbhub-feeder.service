@@ -1,0 +1,23 @@
+[Unit]
+Description=Forward locally received SBS observations to ADSBHub
+Documentation=https://www.adsbhub.org/howtofeed.php
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+# Install on the PHYSICAL RECEIVER host after registering its public IP.
+# Port 30003 must contain only this receiver's own observations.
+ExecStart=/usr/bin/socat -u -T 30 TCP:127.0.0.1:30003,connect-timeout=10 TCP:data.adsbhub.org:5001,connect-timeout=10
+Restart=always
+RestartSec=15
+DynamicUser=yes
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+RestrictAddressFamilies=AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target
