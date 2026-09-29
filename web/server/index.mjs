@@ -1,3 +1,5 @@
+import {publicPage} from './public-pages.mjs';
+import {createOperations,authorizedMetrics,clientAddress} from './operations.mjs';
 import {configuredFeed} from './combined-feed.mjs';
 import {tripResponse,tripQuery,createTripDiscovery} from './trip-follower.mjs';
 import {createLocalWeather} from './local-weather.mjs';
@@ -28,9 +30,11 @@ const tripDiscovery=createTripDiscovery(feed);
 const airportWeather=createAirportWeather();
 const localWeather=createLocalWeather();
 const rates = new Map();
+const operations=createOperations();
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'application/javascript', '.css': 'text/css', '.txt': 'text/plain; charset=utf-8', '.json': 'application/json', '.geojson': 'application/geo+json', '.png': 'image/png', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.wasm': 'application/wasm', '.gltf': 'model/gltf+json', '.glb': 'model/gltf-binary', '.woff2': 'font/woff2' };
 function json(res, code, value) { res.writeHead(code, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(value)); }
 export const server = http.createServer(async (req, res) => {
+  operations.observe(res);
   if(process.env.SKYWARD_ACCESS_LOG==='1'){const start=Date.now();res.once('finish',()=>console.log(`${req.method} ${req.url?.startsWith('/share/')?'/share/[redacted]':req.url?.split('?')[0]} ${res.statusCode} ${Date.now()-start}ms`));}
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
@@ -41,12 +45,18 @@ export const server = http.createServer(async (req, res) => {
     if(await membership.handle(req,res,memberUrl)) return;
     if (!['GET', 'HEAD'].includes(req.method)) return json(res, 405, { error: 'Method not allowed' });
     const url = new URL(req.url, 'http://localhost');
-    if (url.pathname === '/healthz') {
+    if (url.pathname === '/metrics') {
+      if(!authorizedMetrics(req.headers.authorization,process.env.SKYWARD_METRICS_TOKEN))return json(res,401,{error:'Unauthorized'});
+      return json(res,200,{server:operations.snapshot(),feeds:feed.diagnostics});
+    }
+    const published=publicPage(url);
+    if(published){if(published.location){res.writeHead(published.status,{Location:published.location,'Cache-Control':'no-store'});return res.end();}res.writeHead(published.status,{'Content-Type':published.type,'Cache-Control':published.status===200?'public, max-age=300':'no-store'});return res.end(req.method==='HEAD'?undefined:published.body);}
+    if (url.pathname === '/healthz' || url.pathname === '/readyz') {
       try { await stat(resolve(webRoot, 'index.html')); return json(res, 200, { status: 'ok', service: 'skyward', upstream: 'not checked' }); }
       catch { return json(res, 503, { status: 'unavailable', error: 'Build assets missing' }); }
     }
     if (url.pathname.startsWith('/api/')) {
-      const ip = req.socket.remoteAddress;
+      const ip = clientAddress(req,process.env.SKYWARD_TRUST_LOOPBACK_PROXY==='1');
       const rate = rates.get(ip) ?? { start: Date.now(), count: 0 };
       if (Date.now() - rate.start > 60000) { rate.start = Date.now(); rate.count = 0; }
       rate.count++; rates.set(ip, rate);
@@ -89,11 +99,13 @@ export const server = http.createServer(async (req, res) => {
     if (['/watch','/watch/','/watch/index.html','/index.html'].includes(url.pathname)) { res.writeHead(302, { Location: '/' + url.search, 'Cache-Control':'no-store' }); return res.end(); }
     if (url.pathname === '/airport-simulation') { res.writeHead(302, { Location: '/airport-simulation/' + url.search, 'Cache-Control':'no-store' }); return res.end(); }
     if(url.pathname==='/flight-simulator'){res.writeHead(302,{Location:'/flight-simulator/','Cache-Control':'no-store'});return res.end();}
+    const isAccount=url.pathname==='/account/';
+    if(isAccount)res.setHeader('X-Robots-Tag','noindex, nofollow');
     const isFlight=url.pathname==='/flight-simulator/';
     if(isFlight){const access=await membership.simulatorAccess(req);if(!access.allowed){res.writeHead(access.status,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'private, no-store'});return res.end(simulatorPage(access).replaceAll('Airport simulator','Flight simulator').replaceAll('airport simulator','flight simulator'));}}
     const isWatch = url.pathname.startsWith('/watch/');
     const isGame = url.pathname.startsWith('/airport-simulation/');
-    if(!isFlight&&!isWatch&&!isGame&&!['/','/offline-worker.js'].includes(url.pathname))return json(res,404,{error:'File not found'});
+    if(!isAccount&&!isFlight&&!isWatch&&!isGame&&!['/','/offline-worker.js'].includes(url.pathname))return json(res,404,{error:'File not found'});
     if(isGame) {
       const access=await membership.simulatorAccess(req);
       const document=['/airport-simulation/','/airport-simulation/index.html'].includes(url.pathname);
@@ -105,7 +117,7 @@ export const server = http.createServer(async (req, res) => {
       }
     }
     const root = isGame ? gameRoot : webRoot;
-    const path = decodeURIComponent(isFlight?'':isWatch ? url.pathname.slice('/watch/'.length) : isGame ? url.pathname.slice('/airport-simulation/'.length) : url.pathname.slice(1));
+    const path = decodeURIComponent(isFlight||isAccount?'':isWatch ? url.pathname.slice('/watch/'.length) : isGame ? url.pathname.slice('/airport-simulation/'.length) : url.pathname.slice(1));
     let file = resolve(root, path || 'index.html');
     if (file !== root && !file.startsWith(root + sep)) return json(res, 403, { error: 'Forbidden' });
     try { if ((await stat(file)).isDirectory()) file = resolve(file, 'index.html'); } catch { return json(res, 404, { error: 'File not found' }); }
@@ -127,7 +139,8 @@ export const server = http.createServer(async (req, res) => {
 });
 let premiumTimer;
 server.on('listening',()=>{if(membership.premiumTick)premiumTimer=setInterval(()=>{void membership.premiumTick().catch(()=>console.error('Background account check failed.'));},60000).unref();});
-server.on('close',()=>clearInterval(premiumTimer));
+server.on('close',()=>{clearInterval(premiumTimer);feed.close();});
+server.requestTimeout=30000;server.headersTimeout=15000;server.keepAliveTimeout=5000;
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   // Let Node bind dual-stack localhost by default; explicit HOST remains supported.
   server.listen({port:Number(process.env.PORT ?? 8000), ...(process.env.HOST ? {host:process.env.HOST} : {}), ipv6Only:false}, () => console.log(`Skyward: http://localhost:${server.address().port}/ · airport simulation: /airport-simulation/`));

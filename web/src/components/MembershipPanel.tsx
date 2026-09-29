@@ -1,5 +1,6 @@
-import {AccountWorkspace} from './AccountWorkspace';
-import {accountChanged} from '../lib/accountLibrary';
+import {lazy,Suspense} from 'react';
+const AccountWorkspace=lazy(()=>import('./AccountWorkspace').then(m=>({default:m.AccountWorkspace})));
+import {accountChanged} from '../lib/accountEvents';
 import {useEffect,useState} from 'react';
 import {accountRequest,disconnectAccountNotifications,type Account} from '../lib/membership';
 export function MembershipPanel({openJourney}:{openJourney:(hex:string)=>Promise<void>}) {
@@ -37,7 +38,7 @@ export function MembershipPanel({openJourney}:{openJourney:(hex:string)=>Promise
         {!account.billingReady&&<p>Checkout setup is pending. No payment can be taken yet.</p>}
         {account.usage&&<p>Monthly test lookups: {account.usage.requests} / {account.usage.limit}. Actual flight-data spend: $0. Background checks run only for journeys enabled in Premium tools.</p>}
         {account.user.premium&&<p><a href="/airport-simulation/">Play airport simulator →</a></p>}
-        <AccountWorkspace account={account} openJourney={openJourney}/>
+        <Suspense fallback={<p role="status">Loading saved journeys…</p>}><AccountWorkspace account={account} openJourney={openJourney}/></Suspense>
       </>}
     </>}
     {message&&<p role="status">{message}</p>}

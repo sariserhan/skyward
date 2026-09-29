@@ -45,7 +45,7 @@ export function cameraAreaPath(lat,lon,radius){
 }
 
 export class FeedClient {
-  constructor(fetcher = fetch) { this.fetcher = fetcher; this.cooldowns = new Map(); this.cache = new Map(); this.pending = new Map(); this.tail = Promise.resolve(); this.nextAt = 0; this.stats = {started:0,failed:0,cacheHits:0,lastSuccessAt:null,lastPositionAt:null,totalMs:0}; }
+  constructor(fetcher = fetch) { this.fetcher = fetcher; this.cooldowns = new Map(); this.failures = new Map(); this.errors = new Map(); this.cache = new Map(); this.pending = new Map(); this.tail = Promise.resolve(); this.nextAt = 0; this.stats = {started:0,failed:0,cacheHits:0,coalesced:0,suppressed:0,queueExpired:0,lastSuccessAt:null,lastPositionAt:null,totalMs:0}; }
   checkCooldown(origin) {
     const until=this.cooldowns.get(origin)??0;
     if(until>Date.now()){const error=new Error('Flight feed is rate limited. Retrying after the requested pause.');error.retryAfter=Math.ceil((until-Date.now())/1000);throw error;}
@@ -54,8 +54,10 @@ export class FeedClient {
     const key = origin + kind + path + (body ? JSON.stringify(body) : '');
     const cached = this.cache.get(key);
     if (cached && Date.now() < cached.expires) {this.stats.cacheHits++;return cached.value;}
+    const failure=this.errors.get(key);
+    if(failure&&failure.until>Date.now()){this.stats.suppressed++;throw failure.error;}
     this.checkCooldown(origin);
-    if (this.pending.has(key)) return this.pending.get(key);
+    if (this.pending.has(key)) {this.stats.coalesced++;return this.pending.get(key);}
     if (this.pending.size >= 16) throw new Error('Observation service busy. Please retry shortly.');
     const queuedAt = Date.now();
     const task = this.tail.catch(() => {}).then(async () => {
@@ -63,7 +65,7 @@ export class FeedClient {
       const wait = Math.max(0, this.nextAt - Date.now());
       if (wait) await new Promise(resolve => setTimeout(resolve, wait));
       this.checkCooldown(origin);
-      if (Date.now() - queuedAt > 15000) throw new Error('Observation request expired in queue.');
+      if (Date.now() - queuedAt > 15000) {this.stats.queueExpired++;throw new Error('Observation request expired in queue.');}
       this.nextAt = Date.now() + 1100;
       const startedAt=Date.now();this.stats.started++;
       try {
@@ -83,6 +85,7 @@ export class FeedClient {
         }
         const raw = await response.json();
         const value = kind === 'route' ? { raw, fetchedAt: Date.now() } : body ? raw : normalizePayload(raw);
+        this.failures.delete(origin);this.errors.delete(key);
         this.stats.lastSuccessAt=Date.now();
         if(kind==='positions'&&value.sourceAt)this.stats.lastPositionAt=value.sourceAt;
         this.cache.set(key, { value, expires: Date.now() + (body || kind === 'route' ? 300000 : path.startsWith('/v2/hex/') ? 8000 : 20000) });
@@ -90,6 +93,11 @@ export class FeedClient {
         return value;
       } catch (error) {
         this.stats.failed++;
+        // Share brief failures too: concurrent viewers must not hammer a down
+        // endpoint. Errors remain errors, never cached empty aircraft arrays.
+        this.errors.set(key,{error,until:Date.now()+5000});
+        if(this.errors.size>150)this.errors.delete(this.errors.keys().next().value);
+        if(!error.status||error.status>=500){const failures=(this.failures.get(origin)??0)+1;this.failures.set(origin,failures);if(failures>=3)this.cooldowns.set(origin,Math.max(this.cooldowns.get(origin)??0,Date.now()+30000));}
         // Back off between upstream requests after failures.
         this.nextAt = Date.now() + 3000;
         throw error;

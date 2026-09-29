@@ -23,8 +23,9 @@ export function mergeFeeds(results,now=Date.now()){
 }
 export class CombinedFeed {
  constructor(primary,secondary=[]){this.primary=primary;this.providers=[{id:'adsblol',name:'ADSB.lol',url:'https://www.adsb.lol/',license:'ODbL-1.0',client:primary},...secondary];this.health=new Map();}
- get stats(){const stats={started:0,failed:0,cacheHits:0,totalMs:0,lastSuccessAt:null,lastPositionAt:null};for(const {client} of this.providers){for(const k of ['started','failed','cacheHits','totalMs'])stats[k]+=client.stats?.[k]??0;for(const k of ['lastSuccessAt','lastPositionAt'])if(client.stats?.[k])stats[k]=Math.max(stats[k]??0,client.stats[k]);}return stats;}
+ get stats(){const stats={started:0,failed:0,cacheHits:0,coalesced:0,suppressed:0,queueExpired:0,totalMs:0,lastSuccessAt:null,lastPositionAt:null};for(const {client} of this.providers){for(const k of ['started','failed','cacheHits','coalesced','suppressed','queueExpired','totalMs'])stats[k]+=client.stats?.[k]??0;for(const k of ['lastSuccessAt','lastPositionAt'])if(client.stats?.[k])stats[k]=Math.max(stats[k]??0,client.stats[k]);}return stats;}
  get pending(){return new Map(this.providers.flatMap(p=>[...(p.client.pending??[])].map(([key,value])=>[p.id+key,value])));}
+ get diagnostics(){return this.providers.map(({id,client})=>({id,...client.stats,pending:client.pending.size,cacheEntries:client.cache.size,cooldownUntil:Math.max(0,...client.cooldowns.values())}));}
  get sources(){return this.providers.map(({client,...p})=>({...p,...this.health.get(p.id)}));}
  route(...args){return this.primary.route(...args);}
  area(id){if(!Object.hasOwn(AIRPORTS,id))throw Error('Unknown airport');return this.cameraArea(AIRPORTS[id].lat,AIRPORTS[id].lon,100);}

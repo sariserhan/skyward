@@ -6,7 +6,7 @@ export const listAccountItems=<T>(kind:LibraryKind)=>accountRequest<{items:Libra
 export const getAccountItem=<T>(kind:LibraryKind,key:string)=>accountRequest<LibraryItem<T>>(`/api/account/library?kind=${kind}&key=${encodeURIComponent(key)}`);
 export const saveAccountItem=(kind:LibraryKind,key:string,value:unknown,revision=0)=>accountRequest<{key:string;revision:number}>('/api/account/library',{kind,key,value,revision});
 export const deleteAccountItem=(kind:LibraryKind,item:LibraryItem)=>accountRequest('/api/account/library',{kind,key:item.key,revision:item.revision,remove:true});
-export const accountChanged=(signedOut=false)=>window.dispatchEvent(new CustomEvent('skyward-account-changed',{detail:{signedOut}}));
+export {accountChanged} from './accountEvents';
 export const watchlistChanged=()=>window.dispatchEvent(new Event('skyward-watchlist-changed'));
 export const VIEW_KEYS=['skyward.map.v1','skyward.flight-view.v1','skyward.camera-bookmarks.v1','skyward.favorites.v1','skyward.cabin-audio.v1'];
 export function captureViewSettings(){return Object.fromEntries(VIEW_KEYS.flatMap(k=>{const v=localStorage.getItem(k);return v===null?[]:[[k,v]];}));}

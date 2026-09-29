@@ -59,6 +59,7 @@
     "start:neon:dev": "NODE_ENV=development SKYWARD_DEV_PREMIUM=1 SKYWARD_ACCOUNTS=neon node --env-file-if-exists=.env --env-file-if-exists=.env.local server/index.mjs",
     "test:weather": "npm run build && node scripts/browser-tests.mjs --weather",
     "test:cockpit": "npm run build && node scripts/browser-tests.mjs --cockpit",
-    "check:flyitaly": "node --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/check-flyitaly.mjs"
+    "check:flyitaly": "node --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/check-flyitaly.mjs",
+    "test:architecture": "npm run build && node scripts/browser-tests.mjs --architecture"
   }
 }

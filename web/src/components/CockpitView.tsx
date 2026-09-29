@@ -1,38 +1,25 @@
+import {useCockpitMotion} from '../lib/useCockpitMotion';
 import {FlightMiniMap} from './FlightMiniMap';
 import {Windshield} from './Windshield';
-import {createWeatherMotion} from '../lib/weatherMotion';
-import {aircraftBankRadians} from '../lib/aircraftAttitude';
 import {CockpitAudio} from './CockpitAudio';
 import {TowerRadar} from './TowerRadar';
-import {surfaceHeight} from '../lib/surfaceHeight';
-import {useEffect,useRef,useState} from 'react';
+import {useEffect,useState} from 'react';
 import type * as Cesium from 'cesium';
 import type {Aircraft,AirportGeometry,FlightRoute,TrailPoint} from '../types';
-import {cockpitControls,practicePose,stepPractice,type PracticeControls,type PracticePose} from '../lib/cockpit';
+import {cockpitControls,practicePose,type PracticeControls,type PracticePose} from '../lib/cockpit';
 import {sharedLiveMotion} from '../lib/liveMotion';
-import {aircraftViewpoint} from '../lib/flightViewpoints';
-import {sourcedModel} from '../lib/flightPresentation';
 interface Props {observations:Aircraft[];viewer:Cesium.Viewer|null;aircraft:Aircraft;points:TrailPoint[];route:FlightRoute|null;arrival:AirportGeometry|null;reduced:boolean;suspended:boolean;front:()=>void;side:()=>void;close:()=>void;}
 const number=(v:number|null|undefined)=>typeof v==='number'&&Number.isFinite(v)?Math.round(v).toLocaleString('en-US'):'—';
 function Attitude({pose,practice,hasTrack}:{pose:PracticePose;practice:boolean;hasTrack:boolean}){return <svg viewBox="0 0 300 220" role="img" aria-label={practice?'Practice attitude indicator':'Illustrative attitude indicator; actual attitude is not reported'}><defs><clipPath id="cockpit-horizon"><rect x="45" y="24" width="210" height="152" rx="5"/></clipPath></defs><g clipPath="url(#cockpit-horizon)"><g transform={`translate(150 ${100+pose.pitch*3}) rotate(${-pose.bank})`}><rect x="-300" y="-400" width="600" height="400" fill="#1e6385"/><rect x="-300" y="0" width="600" height="400" fill="#6a482b"/><path d="M-300 0H300" stroke="#eff5eb" strokeWidth="2"/>{[-20,-10,10,20].map(p=><g key={p}><path d={`M-35 ${p*3}H35`} stroke="white"/><text x="42" y={p*3+4} fill="white" fontSize="10">{Math.abs(p)}</text></g>)}</g></g><path d="M100 18Q150 -8 200 18M150 9l-5 8h10z" stroke="#eee" fill="#eee"/><path d="M95 100h37v9h-9v-5H95m110 -4h-37v9h9v-5h28" fill="#ffdd71"/><circle cx="150" cy="101" r="3" fill="#ffdd71"/><text x="150" y="197" textAnchor="middle" fill="#b5e7c4" fontSize="14">TRACK {hasTrack?Math.round(pose.heading).toString().padStart(3,'0')+'°':'—'}</text><text x="150" y="214" textAnchor="middle" fill="#899ca3" fontSize="9">{practice?'LOCAL PRACTICE':'ATTITUDE NOT REPORTED · ILLUSTRATIVE'}</text></svg>;}
 function Navigation({heading,lat,lon}:{heading:number;lat:number;lon:number}){return <svg viewBox="0 0 260 220" role="img" aria-label="Track compass"><g transform={`translate(130 110) rotate(${-heading})`}><circle r="82" fill="none" stroke="#46746c"/><circle r="43" fill="none" stroke="#244c47" strokeDasharray="3 6"/>{Array.from({length:36},(_,i)=><path key={i} d={`M0 -${i%3?76:70}V-82`} transform={`rotate(${i*10})`} stroke="#9bc0b6"/>)}{['N','E','S','W'].map((d,i)=><text key={d} x="0" y="-58" textAnchor="middle" transform={`rotate(${i*90})`} fill="#aee9bd" fontSize="12">{d}</text>)}</g><path d="M130 88l-8 25 8-5 8 5z" fill="#e5f4d9"/><path d="M130 36V88" stroke="#cc89de" strokeDasharray="4 4"/><text x="130" y="208" textAnchor="middle" fill="#9bbab0" fontSize="11">{lat.toFixed(3)}° / {lon.toFixed(3)}°</text></svg>;}
 export function CockpitView(p:Props){
  const [traffic,setTraffic]=useState(true),[radarTarget,setRadarTarget]=useState('');
- const [practice,setPractice]=useState(false),[controls,setControls]=useState<PracticeControls>({...cockpitControls,paused:p.reduced}),[lights,setLights]=useState(true),[display,setDisplay]=useState(practicePose(p.aircraft));
- const [audioFlight,setAudioFlight]=useState<{agl:number|null;ground:boolean;gear:boolean|null;at:number}>({agl:null,ground:p.aircraft.ground,gear:null,at:Date.now()});
- const pose=useRef<PracticePose|null>(null),state=useRef({p,practice,controls});state.current={p,practice,controls};
+ const [practice,setPractice]=useState(false),[controls,setControls]=useState<PracticeControls>({...cockpitControls,paused:p.reduced}),[lights,setLights]=useState(true);
+ const {display,audioFlight,pose}=useCockpitMotion(p,practice,controls);
  const change=(patch:Partial<PracticeControls>)=>setControls(c=>({...c,...patch}));
  useEffect(()=>{if(p.reduced)change({paused:true});},[p.reduced]);
  useEffect(()=>{const blur=()=>setControls(c=>({...c,roll:0,pitch:0,rudder:0})),hidden=()=>{if(document.hidden)setControls(c=>({...c,roll:0,pitch:0,rudder:0,paused:true}));};window.addEventListener('blur',blur);document.addEventListener('visibilitychange',hidden);return()=>{window.removeEventListener('blur',blur);document.removeEventListener('visibilitychange',hidden);};},[]);
- useEffect(()=>{const v=p.viewer;if(!v||v.isDestroyed())return;const C=window.Cesium,weatherMotion=createWeatherMotion();let last=0,ui=0,frame=0,retainedTerrain=0;const groundSurface=(lon:number,lat:number)=>{const value=v.scene.globe.getHeight(C.Cartographic.fromDegrees(lon,lat));if(typeof value==='number'&&Number.isFinite(value)&&value>=-430&&value<=8849)retainedTerrain=value;return retainedTerrain;};v.camera.cancelFlight();v.trackedEntity=undefined;
- const tick=(time:number)=>{frame=requestAnimationFrame(tick);const s=state.current;if(v.isDestroyed())return;if(document.hidden||s.p.suspended){last=0;return;}if(last&&time-last<33)return;const dt=last?Math.min(.1,(time-last)/1000):0;last=time;let current:PracticePose,ground=s.p.aircraft.ground,arrivalOffset=0,groundClearance=0,landing=false,predictedGear:boolean|null=null;
- if(s.practice){const previous=pose.current??practicePose(s.p.aircraft),terrain=surfaceHeight(v.scene.globe.getHeight(C.Cartographic.fromDegrees(previous.lon,previous.lat)));current=stepPractice(previous,s.controls,dt,terrain/.3048);pose.current=current;}
- else {const a=s.p.aircraft,fix=sharedLiveMotion.sample(a,s.p.points,Date.now(),s.p.reduced,s.p.route,s.p.arrival);ground=fix?.ground??a.ground;landing=!!fix?.landingPhase;groundClearance=(fix?.groundClearance??0)*.3048;if(fix?.landingPhase)predictedGear=true;if(fix?.landingPhase)arrivalOffset=(fix?.arrivalElevationFt??s.p.arrival?.elevationFt??0)*.3048;current={...practicePose(a),...(fix?{lon:fix.lon,lat:fix.lat,altitude:fix.altitude,heading:fix.heading}:{}),pitch:0,bank:0,verticalRate:a.verticalRate??0};}
- const terrain=groundSurface(current.lon,current.lat),height=s.practice?current.altitude*.3048:ground?terrain+5+groundClearance:landing?terrain+Math.max(5,current.altitude*.3048-arrivalOffset):Math.max(terrain+5,current.altitude*.3048),point=aircraftViewpoint('front',sourcedModel(s.p.aircraft.aircraftType)?.length??40,current.heading),origin=C.Cartesian3.fromDegrees(current.lon,current.lat,height),matrix=C.Transforms.eastNorthUpToFixedFrame(origin),destination=C.Matrix4.multiplyByPoint(matrix,new C.Cartesian3(point.east,point.north,point.up),new C.Cartesian3());
- const rough=weatherMotion(v,current.lat,current.lon,current.altitude*.3048,ground||s.practice,s.p.reduced||window.matchMedia('(prefers-reduced-motion: reduce)').matches,time/1000);
- v.camera.lookAtTransform(C.Matrix4.IDENTITY);v.camera.setView({destination,orientation:{heading:current.heading*Math.PI/180,pitch:(current.pitch-3+rough.pitch*.6)*Math.PI/180,roll:aircraftBankRadians(current.bank+rough.roll*.6)}});v.scene.requestRender();if(time-ui>120){ui=time;setDisplay(current);const agl=s.practice?Math.max(0,current.altitude-terrain/.3048):s.p.arrival&&Number.isFinite(s.p.arrival.elevationFt)?Math.max(0,current.altitude-s.p.arrival.elevationFt!):null;setAudioFlight({agl,ground:s.practice?agl!==null&&agl<=8.1:ground,gear:s.practice?s.controls.gear:predictedGear,at:Date.now()});}
- };frame=requestAnimationFrame(tick);return()=>cancelAnimationFrame(frame);
- },[p.viewer]);
+
  const toggle=()=>{pose.current=practicePose(p.aircraft);setControls({...cockpitControls,gear:p.aircraft.ground,paused:p.reduced});setPractice(v=>!v);};
  const reset=()=>{pose.current=practicePose(p.aircraft);setControls({...cockpitControls,gear:p.aircraft.ground,paused:p.reduced});};
  const stick=(e:React.PointerEvent<HTMLDivElement>)=>{if(!practice||!e.currentTarget.hasPointerCapture(e.pointerId))return;const r=e.currentTarget.getBoundingClientRect();change({roll:Math.max(-1,Math.min(1,(e.clientX-r.left-r.width/2)/(r.width*.4))),pitch:Math.max(-1,Math.min(1,(e.clientY-r.top-r.height/2)/(r.height*.4))),level:false});};

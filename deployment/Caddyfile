@@ -1,0 +1,5 @@
+# Set SKYWARD_DOMAIN to the hostname you own and have pointed to this host.
+{$SKYWARD_DOMAIN} {
+ encode zstd gzip
+ reverse_proxy 127.0.0.1:8000
+}

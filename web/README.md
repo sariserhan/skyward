@@ -1632,3 +1632,23 @@ Use `npm --prefix web run start:dev` for local development or
 `npm --prefix web start` for normal startup. Restart the running server after
 changing settings. Frontend Vite also reads `.env.local`; never give server
 credentials a `VITE_` prefix, which would expose them to the browser.
+
+### Application boundaries and public pages
+
+The root entry lazily loads either the observatory, flight simulator or standalone
+`/account/` page. Only globe/simulator entries download Cesium. Account workspace
+features load after sign-in; help/data content loads when opened. Cockpit camera
+and physics updates live in `src/lib/useCockpitMotion.ts`, with refs for frame
+state and throttled snapshots for React instruments.
+
+`/explore/`, `/airports/`, `/airports/TAS/`, `/flights/`, `/premium/` and `/about/`
+are server-rendered public pages without a React or Cesium dependency. Airport
+pages use the local directory, not inferred live traffic. Callsign lookup URLs
+(`/flights/THY111/`) open the globe through `/?flight=THY111`; they are noindex
+until there is verified flight content. Unknown airports return 404. Set
+`SKYWARD_PUBLIC_ORIGIN` for canonical URLs and `/sitemap.xml`.
+
+Run `npm run test:architecture` for public-page, account bundle isolation,
+metrics authentication and cockpit browser checks. See
+[production deployment](../deployment/README.md) for the container, systemd/HTTPS
+examples, monitoring and current single-process feed capacity limit.

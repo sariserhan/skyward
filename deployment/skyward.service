@@ -1,0 +1,27 @@
+[Unit]
+Description=Skyward observatory
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=skyward
+Group=skyward
+WorkingDirectory=/opt/skyward/web
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=8000
+EnvironmentFile=/etc/skyward.env
+ExecStart=/usr/bin/node server/index.mjs
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=15
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/opt/skyward/web/.local
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target
