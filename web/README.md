@@ -1660,7 +1660,10 @@ observed aircraft automatically triggers a fictional Skyward population up to
 20 total aircraft. Ten or more observations removes the supplemental population.
 Green airplane icons and Skyward callsigns distinguish fictional flights; the
 Flight view banner explains the difference and opens Premium upgrade details.
-The banner appears only while watching a simulated aircraft. No demo button or separate scene is
+The simulation banner appears only while watching a simulated aircraft.
+Real Flight view has a separate banner identifying observed traffic and its last
+position age, with a Premium details button. Neither banner appears on the general
+map. The paywall explicitly explains that both plans share observed map coverage. No demo button or separate scene is
 required. Selecting a Skyward aircraft opens the same flight view, route, cabin,
 cockpit and camera controls as observed aircraft.
 
