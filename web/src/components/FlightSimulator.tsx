@@ -1,3 +1,4 @@
+import {installRunwayLights} from '../lib/installRunwayLights';
 import {SimulatorAirportPicker} from './SimulatorAirportPicker';
 import {createWeatherMotion} from '../lib/weatherMotion';
 import {WeatherLayer} from './WeatherLayer';
@@ -28,7 +29,7 @@ import {initialRadio,stepRadio,radioReadback,type RadioState} from '../lib/simul
 import './flight-simulator.css';
 function FlightScene({plan,geometry,state,camera,taxi,onViewer}:{onViewer:(v:Cesium.Viewer|null)=>void;taxi:MutableRefObject<TaxiSession|null>;plan:FlightPlan;geometry:AirportGeometry[];state:MutableRefObject<FlightState>;camera:MutableRefObject<'chase'|'front'|'overhead'|'cockpit'>}){
  const root=useRef<HTMLDivElement>(null),[error,setError]=useState('');
- useEffect(()=>{let viewer:Cesium.Viewer|undefined,disposed=false,cleanupGear:(()=>void)|undefined,removeFrame:(()=>void)|undefined;
+ useEffect(()=>{let viewer:Cesium.Viewer|undefined,disposed=false,cleanupGear:(()=>void)|undefined,cleanupRunways:(()=>void)|undefined,removeFrame:(()=>void)|undefined;
   const timer=setInterval(()=>{if(!window.Cesium||!root.current||disposed)return;clearInterval(timer);try{
    const C=window.Cesium;viewer=new C.Viewer(root.current,{baseLayer:false,animation:false,timeline:false,baseLayerPicker:false,geocoder:false,homeButton:false,sceneModePicker:false,navigationHelpButton:false,fullscreenButton:false,selectionIndicator:false,infoBox:false,requestRenderMode:false});const v=viewer;onViewer(v);
    v.resolutionScale=Math.min(1,1.5/window.devicePixelRatio);v.scene.globe.baseColor=C.Color.fromCssColorString('#355b55');v.scene.globe.depthTestAgainstTerrain=false;if(plan.weather){v.scene.fog.enabled=true;v.scene.fog.density=.00001*40/plan.weather.visibility;v.scene.fog.minimumBrightness=.35;}v.scene.screenSpaceCameraController.enableInputs=false;
@@ -42,6 +43,7 @@ function FlightScene({plan,geometry,state,camera,taxi,onViewer}:{onViewer:(v:Ces
    v.entities.add({polyline:{positions:C.Cartesian3.fromDegreesArrayHeights([...plan.departure.b,800,...plan.arrival.a,800]),width:1.5,material:C.Color.fromCssColorString('#b4f3dc').withAlpha(.4)}});
    const taxiLine=v.entities.add({id:'simulator-taxi-route',show:false,polyline:{positions:new C.CallbackProperty(()=>taxi.current?C.Cartesian3.fromDegreesArrayHeights(taxi.current.route.points.flatMap(p=>[p.lon,p.lat,.7])):[],false),width:3,material:C.Color.fromCssColorString('#ffd284')}});
    const stand=v.entities.add({id:'simulator-assigned-stand',show:false,position:new C.CallbackPositionProperty(()=>{const p=taxi.current?.route.points.at(-1)??state.current;return C.Cartesian3.fromDegrees(p.lon,p.lat,5);},false),label:{text:new C.CallbackProperty(()=>taxi.current?`Stand ${taxi.current.route.gate}`:'',false),font:'16px sans-serif',fillColor:C.Color.WHITE,showBackground:true,disableDepthTestDistance:Number.POSITIVE_INFINITY}});
+   cleanupRunways=installRunwayLights(C,v,geometry,{flat:true});
    const aircraft:Aircraft={hex:'000001',callsign:'SKYWARD',registration:'Simulation',aircraftType:plan.aircraftType,targetKind:'aircraft',lat:0,lon:0,altitude:0,observedAt:Date.now(),ground:true,groundSpeed:0,heading:0,verticalRate:0,sourceType:'Simulation'};
    const entity=v.entities.add({id:'flight-simulation',position:C.Cartesian3.fromDegrees(state.current.lon,state.current.lat,6),model:{uri:'/watch/'+fleetUri(aircraft),scale:1,minimumPixelSize:0,maximumScale:1}});
    cleanupGear=installLandingGear(C,v,()=>({aircraft:[aircraft],selected:aircraft,quality:'high'}));
@@ -55,7 +57,7 @@ function FlightScene({plan,geometry,state,camera,taxi,onViewer}:{onViewer:(v:Ces
     else{impactAt=null;impactAge=0;fire.show=false;smoke.forEach(e=>{e.show=false;});}});
    v.scene.renderError.addEventListener(()=>setError('The 3D view could not render. Pause and reload the simulator.'));
   }catch{setError('The 3D view could not start. Try a browser with WebGL enabled.');}},50);
-  return()=>{onViewer(null);disposed=true;clearInterval(timer);removeFrame?.();cleanupGear?.();if(viewer&&!viewer.isDestroyed())viewer.destroy();};
+  return()=>{onViewer(null);disposed=true;clearInterval(timer);removeFrame?.();cleanupGear?.();cleanupRunways?.();if(viewer&&!viewer.isDestroyed())viewer.destroy();};
  },[plan,geometry,state,camera,taxi,onViewer]);
  return <div className="pilot-scene" ref={root} aria-label="Flight simulation 3D view">{error&&<p className="pilot-render-error" role="alert">{error}</p>}</div>;
 }
