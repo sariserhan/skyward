@@ -1,6 +1,6 @@
 import {createPortal} from 'react-dom';
 import {useEffect,useRef,useState} from 'react';
-import {FlightDialogue,TurbulenceRecovery,turbulenceRecoveryAnnouncement,TurbulenceAnnouncement,turbulenceAnnouncement,captainAnnouncement,type DialogueContext,type DialogueLine} from '../lib/flightDialogue';
+import {FlightDialogue,TurbulenceRecovery,turbulenceRecoveryAnnouncement,TurbulenceAnnouncement,turbulenceAnnouncement,captainAnnouncement,towerExchange,type DialogueContext,type DialogueLine} from '../lib/flightDialogue';
 import {readAudioMix,onAudioMix,acquireSpeechFocus} from '../lib/audioMix';
 import {readPublishedWeather,weatherRoughness} from '../lib/weatherMotion';
 import {reportDistanceKm} from '../lib/localWeather';
@@ -14,7 +14,8 @@ export function FlightVoices(p:Props){
  const recordCaption=(text:string)=>{setCaption(text);setHistory(rows=>[...rows.slice(-7),text]);};
  const [host,setHost]=useState<Element|null>(null);useEffect(()=>{setHost(p.cockpit?document.querySelector('.cockpit-mode'):null);},[p.cockpit]);
  const latest=useRef({p,enabled,unlocked});latest.current={p,enabled,unlocked};
- const repeat=useRef<(()=>void)|null>(null);
+ const repeat=useRef<((channel?:'captain'|'radio')=>void)|null>(null);
+ const activate=(channel:'captain'|'radio',toggle=false)=>{const next={...latest.current.enabled,[channel]:toggle?!latest.current.enabled[channel]:true};latest.current={...latest.current,enabled:next,unlocked:true};setEnabled(next);setUnlocked(true);if(next[channel]){if('speechSynthesis' in window)window.speechSynthesis.resume();repeat.current?.(channel);}};
  useEffect(()=>{try{localStorage.setItem('skyward.flight-voices.v1',JSON.stringify(enabled));}catch{}},[enabled]);
  useEffect(()=>{
   setCaption('');setHistory([]);setNotice('');
@@ -28,7 +29,7 @@ export function FlightVoices(p:Props){
   const pump=()=>{const {p,enabled,unlocked}=latest.current;
    if(document.hidden||p.suspended||!unlocked){stop();recovery.update(0,Date.now(),true,false);return;}
    // Other cockpit callouts can cancel browser speech without dispatching onend.
-   if(owned&&(Date.now()-lastSpoken>45000||(Date.now()-lastSpoken>1500&&'speechSynthesis' in window&&!window.speechSynthesis.speaking&&!window.speechSynthesis.pending))){owned=null;releaseSpeech?.();releaseSpeech=null;}
+   if(owned&&(Date.now()-lastSpoken>45000||(Date.now()-lastSpoken>1500&&'speechSynthesis' in window&&!window.speechSynthesis.speaking&&!window.speechSynthesis.pending))){owned=null;releaseSpeech?.();releaseSpeech=null;setNotice('Speech was interrupted or did not start. Press Captain update to retry.');}
    if(owned&&!enabled[(owned as SpeechSynthesisUtterance&{channel:'radio'|'captain'}).channel])stop();
    queue=queue.filter(line=>enabled[line.channel]);
    const c=context(),now=Date.now(),frame=sharedLiveMotion.displayed(p.identity),report=p.viewer?readPublishedWeather(p.viewer):undefined,lat=frame?.lat??p.lat,lon=frame?.lon??p.lon,ground=frame?.ground??p.ground??['ready','ground','parked','taxi','rollout'].includes(c.phase);
@@ -43,20 +44,22 @@ export function FlightVoices(p:Props){
    if(owned||!queue.length||now-lastSpoken<1200)return;
    if(!('speechSynthesis' in window)){const line=queue.shift()!;recordCaption(`${line.speaker}: ${line.text}`);setNotice('Speech unavailable in this browser. Transcript only.');lastSpoken=now;return;}
    if(window.speechSynthesis.speaking||window.speechSynthesis.pending)return;
-   const line=queue.shift()!,voices=window.speechSynthesis.getVoices().filter(v=>v.localService&&v.lang.startsWith('en'));
-   recordCaption(`${line.speaker}: ${line.text}`);lastSpoken=now;
-   if(!voices.length){setNotice('No local English voice is installed. Transcript only.');return;}
-   const volume=readAudioMix()[line.channel==='radio'?'radio':'cabin'];if(volume===0)return;
-   const utterance=new SpeechSynthesisUtterance(line.text);Object.assign(utterance,{channel:line.channel});utterance.voice=voices[line.speaker==='Tower'?0:Math.min(1,voices.length-1)];utterance.rate=line.speaker==='Tower'?1.04:.92;utterance.pitch=line.speaker==='Tower'?1:.9;utterance.volume=volume*.8;owned=utterance;
+   const playable=Math.max(0,queue.findIndex(line=>readAudioMix()[line.channel==='radio'?'radio':'cabin']>0));
+   const line=queue[playable],voices=window.speechSynthesis.getVoices().filter(v=>v.localService&&/^en(?:[-_]|$)/i.test(v.lang));
+   if(!voices.length){setCaption(`${line.speaker}: ${line.text}`);setNotice('Waiting for a local English voice. If none is installed, only the transcript is available.');return;}
+   const volume=readAudioMix()[line.channel==='radio'?'radio':'cabin'];if(volume===0){setNotice(`${line.channel==='radio'?'Radio':'Cabin'} sound is muted. Raise its level in Sound mix to hear ${line.speaker.toLowerCase()} speech.`);return;}
+   queue.splice(playable,1);recordCaption(`${line.speaker}: ${line.text}`);lastSpoken=now;
+   const utterance=new SpeechSynthesisUtterance(line.text);Object.assign(utterance,{channel:line.channel});utterance.voice=voices.find(v=>v.default)??voices[0];utterance.lang=utterance.voice.lang;utterance.rate=line.speaker==='Tower'?1.04:.92;utterance.pitch=line.speaker==='Tower'?1:.9;utterance.volume=volume*.8;owned=utterance;
    const finish=()=>{if(owned===utterance){owned=null;releaseSpeech?.();releaseSpeech=null;}};
-   utterance.onstart=()=>{if(owned===utterance)releaseSpeech=acquireSpeechFocus();};utterance.onend=finish;utterance.onerror=()=>{finish();if(!disposed)setNotice('Speech could not play. Use Enable voices to retry.');};
-   try{window.speechSynthesis.speak(utterance);setNotice('');}catch{finish();setNotice('Speech could not play. Transcript available.');}
+   utterance.onstart=()=>{if(owned===utterance){releaseSpeech=acquireSpeechFocus();setNotice(`Speaking · ${line.speaker}`);}};utterance.onend=()=>{const active=owned===utterance;finish();if(active&&!disposed)setNotice('');};utterance.onerror=()=>{const active=owned===utterance;finish();if(active&&!disposed)setNotice('Speech could not play. Press Captain update or toggle Tower dialogue to retry.');};
+   try{setNotice(`Starting ${line.speaker.toLowerCase()} speech…`);window.speechSynthesis.speak(utterance);}catch{finish();setNotice('Speech could not play. Transcript available.');}
   };
-  repeat.current=()=>{stop();if(latest.current.enabled.captain)queue=[{channel:'captain',speaker:'Captain',text:captainAnnouncement(context())}];lastSpoken=0;pump();};
+  repeat.current=(channel='captain')=>{stop();const c=context();lastPhase=c.phase;stableAt=Date.now();if(latest.current.enabled[channel])queue=channel==='captain'?[{channel:'captain',speaker:'Captain',text:captainAnnouncement(c)}]:towerExchange(c);lastSpoken=0;pump();};
+  const voicesReady=()=>pump();if('speechSynthesis' in window)window.speechSynthesis.addEventListener('voiceschanged',voicesReady);
   const timer=setInterval(pump,500),mixStop=onAudioMix(()=>{if(owned){const channel=(owned as SpeechSynthesisUtterance&{channel:'radio'|'captain'}).channel;if(readAudioMix()[channel==='radio'?'radio':'cabin']===0)stop();}});
   const hide=()=>{if(document.hidden){stop();recovery.update(0,Date.now(),true,false);}};document.addEventListener('visibilitychange',hide);
-  return()=>{disposed=true;clearInterval(timer);mixStop();document.removeEventListener('visibilitychange',hide);stop();repeat.current=null;};
+  return()=>{disposed=true;if('speechSynthesis' in window)window.speechSynthesis.removeEventListener('voiceschanged',voicesReady);clearInterval(timer);mixStop();document.removeEventListener('visibilitychange',hide);stop();repeat.current=null;};
  },[p.identity]);
- const controls=<details className="flight-voices" open={expanded} onToggle={e=>setExpanded(e.currentTarget.open)}><summary>Flight voices · Simulation</summary><small>Scripted tower, captain and cabin dialogue. Not live radio.</small><div className="flight-buttons">{!p.captainOnly&&<button role="switch" aria-label="Simulated tower dialogue" aria-checked={enabled.radio} onClick={()=>{setUnlocked(true);setEnabled(s=>({...s,radio:!s.radio}));}}>Tower dialogue: {enabled.radio?'On':'Off'}</button>}<button role="switch" aria-label="Captain announcements" aria-checked={enabled.captain} onClick={()=>{setUnlocked(true);setEnabled(s=>({...s,captain:!s.captain}));}}>Captain: {enabled.captain?'On':'Off'}</button>{!unlocked&&(enabled.radio||enabled.captain)&&<button onClick={()=>setUnlocked(true)}>Enable voices</button>}<button disabled={!enabled.captain||!unlocked||p.suspended} onClick={()=>repeat.current?.()}>Captain update</button></div>{caption&&<p aria-live="polite">{caption}</p>}{history.length>1&&<details className="voice-history"><summary>Recent dialogue ({history.length})</summary><ol>{history.map((text,i)=><li key={i}>{text}</li>)}</ol><button onClick={()=>setHistory([])}>Clear dialogue history</button></details>}{notice&&<small role="status">{notice}</small>}<small>Levels follow Radio and Cabin in Sound mix.</small></details>;
+ const controls=<details className="flight-voices" open={expanded} onToggle={e=>setExpanded(e.currentTarget.open)}><summary>Flight voices · Simulation</summary><small>Scripted tower, captain and cabin dialogue. Not live radio.</small><div className="flight-buttons">{!p.captainOnly&&<button role="switch" aria-label="Simulated tower dialogue" aria-checked={enabled.radio} onClick={()=>activate('radio',true)}>Tower dialogue: {enabled.radio?'On':'Off'}</button>}<button role="switch" aria-label="Captain announcements" aria-checked={enabled.captain} onClick={()=>activate('captain',true)}>Captain: {enabled.captain?'On':'Off'}</button>{!unlocked&&(enabled.radio||enabled.captain)&&<button onClick={()=>activate(enabled.captain?'captain':'radio')}>Enable voices</button>}<button disabled={p.suspended} onClick={()=>activate('captain')}>Captain update</button></div>{caption&&<p aria-live="polite">{caption}</p>}{history.length>1&&<details className="voice-history"><summary>Recent dialogue ({history.length})</summary><ol>{history.map((text,i)=><li key={i}>{text}</li>)}</ol><button onClick={()=>setHistory([])}>Clear dialogue history</button></details>}{notice&&<small role="status">{notice}</small>}<small>Levels follow Radio and Cabin in Sound mix.</small></details>;
  return p.cockpit&&host?createPortal(controls,host):controls;
 }
