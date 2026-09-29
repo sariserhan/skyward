@@ -1,3 +1,4 @@
+import {buildingAppearance} from '../lib/buildingAppearance';
 import {createModelWarmup} from '../lib/sceneWarmup';
 import {rotorRig} from '../lib/rotorAnimation';
 import {installTouchdownEffects} from '../lib/touchdownEffects';
@@ -96,7 +97,7 @@ export function Globe(p: Props) {
     if(!p.selected||p.obscured)return;
     const warmer=createModelWarmup(new URL(BASE,location.href).href);
     const warm=()=>{const state=callbacks.current,a=state.selected;if(!a||!hasPosition(a)||document.hidden)return;
-      warmer.add(fleetUri(a));if(!flightOpen)return;
+      warmer.add(fleetUri(a),true);if(!flightOpen)return;
       state.aircraft.filter(b=>b.hex!==a.hex&&b.targetKind==='aircraft'&&hasPosition(b)).map(b=>({b,d:Math.hypot((b.lon!-a.lon!)*Math.cos(a.lat!*Math.PI/180),b.lat!-a.lat!)})).filter(x=>x.d<.25).sort((a,b)=>a.d-b.d).slice(0,state.preferences.quality==='low'?1:3).forEach(({b})=>warmer.add(fleetUri(b)));
     };warm();const timer=setInterval(warm,10000);return()=>{clearInterval(timer);warmer.dispose();};
   },[flightOpen,p.obscured,p.selected?.hex]);
@@ -424,7 +425,7 @@ export function Globe(p: Props) {
     }
     // This small, fixed airport snapshot is built synchronously so airport details
     // do not wait behind worldwide polygon jobs in Cesium's shared worker pool.
-    const surfaces = v.scene.primitives.add(new C.Primitive({ show:p.preferences.structures||p.camera.type==='tower'||flightOpen, geometryInstances: meshes, appearance: new C.PerInstanceColorAppearance({ flat: false, closed: true, translucent: false }), asynchronous: false }));
+    const surfaces = v.scene.primitives.add(new C.Primitive({ show:p.preferences.structures||p.camera.type==='tower'||flightOpen, geometryInstances: meshes, appearance: buildingAppearance(C,airports[0]?.lon??0,airports[0]?.lat??0), asynchronous: false }));
     const taxiways = v.scene.primitives.add(new C.Primitive({ show:p.preferences.structures||p.camera.type==='tower'||flightOpen, geometryInstances: lines, appearance: new C.PolylineColorAppearance({ translucent: false }), asynchronous: false }));
     if(!terrainActive)added.forEach(e=>{e.show=p.preferences.labels;});
     v.scene.requestRender(); return () => { if (!v.isDestroyed()) { for (const e of added) v.entities.remove(e); v.scene.primitives.remove(surfaces); v.scene.primitives.remove(taxiways); } };

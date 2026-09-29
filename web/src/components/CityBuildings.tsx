@@ -1,3 +1,4 @@
+import {buildingAppearance} from '../lib/buildingAppearance';
 import {useEffect,useState} from 'react';
 import {createPortal} from 'react-dom';
 import type * as Cesium from 'cesium';
@@ -29,7 +30,7 @@ export function CityBuildings({viewer:v,enabled,quality,terrain,airports,airport
     const hierarchy=new C.PolygonHierarchy(C.Cartesian3.fromDegreesArray(ring.flat()),b.rings.slice(1).map(hole=>new C.PolygonHierarchy(C.Cartesian3.fromDegreesArray(hole.flat()))));
     instances.push(new C.GeometryInstance({id:`city-building-${key}-${index}`,geometry:new C.PolygonGeometry({polygonHierarchy:hierarchy,height:base+b.base,extrudedHeight:base+b.height,vertexFormat:C.PerInstanceColorAppearance.VERTEX_FORMAT}),attributes:{color:C.ColorGeometryInstanceAttribute.fromColor(C.Color.fromCssColorString(b.height>80?'#acb9c0':b.height>25?'#b5b9b7':'#c1bcb0'))}}));
    }
-   if(instances.length)(replace&&meshes.has(key)?replacements:meshes).set(key,v!.scene.primitives.add(new C.Primitive({geometryInstances:instances,appearance:new C.PerInstanceColorAppearance({closed:true,translucent:false,flat:false}),asynchronous:true,allowPicking:false})));
+   if(instances.length)(replace&&meshes.has(key)?replacements:meshes).set(key,v!.scene.primitives.add(new C.Primitive({geometryInstances:instances,appearance:buildingAppearance(C,buildings[0]?.rings[0]?.[0]?.[0]??0,buildings[0]?.rings[0]?.[0]?.[1]??0),asynchronous:true,allowPicking:false})));
    v!.scene.requestRender();
   }
   function pump(){

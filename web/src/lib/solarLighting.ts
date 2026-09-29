@@ -29,6 +29,12 @@ export function aircraftSunColor(elevation:number,altitude=0,cover=0,clarity=fal
 /** One scene-wide sun. Each aircraft accounts for Earth's night-side occlusion. */
 export function installSolarLighting(C:Engine,v:Cesium.Viewer){
  const disposeNight=installNightMap(C,v);
+ // Conservative clearcoat-like response for legacy matte paint. Preserve dark
+ // rubber/glass, transparent parts, metals and already-authored roughness.
+ const paintShader=new C.CustomShader({fragmentShaderText:`void fragmentMain(FragmentInput fsInput,inout czm_modelMaterial material){
+  float paint=smoothstep(.25,.55,max(material.diffuse.r,max(material.diffuse.g,material.diffuse.b)));
+  if(material.alpha>.98&&max(material.specular.r,max(material.specular.g,material.specular.b))<.1&&material.roughness>.85){material.roughness=mix(material.roughness,.46,paint);}
+ }`});
  const globe=v.scene.globe;v.clock.clockStep=C.ClockStep.SYSTEM_CLOCK;v.clock.shouldAnimate=true;
  v.scene.light=new C.SunLight();globe.enableLighting=true;
  globe.dynamicAtmosphereLighting=true;globe.dynamicAtmosphereLightingFromSun=true;
@@ -41,6 +47,9 @@ export function installSolarLighting(C:Engine,v:Cesium.Viewer){
  const amount=(entity:Cesium.Entity)=>{const position=entity.position?.getValue(v.clock.currentTime);if(!position)return 1;return sunlightAmount(solarElevation(C,position,sun),C.Cartographic.fromCartesian(position).height);};
  const wire=(entity:Cesium.Entity)=>{
   const model=entity.model;if(!model||wired.has(model))return;wired.add(model);
+  if((entity.id.startsWith('aircraft-')||entity.id==='flight-simulation')&&!model.customShader)model.customShader=new C.ConstantProperty(paintShader);
+  model.environmentMapOptions=new C.PropertyBag({maximumSecondsDifference:120,maximumPositionEpsilon:2000,mipmapLevels:6,groundAlbedo:.25,
+   saturation:new C.CallbackProperty(()=>1-.45*skyObscuration(v),false)});
   model.lightColor=new C.CallbackProperty(()=>{
    const position=entity.position?.getValue(v.clock.currentTime);if(!position)return C.Color.WHITE;
    // Weather is local to the watched scene: don't dim distant aircraft globally.
@@ -60,5 +69,5 @@ export function installSolarLighting(C:Engine,v:Cesium.Viewer){
  // Keep the terminator moving even when request-render mode is otherwise idle.
  const refresh=()=>{if(!document.hidden&&!v.isDestroyed())v.scene.requestRender();};
  const timer=setInterval(refresh,15000);document.addEventListener('visibilitychange',refresh);refresh();
- return()=>{disposeNight();remove();clearInterval(timer);document.removeEventListener('visibilitychange',refresh);};
+ return()=>{if(!v.isDestroyed())for(const e of v.entities.values)if(e.model?.customShader?.getValue(v.clock.currentTime)===paintShader)e.model.customShader=undefined;paintShader.destroy();disposeNight();remove();clearInterval(timer);document.removeEventListener('visibilitychange',refresh);};
 }

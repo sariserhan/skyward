@@ -1,10 +1,11 @@
+import {buildingMaterial} from './buildingAppearance';
 import {airportBuildingHeight} from './airportBuildings';
 import type * as Cesium from 'cesium';
 import type { AirportGeometry, FacilityTarget } from '../types';
 import type { MapPreferences } from './mapPreferences';
 export function addTerrainAirport(v:Cesium.Viewer,airport:AirportGeometry,all:FacilityTarget[],prefs:MapPreferences){
   const C=window.Cesium,added:Cesium.Entity[]=[];
-  const color=C.Color.fromCssColorString('#b9c6bd');
+  const color=buildingMaterial(C,airport.lon,airport.lat,C.Color.fromCssColorString('#b9c6bd'));
   let index=airport.runways.length;
   for(const surface of airport.surfaces){
     if(surface.kind==='apron')continue;
