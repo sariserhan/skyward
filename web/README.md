@@ -1517,3 +1517,8 @@ gear-down airborne-to-ground transition above 35 kt. Cabin audio controls the
 synthesized tire chirp and thump. Reduced motion suppresses smoke; initial ground
 selection, taxi and gear-up contact do not trigger it. The simulator shares the
 smoke effect and adds a touchdown thump through its existing sound controls.
+
+Cabin ambience follows the displayed flight state: airborne airflow fades into
+speed-dependent rolling noise on touchdown, softens while taxiing, and leaves
+quiet ventilation and a low hum when parked. Audio parameters transition smoothly
+without restarting the sound, and the On/Off preference remains unchanged.
