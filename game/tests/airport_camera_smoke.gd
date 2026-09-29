@@ -34,8 +34,14 @@ func _process(_delta: float) -> bool:
 		view.panning = false
 		if view.center.distance_to(target) < 1: failures += 1
 	if frame == 150:
+		if main.map3d.detail_scene.roof_units<=0 or main.map3d.detail_scene.floodlights.size()!=6: failures+=1
+		main.map3d.night=true
+		main.map3d._lighting()
+		for light in main.map3d.detail_scene.floodlights:
+			if not light.visible: failures+=1
+	if frame == 210:
 		root.get_texture().get_image().save_png("/tmp/airport-camera-refined.png")
 		print("Airport camera checks: %d failures" % failures)
 		main.queue_free()
-	if frame == 160: quit(failures)
+	if frame == 220: quit(failures)
 	return false

@@ -25,6 +25,7 @@ var dragging := false
 var panning := false
 var camera_target := Vector3.ZERO
 var apron_material: ShaderMaterial
+var building_material: ShaderMaterial
 var night := false
 var manual: CheckButton
 var status: Label
@@ -248,10 +249,10 @@ func _label(text: String, at: Vector3, parent: Node3D = null) -> Label3D:
 	label.text = text
 	label.position = at
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	label.font_size = 36
+	label.font_size = 26
 	label.pixel_size = 0.35
 	label.no_depth_test = false
-	label.outline_size = 7
+	label.outline_size = 4
 	(world if parent == null else parent).add_child(label)
 	return label
 
@@ -281,7 +282,11 @@ func _surface(points: Array, height: float, color: Color) -> void:
 			apron_material = ShaderMaterial.new()
 			apron_material.shader = load("res://assets/shaders/airport_concrete.gdshader")
 		node.material_override = apron_material
-	else: node.material_override = material
+	else:
+		if building_material == null:
+			building_material=ShaderMaterial.new()
+			building_material.shader=load("res://assets/shaders/airport_building.gdshader")
+		node.material_override = building_material
 	world.add_child(node)
 
 
@@ -330,20 +335,9 @@ func _build_world() -> void:
 	ground.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	ground.material_override = _material(Color("46513b"))
 	world.add_child(ground)
-	var noise := FastNoiseLite.new()
-	noise.frequency = .06
-	var texture := NoiseTexture2D.new()
-	texture.width = 256
-	texture.height = 256
-	texture.noise = noise
-	texture.seamless = true
-	var ramp := Gradient.new()
-	ramp.set_color(0,Color("46513b"))
-	ramp.set_color(1,Color("535e46"))
-	texture.color_ramp = ramp
-	ground.material_override.albedo_color = Color.WHITE
-	ground.material_override.albedo_texture = texture
-	ground.material_override.uv1_scale = Vector3(300,300,300)
+	var landscape := ShaderMaterial.new()
+	landscape.shader=load("res://assets/shaders/airport_landscape.gdshader")
+	ground.material_override=landscape
 	for edge in sim.airside.edges.values():
 		var path: Array = edge.get("points",[])
 		if path.size()<2:
@@ -432,16 +426,19 @@ func _add_lights(points: Array[Vector3], color: Color) -> void:
 	var multi := MultiMesh.new()
 	multi.transform_format = MultiMesh.TRANSFORM_3D
 	var mesh := SphereMesh.new()
-	mesh.radius = 0.9
-	mesh.height = 1.8
+	mesh.radius = 0.45
+	mesh.height = 0.9
 	mesh.radial_segments = 6
 	mesh.rings = 3
-	mesh.material = _material(color,true)
+	mesh.material = _material(color,true).duplicate()
+	mesh.material.albedo_color = color if night else color*.18
+	mesh.material.emission_enabled = night
 	multi.mesh = mesh
 	multi.instance_count = points.size()
 	for i in points.size(): multi.set_instance_transform(i,Transform3D(Basis.IDENTITY,points[i]))
 	var node := MultiMeshInstance3D.new()
 	node.multimesh = multi
+	node.set_meta("lamp_color",color)
 	world.add_child(node)
 
 func _lighting() -> void:
@@ -451,6 +448,12 @@ func _lighting() -> void:
 	var sky := environment.sky.sky_material as ProceduralSkyMaterial
 	sky.sky_top_color = Color("071322") if night else Color("3979b4")
 	sky.sky_horizon_color = Color("23394c") if night else Color("c8d8df")
+	for child in world.get_children():
+		if child is MultiMeshInstance3D and child.has_meta("lamp_color"):
+			var material: StandardMaterial3D=child.multimesh.mesh.material
+			var color: Color=child.get_meta("lamp_color")
+			material.albedo_color=color if night else color*.18
+			material.emission_enabled=night
 	if bound_sim!=null: detail_scene.apply_weather()
 
 func _bounds(node: Node3D, root: Node3D) -> AABB:
@@ -608,7 +611,7 @@ func _process(delta: float) -> void:
 	var desired: Vector3
 	if camera_mode == "Concourse": target = concourse_position
 	match camera_mode:
-		"Concourse": desired = concourse_position+Vector3(180,110,200)
+		"Concourse": desired = concourse_position+Vector3(145,65,165)
 		"Tower": desired = tower_position if tower_position != Vector3.ZERO else center+Vector3(radius*.12,85,radius*.18)
 		"Follow": desired = target+Vector3(60,24,70)
 		"Top": desired = center+Vector3(0,distance,.1)

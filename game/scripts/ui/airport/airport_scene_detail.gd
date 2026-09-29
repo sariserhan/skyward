@@ -9,13 +9,16 @@ var puddle_materials: Array[StandardMaterial3D] = []
 var tick := 0.0
 var last_tick := -1
 var strobes: Array[Node3D]=[]
+var floodlights: Array[SpotLight3D]=[]
+var roof_units := 0
 
 func setup(owner_view: Airport3D) -> void:
 	view=owner_view
-	decorations.clear(); vehicles.clear(); puddle_materials.clear(); strobes.clear(); rain=null
+	decorations.clear(); vehicles.clear(); puddle_materials.clear(); strobes.clear(); rain=null; floodlights.clear(); roof_units=0
 	var sim:=view.sim
 	if not sim.airside.enabled(): return
 	_mapped_terminals()
+	_apron_lighting()
 	# Match terminal detail to the scenario footprint, retaining mapped Dulles buildings.
 	if sim.airside.config.has("terminal_zone"):
 		var z: Dictionary=sim.airside.config.terminal_zone
@@ -67,6 +70,12 @@ func apply_weather() -> void:
 	view.environment.fog_density=.00008 if float(w.visibility)>2 else .00035
 	if view.apron_material != null: view.apron_material.set_shader_parameter("wetness", 1.0 if w.wet else 0.0)
 	for material in puddle_materials: material.roughness=.32 if w.wet else .82
+	var glazing := view._material(Color("365765"))
+	glazing.roughness=.22; glazing.metallic=.25
+	glazing.emission_enabled=view.night
+	glazing.emission=Color("b8c4b7")
+	glazing.emission_energy_multiplier=.3
+	for light in floodlights: light.visible=view.night
 	if rain!=null: rain.emitting=w.wet
 
 func _vehicle(color: Color,kind: String) -> Node3D:
@@ -177,6 +186,7 @@ func _mapped_terminals() -> void:
 		if surface.kind != "terminal": continue
 		var height := Airport3D.mapped_building_height(surface)
 		var points: Array = surface.points
+		_roof_equipment(points,height)
 		for i in points.size():
 			var p: Array = points[i]
 			var q: Array = points[(i+1)%points.size()]
@@ -186,7 +196,53 @@ func _mapped_terminals() -> void:
 			if length < 2: continue
 			# Broad glazing and roof coping track every concourse bend.
 			view._line(a,b,.5,Color("365765"),height*.35)
-			view._line(Vector3(a.x,height+.2,a.z),Vector3(b.x,height+.2,b.z),.8,Color("d4d8d4"),.4)
+			view._line(Vector3(a.x,height+.2,a.z),Vector3(b.x,height+.2,b.z),.8,Color("8d9696"),.4)
 			for bay in range(1,mini(60,int(length/6))):
 				var at := a.lerp(b,float(bay)/float(mini(60,int(length/6))))
-				decorations.append(view._box(view.world,at,Vector3(.45,height*.4,.45),Color("c0c8c9")))
+				decorations.append(view._box(view.world,at,Vector3(.45,height*.4,.45),Color("98a4a7")))
+
+## Generic service equipment is kept within the mapped roof footprint.
+func _roof_equipment(points: Array, height: float) -> void:
+	var polygon := PackedVector2Array()
+	var lo := Vector2(INF,INF)
+	var hi := Vector2(-INF,-INF)
+	for point in points:
+		var p := Vector2(point[0],point[1])
+		polygon.append(p); lo=lo.min(p); hi=hi.max(p)
+	var count := 0
+	for x in range(int(lo.x)+12,int(hi.x)-8,32):
+		for z in range(int(lo.y)+12,int(hi.y)-8,32):
+			if count>=48: return
+			var valid := true
+			for offset in [Vector2(-4,-6),Vector2(4,-6),Vector2(4,6),Vector2(-4,6)]:
+				if not Geometry2D.is_point_in_polygon(Vector2(x,z)+offset,polygon): valid=false
+			if not valid: continue
+			count+=1; roof_units+=1
+			var at := Vector3(x,height,z)
+			view._box(view.world,at+Vector3.UP*.25,Vector3(7,.5,11),Color("414b4e"))
+			view._box(view.world,at+Vector3.UP*1.1,Vector3(5,1.7,8),Color("899496"))
+			for vent in [-2.4,0.0,2.4]:
+				view._box(view.world,at+Vector3(0,2,vent),Vector3(4,.15,1.7),Color("283638"))
+			view._box(view.world,at+Vector3(4,.7,0),Vector3(2,1.1,1.2),Color("707f83"))
+
+func _apron_lighting() -> void:
+	for gate in view.bridges:
+		var base: Vector3 = view.bridges[gate].base
+		var stand := view._point(view.sim.airside.config.stands[gate])
+		var direction := (stand-base).normalized()
+		var side := Vector3(-direction.z,0,direction.x)
+		var foot := Vector3(base.x,0,base.z)+side*12+direction*2
+		view._box(view.world,foot+Vector3.UP*9,Vector3(.35,18,.35),Color("637477"))
+		view._box(view.world,foot+Vector3.UP*18,Vector3(4,.35,.65),Color("39464b"))
+		for offset in [-1.3,0.0,1.3]:
+			view._box(view.world,foot+Vector3(offset,17.8,.2),Vector3(.8,.25,.8),Color("cfdbcc"))
+		# Budget the real illumination separately from decorative pole geometry.
+		if floodlights.size()>=6: continue
+		var light := SpotLight3D.new()
+		view.world.add_child(light)
+		light.position=foot+Vector3.UP*17.5
+		light.look_at(stand+Vector3.UP,Vector3.FORWARD)
+		light.spot_range=110; light.spot_angle=65; light.spot_attenuation=.7
+		light.light_color=Color("fff0d3"); light.light_energy=2.5
+		light.shadow_enabled=false; light.visible=view.night
+		floodlights.append(light)

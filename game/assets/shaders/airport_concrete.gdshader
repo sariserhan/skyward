@@ -11,7 +11,7 @@ void fragment() {
  float aa=max(length(fwidth(p)),0.015);
  float joint=1.0-smoothstep(0.015,0.015+aa,min(edge.x,edge.y));
  joint*=min(1.0,0.06/aa);
- float variation=(hash(cell)-0.5)*0.055;
+ float variation=(hash(cell)-0.5)*0.018;
  float grain=(hash(floor(p*18.0))-0.5)*0.02/(1.0+aa*18.0);
  ALBEDO=(vec3(0.43,0.44,0.42)+variation+grain-joint*0.1)*(1.0-wetness*0.22);
  ROUGHNESS=mix(0.9,0.38,wetness);

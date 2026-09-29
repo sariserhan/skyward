@@ -178,6 +178,11 @@ Static scenery is batched by material and local area to reduce scene overhead;
 aircraft, service vehicles, bridges, and sequenced lights stay independently animated.
 Use **Hide setup** above the game for more viewport space. Progress sync and local
 backup controls are under **Save & backups**.
+Terminal roofs have weathered panel materials and bounded illustrative service
+equipment. Non-repeating landscape shading replaces the tiled grass texture.
+Apron masts provide a budget of six actual nighttime floodlights; window bands gain
+subtle nighttime illumination. These additions are generic scenery, not surveyed
+architectural details. The lower Concourse camera emphasizes terminal scale.
 Building footprints come from OSM, with tagged heights/levels where available and
 fallback heights otherwise. Facades are illustrative: these are not photogrammetry
 or detailed architectural models. Other globe airports are not yet playable controller scenarios.
