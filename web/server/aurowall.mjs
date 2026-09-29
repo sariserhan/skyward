@@ -2,6 +2,7 @@ import {AwsClient} from 'aws4fetch';
 const credit={name:'Aurowall',url:'https://aurowall.com'};
 const xmlValue=(xml,tag)=>xml.match(new RegExp(`<${tag}>([\\s\\S]*?)</${tag}>`))?.[1]?.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'");
 export function audioTrack(key,base,prefix=''){
+ if(/(?:^|\/)(?:prayer|quran)(?:\/|\.|$)/i.test(key))return null;
  if(!key.startsWith(prefix)||!key.match(/\.(mp3|m4a|ogg|wav|aac|flac)$/i)||key.split('/').some(p=>p==='.'||p==='..'||!p)||key.length>1000)return null;
  const parts=key.split('/'),folder=parts.length>1?parts[parts.length-2]:'Audio';
  const stem=parts.at(-1).replace(/\.[^.]+$/,'');const title=(stem===folder?stem:parts.length>1?`${folder} · ${stem}`:stem).replace(/[-_]+/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
