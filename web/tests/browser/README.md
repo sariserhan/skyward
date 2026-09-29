@@ -52,3 +52,5 @@ or a confirmed runway/gate assignment. No live aviation API is needed.
 Weather rendering: `npm run test:weather` checks report-driven globe clouds, changing aircraft attitude inside a storm layer, and cockpit rendering with deterministic weather fixtures. Screenshots are saved in the printed evidence directory. Set `SKYWARD_QA_PYTHON` if Playwright is in a virtual environment.
 
 Globe clouds illustrate recent nearby station observations, not satellite imagery or coverage over unreported oceans. Cloud thickness, shapes and turbulence are visual approximations. Weather motion does not change live positions, tracks or reported instrument readings; it is suppressed on the ground and with reduced motion, and can be disabled in Weather settings.
+
+Cockpit recovery: `npm run test:cockpit` verifies cockpit opening with the former deferred-module URL blocked, then injects an audio startup effect failure to check that only the cockpit recovers. It exercises retry, return to side view, and the mobile recovery layout.
