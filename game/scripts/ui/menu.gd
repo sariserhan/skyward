@@ -68,16 +68,16 @@ func _build() -> void:
 	column.add_theme_constant_override("separation", 14)
 	column.custom_minimum_size.x = 520
 	center.add_child(column)
-	_label(column, "RIVERDALE / BOARDING", 34, Color.WHITE)
-	_label(column, "Run a small airport. Grow it.", 16)
+	_label(column, "SKYWARD / AIRPORT CONTROL", 34, Color.WHITE)
+	_label(column, "Control a real airport. Build your own career.", 16)
 	for id in ["home", "new", "dulles", "load", "settings", "developer"]: column.add_child(_page(id))
 	# Home
 	var home: VBoxContainer = pages.home
 	continue_button = _button(home, "CONTINUE", _continue)
+	_button(home, "WASHINGTON DULLES · REAL AIRPORT", func(): _show("dulles"))
 	_button(home, "NEW CAREER", func(): _show("new"))
 	_button(home, "SANDBOX · RIVERDALE INTERNATIONAL", func():
 		AirportLaunch.open(get_tree(), AirportLaunch.start_new(AirportLaunch.SANDBOX, -1, {"mode": "sandbox", "name": "Riverdale International"})))
-	_button(home, "WASHINGTON DULLES · IAD", func(): _show("dulles"))
 	_button(home, "LOAD GAME", func(): _show("load"))
 	_button(home, "SETTINGS", func(): _show("settings"))
 	if GameSettings.developer() or OS.is_debug_build(): _button(home, "DEVELOPER SCENARIOS", func(): _show("developer"))

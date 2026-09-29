@@ -15,6 +15,7 @@ func setup(owner_view: Airport3D) -> void:
 	decorations.clear(); vehicles.clear(); puddle_materials.clear(); strobes.clear(); rain=null
 	var sim:=view.sim
 	if not sim.airside.enabled(): return
+	_mapped_terminals()
 	# Match terminal detail to the scenario footprint, retaining mapped Dulles buildings.
 	if sim.airside.config.has("terminal_zone"):
 		var z: Dictionary=sim.airside.config.terminal_zone
@@ -168,3 +169,23 @@ func touchdown(at: Vector3) -> void:
 	var mesh:=SphereMesh.new(); mesh.radius=.5; mesh.height=1; mesh.radial_segments=8; mesh.rings=4
 	var material:=StandardMaterial3D.new(); material.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA; material.albedo_color=Color(.8,.84,.85,.25); mesh.material=material; smoke.mesh=mesh; smoke.position=Vector3(at.x,.8,at.z)
 	view.world.add_child(smoke); smoke.finished.connect(smoke.queue_free); smoke.emitting=true
+
+## Facade treatment follows the source polygon; it is illustrative, not surveyed architecture.
+func _mapped_terminals() -> void:
+	for surface in view.sim.airside.config.get("surfaces", []):
+		if surface.kind != "terminal": continue
+		var height := Airport3D.mapped_building_height(surface)
+		var points: Array = surface.points
+		for i in points.size():
+			var p: Array = points[i]
+			var q: Array = points[(i+1)%points.size()]
+			var a := Vector3(p[0], height*.6, p[1])
+			var b := Vector3(q[0], height*.6, q[1])
+			var length := a.distance_to(b)
+			if length < 2: continue
+			# Broad glazing and roof coping track every concourse bend.
+			view._line(a,b,.5,Color("365765"),height*.35)
+			view._line(Vector3(a.x,height+.2,a.z),Vector3(b.x,height+.2,b.z),.8,Color("d4d8d4"),.4)
+			for bay in range(1,mini(60,int(length/6))):
+				var at := a.lerp(b,float(bay)/float(mini(60,int(length/6))))
+				decorations.append(view._box(view.world,at,Vector3(.45,height*.4,.45),Color("c0c8c9")))

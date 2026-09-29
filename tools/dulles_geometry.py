@@ -71,7 +71,7 @@ def build_airside(base, groups):
         rings=join_rings(el['members']) if el['type']=='relation' else [el.get('geometry',[])]
         for ring in rings:
             if len(ring)<4 or ring[0]!=ring[-1]:continue
-            a['surfaces'].append({'osm_id':el['id'],'kind':kind,'label':tags.get('name',''), 'points':[project(pt['lat'],pt['lon']) for pt in ring[:-1]],'levels':tags.get('building:levels','')})
+            a['surfaces'].append({'osm_id':el['id'],'kind':kind,'label':tags.get('name',''), 'points':[project(pt['lat'],pt['lon']) for pt in ring[:-1]],'levels':tags.get('building:levels',''),'height':tags.get('height','')})
     # Only retain the connected main taxi network for routing. Remote features
     # remain source data; no invented straight-line taxiways join components.
     adjacency={}

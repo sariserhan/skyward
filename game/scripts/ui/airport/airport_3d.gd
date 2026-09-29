@@ -19,6 +19,7 @@ var yaw := 0.0
 var elevation := 0.9
 var distance := 3000.0
 var camera_mode := "Orbit"
+var concourse_position := Vector3.ZERO
 var dragging := false
 var night := false
 var manual: CheckButton
@@ -45,7 +46,7 @@ func _ready() -> void:
 	custom_minimum_size = Vector2(600, 290)
 	var tools := HFlowContainer.new()
 	add_child(tools)
-	for mode in ["Orbit", "Tower", "Follow", "Top"]:
+	for mode in ["Orbit", "Concourse", "Tower", "Follow", "Top"]:
 		var button := Button.new()
 		button.text = mode
 		button.pressed.connect(func(): camera_mode = mode)
@@ -261,6 +262,15 @@ func _surface(points: Array, height: float, color: Color) -> void:
 	node.material_override = material
 	world.add_child(node)
 
+
+static func mapped_building_height(surface: Dictionary) -> float:
+	if surface.kind == "apron": return .08
+	var explicit_height := str(surface.get("height", "")).trim_suffix(" m").to_float()
+	if explicit_height > 0: return clampf(explicit_height, 3, 300)
+	var levels := str(surface.get("levels", "")).to_float()
+	if levels > 0: return clampf(levels*3.5, 3, 300)
+	return 12.0 if surface.kind == "terminal" else 8.0
+
 func _build_world() -> void:
 	for child in world.get_children():
 		if child not in [camera, sun] and not child is WorldEnvironment: child.queue_free()
@@ -323,7 +333,11 @@ func _build_world() -> void:
 			_line(a, b, 24, Color("393f40"))
 			_line(a+Vector3.UP*.2, b+Vector3.UP*.2, 0.5, Color("bda647"))
 	for surface in sim.airside.config.get("surfaces", []):
-		_surface(surface.points, 0.08 if surface.kind == "apron" else 14.0, Color("707574") if surface.kind == "apron" else Color("bbc4c8"))
+		_surface(surface.points, mapped_building_height(surface), Color("707574") if surface.kind == "apron" else Color("bbc4c8"))
+	concourse_position = center
+	var stands: Dictionary = sim.airside.config.get("stands", {})
+	if not stands.is_empty(): concourse_position = _point(stands.values()[0])
+	if sim.airside.config.get("geographic", false): camera_mode = "Concourse"
 	if sim.airside.config.has("terminal_zone"):
 		var z: Dictionary = sim.airside.config.terminal_zone
 		_box(world,Vector3((z.x0+z.x1)/2,0,z.y0-90),Vector3(z.x1-z.x0,.1,190),Color("757771"))
@@ -553,7 +567,9 @@ func _process(delta: float) -> void:
 	var target := center
 	if camera_mode in ["Follow","Tower"] and models.has(selected_id) and models[selected_id].visible: target = models[selected_id].position
 	var desired: Vector3
+	if camera_mode == "Concourse": target = concourse_position
 	match camera_mode:
+		"Concourse": desired = concourse_position+Vector3(180,110,200)
 		"Tower": desired = tower_position if tower_position != Vector3.ZERO else center+Vector3(radius*.12,85,radius*.18)
 		"Follow": desired = target+Vector3(60,24,70)
 		"Top": desired = center+Vector3(0,distance,.1)

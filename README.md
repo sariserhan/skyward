@@ -163,9 +163,14 @@ Full product spec: [spec.md](spec.md). Design decisions: [docs/DECISIONS.md](doc
 
 ## Dulles airport prototype
 
-Choose **WASHINGTON DULLES · IAD → PLAY DULLES** from the menu for the geographic
+Dulles is the first scenario choice in `/airport-simulation/`. Choose **Start scenario**,
+or **WASHINGTON DULLES · REAL AIRPORT → PLAY DULLES** in the game menu, for the geographic
 airport sandbox: four FAA-positioned runways, mapped terminal footprints and
 taxiways, and real airline names with explicitly illustrative traffic.
+The 3D view opens at the mapped concourses; **Concourse** returns to that camera.
+Building footprints come from OSM, with tagged heights/levels where available and
+fallback heights otherwise. Facades are illustrative: these are not photogrammetry
+or detailed architectural models. Other globe airports are not yet playable controller scenarios.
 See [Dulles details and limitations](docs/dulles.md).
 
 ## Run the game
