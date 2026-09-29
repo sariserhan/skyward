@@ -1659,7 +1659,8 @@ In airport-scale views (camera radius at most 100 nm), fewer than ten recent
 observed aircraft automatically triggers a fictional Skyward population up to
 20 total aircraft. Ten or more observations removes the supplemental population.
 Green airplane icons and Skyward callsigns distinguish fictional flights; the
-coverage banner explains the difference. No demo button or separate scene is
+Flight view banner explains the difference and opens Premium upgrade details.
+The banner appears only while watching a simulated aircraft. No demo button or separate scene is
 required. Selecting a Skyward aircraft opens the same flight view, route, cabin,
 cockpit and camera controls as observed aircraft.
 

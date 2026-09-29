@@ -12,7 +12,7 @@ def run(page):
  for path in ['route?*','search?*','status']:page.route('**/api/'+path,f.mock)
  page.route('**/api/account',lambda r:r.fulfill(json={'enabled':False,'billingReady':False,'mode':'test','user':None,'usage':None}))
  page.goto(f.URL+'/#airport=TAS');assert 'Skyward' in page.title();page.wait_for_function("window.__viewer && __viewer.entities.values.filter(e=>e.id.startsWith('aircraft-skyward-tas-')).length===20",timeout=60000)
- assert not page.get_by_role('button',name='Try Skyward simulated traffic').count();assert not page.get_by_role('region',name='Skyward simulated traffic').count();expect(page.get_by_role('complementary',name='Skyward traffic disclosure')).to_be_visible()
+ assert not page.get_by_role('button',name='Try Skyward simulated traffic').count();assert not page.get_by_role('region',name='Skyward simulated traffic').count();expect(page.get_by_role('complementary',name='Simulated flight Premium upgrade')).to_have_count(0)
  assert page.evaluate("__viewer.entities.getById('aircraft-skyward-tas-0').billboard!==undefined")
  page.screenshot(path=str(f.ARTIFACTS/'automatic-map.jpg'),type='jpeg')
  # Click a visible aircraft icon on the canvas before exercising the list and cameras.
