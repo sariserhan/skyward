@@ -1,3 +1,4 @@
+import {aircraftFamily,propulsionSound} from './aircraftSound.ts';
 export type CockpitCue='gear'|'touchdown'|'turbulence'|500|100|50|40|30|20|10;
 export interface AudioFlight {turbulence?:number;agl:number|null;ground:boolean;gear:boolean|null;at:number;}
 export function cockpitCues(previous:AudioFlight|null,next:AudioFlight):CockpitCue[]{
@@ -12,12 +13,12 @@ export function cockpitCues(previous:AudioFlight|null,next:AudioFlight):CockpitC
 export interface CockpitAudioInput {turbulence?:number;speed:number|null;throttle:number|null;volume:number;}
 const clamp=(n:number,min:number,max:number)=>Math.max(min,Math.min(max,n));
 export function cockpitAudioSettings(type:string,input:CockpitAudioInput){
- const prop=/^(AT[47]|DH8|DHC|C1[578]|C208|PA[234]|PC12|BE[23]|B350|SR2)/i.test(type);
- const piston=/^(C1[578]|PA[234]|SR2|BE36)/i.test(type),business=/^(C[2567]|GL|FA|LJ)/i.test(type),heavy=/^(B74|B77|B78|A33|A34|A35|A38)/i.test(type);
- const base=piston?30:prop?38:business?65:heavy?34:48,range=piston?28:prop?42:business?80:heavy?45:62;
+ const family=aircraftFamily(type),prop=family==='piston'||family==='turboprop',piston=family==='piston',helicopter=family==='helicopter';
+ const business=/^(C[2567]|GL|FA|LJ)/i.test(type),heavy=/^(B74|B77|B78|A33|A34|A35|A38)/i.test(type);
+ const base=helicopter?24:piston?30:prop?38:business?65:heavy?34:48,range=helicopter?14:piston?28:prop?42:business?80:heavy?45:62;
  const speed=Number.isFinite(input.speed)?clamp(input.speed!,0,600):0;
  const power=input.throttle!==null&&Number.isFinite(input.throttle)?clamp(input.throttle,0,1):clamp(.25+speed/700,.25,.85);
- return {frequency:base+power*range,hum:prop?.12:.07,wind:350+speed*2+clamp(input.turbulence??0,0,1)*1200,volume:Number.isFinite(input.volume)?clamp(input.volume,0,1)*.18:0};
+ return {frequency:base+power*range,hum:helicopter?.16:prop?.12:.07,wind:350+speed*2+clamp(input.turbulence??0,0,1)*1200,volume:Number.isFinite(input.volume)?clamp(input.volume,0,1)*.18:0};
 }
 /** Original illustrative engine/ventilation sound. No media or provider requests. */
 export function createCockpitSound(type:string){
@@ -29,7 +30,9 @@ export function createCockpitSound(type:string){
   const c=new AudioContext();context=c;master=c.createGain();master.gain.value=0;master.connect(c.destination);low=c.createBiquadFilter();low.type='lowpass';low.frequency.value=500;const high=c.createBiquadFilter();high.type='highpass';high.frequency.value=35;
   const buffer=c.createBuffer(1,c.sampleRate*4,c.sampleRate),data=buffer.getChannelData(0);let seed=8173;for(let i=0;i<data.length;i++){seed=(Math.imul(seed,1664525)+1013904223)>>>0;data[i]=seed/2147483648-1;}
   const noise=c.createBufferSource();noise.buffer=buffer;noise.loop=true;noise.connect(low).connect(high).connect(master);noise.start();sources.push(noise);
-  humGain=c.createGain();humGain.gain.value=.07;humGain.connect(master);for(let i=0;i<2;i++){const o=c.createOscillator();o.type='sine';o.connect(humGain);o.start();oscillators.push(o);sources.push(o);}nodes.push(master,low,high,humGain);update(input);
+  humGain=c.createGain();humGain.gain.value=.07;humGain.connect(master);for(let i=0;i<2;i++){const o=c.createOscillator();o.type=propulsionSound(type).wave;o.connect(humGain);o.start();oscillators.push(o);sources.push(o);}nodes.push(master,low,high,humGain);
+  const signature=propulsionSound(type);if(signature.beat){const beat=c.createOscillator(),depth=c.createGain();beat.frequency.value=signature.beat;depth.gain.value=cockpitAudioSettings(type,input).hum*signature.depth;beat.connect(depth).connect(humGain.gain);beat.start();sources.push(beat);nodes.push(depth);}
+  update(input);
  }
  const cue=(kind:CockpitCue)=>{
   if(!context||!master||!wantsPlayback||context.state!=='running')return;

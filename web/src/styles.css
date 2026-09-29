@@ -320,3 +320,23 @@ body>.cesium-credit-lightbox-overlay .cesium-credit-lightbox-close{min-width:36p
 .turbulence-caution{display:block;width:100%;color:#ffd59b;font-size:10px;padding:5px 7px;border-left:2px solid #e5ac60;background:#392d1dc9}
 
 .observed-flight-upgrade{border-color:#659ec7;background:#173746}.upgrade-traffic-explainer{padding:14px;margin:12px 0;border:1px solid #456577;border-radius:8px;background:#112c39}.upgrade-traffic-explainer h3{margin:0 0 8px}.upgrade-traffic-explainer p{font-size:12px;line-height:1.5;color:#c2d9e3}
+
+/* Family-specific flight decks share navigation, audio and accessible controls. */
+.cockpit-family-helicopter .cockpit-roof{height:32px;background:linear-gradient(#111b18,#25372b)}
+.cockpit-family-helicopter .cockpit-pillar{width:22px;background:linear-gradient(90deg,#182721,#64705c,#17231e)}
+.cockpit-family-helicopter .cockpit-dashboard{border-top-color:#78836b;background:linear-gradient(#344334,#111c18)}
+.cockpit-family-helicopter .cockpit-glareshield{color:#cfdbb6}
+.cockpit-family-helicopter .cockpit-yoke{max-width:180px;margin-inline:auto}
+.cockpit-family-piston .cockpit-dashboard{background:linear-gradient(#72695a,#292a27);border-top-color:#ad9d7e}
+.cockpit-family-piston .cockpit-pfd{background:#282c29}
+.cockpit-family-piston .cockpit-pfd>.cockpit-readings{display:none}
+.cockpit-round-dials{display:flex;gap:8px;justify-content:center;padding:8px}
+.cockpit-round-dials>div{width:82px;height:82px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:5px solid #68726d;outline:2px solid #101612;border-radius:50%;background:radial-gradient(#202c27,#030906);box-shadow:inset 0 0 9px #000;color:#edf1d7}
+.cockpit-round-dials small{font-size:9px}.cockpit-round-dials b{font-size:16px}.cockpit-round-dials span{font-size:7px;color:#9daa9b}
+.cockpit-family-turboprop .cockpit-dashboard{background:linear-gradient(#343e48,#11191e);border-top-color:#8999a4}
+.cockpit-engine-panel{padding:7px 9px;border:1px solid #50625a;border-radius:5px;background:#0b1813;color:#c6dfc6;margin-bottom:7px;font-size:10px}
+.cockpit-engine-panel>div{display:flex;justify-content:space-around;gap:8px;margin:5px 0}.cockpit-engine-panel span{display:flex;flex-direction:column;align-items:center}.cockpit-engine-panel b{font-size:19px}.cockpit-engine-panel small{font-size:9px;color:#a6b9ae}
+@media(max-width:600px){.cockpit-round-dials>div{width:65px;height:65px}.cockpit-round-dials b{font-size:13px}}
+
+.cockpit-round-dials>div{flex:1;aspect-ratio:1;width:auto;height:auto;min-width:0;max-width:82px}
+@media(max-width:600px){.cockpit-round-dials{gap:4px;padding:7px 4px}.cockpit-round-dials>div{border-width:3px}.cockpit-round-dials b{font-size:11px}.cockpit-round-dials small{font-size:7px}}

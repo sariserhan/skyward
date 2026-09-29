@@ -1,0 +1,413 @@
+{
+  "pa18": {
+    "groups": [
+      {
+        "nodes": [
+          "helice"
+        ],
+        "axis": 2,
+        "pivot": [
+          -5.418062210083008e-05,
+          -0.07071793079376221,
+          3.3378454446792603
+        ],
+        "kind": "propeller"
+      }
+    ],
+    "hide": [
+      "propblur",
+      "propdisc"
+    ]
+  },
+  "pa28": {
+    "groups": [
+      {
+        "nodes": [
+          "helice"
+        ],
+        "axis": 2,
+        "pivot": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "kind": "propeller"
+      }
+    ],
+    "hide": [
+      "propblur",
+      "propdisc"
+    ]
+  },
+  "pa32": {
+    "groups": [
+      {
+        "nodes": [
+          "helice"
+        ],
+        "axis": 2,
+        "pivot": [
+          -0.015742480754852295,
+          0.2458016276359558,
+          3.902807593345642
+        ],
+        "kind": "propeller"
+      }
+    ],
+    "hide": [
+      "propblur",
+      "propdisc"
+    ]
+  },
+  "sr22": {
+    "groups": [
+      {
+        "nodes": [
+          "helice"
+        ],
+        "axis": 2,
+        "pivot": [
+          -0.040972769260406494,
+          0.47222115099430084,
+          3.580120086669922
+        ],
+        "kind": "propeller"
+      }
+    ],
+    "hide": [
+      "propblur",
+      "propdisc"
+    ]
+  },
+  "dr40": {
+    "groups": [
+      {
+        "nodes": [
+          "helice"
+        ],
+        "axis": 2,
+        "pivot": [
+          -0.0005626678466796875,
+          0.3927500396966934,
+          3.1494462490081787
+        ],
+        "kind": "propeller"
+      }
+    ],
+    "hide": [
+      "propblur",
+      "propdisc"
+    ]
+  },
+  "pc12": {
+    "groups": [
+      {
+        "nodes": [
+          "helice"
+        ],
+        "axis": 2,
+        "pivot": [
+          -8.064508438110352e-05,
+          0.49968498945236206,
+          6.726502418518066
+        ],
+        "kind": "propeller"
+      }
+    ],
+    "hide": [
+      "propblur",
+      "propdisc"
+    ]
+  },
+  "c208": {
+    "groups": [
+      {
+        "nodes": [
+          "helice"
+        ],
+        "axis": 2,
+        "pivot": [
+          0.021909594535827637,
+          0.5367454290390015,
+          5.9156694412231445
+        ],
+        "kind": "propeller"
+      }
+    ],
+    "hide": [
+      "propblur",
+      "propdisc"
+    ]
+  },
+  "c182": {
+    "groups": [
+      {
+        "nodes": [
+          "SlowProp"
+        ],
+        "axis": 2,
+        "pivot": [
+          0.0003247857093811035,
+          0.01776096224784851,
+          3.820056915283203
+        ],
+        "kind": "propeller"
+      }
+    ],
+    "hide": [
+      "FastProp"
+    ]
+  },
+  "q400": {
+    "groups": [
+      {
+        "nodes": [
+          "propL"
+        ],
+        "axis": 0,
+        "pivot": [
+          0.11559550277888775,
+          0.0,
+          0.0
+        ],
+        "kind": "propeller"
+      },
+      {
+        "nodes": [
+          "propR"
+        ],
+        "axis": 0,
+        "pivot": [
+          0.11559550277888775,
+          0.0,
+          0.0
+        ],
+        "kind": "propeller"
+      }
+    ],
+    "hide": []
+  },
+  "atr42": {
+    "groups": [
+      {
+        "nodes": [
+          "Prop1"
+        ],
+        "axis": 1,
+        "pivot": [
+          0.0,
+          -0.2119840532541275,
+          0.0
+        ],
+        "kind": "propeller"
+      },
+      {
+        "nodes": [
+          "Prop2"
+        ],
+        "axis": 1,
+        "pivot": [
+          0.0,
+          -0.2119840532541275,
+          0.0
+        ],
+        "kind": "propeller"
+      }
+    ],
+    "hide": []
+  },
+  "atr72": {
+    "groups": [
+      {
+        "nodes": [
+          "lprop1",
+          "lprop2",
+          "lprop3",
+          "lprop4",
+          "lprop5",
+          "lprop6"
+        ],
+        "axis": 2,
+        "pivot": [
+          4.048132061958313,
+          1.39993916451931,
+          4.751597166061401
+        ],
+        "kind": "propeller"
+      },
+      {
+        "nodes": [
+          "rprop1",
+          "rprop2",
+          "rprop3",
+          "rprop4",
+          "rprop5",
+          "rprop6"
+        ],
+        "axis": 2,
+        "pivot": [
+          -4.05899965763092,
+          1.3926542550325394,
+          4.751598119735718
+        ],
+        "kind": "propeller"
+      }
+    ],
+    "hide": [
+      "lpropblur",
+      "rpropblur"
+    ]
+  },
+  "ec35": {
+    "groups": [
+      {
+        "nodes": [
+          "blade1",
+          "blade1a",
+          "blade1b",
+          "blade1c",
+          "blade1d",
+          "blade2",
+          "blade2a",
+          "blade2b",
+          "blade2c",
+          "blade2d",
+          "blade3",
+          "blade3a",
+          "blade3b",
+          "blade3c",
+          "blade3d",
+          "blade4",
+          "blade4a",
+          "blade4b",
+          "blade4c",
+          "blade4d",
+          "Flexbeam",
+          "rotorcap"
+        ],
+        "axis": 1,
+        "pivot": [
+          -4.76837158203125e-07,
+          3.0820640325546265,
+          0.8688460141420364
+        ],
+        "kind": "main"
+      },
+      {
+        "nodes": [
+          "Tblade"
+        ],
+        "axis": 0,
+        "pivot": [
+          -0.10066630691289902,
+          2.153528332710266,
+          -4.928909540176392
+        ],
+        "kind": "tail"
+      }
+    ],
+    "hide": [
+      "blurred1a",
+      "blurred1a_0",
+      "blurred2a",
+      "blurred2a_0",
+      "blurred3a",
+      "blurred3a_0",
+      "blurred4a",
+      "blurred4a_0",
+      "rotor_disc_T"
+    ]
+  },
+  "b407": {
+    "groups": [
+      {
+        "nodes": [
+          "SkywardMainRotor"
+        ],
+        "axis": 1,
+        "pivot": [
+          0.0,
+          1.8752505779266357,
+          1.2813149690628052
+        ],
+        "kind": "main"
+      },
+      {
+        "nodes": [
+          "SkywardTailRotor"
+        ],
+        "axis": 0,
+        "pivot": [
+          0.10724199563264847,
+          1.1902333498001099,
+          -5.59918999671936
+        ],
+        "kind": "tail"
+      }
+    ],
+    "hide": []
+  },
+  "fleet:turboprop": {
+    "groups": [
+      {
+        "nodes": [
+          "SkywardProp0"
+        ],
+        "axis": 2,
+        "pivot": [
+          -4.94,
+          0.42,
+          1.5525000000000002
+        ],
+        "kind": "propeller"
+      },
+      {
+        "nodes": [
+          "SkywardProp1"
+        ],
+        "axis": 2,
+        "pivot": [
+          4.94,
+          0.42,
+          1.5525000000000002
+        ],
+        "kind": "propeller"
+      }
+    ],
+    "hide": []
+  },
+  "fleet:light": {
+    "groups": [
+      {
+        "nodes": [
+          "SkywardProp0"
+        ],
+        "axis": 2,
+        "pivot": [
+          0,
+          0,
+          4.68
+        ],
+        "kind": "propeller"
+      }
+    ],
+    "hide": []
+  },
+  "fleet:pc12": {
+    "groups": [
+      {
+        "nodes": [
+          "SkywardProp0"
+        ],
+        "axis": 2,
+        "pivot": [
+          0,
+          0,
+          7.28
+        ],
+        "kind": "propeller"
+      }
+    ],
+    "hide": []
+  }
+}

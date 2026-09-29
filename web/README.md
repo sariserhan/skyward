@@ -1740,3 +1740,24 @@ apply. Strong weather produces gust-modulated aircraft and cockpit motion;
 grounded aircraft remain steady. Watched-flight cockpit audio adds stronger
 airflow and an entry chime with a 30-second cooldown, plus a visible turbulence
 message. This is a simulation cue, not an aircraft-reported emergency warning.
+
+### Rotorcraft and propeller presentation
+
+`python3 scripts/prepare-rotor-rigs.py` prepares audited moving nodes for 13 sourced
+models and the light, PC-12 and turboprop fallback families. Run it after regenerating
+those aircraft assets. It retains the original geometry and licenses, splits the
+Bell 407 rotor primitives and fallback propeller triangles from static geometry,
+and emits `src/lib/rotorRigs.json`. Main rotors, tail rotors and propellers rotate
+around local hubs; stationary airborne helicopters still animate. Reduced motion
+freezes rotation. Known simulator engine shutdown stops rotation; otherwise parked
+stationary aircraft spin down. RPM is illustrative because tracking feeds do not
+provide engine telemetry.
+
+Helicopters, piston aircraft, turboprops and jets use distinct synthesized cabin
+and cockpit sound profiles. Rotor beat and propeller modulation use local Web Audio
+oscillators, respect the existing mute controls and are disposed on exit. No media
+service or recording is required. Flight-follow cockpits use family-specific panel
+finishes, piston round instruments, helicopter cyclic controls and appropriate
+engine instrument labels. Unavailable engine readings remain blank. Practice remains
+simplified camera-flight practice, not aircraft-specific training or helicopter
+flight dynamics.

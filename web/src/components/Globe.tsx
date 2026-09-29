@@ -1,3 +1,4 @@
+import {rotorRig} from '../lib/rotorAnimation';
 import {installTouchdownEffects} from '../lib/touchdownEffects';
 import {readCabinAudio} from '../lib/cabinAudio';
 import {WaterSurface} from './WaterSurface';
@@ -520,7 +521,7 @@ export function Globe(p: Props) {
           const fix=motion.sample(a,s.histories.get(a.hex)??[],Date.now(),false,selected?s.route:null,airport);if(!fix)continue;animatedIds.current.add(id);
           const displayAltitude=fix.ground?(surfaceHeight(v.scene.globe.getHeight(C.Cartographic.fromDegrees(fix.lon,fix.lat))))/.3048:fix.simulationElevationFt!==undefined?Math.max(0,fix.altitude-fix.simulationElevationFt)+(surfaceHeight(v.scene.globe.getHeight(C.Cartographic.fromDegrees(fix.lon,fix.lat))))/.3048:fix.landingPhase?Math.max(0,fix.altitude-(airport?.elevationFt??0))+(surfaceHeight(v.scene.globe.getHeight(C.Cartographic.fromDegrees(fix.lon,fix.lat))))/.3048:fix.altitude;
           const clearance=String(e.model?.uri?.getValue(v.clock.currentTime)).includes('/models/sourced/')?sourcedGearClearance(a.aircraftType,8)-gearCompression(e):8;
-          const key=`${fix.lon}/${fix.lat}/${displayAltitude}/${clearance}`;const desired=C.Cartesian3.fromDegrees(fix.lon,fix.lat,(Math.max(0,displayAltitude)+(fix.groundClearance??0))*.3048+clearance);if(drawn.get(id)===key&&C.Cartesian3.equalsEpsilon(current,desired,0,.01))continue;drawn.set(id,key);
+          const key=`${fix.lon}/${fix.lat}/${displayAltitude}/${clearance}`;const desired=C.Cartesian3.fromDegrees(fix.lon,fix.lat,(Math.max(0,displayAltitude)+(fix.groundClearance??0))*.3048+clearance);if(drawn.get(id)===key&&C.Cartesian3.equalsEpsilon(current,desired,0,.01)&&!rotorRig(String(e.model?.uri?.getValue(v.clock.currentTime)??'')))continue;drawn.set(id,key);
           const pos=C.Cartesian3.fromDegrees(fix.lon,fix.lat,(Math.max(0,displayAltitude)+(fix.groundClearance??0))*.3048+clearance);
           e.position=new C.ConstantPositionProperty(pos);
           const heading='heading' in fix?fix.heading:a.heading??0;
