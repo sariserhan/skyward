@@ -1,4 +1,3 @@
-import {configuredFeed} from './combined-feed.mjs';
 import {tripResponse,tripQuery,createTripDiscovery} from './trip-follower.mjs';
 import {createLocalWeather} from './local-weather.mjs';
 import http from 'node:http';
@@ -12,7 +11,7 @@ function acceptsGzip(header='') {
 import { readFile, stat } from 'node:fs/promises';
 import { resolve, extname, dirname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { AIRPORTS, cameraAreaPath } from './feed.mjs';
+import { FeedClient, AIRPORTS, cameraAreaPath } from './feed.mjs';
 import { routePath } from './routes.mjs';
 import { airlabsPreview } from './airlabs.mjs';
 import {createConfiguredMembership} from './membership-config.mjs';
@@ -23,7 +22,7 @@ const membership=await createConfiguredMembership();
 const here = dirname(fileURLToPath(import.meta.url));
 const webRoot = resolve(here, '../dist');
 const gameRoot = resolve(here, '../../dist/web');
-const feed = configuredFeed();
+const feed = new FeedClient();
 const tripDiscovery=createTripDiscovery(feed);
 const airportWeather=createAirportWeather();
 const localWeather=createLocalWeather();
@@ -58,8 +57,7 @@ export const server = http.createServer(async (req, res) => {
         if(url.pathname==='/api/local-weather'){const coords=['lat','lon'].map(k=>{const v=url.searchParams.get(k);return v!==null&&v.trim()!==''?Number(v):NaN;});try{return json(res,200,await localWeather(...coords));}catch(e){return json(res,e.status||503,{error:e.status?e.message:'Weather unavailable.'});}}
         if(url.pathname==='/api/airport-weather'){try{return json(res,200,await airportWeather(url.searchParams.get('airport')));}catch(e){return json(res,e.status||503,{error:e.status?e.message:'Weather observations are unavailable. Try again later.'});}}
         if (url.pathname === '/api/flight-details') return json(res, 200, airlabsPreview(process.env.SKYWARD_AIRLABS_MODE));
-        if(url.pathname==='/api/feed-sources')return json(res,200,{sources:feed.sources});
-        if (url.pathname === '/api/status') {const {totalMs,...stats}=feed.stats;return json(res,200,{...stats,sources:feed.sources,pending:feed.pending.size,meanProviderMs:stats.started?Math.round(totalMs/stats.started):0});}
+        if (url.pathname === '/api/status') {const {totalMs,...stats}=feed.stats;return json(res,200,{...stats,pending:feed.pending.size,meanProviderMs:stats.started?Math.round(totalMs/stats.started):0});}
         if (url.pathname === '/api/area') {
           const values=['lat','lon','radius'].map(key=>{const raw=url.searchParams.get(key);return raw!==null&&raw.trim()!==''?Number(raw):NaN;});
           try{cameraAreaPath(...values);}catch(e){return json(res,400,{error:e.message});}
@@ -127,7 +125,7 @@ export const server = http.createServer(async (req, res) => {
 });
 let premiumTimer;
 server.on('listening',()=>{if(membership.premiumTick)premiumTimer=setInterval(()=>{void membership.premiumTick().catch(()=>console.error('Background account check failed.'));},60000).unref();});
-server.on('close',()=>{clearInterval(premiumTimer);feed.close();});
+server.on('close',()=>clearInterval(premiumTimer));
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   // Let Node bind dual-stack localhost by default; explicit HOST remains supported.
   server.listen({port:Number(process.env.PORT ?? 8000), ...(process.env.HOST ? {host:process.env.HOST} : {}), ipv6Only:false}, () => console.log(`Skyward: http://localhost:${server.address().port}/ · airport simulation: /airport-simulation/`));
