@@ -1,4 +1,4 @@
-import {cloudThickness,reportDistanceKm,type WeatherReport} from './localWeather.ts';
+import {cloudLayerThickness,reportDistanceKm,type WeatherReport} from './localWeather.ts';
 
 // Presentation only: surface weather cannot measure turbulence along a flight track.
 const reports=new WeakMap<object,WeatherReport>();
@@ -9,7 +9,7 @@ export function weatherRoughness(report:WeatherReport|null|undefined,lat:number,
  const smooth=(x:number)=>{const t=Math.max(0,Math.min(1,x));return t*t*(3-2*t);};
  const terrain=report.elevationM??0,clearance=smooth((altitudeM-terrain-20)/120);
  const gust=Math.max(0,(report.gustKnots??0)-(report.windKnots??0))/30;
- const layer=Math.max(0,...report.clouds.map(c=>smooth((altitudeM-c.baseM+250)/500)*smooth((c.baseM+cloudThickness(report)+250-altitudeM)/500)));
+ const layer=Math.max(0,...report.clouds.map(c=>smooth((altitudeM-c.baseM+250)/500)*smooth((c.baseM+cloudLayerThickness(report,c)+250-altitudeM)/500)));
  return Math.min(1,(layer*(report.storm?.85:report.rain||report.snow?.35:.08)+gust*smooth((terrain+2500-altitudeM)/1200)))*clearance;
 }
 export function turbulenceFrame(time:number,strength:number){

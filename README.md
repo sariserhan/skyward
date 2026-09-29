@@ -298,3 +298,17 @@ Enable voices with a click each time you enter a flight. Volume follows **Radio*
 and **Cabin** in Sound mix. Backgrounding or leaving the view stops its speech.
 The flight simulator also offers captain announcements alongside its existing
 simulated tower instructions.
+
+### Atmosphere and Advanced handling
+
+Weather now uses several illustrative cloud formations, with clearer gaps between
+clouds, sun-aware shading and camera immersion tied to rendered volumes. Water
+responds gradually to nearby wind reports and sunlight. In Advanced flight mode,
+climbing trades airspeed for altitude and banked turns require more energy; Easy
+assistance stays available.
+
+**Map tools → Layers → Automatically balance detail and scene resolution** can
+reduce scene resolution during sustained slow rendering, then restore it slowly.
+Turn it off to hold your selected preset. The interface remains at its normal
+resolution, and **Performance** shows the current scene scale. See
+[visual realism](docs/visual-realism.md) for the approximations and current limits.

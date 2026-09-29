@@ -51,6 +51,7 @@ import {nearbyModelIds,modelBudget,modelRange,modelOpacity} from '../lib/modelBu
 import {TowerView} from './TowerView';
 import {sharedLiveMotion} from '../lib/liveMotion';
 import {airportPoints,type Movement} from '../lib/exploration';
+import {ResolutionGovernor} from '../lib/resolutionGovernor';
 import {qualityEvent} from '../lib/qualityEvents';
 import { createOpenTerrain } from '../lib/openTerrain';
 import { addTerrainAirport } from '../lib/terrainAirport';
@@ -515,7 +516,12 @@ export function Globe(p: Props) {
     v.resolutionScale=Math.min(p.preferences.batterySaver?.8:devicePixelRatio,quality==='low'?.8:quality==='high'?2:1.25);
     v.scene.globe.maximumScreenSpaceError=quality==='low'?6:quality==='high'?1.5:3;
     v.scene.postProcessStages.fxaa.enabled=quality!=='low';v.scene.requestRender();
-  },[ready,p.preferences.quality,p.preferences.batterySaver]);
+    if(!p.preferences.autoQuality||p.preferences.batterySaver)return;
+    const governor=new ResolutionGovernor(v.resolutionScale,performance.now());let rendered=0;
+    const remove=v.scene.postRender.addEventListener(()=>rendered++);
+    const timer=setInterval(()=>{if(v.isDestroyed())return;const frames=rendered;rendered=0;if(document.hidden)return;const next=governor.update(performance.now(),readRenderStats(v).p95,frames);if(Math.abs(next-v.resolutionScale)>.001){v.resolutionScale=next;v.scene.requestRender();}},2000);
+    return()=>{remove();clearInterval(timer);};
+  },[ready,p.preferences.quality,p.preferences.batterySaver,p.preferences.autoQuality]);
   useEffect(()=>{
     const v=viewer.current;if(!ready||!v)return;const C=window.Cesium;let lastLabels=0,lastSlowMotion=0,lastAnimation=0;
     const drawn=new Map<string,string>(),motion=sharedLiveMotion;

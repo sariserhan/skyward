@@ -1,3 +1,4 @@
+import {advancedAerodynamics} from './advancedAerodynamics.ts';
 import {weatherAt,type SimWeather} from './simulatorWeather.ts';
 import type {Runway} from '../types';
 export type Difficulty='easy'|'advanced';
@@ -107,14 +108,15 @@ export function stepFlight(previous:FlightState,p:FlightPlan,input:FlightInput,s
   s.fuelKg=Math.max(0,s.fuelKg-s.fuelBurnKgHour*dt/3600);
   if(s.fuelKg===0){s.fuelExhausted=true;s.engineRunning=false;s.autopilot=false;s.fuelBurnKgHour=0;}
   if(!s.ground)s.reverse=false;
-  const ground=s.ground,drag=.15+s.speed*.009+s.gearPosition*handling.gearDrag+s.flapPosition*.18+Math.max(0,s.pitch)*.07+(s.speedbrake?1.8:0);
+  const aero=advancedAerodynamics(s.speed,s.pitch,s.bank,s.altitude,p.aircraftType==='C172'?11:p.aircraftType==='C560'?16:35,s.ground);
+  const advanced=p.difficulty==='advanced',ground=s.ground,drag=.15+s.speed*.009+s.gearPosition*handling.gearDrag+s.flapPosition*.18+(advanced?aero.inducedDrag:Math.max(0,s.pitch)*.07)+(s.speedbrake?1.8:0);
   const thrust=s.fuelExhausted||s.engineRunning===false?0:s.reverse&&ground&&p.aircraftType!=='C172'?-s.enginePower*a.acceleration*.65:s.enginePower*a.acceleration;
-  s.speed=clamp(s.speed+(thrust-drag+((s.fuelExhausted||s.engineRunning===false)&&!ground?-Math.sin(s.pitch*rad)*19.06:0)-(ground&&s.brakes?handling.braking*(1-wind.rain*.3):0))*dt,0,a.cruise*1.6);
+  s.speed=clamp(s.speed+(thrust-drag+(advanced?aero.gravity:(s.fuelExhausted||s.engineRunning===false)&&!ground?-Math.sin(s.pitch*rad)*19.06:0)-(ground&&s.brakes?handling.braking*(1-wind.rain*.3):0))*dt,0,a.cruise*1.6);
   const stallSpeed=a.stall*(1-s.flapPosition*.11)*Math.sqrt(1/Math.max(.5,Math.cos(s.bank*rad)));
   if(ground&&s.phase!=='rollout'&&s.speed>a.rotate&&s.pitch>3){s.ground=false;s.phase='climb';s.altitude=.1;}
   if(!s.ground){
    s.heading=(s.heading+((9.81*Math.tan(s.bank*rad)/Math.max(20,s.speed*.514444)/rad)+(s.autopilot?0:input.rudder*6))*dt+360)%360;
-   let vs=s.speed*101.269*Math.sin(s.pitch*rad);
+   let vs=s.speed*101.269*Math.sin(s.pitch*rad)-(advanced?aero.bankSink:0);
    if(s.fuelExhausted||s.engineRunning===false)vs-=Math.max(250,s.speed*101.269/(p.aircraftType==='C172'?9:15));
    if(s.speed<stallSpeed){s.warning='STALL — lower nose and add power';vs-=p.difficulty==='advanced'?1500:600;if(p.difficulty==='advanced')s.pitch-=4*dt;}
    if(p.difficulty==='advanced'&&s.pitch>18){s.warning='High angle of attack — lower nose';vs-=1200;}

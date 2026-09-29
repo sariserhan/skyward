@@ -64,3 +64,11 @@ rendering, weather audio lifecycle, a rendered fallback 787 flex rig, account
 recovery, Premium recording access and watched landing/taxi. Firefox and WebKit
 matrix probes returned BLOCKED because those engines are not installed. This does
 not change the physical-device statuses above.
+
+The cloud/water/handling refinement subsequently passed the production build and
+395 unit checks (one Neon integration skipped). Software-rendered Chromium
+fixtures exercised cumulus, stratus, cirrus-like and storm shader paths,
+wind-responsive water with day/night transition, landing/taxi, and adaptive
+resolution with watched-aircraft retention and manual override. Captured images
+were visually inspected; these checks do not establish hardware-GPU frame rates
+or MSFS-level fidelity.

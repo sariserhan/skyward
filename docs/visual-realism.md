@@ -94,3 +94,30 @@ performance pass or improvement claim is inferred from it. See
 
 Validation uses fixture traffic and software-rendered Chromium. No claim of MSFS
 visual parity, guaranteed 60 fps, or validated physical-device performance is made.
+
+## Cloud, water and handling refinement
+
+Microsoft's public descriptions emphasize atmospheric/cloud lighting and a
+surface-based aerodynamic model:
+[official MSFS 2024 overview](https://www.flightsimulator.com/msfs2024-preorder-now-available/)
+and [official aerodynamic documentation](https://docs.flightsimulator.com/msfs2024/flighting/samples-tutorials/tutorials/tuning-the-flight-model/basic-aerodynamics/).
+This pass applies a few practical ideas to our existing browser renderer using
+original procedural effects. It does not import Microsoft scenery, aircraft,
+textures or simulation code.
+
+| Area | Implemented | Practical limit |
+| --- | --- | --- |
+| Cloud formations | Puffy cumulus, lower stratiform decks, thin high cirrus-like fibers and storm anvils; per-layer thickness shared by weather effects | Types and thicknesses are illustrative heuristics from station cover/base/precipitation, not observed 3D cloud structure |
+| Cloud lighting | Scale-correct sun-facing normals, forward light scattering, interior shadowing and restrained finer erosion | Bounded ray marching, not full volumetric multiple scattering |
+| Flying between clouds | Camera haze follows visible volume interiors instead of covering an entire altitude layer; clear gaps remain clearer | Interior density is a conservative analytic approximation of the visual volume |
+| Water | Gradually changing wind roughness/speed, restrained whitecaps, view-angle sky reflectance and day/night specular response | No geometric swells, exact water depth, measured sea state or scene reflection tracing |
+| Advanced controls | Pitch exchanges kinetic/potential energy even under power; banking adds induced drag/sink; reduced induced drag near the surface | Gameplay approximation; no full surface airflow solver, CFD, aircraft calibration or navigation certification |
+| Rendering | Automatic scene-resolution reductions under sustained pressure, slow recovery, idle-frame exclusion and explicit manual override | Lower bound 0.7×; interface resolution unchanged; actual hardware performance remains unverified |
+
+Easy assistance and existing ground-contact interlocks remain intact. Dynamic
+resolution shares the existing automatic-quality checkbox; disabling it restores
+the selected preset's scene resolution. Battery saver keeps its own fixed budget.
+The Performance monitor, local captures and problem snapshots report the current
+resolution. Cloud sample budgets stay bounded (10 low, 16 normal, 4–6 distant);
+near samples reduce to 12 under pressure. No new paid service or database writes
+are introduced.

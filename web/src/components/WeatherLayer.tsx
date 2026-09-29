@@ -1,3 +1,4 @@
+import {cloudFormation,cloudInterior,cloudWidth,type CloudFormation} from '../lib/cloudFormation';
 import {tagRenderLayer} from '../lib/renderLayers';
 import {readRenderStats} from '../lib/renderDiagnostics';
 import {createWeatherSky,weatherSkyAmount} from '../lib/weatherSky';
@@ -10,7 +11,7 @@ import {publishWeather} from '../lib/weatherMotion';
 import {useEffect,useRef,useState} from 'react';
 import {createPortal} from 'react-dom';
 import type * as Cesium from 'cesium';
-import {reportDistanceKm,cloudImmersion,altitudeWeather,cloudThickness,weatherSummary,type LocalWeather,type WeatherFocus,type WeatherReport} from '../lib/localWeather';
+import {reportDistanceKm,altitudeWeather,cloudLayerThickness,weatherSummary,type LocalWeather,type WeatherFocus,type WeatherReport} from '../lib/localWeather';
 import type {SimWeather} from '../lib/simulatorWeather';
 import {solarElevation,sunDirectionFixed} from '../lib/solarLighting';
 import './weather-layer.css';
@@ -30,7 +31,7 @@ export function WeatherLayer(props:Props){
  useEffect(()=>{const v=props.viewer;if(!v||!props.enabled||v.isDestroyed())return;const C=window.Cesium,volumes=v.scene.primitives.add(new C.PrimitiveCollection());
   tagRenderLayer(volumes,'cloud collections');
   const canvas=document.createElement('canvas');canvas.className='weather-particles';canvas.setAttribute('aria-hidden','true');v.container.appendChild(canvas);const ctx=canvas.getContext('2d');if(!ctx){v.scene.primitives.remove(volumes);canvas.remove();return;}
-  let windEast=0,windNorth=0;const moving=new Map<string,{primitive:Cesium.Primitive;lon:number;lat:number;height:number;opacity:number;wanted:boolean}>();
+  let windEast=0,windNorth=0;const moving=new Map<string,{primitive:Cesium.Primitive;lon:number;lat:number;height:number;opacity:number;wanted:boolean;size:number;thickness:number;formation:CloudFormation;seed:number}>();
   const pending=new Map<string,Parameters<typeof addCloudVolume>[2]>();
   const want=(id:string,options:Parameters<typeof addCloudVolume>[2])=>{const old=moving.get(id);if(old){old.wanted=true;return;}pending.set(id,options);};
   let last=0,cloudKey='',lastCloud=0,width=0,height=0,nextFlash=0,strike:LightningStrike|null=null,stormKey='';const particles=Array.from({length:240},(_,i)=>({x:hash(i+1),y:hash(i+300),depth:.2+hash(i+700)*.8}));
@@ -43,8 +44,8 @@ export function WeatherLayer(props:Props){
    if(!effectsRef.current||!f||!r||reportDistanceKm(r,f)>150||Date.now()-r.observedAt>7200000||document.hidden||v.scene.mode!==C.SceneMode.SCENE3D){strike=null;nextFlash=0;stormKey='';volumes.show=false;clearWeatherAudio(v);publishWeather(v,null);publishWindshieldWeather(v,null);restore();return;}volumes.show=true;publishWeather(v,motionRef.current?r:null);publishWindshieldWeather(v,r);
    if(!reduced){const bearing=((r.windDirection??0)+180)*Math.PI/180,speed=Math.min(25,r.windKnots??0)*.514444;windEast+=Math.sin(bearing)*speed*dt;windNorth+=Math.cos(bearing)*speed*dt;}
    const datum=f.datumM??0,eyeAltitude=v.camera.positionCartographic.height+datum,conditions=altitudeWeather(r,eyeAltitude),cos=Math.max(.3,Math.cos(r.lat*Math.PI/180)),lonStep=.045/cos,gx=Math.floor((f.lon-windEast/(111320*cos))/lonStep),gy=Math.floor((f.lat-windNorth/111320)/.045),key=`${r.station}:${manual?'manual':r.observedAt}:${gx}:${gy}:${datum}:${r.rain}:${r.clouds.length}:${p.lowQuality}:${Math.floor(Date.now()/300000)}`;
-   if(now-lastCloud>1000&&key!==cloudKey){cloudKey=key;lastCloud=now;pending.clear();for(const cloud of moving.values())cloud.wanted=false;const thickness=cloudThickness(r),radius=p.lowQuality?1:2,sun=sunDirectionFixed(C,v.clock.currentTime),elevation=solarElevation(C,C.Cartesian3.fromDegrees(f.lon,f.lat),sun),night=v.scene.globe.enableLighting&&elevation< -3;
-    for(const [level,layer] of r.clouds.slice(0,p.lowQuality?1:2).entries())for(let y=gy-radius;y<=gy+radius;y++)for(let x=gx-radius;x<=gx+radius;x++){const seed=x*73+y*173+level*97;if(hash(seed)>cover(layer.cover))continue;const id=`${r.station}:${level}:${x}:${y}:${layer.baseM}:${datum}:${layer.cover}:${p.lowQuality}:${r.storm}:${!!(r.rain||r.snow)}`;const existing=moving.get(id);if(existing){existing.wanted=true;existing.primitive.appearance.material!.uniforms.cloudNight=Number(night);continue;}const options={lon:((x+hash(seed+2))*lonStep+windEast/(111320*cos)+540)%360-180,lat:Math.max(-89.9,Math.min(89.9,(y+hash(seed+3))*.045+windNorth/111320)),base:Math.max(50,layer.baseM-datum),thickness:thickness*(.85+hash(seed+5)*.3),size:(cover(layer.cover)>.7?4500:2200)+hash(seed+4)*1600,seed,night,storm:r.storm,wet:!!(r.rain||r.snow),low:!!p.lowQuality};want(id,options);}
+   if(now-lastCloud>1000&&key!==cloudKey){cloudKey=key;lastCloud=now;pending.clear();for(const cloud of moving.values())cloud.wanted=false;const radius=p.lowQuality?1:2,sun=sunDirectionFixed(C,v.clock.currentTime),elevation=solarElevation(C,C.Cartesian3.fromDegrees(f.lon,f.lat),sun),night=v.scene.globe.enableLighting&&elevation< -3;
+    for(const [level,layer] of r.clouds.slice(0,p.lowQuality?1:2).entries())for(let y=gy-radius;y<=gy+radius;y++)for(let x=gx-radius;x<=gx+radius;x++){const seed=x*73+y*173+level*97;if(hash(seed)>cover(layer.cover))continue;const id=`${r.station}:${level}:${x}:${y}:${layer.baseM}:${datum}:${layer.cover}:${p.lowQuality}:${r.storm}:${!!(r.rain||r.snow)}`;const existing=moving.get(id);if(existing){existing.wanted=true;existing.primitive.appearance.material!.uniforms.cloudNight=Number(night);continue;}const options={lon:((x+hash(seed+2))*lonStep+windEast/(111320*cos)+540)%360-180,lat:Math.max(-89.9,Math.min(89.9,(y+hash(seed+3))*.045+windNorth/111320)),base:Math.max(50,layer.baseM-datum),thickness:cloudLayerThickness(r,layer),formation:cloudFormation(layer,r.storm,!!(r.rain||r.snow)),size:(cover(layer.cover)>.7?4500:2200)+hash(seed+4)*1600,seed,night,storm:r.storm,wet:!!(r.rain||r.snow),low:!!p.lowQuality};want(id,options);}
     // Distant clouds share the near-field volumetric renderer. Stable cells are
     // retained and faded, rather than rebuilding a flat horizon billboard deck.
     const outerStep=.2/cos,ox=Math.floor((f.lon-windEast/(111320*cos))/outerStep),oy=Math.floor((f.lat-windNorth/111320)/.2),layer=r.clouds[0],outerRadius=p.lowQuality?1:2;
@@ -52,16 +53,22 @@ export function WeatherLayer(props:Props){
      if(x===ox&&y===oy)continue;
      const seed=x*71+y*197;if(hash(seed)>cover(layer.cover))continue;
      const id=`far:${r.station}:${x}:${y}:${layer.baseM}:${datum}:${layer.cover}:${p.lowQuality}:${r.storm}:${!!(r.rain||r.snow)}`;
-     want(id,{lon:((x+hash(seed))*outerStep+windEast/(111320*cos)+540)%360-180,lat:Math.max(-89.9,Math.min(89.9,(y+hash(seed+1))*.2+windNorth/111320)),base:Math.max(50,layer.baseM-datum),thickness:thickness*(.85+hash(seed+5)*.3),size:9000+hash(seed+2)*5000,seed,night,storm:r.storm,wet:!!(r.rain||r.snow),low:true,distant:true});
+     want(id,{lon:((x+hash(seed))*outerStep+windEast/(111320*cos)+540)%360-180,lat:Math.max(-89.9,Math.min(89.9,(y+hash(seed+1))*.2+windNorth/111320)),base:Math.max(50,layer.baseM-datum),thickness:cloudLayerThickness(r,layer),formation:cloudFormation(layer,r.storm,!!(r.rain||r.snow)),size:9000+hash(seed+2)*5000,seed,night,storm:r.storm,wet:!!(r.rain||r.snow),low:true,distant:true});
     }
    }
    // Spread GPU resource creation across frames; visible volumes stay in place.
-   let created=0;for(const [id,options] of pending){if(created++>=((p.lowQuality||limited)?1:2))break;pending.delete(id);const primitive=addCloudVolume(C,volumes,options);moving.set(id,{primitive,opacity:0,wanted:true,lon:options.lon-windEast/(111320*cos),lat:options.lat-windNorth/111320,height:options.base+options.thickness*.5});}
+   let created=0;for(const [id,options] of pending){if(created++>=((p.lowQuality||limited)?1:2))break;pending.delete(id);const primitive=addCloudVolume(C,volumes,options);moving.set(id,{primitive,opacity:0,wanted:true,lon:options.lon-windEast/(111320*cos),lat:options.lat-windNorth/111320,height:options.base+options.thickness*.5,size:cloudWidth(options.size,options.formation??'cumulus',options.distant),thickness:options.thickness,formation:options.formation??'cumulus',seed:options.seed});}
 
    for(const [id,cloud] of moving){cloud.opacity=Math.max(0,Math.min(1,cloud.opacity+(cloud.wanted?1:-1)*dt/2.5));if(!cloud.wanted&&cloud.opacity===0){volumes.remove(cloud.primitive);moving.delete(id);continue;}cloud.primitive.appearance.material!.uniforms.cloudOpacity=cloud.opacity;
-    cloud.primitive.appearance.material!.uniforms.cloudSteps=id.startsWith('far:')?(limited?4:6):p.lowQuality?10:20;const position=C.Cartesian3.fromDegrees(cloud.lon+windEast/(111320*cos),cloud.lat+windNorth/111320,cloud.height);C.Matrix4.setTranslation(cloud.primitive.modelMatrix,position,cloud.primitive.modelMatrix);}
-   const near=eyeAltitude<50000,inside=conditions.inside&&r.clouds.some(c=>cover(c.cover)>.7||hash(gx*73+gy*173)<cover(c.cover));
-   const immersion=inside?cloudImmersion(r,eyeAltitude):0;
+    cloud.primitive.appearance.material!.uniforms.cloudSteps=id.startsWith('far:')?(limited?4:6):p.lowQuality?10:limited?12:16;const position=C.Cartesian3.fromDegrees(cloud.lon+windEast/(111320*cos),cloud.lat+windNorth/111320,cloud.height);C.Matrix4.setTranslation(cloud.primitive.modelMatrix,position,cloud.primitive.modelMatrix);}
+   const near=eyeAltitude<50000,camera=v.camera.positionCartographic,eyeLon=C.Math.toDegrees(camera.longitude),eyeLat=C.Math.toDegrees(camera.latitude);
+   let immersion=0;
+   if(near)for(const cloud of moving.values()){
+    const lon=cloud.lon+windEast/(111320*cos),lat=cloud.lat+windNorth/111320;
+    const east=(((eyeLon-lon+540)%360)-180)*111320*Math.cos(camera.latitude),north=(eyeLat-lat)*111320;
+    immersion=Math.max(immersion,cloudInterior(east,north,camera.height-cloud.height,cloud.size,cloud.thickness,cloud.formation,cloud.seed)*cloud.opacity);
+   }
+   const inside=immersion>.15;
    if(near)weatherSky.update(weatherSkyAmount(r,eyeAltitude),dt);
    publishWeatherAudio(v,near?conditions.precipitation*r.rain:0,near&&r.storm&&lightningRef.current&&!reduced);
    if(near){v.scene.fog.enabled=true;v.scene.fog.density=Math.max(immersion*.0012,Math.min(.0002,.00002*10/Math.max(.2,r.visibilityKm??40)));v.scene.fog.minimumBrightness=.28;changedFog=true;}else restore();
