@@ -65,6 +65,7 @@ func apply_weather() -> void:
 	view.environment.fog_enabled=float(w.visibility)<10
 	view.environment.fog_light_color=Color("293d4b") if view.night else Color("a1adb2")
 	view.environment.fog_density=.00008 if float(w.visibility)>2 else .00035
+	if view.apron_material != null: view.apron_material.set_shader_parameter("wetness", 1.0 if w.wet else 0.0)
 	for material in puddle_materials: material.roughness=.32 if w.wet else .82
 	if rain!=null: rain.emitting=w.wet
 

@@ -14,6 +14,7 @@ var scenes: Dictionary = {}
 var bridges: Dictionary = {}
 var arrival_starts: Dictionary = {}
 var center := Vector3.ZERO
+var airport_center := Vector3.ZERO
 var radius := 2000.0
 var yaw := 0.0
 var elevation := 0.9
@@ -21,6 +22,9 @@ var distance := 3000.0
 var camera_mode := "Orbit"
 var concourse_position := Vector3.ZERO
 var dragging := false
+var panning := false
+var camera_target := Vector3.ZERO
+var apron_material: ShaderMaterial
 var night := false
 var manual: CheckButton
 var status: Label
@@ -49,7 +53,9 @@ func _ready() -> void:
 	for mode in ["Orbit", "Concourse", "Tower", "Follow", "Top"]:
 		var button := Button.new()
 		button.text = mode
-		button.pressed.connect(func(): camera_mode = mode)
+		button.pressed.connect(func():
+			if mode == "Orbit" or mode == "Top": center = airport_center; distance = radius*1.1
+			camera_mode = mode)
 		tools.add_child(button)
 	skip_idle = Button.new()
 	skip_idle.text = "Next arrival"
@@ -138,7 +144,7 @@ func _ready() -> void:
 	runway_status.add_theme_font_size_override("font_size", 12)
 	add_child(runway_status)
 	status = Label.new()
-	status.text = "Right-drag: orbit · wheel: zoom · click aircraft: select · Next arrival skips quiet time"
+	status.text = "Right-drag: orbit · middle-drag / Shift+right-drag: pan · wheel: zoom · click aircraft: select"
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	status.add_theme_font_size_override("font_size", 12)
 	add_child(status)
@@ -259,12 +265,17 @@ func _surface(points: Array, height: float, color: Color) -> void:
 	node.mesh = st.commit()
 	var material := _material(color)
 	material.cull_mode = BaseMaterial3D.CULL_DISABLED
-	node.material_override = material
+	if height < 1:
+		if apron_material == null:
+			apron_material = ShaderMaterial.new()
+			apron_material.shader = load("res://assets/shaders/airport_concrete.gdshader")
+		node.material_override = apron_material
+	else: node.material_override = material
 	world.add_child(node)
 
 
 static func mapped_building_height(surface: Dictionary) -> float:
-	if surface.kind == "apron": return .08
+	if surface.kind == "apron": return .18
 	var explicit_height := str(surface.get("height", "")).trim_suffix(" m").to_float()
 	if explicit_height > 0: return clampf(explicit_height, 3, 300)
 	var levels := str(surface.get("levels", "")).to_float()
@@ -295,6 +306,7 @@ func _build_world() -> void:
 		lo=lo.min(Vector2(zone.x0-180,zone.y0-100))
 		hi=hi.max(Vector2(zone.x1+130,zone.y1))
 	center = Vector3((lo.x+hi.x)/2, 0, (lo.y+hi.y)/2)
+	airport_center = center
 	radius = maxf(hi.x-lo.x, hi.y-lo.y)
 	distance = radius * 1.1
 	var ground := MeshInstance3D.new()
@@ -333,7 +345,7 @@ func _build_world() -> void:
 			_line(a, b, 24, Color("393f40"))
 			_line(a+Vector3.UP*.2, b+Vector3.UP*.2, 0.5, Color("bda647"))
 	for surface in sim.airside.config.get("surfaces", []):
-		_surface(surface.points, mapped_building_height(surface), Color("707574") if surface.kind == "apron" else Color("bbc4c8"))
+		_surface(surface.points, mapped_building_height(surface), Color("707574") if surface.kind == "apron" else Color("929c9e"))
 	concourse_position = center
 	var stands: Dictionary = sim.airside.config.get("stands", {})
 	if not stands.is_empty(): concourse_position = _point(stands.values()[0])
@@ -574,6 +586,7 @@ func _process(delta: float) -> void:
 		"Follow": desired = target+Vector3(60,24,70)
 		"Top": desired = center+Vector3(0,distance,.1)
 		_: desired = center+Vector3(sin(yaw)*cos(elevation),sin(elevation),cos(yaw)*cos(elevation))*distance
+	camera_target = target
 	camera.near = clampf(desired.distance_to(target)/100.0,.5,30.0)
 	camera.position = camera.position.lerp(desired,1-exp(-delta*4))
 	if camera.position.distance_to(target)>.1: camera.look_at(target)
@@ -606,9 +619,13 @@ func _command(command: String) -> void:
 
 func _input_view(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_RIGHT: dragging = event.pressed
+		if event.button_index == MOUSE_BUTTON_RIGHT:
+			dragging = event.pressed and not event.shift_pressed
+			panning = event.pressed and event.shift_pressed
+		if event.button_index == MOUSE_BUTTON_MIDDLE: panning = event.pressed
 		if event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP,MOUSE_BUTTON_WHEEL_DOWN]:
-			distance = clampf(distance*(.85 if event.button_index == MOUSE_BUTTON_WHEEL_UP else 1.18),120,18000)
+			_free_camera()
+			distance = clampf(distance*(.85 if event.button_index == MOUSE_BUTTON_WHEEL_UP else 1.18),35,18000)
 		if event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 			if desk.radar.edit_route:
 				var nearest:=""
@@ -628,11 +645,25 @@ func _input_view(event: InputEvent) -> void:
 				var gap := camera.unproject_position(body.position).distance_to(event.position)
 				if gap<best: best=gap; id=key
 			if not id.is_empty(): flight_selected.emit(id)
+	if event is InputEventMouseMotion and panning:
+		_free_camera()
+		var right := camera.global_basis.x
+		var forward := Vector3(-right.z,0,right.x)
+		center += (-right*event.relative.x-forward*event.relative.y)*distance*.0015
 	if event is InputEventMouseMotion and dragging:
-		camera_mode = "Orbit"
+		_free_camera()
 		yaw -= event.relative.x*.006
 		elevation = clampf(elevation+event.relative.y*.004,.1,1.5)
 	if event is InputEventScreenDrag:
-		camera_mode = "Orbit"
+		_free_camera()
 		yaw -= event.relative.x*.006
 		elevation = clampf(elevation+event.relative.y*.004,.1,1.5)
+
+func _free_camera() -> void:
+	if camera_mode == "Orbit": return
+	center = camera_target
+	var offset := camera.position-center
+	distance = maxf(35,offset.length())
+	yaw = atan2(offset.x,offset.z)
+	elevation = clampf(asin(clampf(offset.y/distance,-1,1)),.1,1.5)
+	camera_mode = "Orbit"

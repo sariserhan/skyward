@@ -168,6 +168,9 @@ or **WASHINGTON DULLES · REAL AIRPORT → PLAY DULLES** in the game menu, for t
 airport sandbox: four FAA-positioned runways, mapped terminal footprints and
 taxiways, and real airline names with explicitly illustrative traffic.
 The 3D view opens at the mapped concourses; **Concourse** returns to that camera.
+Right-drag to orbit, middle-drag (or Shift+right-drag) to pan, and scroll to zoom.
+Leaving a preset camera preserves the current target; **Orbit** restores the full-airport view.
+Aprons use concrete slab shading and become darker and less rough in rain.
 Building footprints come from OSM, with tagged heights/levels where available and
 fallback heights otherwise. Facades are illustrative: these are not photogrammetry
 or detailed architectural models. Other globe airports are not yet playable controller scenarios.
