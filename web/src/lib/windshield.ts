@@ -11,5 +11,5 @@ export function wiperAngle(phase:number){return -Math.PI+.15+(1-Math.cos(phase*M
 /** Clear the actual swept sector, including frames that skip over a droplet. */
 export function wiperClears(x:number,y:number,pivotX:number,pivotY:number,radius:number,previous:number,current:number){
  const dx=x-pivotX,dy=y-pivotY,d=Math.hypot(dx,dy),angle=Math.atan2(dy,dx);
- return d>=radius*.12&&d<=radius&&angle>=Math.min(previous,current)-.04&&angle<=Math.max(previous,current)+.04;
+ return d>=radius*.58&&d<=radius&&angle>=Math.min(previous,current)-.04&&angle<=Math.max(previous,current)+.04;
 }
