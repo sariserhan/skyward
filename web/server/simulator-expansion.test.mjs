@@ -31,7 +31,7 @@ test('Manual taxi responds to rudder, respects brakes, stays on the ground and p
 test('Replay validation bounds storage, rejects bad coordinates/order, and summaries omit payloads',()=>{
  const sample={time:0,lat:38,lon:-77,altitude:0,speed:0,fuel:100,phase:'ready',warning:''},replay={samples:[sample],events:[],interval:2,maxAltitude:0};assert.equal(validateReplay(replay).samples.length,1);
  for(const bad of [{...replay,samples:[{...sample,lat:NaN}]},{...replay,samples:[{...sample,time:2},sample]},{...replay,samples:Array(1801).fill(sample)},{...replay,events:Array(101).fill({time:0,text:''})}])assert.throws(()=>validateReplay(bad));
- const saved=validateLibrary('missions',{from:'IAD',to:'DCA',difficulty:'easy',result:'aborted',duration:10,touchdownRate:0,replay});assert.equal(saved.replay.samples.length,1);const summary=librarySummary('missions',saved);assert.equal(summary.hasReplay,true);assert.equal(summary.replay,undefined);
+ const saved=validateLibrary('missions',{from:'IAD',to:'DCA',difficulty:'easy',result:'aborted',duration:10,touchdownRate:0,replay});assert.equal(saved.replay,undefined);const summary=librarySummary('missions',saved);assert.equal(summary.hasReplay,false);assert.equal(summary.replay,undefined);
 });
 test('Long unattended flight remains finite and time-step variation does not break engine or fuel state',()=>{
  let s={...initialFlight(p),ground:false,phase:'cruise',altitude:50000,speed:110,throttle:.5};for(let i=0;i<24000&&!['crashed','landed'].includes(s.phase);i++){s=stepFlight(s,p,neutral,i%2?.05:.25);for(const k of ['lat','lon','speed','pitch','bank','fuelKg'])assert.ok(Number.isFinite(s[k]),k);}assert.ok(s.fuelKg>=0);assert.ok(s.elapsed>3599);

@@ -136,3 +136,35 @@ Sources (recheck before deployment):
 - https://developers.cloudflare.com/workers/platform/limits/
 - https://developers.cloudflare.com/r2/pricing/
 - https://neon.com/blog/how-to-make-the-most-of-neons-free-plan
+
+## Implemented compact-account boundary (2026-09-29)
+
+The product decision is to sync small user records, not to make all saves local.
+Authentication, Premium access and protected API budgets remain server-side. Existing
+account watchlists, viewing setups, journey metadata and small simulator results sync
+on explicit changes. Watchlists refresh on account changes, edits and window focus;
+they no longer query the account database every minute.
+
+The existing SQLite development and Neon account implementations now enforce:
+
+- 512 KiB combined account-library JSON payload per user, plus smaller per-kind limits
+  defined in `web/src/lib/accountStoragePolicy.ts`. This is a payload budget, not a
+  guarantee of database file size; auth, journeys, indexes and reserved operational
+  data have separate footprints.
+- 16 KiB per viewing setup; 4 KiB per mission/progress summary; 20 mission results;
+  five airport career summaries. Summary fields are allowlisted. Flight replay
+  samples, airport simulation state, ledgers and arbitrary extra fields are omitted.
+- No new database recordings or photos; local recording/export tools remain available.
+  Full airport career backups can be exported directly from the simulator. A compact
+  career summary cannot restore a complete airport simulation on another device;
+  transfer the full backup file for that. Existing full cloud saves remain readable.
+- 64 KiB maximum incoming account-library request; unchanged validated saves do not
+  rewrite their rows. Revision conflict checks and account ownership remain enforced.
+- Existing oversized records are not deleted by migration. Users can read, export,
+  delete or replace them with smaller allowed records. They can block new storage
+  until capacity is reclaimed. No silent data loss.
+
+These boundaries apply now to the existing account implementations. They do not
+activate D1, migrate credentials or deploy Workers/R2. The global provider counters,
+D1 adapter/runtime, retention jobs and R2 admission controls above remain release
+requirements. Do not describe those provider-wide protections as implemented.

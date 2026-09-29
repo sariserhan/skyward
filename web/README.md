@@ -1761,3 +1761,18 @@ finishes, piston round instruments, helicopter cyclic controls and appropriate
 engine instrument labels. Unavailable engine readings remain blank. Practice remains
 simplified camera-flight practice, not aircraft-specific training or helicopter
 flight dynamics.
+
+### Compact account sync
+
+Accounts retain watchlists, saved viewing setups and small simulator progress/results.
+The account library is limited to 512 KiB of JSON payload per user, with per-kind caps
+in `src/lib/accountStoragePolicy.ts`. Changes are saved explicitly; watchlist refresh
+is event-driven rather than a one-minute database poll. An unchanged save does not
+rewrite a row. Account ownership and revision conflict checks still apply.
+
+New full recordings, photos and simulator snapshots are not stored in SQL. Browser
+recordings/debriefs remain local and exportable; the airport simulator exports a full
+career backup and sends only an allowlisted progress summary when syncing. Summaries
+are not resumable game backups. Existing cloud copies remain readable/exportable and
+deletable. These policies run on the existing SQLite development and Neon adapters;
+Cloudflare/D1 deployment remains governed by `deployment/FREE_TIER_DESIGN.md`.

@@ -1,3 +1,4 @@
+import {isDeepStrictEqual} from 'node:util';
 import {librarySummary} from './simulator-replay.mjs';
 import {developmentPremium} from './development-premium.mjs';
 import {postgresPremiumStore} from './premium-store.mjs';
@@ -5,7 +6,7 @@ import {createPremiumTools} from './premium-tools.mjs';
 import {toNodeHandler,fromNodeHeaders} from 'better-auth/node';
 import {createHash} from 'node:crypto';
 import {createNeonPool,createNeonAuth,neonConfig} from './neon-auth.mjs';
-import {LIBRARY_LIMITS,validateLibrary} from './account-library.mjs';
+import {LIBRARY_LIMITS,ACCOUNT_LIBRARY_BYTES,validateLibrary} from './account-library.mjs';
 import {changesSince} from './flight-alerts.mjs';
 import {airlabsPreview,flightCode} from './airlabs.mjs';
 import airports from '../data/airport-catalog.json' with {type:'json'};
@@ -29,7 +30,7 @@ export function createNeonMembership({env=process.env,pool=createNeonPool(env),s
  async function entitlement(u){if(devPremium&&u)return true;if(!billing||!u.customer)return false;const q=new URLSearchParams({customer:u.customer,status:'active',limit:'100','expand[]':'data.latest_invoice'}),s=await stripe(`subscriptions?${q}`);return (s.data||[]).some(v=>v.livemode===false&&v.status==='active'&&customerId(v.customer)===u.customer&&v.latest_invoice?.status==='paid'&&v.latest_invoice.amount_paid>0&&customerId(v.latest_invoice.customer)===u.customer&&v.items?.data?.some(i=>i.price?.id===price&&i.current_period_end*1000>now()));}
  async function usage(u){const month=new Date(now()).toISOString().slice(0,7),r=await one('SELECT requests,cost FROM skyward_usage WHERE user_id=$1 AND month=$2',[u.id,month]);return {requests:r?.requests??0,cost:Number(r?.cost??0),limit:limits.userRequests,month,mode:'test',actualProviderSpend:0};}
  async function throttle(req){const expiry=(Math.floor(now()/60000)+1)*60000,k=createHash('sha256').update(`${req.socket.remoteAddress}:${expiry}`).digest('hex');const r=await one('INSERT INTO skyward_rate_limits VALUES($1,1,$2) ON CONFLICT(key) DO UPDATE SET count=skyward_rate_limits.count+1 RETURNING count',[k,expiry]);await pool.query('DELETE FROM skyward_rate_limits WHERE expires<$1',[now()]);if(r.count>120)fail(429,'Too many attempts. Please try again shortly.');}
- async function body(req,path){const chunks=[];let bytes=0;for await(const c of req){bytes+=c.length;if(bytes>(path==='/api/account/library'?17*1024*1024:8192))fail(413,'Request too large.');chunks.push(c);}try{const b=JSON.parse(Buffer.concat(chunks).toString()||'{}');if(!b||typeof b!=='object'||Array.isArray(b))throw Error();return b;}catch{fail(400,'Invalid request.');}}
+ async function body(req,path){const chunks=[];let bytes=0;for await(const c of req){bytes+=c.length;if(bytes>(path==='/api/account/library'?64*1024:8192))fail(413,'Request too large.');chunks.push(c);}try{const b=JSON.parse(Buffer.concat(chunks).toString()||'{}');if(!b||typeof b!=='object'||Array.isArray(b))throw Error();return b;}catch{fail(400,'Invalid request.');}}
  async function library(path,method,u,url,b){
   if(path==='/api/account/alerts'&&method==='POST'){
    if(!Number.isSafeInteger(b.throughId)||b.throughId<0)fail(400,'Invalid alert cursor.');
@@ -44,15 +45,19 @@ export function createNeonMembership({env=process.env,pool=createNeonPool(env),s
   if(!limit)fail(400,'Unknown library.');if(!limit.free&&!await entitlement(u))fail(403,'Premium is required for this library.');
   if(method==='GET'){
    const key=url.searchParams.get('key');if(key){const r=await one('SELECT key,body,revision,updated FROM skyward_library WHERE user_id=$1 AND kind=$2 AND key=$3',[u.id,kind,key]);if(!r)fail(404,'Saved item not found.');return {key:r.key,value:r.body,revision:r.revision,updated:Number(r.updated)};}
-   return {items:(await rows('SELECT key,body,revision,updated FROM skyward_library WHERE user_id=$1 AND kind=$2 ORDER BY updated DESC',[u.id,kind])).map(r=>({key:r.key,revision:r.revision,updated:Number(r.updated),value:['recordings','simulator'].includes(kind)?undefined:librarySummary(kind,r.body),name:r.body.name??r.body.career?.airport_name??r.body.callsign??kind,bytes:Buffer.byteLength(JSON.stringify(r.body))})),limits:limit};
+   return {items:(await rows('SELECT key,body,revision,updated FROM skyward_library WHERE user_id=$1 AND kind=$2 ORDER BY updated DESC',[u.id,kind])).map(r=>({key:r.key,revision:r.revision,updated:Number(r.updated),value:kind==='recordings'||(kind==='simulator'&&r.body.kind==='career')?undefined:librarySummary(kind,r.body),name:r.body.name??r.body.airport_name??r.body.career?.airport_name??r.body.callsign??kind,bytes:Buffer.byteLength(JSON.stringify(r.body))})),limits:limit};
   }
   const key=typeof b.key==='string'?b.key.trim():'';if(!key||key.length>120||!/^[a-zA-Z0-9._:-]+$/.test(key))fail(400,'Invalid item key.');
-  return transaction(`library:${u.id}:${kind}`,async db=>{
-   const old=await one('SELECT revision FROM skyward_library WHERE user_id=$1 AND kind=$2 AND key=$3',[u.id,kind,key],db);
+  return transaction(`library:${u.id}`,async db=>{
+   const old=await one('SELECT revision,body,octet_length(body::text) AS bytes FROM skyward_library WHERE user_id=$1 AND kind=$2 AND key=$3',[u.id,kind,key],db);
    if(!limit.free&&b.revision!==(old?.revision??0))fail(409,'This item changed on another device. Refresh before saving.');
    if(b.remove===true){await db.query('DELETE FROM skyward_library WHERE user_id=$1 AND kind=$2 AND key=$3',[u.id,kind,key]);return {ok:true};}
    const value=validateLibrary(kind,b.value),encoded=JSON.stringify(value);if(kind==='watchlist'&&key!==value.hex)fail(400,'Watch key must match its aircraft.');if(Buffer.byteLength(encoded)>limit.bytes)fail(413,'Saved item exceeds its storage limit.');
    if(!old&&Number((await one('SELECT COUNT(*) n FROM skyward_library WHERE user_id=$1 AND kind=$2',[u.id,kind],db)).n)>=limit.count)fail(429,'Library is full. Remove an item before adding another.');
+   const oldBytes=old?Number(old.bytes):0;
+   if(old&&isDeepStrictEqual(old.body,value))return {ok:true,key,revision:old.revision,unchanged:true};
+   const totals=await one('SELECT COALESCE(SUM(octet_length(body::text)),0) bytes,octet_length($2::jsonb::text) incoming FROM skyward_library WHERE user_id=$1',[u.id,encoded],db),used=Number(totals.bytes),incoming=Number(totals.incoming);
+   if(used-oldBytes+incoming>ACCOUNT_LIBRARY_BYTES&&(!old||incoming>oldBytes))fail(413,'Account storage is full (512 KB). Remove saved items or export a local backup.');
    const revision=(old?.revision??0)+1;await db.query('INSERT INTO skyward_library VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT(user_id,kind,key) DO UPDATE SET body=excluded.body,revision=excluded.revision,updated=excluded.updated',[u.id,kind,key,encoded,revision,now()]);return {ok:true,key,revision};
   });
  }

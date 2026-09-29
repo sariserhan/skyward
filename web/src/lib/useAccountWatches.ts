@@ -13,8 +13,8 @@ export function useAccountWatches(){
    }catch(e){if(alive)setError(e instanceof Error?e.message:'Watchlist sync unavailable.');}
   };
   const changed=(event?:Event)=>{if(event instanceof CustomEvent&&event.detail?.signedOut){++serial.current;account.current=null;setWatches(localWatches());setError('');}void refresh(true);},sync=()=>{void refresh();};changed();
-  addEventListener('skyward-account-changed',changed);addEventListener('skyward-watchlist-changed',sync);addEventListener('focus',changed);const timer=setInterval(changed,60000);
-  return()=>{alive=false;++serial.current;clearInterval(timer);removeEventListener('skyward-account-changed',changed);removeEventListener('skyward-watchlist-changed',sync);removeEventListener('focus',changed);};
+  addEventListener('skyward-account-changed',changed);addEventListener('skyward-watchlist-changed',sync);addEventListener('focus',changed);
+  return()=>{alive=false;++serial.current;removeEventListener('skyward-account-changed',changed);removeEventListener('skyward-watchlist-changed',sync);removeEventListener('focus',changed);};
  },[]);
  const toggleWatch=useCallback(async(a:WatchItem)=>{
   if(busy.current)return;busy.current=true;++serial.current;const owner=account.current,old=rows.current,exists=old.some(w=>w.hex===a.hex),item={hex:a.hex,callsign:a.callsign,registration:a.registration,aircraftType:a.aircraftType};

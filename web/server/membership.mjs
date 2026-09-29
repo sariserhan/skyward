@@ -101,7 +101,7 @@ export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now
   const premium=createPremiumTools({store:sqlitePremiumStore(db),entitlement,env,now,userById:id=>get('SELECT * FROM users WHERE id=?',id),readJourney:(id,key)=>{const j=get('SELECT body FROM journeys WHERE user_id=? AND key=?',id,key),c=get('SELECT body FROM checks WHERE user_id=? AND key=?',id,key);return j?{...JSON.parse(j.body),details:c?JSON.parse(c.body):null}:null;},lookup});
   const accountLibrary=createAccountLibrary(db,{now,entitlement});
   async function body(req) {
-    const maximum=req.url?.split('?')[0]==='/api/account/library'?17*1024*1024:8192;
+    const maximum=req.url?.split('?')[0]==='/api/account/library'?64*1024:8192;
     const chunks=[];let bytes=0;for await(const chunk of req){bytes+=chunk.length;if(bytes>maximum)fail(413,'Request too large.');chunks.push(chunk);}
     const raw=Buffer.concat(chunks).toString('utf8');
     try{const value=JSON.parse(raw||'{}');if(!value||typeof value!=='object'||Array.isArray(value))throw Error();return value;}catch{fail(400,'Invalid request.');}

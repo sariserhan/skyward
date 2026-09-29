@@ -162,13 +162,14 @@ test('Premium libraries persist, enforce optimistic edits and validate viewing s
   f.paid(false);assert.equal((await f.call('/api/account/library?kind=logbook',undefined,cookie)).code,403);
  }finally{if(f)await f.close();rmSync(dir,{recursive:true,force:true});}
 });
-test('Cloud recordings validate observed fixes; storage caps prevent unbounded libraries',async()=>{
+test('New recordings stay local; storage caps prevent unbounded libraries',async()=>{
  const f=await fixture();try{
   const c=await f.register();await f.call('/api/billing/checkout',{},c);f.paid(true);
   const recording={format:'skyward-session',version:1,createdAt:NOW,name:'My flight',tracks:[{identity:{hex:'aab812',callsign:'AAL6'},points:[{lat:38.95,lon:-77.46,altitude:1000,time:NOW,ground:false}]}]};
-  assert.equal((await f.call('/api/account/library',{kind:'recordings',key:'one',revision:0,value:recording},c)).code,200);
-  const r=await f.call('/api/account/library?kind=recordings&key=one',undefined,c);assert.equal(r.body.value.tracks[0].points[0].time,NOW);
-  assert.equal((await f.call('/api/account/library',{kind:'recordings',key:'bad',revision:0,value:{...recording,tracks:[{...recording.tracks[0],points:[{lat:1000}]}]}},c)).code,400);
+  assert.equal((await f.call('/api/account/library',{kind:'recordings',key:'one',revision:0,value:recording},c)).code,413);
+  const r=await f.call('/api/account/library?kind=recordings&key=one',undefined,c);assert.equal(r.code,404);
+  assert.equal((await f.call('/api/account/library',{kind:'recordings',key:'bad',revision:0,value:{...recording,tracks:[{...recording.tracks[0],points:[{lat:1000}]}]}},c)).code,413);
+  assert.equal((await f.call('/api/account/library',{kind:'views',key:'large',revision:0,value:{name:'x'.repeat(65536),settings:{}}},c)).code,413);
   for(let i=0;i<10;i++)assert.equal((await f.call('/api/account/library',{kind:'views',key:'view-'+i,revision:0,value:{name:'View',settings:{}}},c)).code,200);
   assert.equal((await f.call('/api/account/library',{kind:'views',key:'overflow',revision:0,value:{settings:{}}},c)).code,429);
   assert.equal((await f.call('/api/account/library',{kind:'simulator',key:'bad',revision:0,value:{kind:'career',version:1}},c)).code,400);
