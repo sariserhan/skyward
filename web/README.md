@@ -1819,3 +1819,19 @@ full recordings or enlarge the account storage limits.
 
 Run the entitlement browser flow with `SKYWARD_QA_PYTHON=/path/to/python node
 scripts/browser-tests.mjs --recording-premium` from `web/` after building.
+
+### Weather ambience and sky colour
+
+Cabin audio mixes original filtered rain noise with its existing aircraft ambience.
+Each generated lightning strike schedules a muffled thunder rumble using the
+strike distance / 343 m/s; distant thunder is quieter and darker. Rain does not
+require lightning and follows the camera's inferred precipitation layer. No
+external recording, weather request, or paid audio service is added. Cabin audio
+Off, hidden tabs, suspended flight views and unmount cancel pending thunder and
+stop weather audio; resuming does not replay old strikes. Browser autoplay still
+requires a user gesture where enforced.
+
+Below storm clouds, the sky gradually desaturates and dims, obscuring the Sun,
+Moon and planets. Light rain preserves blue sky and more sunlight. Climbing above
+the inferred cloud top restores the normal sky. These are illustrative effects
+from nearby surface reports, not measured cloud/strike geometry or aircraft audio.

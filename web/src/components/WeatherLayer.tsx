@@ -1,3 +1,5 @@
+import {createWeatherSky,weatherSkyAmount} from '../lib/weatherSky';
+import {publishWeatherAudio,publishThunder,clearWeatherAudio} from '../lib/weatherAudio';
 import {addCloudVolume} from '../lib/cloudVolumes';
 import {makeLightning,lightningIntensity,type LightningStrike} from '../lib/lightning';
 import {publishWindshieldWeather} from '../lib/windshield';
@@ -27,12 +29,13 @@ export function WeatherLayer(props:Props){
   const canvas=document.createElement('canvas');canvas.className='weather-particles';canvas.setAttribute('aria-hidden','true');v.container.appendChild(canvas);const ctx=canvas.getContext('2d');if(!ctx){v.scene.primitives.remove(clouds);v.scene.primitives.remove(volumes);canvas.remove();return;}
   let windEast=0,windNorth=0;const moving=new Map<string,{primitive:Cesium.Primitive;lon:number;lat:number;height:number;opacity:number;wanted:boolean}>();
   let horizonKey='',last=0,cloudKey='',lastCloud=0,width=0,height=0,nextFlash=0,strike:LightningStrike|null=null,stormKey='';const particles=Array.from({length:240},(_,i)=>({x:hash(i+1),y:hash(i+300),depth:.2+hash(i+700)*.8}));
+  const weatherSky=createWeatherSky(v);
   const fog={enabled:v.scene.fog.enabled,density:v.scene.fog.density,minimumBrightness:v.scene.fog.minimumBrightness};let changedFog=false;
-  const restore=()=>{if(changedFog){Object.assign(v.scene.fog,fog);changedFog=false;}};
+  const restore=()=>{weatherSky.restore();if(changedFog){Object.assign(v.scene.fog,fog);changedFog=false;}};
   const remove=v.scene.preRender.addEventListener(()=>{const now=performance.now();if(now-last<(latest.current.lowQuality?65:32))return;const dt=Math.min(.25,(now-last)/1000||.033);last=now;
    const p=latest.current,f=p.focus(),manual=f?p.manual?.():null,r=manual&&f?manualReport(manual,f):report.current,reduced=p.reduced||window.matchMedia('(prefers-reduced-motion: reduce)').matches;
    const w=v.canvas.clientWidth,h=v.canvas.clientHeight;if(w!==width||h!==height){width=w;height=h;canvas.width=w;canvas.height=h;}ctx.clearRect(0,0,width,height);
-   if(!effectsRef.current||!f||!r||reportDistanceKm(r,f)>150||Date.now()-r.observedAt>7200000||document.hidden||v.scene.mode!==C.SceneMode.SCENE3D){strike=null;nextFlash=0;stormKey='';clouds.show=false;volumes.show=false;publishWeather(v,null);publishWindshieldWeather(v,null);restore();return;}clouds.show=true;volumes.show=true;publishWeather(v,motionRef.current?r:null);publishWindshieldWeather(v,r);
+   if(!effectsRef.current||!f||!r||reportDistanceKm(r,f)>150||Date.now()-r.observedAt>7200000||document.hidden||v.scene.mode!==C.SceneMode.SCENE3D){strike=null;nextFlash=0;stormKey='';clouds.show=false;volumes.show=false;clearWeatherAudio(v);publishWeather(v,null);publishWindshieldWeather(v,null);restore();return;}clouds.show=true;volumes.show=true;publishWeather(v,motionRef.current?r:null);publishWindshieldWeather(v,r);
    if(!reduced){const bearing=((r.windDirection??0)+180)*Math.PI/180,speed=Math.min(25,r.windKnots??0)*.514444;windEast+=Math.sin(bearing)*speed*dt;windNorth+=Math.cos(bearing)*speed*dt;}
    const datum=f.datumM??0,eyeAltitude=v.camera.positionCartographic.height+datum,conditions=altitudeWeather(r,eyeAltitude),cos=Math.max(.3,Math.cos(r.lat*Math.PI/180)),lonStep=.045/cos,gx=Math.floor((f.lon-windEast/(111320*cos))/lonStep),gy=Math.floor((f.lat-windNorth/111320)/.045),key=`${r.station}:${manual?'manual':r.observedAt}:${gx}:${gy}:${datum}:${r.rain}:${r.clouds.length}:${p.lowQuality}:${Math.floor(Date.now()/300000)}`;
    if(now-lastCloud>1000&&key!==cloudKey){cloudKey=key;lastCloud=now;for(const cloud of moving.values())cloud.wanted=false;const thickness=cloudThickness(r),radius=p.lowQuality?1:2,sun=sunDirectionFixed(C,v.clock.currentTime),elevation=solarElevation(C,C.Cartesian3.fromDegrees(f.lon,f.lat),sun),night=v.scene.globe.enableLighting&&elevation< -3;
@@ -51,6 +54,8 @@ export function WeatherLayer(props:Props){
    }
    for(const [id,cloud] of moving){cloud.opacity=Math.max(0,Math.min(1,cloud.opacity+(cloud.wanted?1:-1)*dt/2.5));if(!cloud.wanted&&cloud.opacity===0){volumes.remove(cloud.primitive);moving.delete(id);continue;}cloud.primitive.appearance.material!.uniforms.cloudOpacity=cloud.opacity;const position=C.Cartesian3.fromDegrees(cloud.lon+windEast/(111320*cos),cloud.lat+windNorth/111320,cloud.height);C.Matrix4.setTranslation(cloud.primitive.modelMatrix,position,cloud.primitive.modelMatrix);}
    const near=eyeAltitude<50000,inside=conditions.inside&&r.clouds.some(c=>cover(c.cover)>.7||hash(gx*73+gy*173)<cover(c.cover));
+   if(near)weatherSky.update(weatherSkyAmount(r,eyeAltitude),dt);
+   publishWeatherAudio(v,near?conditions.precipitation*r.rain:0,near&&r.storm&&lightningRef.current&&!reduced);
    if(near){v.scene.fog.enabled=true;v.scene.fog.density=inside?.0012:Math.min(.0002,.00002*10/Math.max(.2,r.visibilityKm??40));v.scene.fog.minimumBrightness=.28;changedFog=true;}else restore();
    if(!near){strike=null;nextFlash=0;return;}
    if(!inside&&conditions.precipitation&&r.clouds.some(c=>c.cover==='OVC')){ctx.fillStyle='rgba(120,129,139,.13)';ctx.fillRect(0,0,width,height);}
@@ -74,6 +79,7 @@ export function WeatherLayer(props:Props){
     const ground=r.elevationM??f.datumM??0,base=Math.max(ground+900,r.clouds[0]?.baseM??ground+1800);
     const inCloud=inside||eyeAltitude>base+500||hash(now+3)>.65;
     strike=makeLightning({lat:f.lat+Math.cos(bearing)*distance/111320,lon:f.lon+Math.sin(bearing)*distance/(111320*cos),altitude:inCloud?base+1800:base+400},ground,Math.floor(now),now,inCloud);
+    publishThunder(v,Math.hypot(distance,strike.origin.altitude-eyeAltitude));
     nextFlash=now+9000+hash(now+4)*15000;
    }
    if(strike&&now-strike.start>strike.duration)strike=null;
@@ -103,7 +109,7 @@ export function WeatherLayer(props:Props){
    }
   });
   let lastWake=0;const wake=setInterval(()=>{if(v.isDestroyed()||document.hidden)return;const p=latest.current,f=p.focus(),r=report.current,manual=f?p.manual?.():null;if(!effectsRef.current||!f||(!r&&!manual))return;const active=v.camera.positionCartographic.height<50000&&((manual?.rain??0)||(r?.rain??0)||(r?.snow??0)||(r?.storm??false)||(!p.reduced&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches&&r?.clouds.length&&(r.windKnots??0)>0));if(active||[...moving.values()].some(c=>c.opacity<1||!c.wanted)||performance.now()-lastWake>1500){v.scene.requestRender();lastWake=performance.now();}},props.lowQuality?66:33);
-  return()=>{clearInterval(wake);remove();publishWeather(v,null);publishWindshieldWeather(v,null);canvas.remove();if(!v.isDestroyed()){restore();v.scene.primitives.remove(clouds);v.scene.primitives.remove(volumes);}};
+  return()=>{clearInterval(wake);remove();clearWeatherAudio(v);publishWeather(v,null);publishWindshieldWeather(v,null);canvas.remove();if(!v.isDestroyed()){restore();v.scene.primitives.remove(clouds);v.scene.primitives.remove(volumes);}};
  },[props.viewer,props.enabled]);
  if(!props.enabled||!props.viewer)return null;const r=data?.report;
  const status=<details className="weather-readout"><summary>Weather · {!focused?'zoom in':r?weatherSummary(r):data?'unavailable':'loading'}</summary>{r&&<p>{r.station==='Manual'?'Manual conditions':`${Math.round(r.distanceKm)} km from report · ${new Date(r.observedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`}{data?.status==='stale'?' · refresh delayed':''}</p>}<p>{!focused?'Globe clouds illustrate recent station reports, not satellite coverage. Unreported areas are unknown. Zoom in for local weather.':r?'Cloud shapes, thickness, lightning and turbulence motion are illustrative, not measured aircraft conditions. Reports describe nearby surface conditions.':'No recent nearby report is available. Missing data is not clear weather.'}</p><label><input type="checkbox" checked={effects} onChange={e=>setEffects(e.target.checked)}/>Weather effects</label><label><input type="checkbox" checked={lightning} disabled={props.reduced} onChange={e=>setLightning(e.target.checked)}/>Lightning effects</label><label><input type="checkbox" checked={motion} disabled={props.reduced} onChange={e=>setMotion(e.target.checked)}/>Turbulence animation</label></details>;

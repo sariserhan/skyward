@@ -1,3 +1,4 @@
+import {createWeatherSound} from './weatherAudio.ts';
 import {propulsionSound} from './aircraftSound.ts';
 /** Native cabin sound: either a supplied audio file or original synthesized ambience. */
 export type CabinSource={kind:'file';url:string}|{kind:'generated'};
@@ -14,11 +15,11 @@ export function cabinSoundProfile(flight:CabinFlight){
  const parked=flight.phase==='parked'||(flight.ground&&flight.speed<1);
  return {...profile,wind:profile.wind*.65,engine:profile.engine*(family==='helicopter'?2:1.5),frequency:parked?28:family==='helicopter'?34:family==='piston'?48:76};
 }
-export interface CabinSound {update:(flight:CabinFlight)=>void;start:()=>Promise<void>;pause:()=>void;dispose:()=>void;}
+export interface CabinSound {weather:(rain:number,storm:boolean)=>void;thunder:(distance:number)=>void;update:(flight:CabinFlight)=>void;start:()=>Promise<void>;pause:()=>void;dispose:()=>void;}
 export const cabinAudioPreference='skyward.cabin-audio.v1';
 export function readCabinAudio(){try{return localStorage.getItem(cabinAudioPreference)!=='off';}catch{return true;}}
 export function saveCabinAudio(enabled:boolean){try{localStorage.setItem(cabinAudioPreference,enabled?'on':'off');}catch{/* Optional preference. */}}
-export function createCabinSound(source:CabinSource,aircraftType=''):CabinSound{
+function createDryCabinSound(source:CabinSource,aircraftType=''):Omit<CabinSound,'weather'|'thunder'>{
  if(source.kind==='file'){
   const audio=new Audio(source.url);audio.loop=true;audio.volume=.3;audio.preload='auto';
   const repeat=()=>{if(audio.currentTime>=300)audio.currentTime=0;};audio.addEventListener('timeupdate',repeat);
@@ -43,4 +44,9 @@ export function createCabinSound(source:CabinSource,aircraftType=''):CabinSound{
   apply();
  }
  return {update:flight=>{profile=cabinSoundProfile({...flight,aircraftType});apply();},start:async()=>{if(disposed)return;wantsPlayback=true;if(!context)initialize();await context!.resume();if(disposed||!wantsPlayback){if(context&&context.state!=='closed')void context.suspend();return;}gain!.gain.cancelScheduledValues(context!.currentTime);gain!.gain.setTargetAtTime(.12,context!.currentTime,.2);},pause:()=>{wantsPlayback=false;if(context&&context.state!=='closed'){gain!.gain.cancelScheduledValues(context.currentTime);gain!.gain.setTargetAtTime(0,context.currentTime,.06);void context.suspend();}},dispose:()=>{disposed=true;for(const node of nodes){try{node.stop();}catch{/* Already stopped. */}node.disconnect();}if(context&&context.state!=='closed')void context.close();context=null;gain=null;}};
+}
+
+export function createCabinSound(source:CabinSource,aircraftType=''):CabinSound{
+ const cabin=createDryCabinSound(source,aircraftType),weather=createWeatherSound();
+ return {update:cabin.update,weather:weather.update,thunder:weather.thunder,start:async()=>{try{await Promise.all([cabin.start(),weather.start()]);}catch(error){cabin.pause();weather.pause();throw error;}},pause:()=>{cabin.pause();weather.pause();},dispose:()=>{cabin.dispose();weather.dispose();}};
 }

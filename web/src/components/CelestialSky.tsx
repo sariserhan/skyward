@@ -1,3 +1,4 @@
+import {skyObscuration} from '../lib/weatherSky';
 import {skyCameraPose} from '../lib/skyCamera';
 import {useEffect,useRef,useState} from 'react';
 import {createPortal} from 'react-dom';
@@ -29,6 +30,8 @@ export default function CelestialSky({viewer,enabled,host,onInteract,navigationK
    }
    v.scene.requestRender();
   };
+  let lastCover=-1;
+  const weather=v.scene.preRender.addEventListener(()=>{const cover=skyObscuration(v);if(Math.abs(cover-lastCover)<.01)return;lastCover=cover;for(const entity of bodies.current.values()){entity.show=cover<.92;if(entity.billboard)entity.billboard.color=new C.ConstantProperty(C.Color.WHITE.withAlpha(1-cover));}});
   update();const timer=setInterval(update,60000);
   const handler=new C.ScreenSpaceEventHandler(v.canvas);
   handler.setInputAction((event:{endPosition:Cesium.Cartesian2})=>{
@@ -38,7 +41,7 @@ export default function CelestialSky({viewer,enabled,host,onInteract,navigationK
    else setHover(null);
   },C.ScreenSpaceEventType.MOUSE_MOVE);
   const leave=()=>setHover(null);v.canvas.addEventListener('pointerleave',leave);
-  return()=>{clearInterval(timer);handler.destroy();v.canvas.removeEventListener('pointerleave',leave);if(!v.isDestroyed()){for(const entity of bodies.current.values())v.entities.remove(entity);if(v.scene.sun)v.scene.sun.show=originalSun??true;if(v.scene.moon)v.scene.moon.show=originalMoon??true;v.scene.requestRender();}bodies.current.clear();};
+  return()=>{weather();clearInterval(timer);handler.destroy();v.canvas.removeEventListener('pointerleave',leave);if(!v.isDestroyed()){for(const entity of bodies.current.values())v.entities.remove(entity);if(v.scene.sun)v.scene.sun.show=originalSun??true;if(v.scene.moon)v.scene.moon.show=originalMoon??true;v.scene.requestRender();}bodies.current.clear();};
  },[viewer,enabled]);
  useEffect(()=>{try{localStorage.setItem('skyward.sky.labels',String(labels));}catch{}for(const e of bodies.current.values())if(e.label)e.label.show=new window.Cesium.ConstantProperty(labels);if(viewer&&!viewer.isDestroyed())viewer.scene.requestRender();},[labels,viewer]);
  useEffect(()=>{if(!selected)return;const key=(e:KeyboardEvent)=>{if(e.key==='Escape'&&!e.defaultPrevented&&!document.querySelector('dialog[open],.unified-map-tools[open],.cesium-credit-lightbox-overlay[style*="block"]')){e.preventDefault();back();}};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[selected,viewer]);
