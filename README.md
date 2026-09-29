@@ -312,3 +312,5 @@ reduce scene resolution during sustained slow rendering, then restore it slowly.
 Turn it off to hold your selected preset. The interface remains at its normal
 resolution, and **Performance** shows the current scene scale. See
 [visual realism](docs/visual-realism.md) for the approximations and current limits.
+
+Flight voices now lower engine, cabin and weather ambience while speaking, then restore your saved levels. In **Sound mix**, choose **Balanced**, **Quiet cabin**, or **Weather immersion**, or tune each slider. Warning tones are not ducked. **Flight voices → Recent dialogue** keeps the last eight messages for the current flight in memory; clear it at any time. A captain follow-up plays after sustained calmer conditions following a turbulence announcement, provided nearby weather and altitude remain available. These are illustrative simulation announcements, not live crew communications.

@@ -6,3 +6,15 @@ test('phase dialogue is once per channel and newly enabled channels can join',()
 test('turbulence onset uses hysteresis, cooldown and suppresses ground calls',()=>{const d=new TurbulenceAnnouncement();assert.equal(d.update(.8,0,true),false);assert.equal(d.update(.8,0,false),true);assert.equal(d.update(.8,10000,false),false);assert.equal(d.update(.1,11000,false),false);assert.equal(d.update(.8,12000,false),false);d.update(0,190000,false);assert.equal(d.update(.8,200000,false),true);assert.match(turbulenceAnnouncement('Nearby stations report rain.'),/fasten your seat belt/);assert.match(turbulenceAnnouncement(),/Cabin crew/);});
 
 test('unclassified ground observation never announces arrival parking',()=>{assert.match(captainAnnouncement({...c,phase:'ground'}),/on the ground/);assert.doesNotMatch(captainAnnouncement({...c,phase:'ground'}),/parking position|touched down/);});
+
+
+test('recovery requires continuous valid calm weather and resets on ground',async()=>{
+ const {TurbulenceRecovery}=await import('../src/lib/flightDialogue.ts');const r=new TurbulenceRecovery();
+ assert.equal(r.update(0,0,false,true),false);
+ r.update(.8,100,false,true,true);assert.equal(r.update(0,200,false,true),false);
+ assert.equal(r.update(0,31000,false,false),false); // Missing coverage is not calm weather.
+ assert.equal(r.update(0,32000,false,true),false);assert.equal(r.update(0,62000,false,true),true);
+ assert.equal(r.update(0,100000,false,true),false);r.update(.8,110000,false,true,true);
+ r.update(0,111000,true,true);assert.equal(r.update(0,150000,false,true),false);
+});
+test('captain weather sentence is not truncated mid instruction',()=>{const text='Nearby station reports mention thunderstorms. Please keep your seat belt fastened.';assert.ok(turbulenceAnnouncement(text).includes(text));});

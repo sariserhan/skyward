@@ -1,4 +1,4 @@
-import {readAudioMix,onAudioMix} from './audioMix.ts';
+import {readAmbienceMix,onAudioMix} from './audioMix.ts';
 import {aircraftFamily,propulsionSound} from './aircraftSound.ts';
 export type CockpitCue='gear'|'touchdown'|'turbulence'|500|100|50|40|30|20|10;
 export interface AudioFlight {turbulence?:number;agl:number|null;ground:boolean;gear:boolean|null;at:number;}
@@ -26,7 +26,7 @@ export function createCockpitSound(type:string){
  let context:AudioContext|null=null,master:GainNode|null=null,low:BiquadFilterNode|null=null,humGain:GainNode|null=null,airGain:GainNode|null=null,beatDepth:GainNode|null=null;
  let disposed=false,wantsPlayback=false,input:CockpitAudioInput={speed:null,throttle:null,volume:.3};
  const sources:AudioScheduledSourceNode[]=[],oscillators:OscillatorNode[]=[],nodes:AudioNode[]=[];
- const update=(next:CockpitAudioInput)=>{input=next;if(!context||!master||!low||!humGain||context.state==='closed')return;const settings=cockpitAudioSettings(type,next),t=context.currentTime;master.gain.setTargetAtTime(wantsPlayback?settings.volume:0,t,.15);low.frequency.setTargetAtTime(settings.wind,t,.4);humGain.gain.setTargetAtTime(settings.hum*readAudioMix().engine,t,.25);beatDepth?.gain.setTargetAtTime(settings.hum*propulsionSound(type).depth*readAudioMix().engine,t,.25);airGain?.gain.setTargetAtTime(readAudioMix().cabin,t,.25);oscillators.forEach((o,i)=>o.frequency.setTargetAtTime(settings.frequency*(i?1.51:1),t,.4));};
+ const update=(next:CockpitAudioInput)=>{input=next;if(!context||!master||!low||!humGain||context.state==='closed')return;const settings=cockpitAudioSettings(type,next),t=context.currentTime;master.gain.setTargetAtTime(wantsPlayback?settings.volume:0,t,.15);low.frequency.setTargetAtTime(settings.wind,t,.4);humGain.gain.setTargetAtTime(settings.hum*readAmbienceMix().engine,t,.25);beatDepth?.gain.setTargetAtTime(settings.hum*propulsionSound(type).depth*readAmbienceMix().engine,t,.25);airGain?.gain.setTargetAtTime(readAmbienceMix().cabin,t,.25);oscillators.forEach((o,i)=>o.frequency.setTargetAtTime(settings.frequency*(i?1.51:1),t,.4));};
  const stopMix=onAudioMix(()=>update(input));
  function initialize(){
   const c=new AudioContext();context=c;master=c.createGain();master.gain.value=0;master.connect(c.destination);low=c.createBiquadFilter();low.type='lowpass';low.frequency.value=500;const high=c.createBiquadFilter();high.type='highpass';high.frequency.value=35;

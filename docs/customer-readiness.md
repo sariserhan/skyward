@@ -72,3 +72,5 @@ wind-responsive water with day/night transition, landing/taxi, and adaptive
 resolution with watched-aircraft retention and manual override. Captured images
 were visually inspected; these checks do not establish hardware-GPU frame rates
 or MSFS-level fidelity.
+
+Speech/continuity pass: production build passed; 400 unit tests passed and one optional database test was skipped. Isolated Chromium checks exercised turbulence-onset speech, tower readback, captain route updates, in-memory dialogue history/clear, all three sound presets and persisted slider values, cockpit entry/exit, and desktop/mobile layouts (1440×1000 and 390×844). No page errors or application error overlay occurred. Mobile screenshot was visually inspected. Browser speech was mocked for deterministic callbacks; audible voice quality and hardware-device audio remain manual checks. Unit tests cover overlapping speech ownership, missing completion callbacks, weather-loss recovery suppression and adaptive-resolution sampling gaps. No paid feed was needed.

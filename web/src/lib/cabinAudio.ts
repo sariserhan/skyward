@@ -1,4 +1,4 @@
-import {readAudioMix,onAudioMix} from './audioMix.ts';
+import {readAmbienceMix,onAudioMix} from './audioMix.ts';
 import {createWeatherSound} from './weatherAudio.ts';
 import {propulsionSound} from './aircraftSound.ts';
 /** Native cabin sound: either a supplied audio file or original synthesized ambience. */
@@ -26,14 +26,14 @@ function createDryCabinSound(source:CabinSource,aircraftType=''):Omit<CabinSound
  if(source.kind==='file'){
   const audio=new Audio(source.url);audio.loop=true;audio.volume=.3;audio.preload='auto';
   const repeat=()=>{if(audio.currentTime>=300)audio.currentTime=0;};audio.addEventListener('timeupdate',repeat);
-  let disposed=false,level=.3;const apply=()=>{audio.volume=level*readAudioMix().cabin;};const stopMix=onAudioMix(apply);apply();
+  let disposed=false,level=.3;const apply=()=>{audio.volume=level*readAmbienceMix().cabin;};const stopMix=onAudioMix(apply);apply();
   return {update:flight=>{level=flight.ground?(flight.speed<1?.08:.15):.3;apply();},start:async()=>{if(!disposed)await audio.play();},pause:()=>audio.pause(),dispose:()=>{disposed=true;stopMix();audio.pause();audio.removeEventListener('timeupdate',repeat);audio.removeAttribute('src');audio.load();}};
  }
  // Original ventilation noise and soft engine hum; no recording or external media.
  let context:AudioContext|null=null,gain:GainNode|null=null,disposed=false,wantsPlayback=false;
  const nodes:AudioScheduledSourceNode[]=[];
  let profile=cabinSoundProfile({ground:false,speed:400,aircraftType}),wind:GainNode|null=null,rolling:GainNode|null=null,ventilation:GainNode|null=null;const beats:GainNode[]=[];const engines:{osc:OscillatorNode;level:GainNode}[]=[];
- const apply=()=>{if(!context||context.state==='closed')return;const at=context.currentTime,mix=readAudioMix();const set=(param:AudioParam|undefined,value:number)=>{if(param){param.cancelScheduledValues(at);param.setTargetAtTime(value,at,.6);}};beats.forEach(level=>set(level.gain,profile.engine*propulsionSound(aircraftType).depth*mix.engine));set(wind?.gain,profile.wind*mix.cabin);set(rolling?.gain,profile.rolling*mix.cabin);set(ventilation?.gain,profile.ventilation*mix.cabin);engines.forEach(({osc,level},i)=>{set(osc.frequency,profile.frequency+(i?32:0));set(level.gain,profile.engine*mix.engine);});};
+ const apply=()=>{if(!context||context.state==='closed')return;const at=context.currentTime,mix=readAmbienceMix();const set=(param:AudioParam|undefined,value:number)=>{if(param){param.cancelScheduledValues(at);param.setTargetAtTime(value,at,.6);}};beats.forEach(level=>set(level.gain,profile.engine*propulsionSound(aircraftType).depth*mix.engine));set(wind?.gain,profile.wind*mix.cabin);set(rolling?.gain,profile.rolling*mix.cabin);set(ventilation?.gain,profile.ventilation*mix.cabin);engines.forEach(({osc,level},i)=>{set(osc.frequency,profile.frequency+(i?32:0));set(level.gain,profile.engine*mix.engine);});};
  const stopMix=onAudioMix(apply);
  function initialize(){
   context=new AudioContext();gain=context.createGain();gain.gain.value=0;gain.connect(context.destination);

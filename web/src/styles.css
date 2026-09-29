@@ -351,3 +351,5 @@ body>.cesium-credit-lightbox-overlay .cesium-credit-lightbox-close{min-width:36p
 .flight-voices{font-size:12px;padding:8px 0;border-top:1px solid #3b5968;max-width:100%}.flight-voices summary{cursor:pointer;padding:5px 0}.flight-voices p{margin:8px 0;line-height:1.5}.flight-voices small{display:block;color:#a8c2d0;line-height:1.5}.flight-voices .flight-buttons{flex-wrap:wrap;margin:7px 0}
 .cockpit-mode:has(.flight-voices){max-height:calc(50% - 110px);overflow:auto;overscroll-behavior:contain;pointer-events:auto;scrollbar-gutter:stable}
 @media(max-width:759px){.cockpit-mode:has(.flight-voices){max-height:calc(50% - 94px)}}
+
+.voice-history ol{max-height:180px;overflow:auto;overscroll-behavior:contain;padding-left:22px}.voice-history li{margin:8px 0;line-height:1.5}.audio-mixer .flight-buttons{display:flex;gap:6px;flex-wrap:wrap}.audio-mixer small{display:block;line-height:1.5;color:#a8c2d0}

@@ -26,3 +26,10 @@ test('powered Advanced flight loses speed in climb and energy in banked turns',a
  const level=stepFlight(base,p,input,2),climb=stepFlight({...base,pitch:8},p,input,2),descent=stepFlight({...base,pitch:-8},p,input,2),turn=stepFlight({...base,bank:45},p,input,2);
  assert.ok(descent.speed>level.speed&&level.speed>climb.speed);assert.ok(turn.speed<level.speed&&turn.altitude<level.altitude);let partitioned=base;for(let i=0;i<20;i++)partitioned=stepFlight(partitioned,p,input,.1);assert.ok(Math.abs(level.speed-partitioned.speed)<.1);
 });
+
+
+test('adaptive resolution does not carry pressure or recovery streaks across inactive gaps',()=>{
+ const g=new ResolutionGovernor(1,0);g.update(4000,100,50);g.update(6000,100,50);
+ assert.equal(g.update(60000,100,50),1);assert.equal(g.update(62000,100,50),1);assert.equal(g.update(64000,100,50),.9);
+ assert.equal(g.update(NaN,100,50),.9);
+});

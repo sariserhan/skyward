@@ -121,3 +121,9 @@ The Performance monitor, local captures and problem snapshots report the current
 resolution. Cloud sample budgets stay bounded (10 low, 16 normal, 4–6 distant);
 near samples reduce to 12 under pressure. No new paid service or database writes
 are introduced.
+
+### Speech clarity and continuity
+
+Captain/tower speech and cockpit altitude callouts temporarily soften ambient engines, cabin noise and weather. Separate speech ownership prevents overlapping callbacks from prematurely restoring levels; completion, cancellation, teardown and a 45-second safety timeout release the temporary mix. Persisted mixer values and warning tones remain unchanged. Local speech failures retain visual cues/transcripts. Sound presets and an eight-message, in-memory dialogue history make these controls easier to use.
+
+A calmer-ride announcement requires a prior turbulence onset and 30 continuous seconds below the recovery threshold with current, nearby weather and a known altitude. Missing/stale data resets the calm interval; ground state clears it. It does not claim the seat-belt sign is off or that actual turbulence has been measured. Adaptive resolution also discards performance streaks after inactive sampling gaps, avoiding changes driven by pre-pause samples.
