@@ -15,3 +15,12 @@ test('new follow views survive preferences and backup validation',()=>{
 });
 
 test('legacy pilot camera preferences migrate to front view',()=>{assert.equal(sanitizeFlightPreferences({view:'pilot'}).view,'front');});
+
+test('window seats shift along fuselage while look-around remains outward and bounded',()=>{
+ for(const side of ['left','right']){
+  const front=aircraftViewpoint('cabin',40,0,side,{seat:.2,look:35}),rear=aircraftViewpoint('cabin',40,0,side,{seat:-.28,look:-35});
+  assert.ok(front.north>rear.north);assert.equal(front.east,rear.east);assert.ok(Math.abs(front.heading-rear.heading-70*Math.PI/180)<1e-9);
+  assert.deepEqual(aircraftViewpoint('cabin',40,0,side,{seat:9,look:99}),front);
+  assert.ok(Object.values(aircraftViewpoint('cabin',NaN,NaN,side,{seat:NaN,look:NaN})).every(Number.isFinite));
+ }
+});

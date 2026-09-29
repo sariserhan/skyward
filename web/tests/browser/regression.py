@@ -4,7 +4,7 @@ import json, os, socket, subprocess, tempfile, time, urllib.parse, urllib.reques
 from playwright.sync_api import sync_playwright, expect
 ROOT=Path(__file__).resolve().parents[2]
 ARTIFACTS=Path(os.environ.get('SKYWARD_QA_ARTIFACTS',tempfile.mkdtemp(prefix='skyward-browser-')));ARTIFACTS.mkdir(parents=True,exist_ok=True)
-INIT="""Object.defineProperty(window,'Cesium',{configurable:true,get(){return this.__C},set(value){const V=value.Viewer;this.__C=new Proxy(value,{get(t,k){if(k==='Viewer')return new Proxy(V,{construct(t,args){const v=Reflect.construct(t,args);window.__viewer=v;return v;}});return t[k]}})}});window.__shift=0;const actualNow=Date.now.bind(Date);Date.now=()=>actualNow()+window.__shift;localStorage.setItem('skyward.map.v1',JSON.stringify({basemap:'atlas',structures:false,quality:'low',autoQuality:false,offlineMaps:false,reducedMotion:false}));"""
+INIT="""Object.defineProperty(window,'Cesium',{configurable:true,get(){return this.__C},set(value){const V=value.Viewer;this.__C=new Proxy(value,{get(t,k){if(k==='Viewer')return new Proxy(V,{construct(t,args){const v=Reflect.construct(t,args);window.__viewer=v;return v;}});return t[k]}})}});window.__shift=0;const actualNow=Date.now.bind(Date);Date.now=()=>actualNow()+window.__shift;localStorage.setItem('skyward.map.v1',JSON.stringify({basemap:'atlas',terrain:false,structures:false,quality:'low',autoQuality:false,offlineMaps:false,reducedMotion:false}));"""
 phase=0;anchor=int(time.time()*1000)
 def rows():
  a=dict(hex='abcdef',callsign='THY111',registration='TC-TEST',aircraftType='B738',lat=38.95,lon=-77.8+phase*.2,altitude=35000,ground=False,groundSpeed=500,heading=90,verticalRate=0,observedAt=anchor-60000+phase*30000,sourceType='test fixture',category='A3',targetKind='aircraft')

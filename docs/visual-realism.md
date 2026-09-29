@@ -71,10 +71,15 @@ performance pass or improvement claim is inferred from it. See
   watched aircraft remains protected. Session reductions do not overwrite saved
   preferences. Disabling automatic quality still disables preset reduction.
 - Selected destinations prepare geometry within 150 nautical miles instead of 30.
-  With open terrain enabled, two destination tiles (levels 9 and 11) warm through
-  the existing bounded cache when visible demand leaves capacity. This does not
+  With open terrain enabled, destination tiles and points 30/90 seconds ahead
+  of the watched aircraft warm at levels 9 and 11 through the bounded cache
+  when visible demand leaves capacity. Warming pauses for battery saver and
+  hidden/obscured scenes. This does not
   download an entire approach corridor or guarantee all future scenery is loaded.
-  Speculative terrain failures do not switch the visible globe to flat terrain.
+  Terrain defaults on for new preferences (saved off settings are preserved).
+  Visible child failures retry twice, then retain coarser parent elevation; they
+  never disable elevation globally. A failed root can use a flat fallback. Detail
+  is capped at level 14; decoded cache capacity remains 128 tiles.
 - Balanced/high graphics add mapped-runway asphalt grain, illustrative rubber
   deposits and rain-responsive wet patches with a restrained specular response.
   Low graphics omit this layer. It is not measured pavement condition, standing

@@ -379,3 +379,12 @@ body>.cesium-credit-lightbox-overlay .cesium-credit-lightbox-close{min-width:36p
 
 .aurowall-dialog{width:420px;max-width:calc(100vw - 24px);max-height:calc(100dvh - 40px);overflow:auto}.aurowall-dialog button{border:1px solid #557183;border-radius:6px;padding:9px;background:#203e4e}.aurowall-close{margin-top:12px}.topbar nav .music-launcher{color:#a3e5d1;white-space:nowrap;gap:5px}
 @media(max-width:759px){.topbar{gap:8px}.topbar nav{gap:10px}.topbar nav .music-launcher{font-size:11px}.topbar nav .music-launcher>span{display:none}.topbar .brand-name{letter-spacing:3px}}
+
+/* Keep the same control order at every viewport size. */
+.flight-group-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:#a8c9d7;margin:12px 0 7px}
+.flight-control-group+.flight-control-group,.flight-details{border-top:1px solid #385361;margin-top:10px;padding-top:2px}
+.flight-control-group .flight-voices{border-top:0}.flight-voices select{width:100%;max-width:100%;margin:5px 0}
+.passenger-window-controls select{max-width:150px;border:1px solid #607c8b;border-radius:6px;background:#203e4e;color:#edf6fb;padding:7px}
+.music-now-playing{color:#b9e5d8;overflow-wrap:anywhere}.music-pause{display:flex;align-items:center;gap:6px;min-height:36px;max-width:160px;background:#153b44;border:1px solid #597f86;border-radius:7px;color:#d6f6eb;padding:6px 9px}.music-pause span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.map-primary-controls>.globe-spin:disabled{opacity:.5;cursor:default}
+@media(max-width:759px){.spin-long-label,.music-pause span{display:none}.music-pause{padding:5px 8px}.passenger-window-controls{width:calc(100% - 40px);box-sizing:border-box}.passenger-window-controls input{width:70px}.passenger-window-controls select{max-width:130px}.map-primary-controls{max-width:calc(100% - 24px);flex-wrap:wrap;justify-content:flex-end}.map-primary-controls>.focus-toggle{max-width:105px;white-space:normal;text-align:center}}

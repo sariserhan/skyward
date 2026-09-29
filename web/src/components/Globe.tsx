@@ -1,3 +1,4 @@
+import {sceneryAhead} from '../lib/sceneryAhead';
 import {buildingAppearance} from '../lib/buildingAppearance';
 import {createModelWarmup} from '../lib/sceneWarmup';
 import {rotorRig} from '../lib/rotorAnimation';
@@ -119,7 +120,8 @@ export function Globe(p: Props) {
   const [hover,setHover]=useState<{aircraft:Aircraft;x:number;y:number}|null>(null);
   const [tilesLoading,setTilesLoading]=useState(false);
   const [terrainError,setTerrainError]=useState(false);
-  const terrainActive=p.preferences.terrain&&p.mode==='3D'&&!terrainError;
+  const [terrainAttempt,retryTerrain]=useState(0);
+  const terrainActive=p.preferences.terrain&&p.mode==='3D';
   const [mapError, setMapError] = useState(''),[mapAttempt,setMapAttempt]=useState(0);
   const [imageryError, setImageryError] = useState('');
   const [imageryReady, setImageryReady] = useState(false);
@@ -372,9 +374,9 @@ export function Globe(p: Props) {
     const v=viewer.current;if(!v||!ready)return;
     if(!terrainActive){v.terrainProvider=new window.Cesium.EllipsoidTerrainProvider();v.scene.requestRender();return;}
     const terrain=createOpenTerrain(()=>setTerrainError(true),()=>{if(!v.isDestroyed())v.scene.requestRender();});v.terrainProvider=terrain.provider;v.scene.requestRender();
-    const warm=()=>{const arrival=callbacks.current.arrivalGeometry;if(arrival)terrain.warm(arrival.lon,arrival.lat);};warm();const timer=setInterval(warm,15000);
+    const warm=()=>{const state=callbacks.current;if(document.hidden||state.obscured||state.preferences.batterySaver)return;const a=state.selected,fix=a&&flightOpenRef.current?(sharedLiveMotion.displayed(a.hex)??a):null;if(fix&&fix.lon!=null&&fix.lat!=null){for(const point of sceneryAhead(fix.lon,fix.lat,fix.heading??null,fix.groundSpeed??null))terrain.warm(point.lon,point.lat);}const arrival=state.arrivalGeometry;if(arrival)terrain.warm(arrival.lon,arrival.lat);};warm();const timer=setInterval(warm,15000);
     return()=>{clearInterval(timer);terrain.dispose();};
-  },[ready,terrainActive]);
+  },[ready,terrainActive,terrainAttempt]);
   useEffect(()=>{
     const v=viewer.current;if(!v||!ready)return;
     const getState=()=>({aircraft:callbacks.current.camera.type==='tower'?callbacks.current.groundObservations:callbacks.current.aircraft,tower:callbacks.current.camera.type==='tower',selected:callbacks.current.selected,quality:callbacks.current.preferences.quality,reduced:callbacks.current.preferences.reducedMotion||callbacks.current.preferences.batterySaver});
@@ -652,7 +654,7 @@ export function Globe(p: Props) {
     {hover&&<div className="aircraft-tooltip" style={{left:Math.max(8,hover.x),top:hover.y}}><strong>{hover.aircraft.callsign||hover.aircraft.registration||hover.aircraft.hex}</strong><span>{hover.aircraft.aircraftType||'Type unknown'} · {hover.aircraft.ground?'Ground':`${hover.aircraft.altitude?.toLocaleString()??'Unknown'} ft`}</span><small>Click for flight details · {hover.aircraft.simulation?'Skyward simulated aircraft':`${Math.round(ageSeconds(hover.aircraft,p.now))}s since fix`}</small></div>}
     {p.replayIndex!==null&&<div className="replay-banner">Replay · recorded observations · other aircraft show latest reports</div>}
     {error && <div className="map-error" role="alert">{error}<button className="text-button" onClick={()=>p.recover(null,true)}>Restart globe</button></div>}{mapError && <div className="map-error" role="status">{mapError}<button className="text-button" onClick={()=>{setMapAttempt(n=>n+1);window.dispatchEvent(new Event('online'));}}>Retry map &amp; traffic</button></div>}
-    {terrainError&&<div className="terrain-warning" role="status">Elevation unavailable. Using the flat globe. Toggle Open terrain off/on to retry.</div>}
+    {terrainError&&<div className="terrain-warning" role="status">Some elevation tiles are unavailable. Loaded terrain remains visible. <button onClick={()=>{setTerrainError(false);retryTerrain(n=>n+1);}}>Retry elevation</button></div>}
     {imageryError && <div className="imagery-warning" role="status">{imageryError}<button onClick={()=>retryImagery(n=>n+1)}>Retry imagery</button></div>}</>;
 }
 
