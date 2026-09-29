@@ -18,7 +18,7 @@ export function Inspector(p: Props) {
   const age = ageSeconds(a, p.now); const runway = inferRunway(a, p.runways, p.now);
   const replay = p.replayIndex === null ? null : p.trail[p.replayIndex];
   const exportTrail = () => {
-    const blob = new Blob([JSON.stringify({ source: 'ADSB.lol', license: 'ODbL-1.0', aircraft: a, observations: p.trail }, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify({ sources: [...new Set([a.positionSource??'adsblol',...p.trail.map(pt=>pt.positionSource??'adsblol')])].map(id=>id==='flyitaly'?{id,name:'FlyItalyADSB',license:'CC BY-SA 4.0',url:'https://flyitalyadsb.com/'}:{id,name:'ADSB.lol',license:'ODbL-1.0',url:'https://www.adsb.lol/'}), aircraft: a, observations: p.trail }, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `skyward-${a.hex}-observations.json`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
   return <section className="inspector selected-inspector" aria-label="Aircraft details"><SheetHandle/>

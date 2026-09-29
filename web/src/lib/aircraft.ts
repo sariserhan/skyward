@@ -15,7 +15,7 @@ export function appendTrail(trail: TrailPoint[], a: Aircraft): TrailPoint[] {
   if (!hasPosition(a) || a.altitude === null || a.positionWarning) return trail;
   if(positionIssue(trail.at(-1),{lat:a.lat!,lon:a.lon!,time:a.observedAt!,altitude:a.altitude},Infinity))return trail;
   if (trail.length && a.observedAt! <= trail[trail.length - 1].time) return trail;
-  return [...trail, { lon: a.lon!, lat: a.lat!, altitude: a.altitude, time: a.observedAt!, ground: a.ground, groundSpeed: a.groundSpeed }].slice(-1440);
+  return [...trail, { lon: a.lon!, lat: a.lat!, altitude: a.altitude, time: a.observedAt!, ground: a.ground, groundSpeed: a.groundSpeed, ...(a.positionSource?{positionSource:a.positionSource}:{}) }].slice(-1440);
 }
 export function splitTrail(points: TrailPoint[]) {
   const segments: TrailPoint[][] = [];

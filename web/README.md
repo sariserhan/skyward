@@ -1583,3 +1583,42 @@ and `npm --prefix web run build`. Browser QA covers desktop/mobile search,
 phase groups, saved routes, input validation, synthetic isolation and verified
 click-through to Flight view. Discovery tests use deterministic feed fixtures;
 live availability varies with receiver and route-service coverage.
+
+### Optional free FlyItalyADSB observations
+
+Request a free key from https://flyitalyadsb.com/en/dati/api/ and set
+`SKYWARD_FLYITALY_API_KEY` in the existing server's private environment. No receiver
+is required. The official documentation permits commercial use within 100
+requests/minute/IP; higher volume, SLA or data resale needs a separate agreement.
+Set `SKYWARD_FLYITALY_ENABLED=0` to disable it without deleting the key. With no
+key the original feed works alone. ADSB.fi and ADSBHub remain removed.
+
+Restart the existing server yourself after setting the environment. If using a
+private `web/.env` file, Node must load it explicitly (from `web/`, for example,
+`node --env-file=.env server/index.mjs`); do not start a second server on the same
+port. Never put this key in a `VITE_` variable, browser code, commits or chat.
+
+A one-area connectivity check, with no secret output:
+
+```sh
+node --env-file=web/.env web/scripts/check-flyitaly.mjs
+```
+
+Camera areas, airport traffic, aircraft lookups and Trip follower use both feeds.
+The supplemental transport converts nautical miles to kilometers, passes the key
+only as `X-Api-Key` to the fixed HTTPS host and rejects redirects. Shared cache,
+in-flight deduplication and a serialized 1.1-second minimum request interval keep
+one server process below 100 requests/minute. Multiple deployments sharing a
+public IP must coordinate that overall quota. HTTP 429 triggers provider backoff.
+
+The merger retains one coherent position per hex address, preserving timestamps
+and rejecting large cross-source jumps. Either source can serve during the
+other's outage; failures are exposed in `partial`, `failedSources`, and Connection
+health. No success is fabricated if both fail. Source provenance is preserved in
+aircraft records and exported trails, with attribution under About the data.
+Route validation still uses the existing route service. No paid API is invoked.
+
+The adapter expects the readsb-style JSON envelope (`ac` array and `now` timestamp)
+and refuses malformed or stale responses. Requests, merge, cache, secret isolation,
+rate-limit handling and failure recovery are fixture-tested; live response-schema
+compatibility and coverage gains require checking with an actual issued key.
