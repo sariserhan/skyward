@@ -99,8 +99,8 @@ export function Globe(p: Props) {
   const [ready, setReady] = useState(false);
   useEffect(()=>{const v=viewer.current;if(!ready||!v)return;return installRenderDiagnostics(v);},[ready]); const [error, setError] = useState('');
   useEffect(()=>{const v=viewer.current;if(!ready||!v)return;const initial=callbacks.current;
-    return installArrivalSpin(window.Cesium,v,initial.camera.type==='world'&&initial.camera.serial===0&&!initial.recoveryPose&&!initial.preferences.reducedMotion,()=>{const p=callbacks.current;return {stop:p.preferences.reducedMotion||p.mode!=='3D'||p.camera.serial!==0||p.command.serial!==0||p.zoomSignal!==0||!!p.selected||!!p.playback||p.following,paused:p.obscured};});
-  },[ready]);
+    return installArrivalSpin(window.Cesium,v,initial.camera.type==='world'&&(initial.camera.spin===true||(initial.camera.serial===0&&!initial.recoveryPose))&&!initial.preferences.reducedMotion,()=>{const p=callbacks.current;return {stop:p.preferences.reducedMotion||p.mode!=='3D'||p.camera.serial!==initial.camera.serial||p.command.serial!==initial.command.serial||p.zoomSignal!==initial.zoomSignal||!!p.selected||!!p.playback||p.following,paused:p.obscured};});
+  },[ready,p.camera.serial]);
 
   useEffect(()=>{const v=viewer.current;if(!v||!ready)return;let timer:ReturnType<typeof setTimeout>|undefined;const changed=()=>{if(timer)return;timer=setTimeout(()=>{timer=undefined;setModelCameraRevision(n=>n+1);},250);};const remove=v.camera.changed.addEventListener(changed);return()=>{remove();clearTimeout(timer);};},[ready]);
   const [hover,setHover]=useState<{aircraft:Aircraft;x:number;y:number}|null>(null);

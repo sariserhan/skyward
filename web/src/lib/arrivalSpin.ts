@@ -1,5 +1,5 @@
 import type * as Cesium from 'cesium';
-/** One arrival animation. Interaction permanently ends it for this viewer. */
+/** One spin session. Interaction ends it; an explicit world-spin request installs a fresh session. */
 export function installArrivalSpin(C:typeof Cesium,viewer:Cesium.Viewer,eligible:boolean,state:()=>{stop:boolean;paused:boolean}) {
  if(!eligible)return ()=>{};
  let active=true,frame=0,last=performance.now(),start=last;
