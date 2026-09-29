@@ -34,7 +34,10 @@ func step() -> Array[Passenger]:
 
 
 func _connect() -> void:
-	engine.passenger_seated.connect(func(p: Passenger): _seated.append(p))
+	engine.passenger_seated.connect(_record_passenger)
+
+func _record_passenger(p: Passenger) -> void:
+	_seated.append(p)
 
 
 func snapshot() -> Dictionary:

@@ -27,7 +27,10 @@ func step() -> Array[Passenger]:
 
 
 func _connect() -> void:
-	engine.passenger_exited.connect(func(p: Passenger): _exited.append(p))
+	engine.passenger_exited.connect(_record_passenger)
+
+func _record_passenger(p: Passenger) -> void:
+	_exited.append(p)
 
 
 func snapshot() -> Dictionary:

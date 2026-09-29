@@ -31,6 +31,15 @@ var bound_sim: AirportSimulation
 var labels := true
 var skip_idle: Button
 var flight_choice: OptionButton
+var desk: TowerDesk
+var detail_scene := AirportSceneDetail.new()
+var quality := 0
+var tower_position := Vector3.ZERO
+var airport_sound: AirportSound
+var material_cache: Dictionary = {}
+var pavement_cache: Dictionary = {}
+var asphalt: NoiseTexture2D
+var route_overlay: Node3D
 
 func _ready() -> void:
 	custom_minimum_size = Vector2(600, 290)
@@ -137,9 +146,45 @@ func _ready() -> void:
 	radio.add_theme_font_size_override("normal_font_size", 12)
 	radio.text = "Tower log · simulation commands, not live ATC."
 	add_child(radio)
+	airport_sound=AirportSound.new()
+	add_child(airport_sound)
+	desk = TowerDesk.new()
+	desk.view = self
+	add_child(desk)
+	var desk_button := Button.new()
+	desk_button.text = "Tower desk"
+	desk_button.pressed.connect(func(): desk.hide() if desk.visible else desk.open())
+	tools.add_child(desk_button)
 	_lighting()
 
+func apply_weather() -> void:
+	if sim != null:
+		detail_scene.apply_weather()
+		airport_sound.update_weather(TowerOperations.weather(sim).wet)
+
+func report_command(result: Dictionary) -> void:
+	status.text = str(result.get("message", "; ".join(result.get("warnings",[])) if not result.get("warnings",[]).is_empty() else "Command completed."))
+	if result.get("ok",false):
+		radio.text = "TOWER: %s\nPILOT: Roger, %s" % [status.text,status.text]
+		desk.speak(status.text)
+	else:
+		sim.config["tower_rejections"] = int(sim.config.get("tower_rejections",0))+1
+
+func show_route(legs: Array) -> void:
+	if is_instance_valid(route_overlay): route_overlay.queue_free()
+	route_overlay=Node3D.new(); world.add_child(route_overlay)
+	for leg in legs:
+		var points:=TowerOperations.route_points(sim,leg)
+		for i in range(1,points.size()):
+			var a:=Vector3(points[i-1].x,1,points[i-1].y)
+			var b:=Vector3(points[i].x,1,points[i].y)
+			var line:=_box(route_overlay,(a+b)*.5,Vector3(2,.1,a.distance_to(b)),Color("eac261"))
+			line.material_override=_material(Color("eac261"),true)
+			if a.distance_to(b)>.1: line.look_at(b+Vector3.UP*.001)
+
 func _material(color: Color, glow := false) -> StandardMaterial3D:
+	var key:=color.to_html()+str(glow)
+	if material_cache.has(key): return material_cache[key]
 	var m := StandardMaterial3D.new()
 	m.albedo_color = color
 	m.roughness = 0.82
@@ -147,6 +192,7 @@ func _material(color: Color, glow := false) -> StandardMaterial3D:
 		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		m.emission_enabled = true
 		m.emission = color
+	material_cache[key]=m
 	return m
 
 func _box(parent: Node3D, at: Vector3, dimensions: Vector3, color: Color) -> MeshInstance3D:
@@ -155,6 +201,17 @@ func _box(parent: Node3D, at: Vector3, dimensions: Vector3, color: Color) -> Mes
 	mesh.size = dimensions
 	node.mesh = mesh
 	node.material_override = _material(color)
+	if dimensions.y<.6 and dimensions.x>5:
+		var key:=color.to_html()
+		if not pavement_cache.has(key):
+			if asphalt==null:
+				asphalt=NoiseTexture2D.new(); asphalt.width=256; asphalt.height=256; asphalt.seamless=true
+				var noise:=FastNoiseLite.new(); noise.frequency=.3; asphalt.noise=noise
+				var gradient:=Gradient.new(); gradient.set_color(0,Color(.65,.65,.65)); gradient.set_color(1,Color.WHITE); asphalt.color_ramp=gradient
+			var material:=_material(color).duplicate() as StandardMaterial3D
+			material.albedo_texture=asphalt; material.uv1_triplanar=true; material.uv1_scale=Vector3(.2,.2,.2)
+			pavement_cache[key]=material
+		node.material_override=pavement_cache[key]
 	node.position = at
 	parent.add_child(node)
 	return node
@@ -211,6 +268,10 @@ func _build_world() -> void:
 	bridges.clear()
 	arrival_starts.clear()
 	bound_sim = sim
+	desk.gate_choice.clear(); desk.runway_choice.clear(); desk.strips.order.clear()
+	desk.via.clear(); desk.radar.route.clear(); desk.route_flight=""
+	desk._stop_speech()
+	tower_position = Vector3.ZERO
 	if not sim.airside.enabled():
 		status.text = "This scenario has no mapped airside network. Use the 2D Airfield tab."
 		return
@@ -219,6 +280,10 @@ func _build_world() -> void:
 	for id in sim.airside.nodes:
 		lo = lo.min(sim.airside.node_position(id))
 		hi = hi.max(sim.airside.node_position(id))
+	if sim.airside.config.has("terminal_zone"):
+		var zone: Dictionary=sim.airside.config.terminal_zone
+		lo=lo.min(Vector2(zone.x0-180,zone.y0-100))
+		hi=hi.max(Vector2(zone.x1+130,zone.y1))
 	center = Vector3((lo.x+hi.x)/2, 0, (lo.y+hi.y)/2)
 	radius = maxf(hi.x-lo.x, hi.y-lo.y)
 	distance = radius * 1.1
@@ -298,7 +363,15 @@ func _build_world() -> void:
 			var z: Dictionary = sim.airside.config.terminal_zone
 			_line(at+Vector3(24,4,12),Vector3(at.x+24,4,z.y0+23),5,Color("9faeaf"),7)
 		var bridge := _box(world,at+Vector3(12,4,10),Vector3(18,3,4),Color("b8c1c1"))
+		for offset in [-6,-2,2,6]:
+			_box(bridge,Vector3(offset,.25,-2.05),Vector3(2.8,1.2,.08),Color("426f80"))
+		_box(bridge,Vector3(-6,-2,0),Vector3(.5,2,2.5),Color("657980"))
 		bridges[gate] = {"node":bridge,"home":bridge.position}
+	detail_scene.setup(self)
+	apply_weather()
+	desk.weather_choice.select(TowerOperations.WEATHER.keys().find(str(sim.config.get("tower_weather","Clear"))))
+	desk.level.select(int(sim.config.get("tower_difficulty",0)))
+	desk.training_on=desk.level.selected==0
 	manual.set_pressed_no_signal(sim.airport.runways.values().any(func(r): return r.manual_control))
 
 func _add_lights(points: Array[Vector3], color: Color) -> void:
@@ -325,6 +398,7 @@ func _lighting() -> void:
 	var sky := environment.sky.sky_material as ProceduralSkyMaterial
 	sky.sky_top_color = Color("071322") if night else Color("3979b4")
 	sky.sky_horizon_color = Color("23394c") if night else Color("c8d8df")
+	if bound_sim!=null: detail_scene.apply_weather()
 
 func _bounds(node: Node3D, root: Node3D) -> AABB:
 	var bounds := AABB()
@@ -344,6 +418,7 @@ func _aircraft(f: AirportFlight) -> Node3D:
 	body.add_child(plane)
 	var bounds := _bounds(plane,plane)
 	var length := 63.0 if type == "787" else 44.5 if type == "A321" else 35.0 if type == "A220" else 39.5
+	body.set_meta("length",length)
 	var k := length/maxf(1,maxf(bounds.size.x,bounds.size.z))
 	plane.scale *= k
 	plane.position = -bounds.get_center()*k
@@ -353,7 +428,9 @@ func _aircraft(f: AirportFlight) -> Node3D:
 	gear.name = "DisplayGear"
 	body.add_child(gear)
 	for at in [Vector3(0,0,-length*.3),Vector3(-length*.075,0,length*.08),Vector3(length*.075,0,length*.08)]:
-		_box(gear,at+Vector3(0,1.5,0),Vector3(.22,1.7,.22),Color("a6b0b5"))
+		var bogie:=Node3D.new(); gear.add_child(bogie); bogie.position=at
+		if at.z<0: bogie.name="NoseSteer"
+		_box(bogie,Vector3(0,1.5,0),Vector3(.22,1.7,.22),Color("a6b0b5"))
 		for side in [-1,1]:
 			var wheel := MeshInstance3D.new()
 			var tire := CylinderMesh.new()
@@ -364,8 +441,9 @@ func _aircraft(f: AirportFlight) -> Node3D:
 			wheel.mesh=tire
 			wheel.material_override=_material(Color("171b20"))
 			wheel.rotation.z=PI/2
-			wheel.position=at+Vector3(side*.35,.65,0)
-			gear.add_child(wheel)
+			wheel.position=Vector3(side*.35,.65,0)
+			bogie.add_child(wheel)
+	detail_scene.rig(body,length)
 	_label(f.flight_number,Vector3(0,17,0),body)
 	return body
 
@@ -390,7 +468,14 @@ func _pose(f: AirportFlight) -> Vector3:
 		p.y = maxf(0,(t-.7)/.3)*100
 		return p
 	var at := sim.aircraft_position(f)
-	if not at.is_empty(): return Vector3(at.pos.x,0,at.pos.y)
+	if not at.is_empty():
+		if f.taxi_leg>=0 and f.leg_exit_tick>f.leg_enter_tick:
+			var fraction:=clampf(float(sim.clock.tick-f.leg_enter_tick)/(f.leg_exit_tick-f.leg_enter_tick),0,1)
+			if f.taxi_leg==0 or f.taxi_leg==f.taxi_route.size()-1:
+				var eased:=smoothstep(0.0,1.0,fraction)
+				var p:=sim.airside.position_on(f.taxi_route[f.taxi_leg],f.leg_enter_tick,f.leg_exit_tick,f.leg_enter_tick+int(eased*(f.leg_exit_tick-f.leg_enter_tick)))
+				return Vector3(p.x,0,p.y)
+		return Vector3(at.pos.x,0,at.pos.y)
 	if f.status == "approaching":
 		var r: Dictionary = sim.airside.runways()[0]
 		var a := _point(r.a)
@@ -408,8 +493,15 @@ func _process(delta: float) -> void:
 	if sim != bound_sim: _build_world()
 	if not sim.airside.enabled(): return
 	for f: AirportFlight in sim.flight_order:
-		if f.status in ["scheduled","departed"]:
-			if models.has(f.id): models[f.id].visible = false
+		if f.status == "scheduled": continue
+		if f.status == "departed":
+			if models.has(f.id):
+				var departing: Node3D=models[f.id]
+				if not departing.has_meta("depart_tick"): departing.set_meta("depart_tick",sim.clock.tick)
+				if sim.clock.tick-int(departing.get_meta("depart_tick"))>150:
+					departing.queue_free(); models.erase(f.id)
+				elif not sim.clock.paused:
+					departing.position+=(-departing.basis.z*65+Vector3.UP*8)*delta*sim.clock.speed
 			continue
 		var fresh := not models.has(f.id)
 		if fresh: models[f.id] = _aircraft(f)
@@ -417,12 +509,26 @@ func _process(delta: float) -> void:
 		body.visible = true
 		var target := _pose(f)
 		var motion := target-body.position
+		if f.status in ["approaching","landed"] and body.position.y>1 and target.y<=.2 and not body.has_meta("touchdown"):
+			body.set_meta("touchdown",true)
+			detail_scene.touchdown(body.position)
+			if f.id==selected_id: airport_sound.touch_down()
 		body.set_meta("placed",true)
 		var gear := body.get_node("DisplayGear") as Node3D
-		gear.visible = not (f.status == "taxiing_out" and target.y>30)
+		var retract := f.status == "taxiing_out" and target.y>30
+		gear.scale.y = lerpf(gear.scale.y,.02 if retract else 1.0,1-exp(-delta*2))
+		gear.visible = gear.scale.y>.04
 		if fresh: body.position = target
 		else: body.position = body.position.lerp(target,1-exp(-delta*5))
-		if Vector2(motion.x,motion.z).length()>.2: body.rotation.y = lerp_angle(body.rotation.y,atan2(-motion.x,-motion.z),1-exp(-delta*3))
+		if Vector2(motion.x,motion.z).length()>.2:
+			var heading:=atan2(-motion.x,-motion.z)
+			var pushback:=sim.turnaround.task(f,Turnaround.PUSHBACK_OP)
+			if pushback!=null and pushback.status==TurnaroundTask.RUNNING: heading+=PI
+			body.set_meta("steering",clampf(angle_difference(body.rotation.y,heading),-.45,.45))
+			body.rotation.y = lerp_angle(body.rotation.y,heading,1-exp(-delta*2))
+		body.rotation.x=lerpf(body.rotation.x,clampf(atan2(motion.y,maxf(.1,Vector2(motion.x,motion.z).length())),-.09,.12) if target.y>2 else 0.0,1-exp(-delta*2))
+		var flap_angle:=.3 if f.status in ["approaching","landed","taxiing_in","taxiing_out"] else 0.0
+		for flap in body.get_meta("flaps",[]): flap.rotation.x=lerpf(flap.rotation.x,flap_angle,1-exp(-delta*2))
 		for child in body.get_children():
 			if child is Label3D:
 				child.visible = (labels or f.id == selected_id) and not (camera_mode == "Follow" and f.id == selected_id)
@@ -430,13 +536,25 @@ func _process(delta: float) -> void:
 				child.modulate = Color("ffda8c") if f.id == selected_id else Color.WHITE
 	for gate in bridges:
 		var record: Dictionary = bridges[gate]
-		var occupied: bool = not sim.airport.gates[gate].occupied_by_flight_id.is_empty()
-		record.node.position = record.node.position.lerp(record.home+Vector3(-5 if occupied else 0,0,0),1-exp(-delta))
+		var occupant: String=sim.airport.gates[gate].occupied_by_flight_id
+		var goal: Vector3=record.home
+		var extension:=1.0
+		var angle:=0.0
+		if models.has(occupant):
+			var aircraft: Node3D=models[occupant]
+			var base: Vector3=record.home+Vector3(9,0,0)
+			var door:=aircraft.position+aircraft.basis*Vector3(-2,4,-float(aircraft.get_meta("length",40))*.28)
+			goal=(base+door)*.5
+			extension=base.distance_to(door)/18.0
+			angle=atan2(-(door-base).z,(door-base).x)
+		record.node.position=record.node.position.lerp(goal,1-exp(-delta))
+		record.node.scale.x=lerpf(record.node.scale.x,extension,1-exp(-delta))
+		record.node.rotation.y=lerp_angle(record.node.rotation.y,angle,1-exp(-delta))
 	var target := center
 	if camera_mode in ["Follow","Tower"] and models.has(selected_id) and models[selected_id].visible: target = models[selected_id].position
 	var desired: Vector3
 	match camera_mode:
-		"Tower": desired = center+Vector3(radius*.12,85,radius*.18)
+		"Tower": desired = tower_position if tower_position != Vector3.ZERO else center+Vector3(radius*.12,85,radius*.18)
 		"Follow": desired = target+Vector3(60,24,70)
 		"Top": desired = center+Vector3(0,distance,.1)
 		_: desired = center+Vector3(sin(yaw)*cos(elevation),sin(elevation),cos(yaw)*cos(elevation))*distance
@@ -447,6 +565,7 @@ func _process(delta: float) -> void:
 		if child is Label3D:
 			child.visible = labels
 			child.pixel_size = clampf(camera.global_position.distance_to(child.global_position)*.0008,.03,2.0)
+	detail_scene.update(delta)
 	refresh += delta
 	if refresh>.3:
 		refresh=0
@@ -467,10 +586,7 @@ func _process(delta: float) -> void:
 
 func _command(command: String) -> void:
 	if sim == null: return
-	var result := sim.tower_command(selected_id,command)
-	status.text = result.message
-	if result.ok:
-		radio.text = "TOWER: %s\nPILOT: Roger, %s." % [result.message,sim.airport.flights[selected_id].flight_number]
+	report_command(sim.tower_command(selected_id,command))
 
 func _input_view(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
@@ -478,6 +594,16 @@ func _input_view(event: InputEvent) -> void:
 		if event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP,MOUSE_BUTTON_WHEEL_DOWN]:
 			distance = clampf(distance*(.85 if event.button_index == MOUSE_BUTTON_WHEEL_UP else 1.18),120,18000)
 		if event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			if desk.radar.edit_route:
+				var nearest:=""
+				var separation:=30.0
+				for node in sim.airside.nodes:
+					var location:=_point(node)
+					if camera.is_position_behind(location): continue
+					var pixels:=camera.unproject_position(location).distance_to(event.position)
+					if pixels<separation: nearest=node; separation=pixels
+				if not nearest.is_empty(): desk.radar.node_selected.emit(nearest)
+				return
 			var best := 35.0
 			var id := ""
 			for key in models:

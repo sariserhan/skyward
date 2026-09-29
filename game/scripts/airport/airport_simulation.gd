@@ -304,10 +304,12 @@ func _start_runway() -> void:
 		# FIFO; ties use immutable scenario insertion order.
 		var operation: Dictionary = runway.queue.pop_front()
 		var duration := int(config.landing_ticks if operation.operation == "landing" else config.takeoff_ticks)
+		var spacing := float(TowerOperations.weather(self).spacing)
+		duration = ceili(duration*(1.0+(spacing-1.0)*.4))
 		operation["started_at"] = clock.tick
 		operation["end_tick"] = clock.tick + duration
 		runway.active_operation = operation
-		runway.occupied_until = clock.tick + duration + int(config.separation_ticks)
+		runway.occupied_until = clock.tick + duration + ceili(int(config.separation_ticks)*spacing)
 		runway.busy_ticks += duration
 		runway.movements += 1
 		var flight: AirportFlight = airport.flights[operation.flight_id]
@@ -692,6 +694,7 @@ static func _entity_shape(data: Variant, template: AirportEntity) -> bool:
 	return true
 
 static func _valid_snapshot(data: Dictionary) -> bool:
+	if not TowerOperations.valid_settings(data.scenario): return false
 	if not data.get("seed") is int: return false
 	for key in ["tick", "speed"]:
 		if not data.clock.get(key) is int: return false
@@ -1589,6 +1592,8 @@ func _taxi_route(f: AirportFlight, runway: AirportRunway, direction: String) -> 
 ## length × operation time), then runway id.
 func _choose_runway(f: AirportFlight, operation: String) -> String:
 	if not airside.enabled(): return _runway_ids()[0]
+	var preferred: String = config.get("tower_runways",{}).get(f.id,"")
+	if airport.runways.has(preferred) and airside.runway_serves(airside.runway(preferred),_aircraft_type(f)) and not _taxi_route(f,airport.runways[preferred],"in" if operation=="landing" else "out").is_empty(): return preferred
 	var best := ""
 	var best_cost := 1 << 60
 	var op_ticks := int(config.landing_ticks if operation == "landing" else config.takeoff_ticks) + int(config.separation_ticks)
@@ -1598,6 +1603,8 @@ func _choose_runway(f: AirportFlight, operation: String) -> String:
 		var legs := _taxi_route(f, runway, "in" if operation == "landing" else "out")
 		if legs.is_empty(): continue
 		var cost := airside.free_ticks(legs) + (runway.queue.size() + (0 if runway.active_operation.is_empty() else 1)) * op_ticks
+		var wind := TowerOperations.wind_components(self,id)
+		cost += int(maxf(0,-wind.x)*1000+wind.y*50)
 		if cost < best_cost:
 			best = id
 			best_cost = cost

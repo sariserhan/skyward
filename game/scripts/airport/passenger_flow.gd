@@ -25,7 +25,11 @@ var ready_by_flight: Dictionary = {}
 ## Passenger ids that reached their gate this tick, drained by boarding each tick.
 var gate_arrivals: Array = []
 ## Checked baggage (M7): bags follow check-in and wait at reclaim. Optional.
-var baggage: BaggageSystem
+# Baggage owns a flow reference. Keep this backlink weak so completed careers release.
+var _baggage_ref: WeakRef
+var baggage: BaggageSystem:
+	get: return _baggage_ref.get_ref() if _baggage_ref != null else null
+	set(value): _baggage_ref = weakref(value) if value != null else null
 
 func bind(state: AirportState, event_bus: AirportEvents, settings: Dictionary) -> void:
 	airport = state
