@@ -1,3 +1,5 @@
+import {createAurowall} from './aurowall.mjs';
+const aurowall=createAurowall();
 import {publicPage} from './public-pages.mjs';
 import {createOperations,authorizedMetrics,clientAddress} from './operations.mjs';
 import {configuredFeed} from './combined-feed.mjs';
@@ -65,6 +67,7 @@ export const server = http.createServer(async (req, res) => {
       try {
         if(url.pathname==='/api/trips'){try{return json(res,200,url.searchParams.get('sample')==='1'?await tripResponse(url.searchParams):tripDiscovery(tripQuery(url.searchParams)));}catch(e){return json(res,e.status||503,{error:e.status?e.message:'Trip lookup unavailable.'});}}
         if(url.pathname==='/api/weather-overview')return json(res,200,await localWeather.overview());
+        if(url.pathname==='/api/aurowall'){try{return json(res,200,await aurowall());}catch{return json(res,503,{error:'Music library is temporarily unavailable. Please retry.'});}}
         if(url.pathname==='/api/local-weather'){const coords=['lat','lon'].map(k=>{const v=url.searchParams.get(k);return v!==null&&v.trim()!==''?Number(v):NaN;});try{return json(res,200,await localWeather(...coords));}catch(e){return json(res,e.status||503,{error:e.status?e.message:'Weather unavailable.'});}}
         if(url.pathname==='/api/airport-weather'){try{return json(res,200,await airportWeather(url.searchParams.get('airport')));}catch(e){return json(res,e.status||503,{error:e.status?e.message:'Weather observations are unavailable. Try again later.'});}}
         if (url.pathname === '/api/flight-details') return json(res, 200, airlabsPreview(process.env.SKYWARD_AIRLABS_MODE));

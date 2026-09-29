@@ -8,6 +8,7 @@ export function onAudioMix(fn:()=>void){listeners.add(fn);return()=>{listeners.d
 
 /** Temporary speech focus never changes saved preferences or warning/alarm volume. */
 const speechOwners=new Set<symbol>();
+export const speechFocusActive=()=>speechOwners.size>0;
 export function readAmbienceMix():AudioMix{
  const mix=readAudioMix();if(!speechOwners.size)return mix;
  return {...mix,engine:mix.engine*.45,cabin:mix.cabin*.28,weather:mix.weather*.4};

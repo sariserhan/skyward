@@ -2,6 +2,7 @@
   "dependencies": {
     "@mapbox/vector-tile": "3.0.0",
     "astronomy-engine": "2.1.19",
+    "aws4fetch": "^1.0.20",
     "better-auth": "1.7.6",
     "cesium": "1.145.0",
     "lucide-react": "1.48.0",
