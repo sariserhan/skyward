@@ -1364,7 +1364,7 @@ connection. Taxi time and fuel consumption are included in the flight record.
   navigation lights, landing lights and flaps. Free flight has an optional cold
   start. Startup requires battery, fuel and idle ground throttle. Stopping an
   airborne engine removes thrust and enters the existing glide model.
-- Free-flight weather controls set wind from a compass direction, gust amplitude,
+- When manual weather is selected, free-flight controls set wind direction, gust amplitude,
   turbulence, rain/wet braking and visibility. These are user-selected simulation
   conditions, not fetched real weather. The C172, Citation and 737 have separate
   rotation/control rates, gear drag, spool, braking and steering profiles; physics
@@ -1398,3 +1398,35 @@ Validation covers full takeoff-to-landing flows, a one-hour deterministic physic
 run with varying frame intervals, controller edge/dead-zone behavior, weather,
 manual/assisted taxi, replay input validation and browser save/reload. Physical
 joysticks and all browser/voice combinations still need hardware testing.
+
+### Report-driven weather scenery
+
+The globe (including tower and flight cameras) and simulator share a weather
+layer: irregular rain streaks, drifting snow/ice, cloud layers, reduced visibility
+inside clouds, and optional small lightning bolts for reported thunderstorms.
+Clouds are anchored in geographic space rather than attached to the camera;
+white/grey shading reflects reported conditions and scene daylight. Surface
+precipitation stops above the depicted cloud tops. Reduced-motion mode suppresses
+moving precipitation and lightning. Weather and lightning controls are in the
+compact Weather disclosure (Map tools on the globe).
+
+`/api/local-weather?lat=…&lon=…` selects the nearest report within 150 km and two
+hours from a shared worldwide METAR snapshot. The backend fetches the compressed
+[official aviation-weather cache](https://aviationweather.gov/data/api/)
+at most once per ten minutes, coalesces concurrent requests, bounds downloads,
+and backs off after failures. The frontend checks for movement every 15 seconds;
+it refreshes the same area after ten minutes, aborts requests on view cleanup, and does
+not fetch in hidden tabs. Raw report timestamps remain intact. Missing ocean or
+remote-area observations return unavailable, never assumed clear weather. Old
+retained reports expire after two hours.
+
+Free-flight simulation defaults to reported local weather; uncheck that option
+for manual controls. Training presets stay deterministic. Reported surface wind
+and wet conditions affect the simplified simulator model; they are not measured
+winds aloft. The globe uses weather only for scenery and never alters observed
+aircraft tracks. Historical replays do not display current weather.
+
+METARs report cloud bases (converted from AGL feet to MSL metres), not cloud
+volumes. Cloud thickness, placement, and lightning are illustrative; this is not
+live lightning-location data, weather radar, or a navigation-grade weather model.
+No new paid service or key is needed. Supplier names are not added to the map UI.

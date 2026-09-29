@@ -1,3 +1,4 @@
+import {createLocalWeather} from './local-weather.mjs';
 import http from 'node:http';
 import { gzip } from 'node:zlib';
 import { promisify } from 'node:util';
@@ -22,6 +23,7 @@ const webRoot = resolve(here, '../dist');
 const gameRoot = resolve(here, '../../dist/web');
 const feed = new FeedClient();
 const airportWeather=createAirportWeather();
+const localWeather=createLocalWeather();
 const rates = new Map();
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'application/javascript', '.css': 'text/css', '.txt': 'text/plain; charset=utf-8', '.json': 'application/json', '.geojson': 'application/geo+json', '.png': 'image/png', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.wasm': 'application/wasm', '.gltf': 'model/gltf+json', '.glb': 'model/gltf-binary', '.woff2': 'font/woff2' };
 function json(res, code, value) { res.writeHead(code, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(value)); }
@@ -48,6 +50,7 @@ export const server = http.createServer(async (req, res) => {
       if (rate.count > 60) { res.setHeader('Retry-After', String(Math.max(1, Math.ceil((rate.start + 60000 - Date.now()) / 1000)))); return json(res, 429, { error: 'Please wait a moment before refreshing.' }); }
       if (rates.size > 500) rates.delete(rates.keys().next().value);
       try {
+        if(url.pathname==='/api/local-weather'){const coords=['lat','lon'].map(k=>{const v=url.searchParams.get(k);return v!==null&&v.trim()!==''?Number(v):NaN;});try{return json(res,200,await localWeather(...coords));}catch(e){return json(res,e.status||503,{error:e.status?e.message:'Weather unavailable.'});}}
         if(url.pathname==='/api/airport-weather'){try{return json(res,200,await airportWeather(url.searchParams.get('airport')));}catch(e){return json(res,e.status||503,{error:e.status?e.message:'Weather observations are unavailable. Try again later.'});}}
         if (url.pathname === '/api/flight-details') return json(res, 200, airlabsPreview(process.env.SKYWARD_AIRLABS_MODE));
         if (url.pathname === '/api/status') {const {totalMs,...stats}=feed.stats;return json(res,200,{...stats,pending:feed.pending.size,meanProviderMs:stats.started?Math.round(totalMs/stats.started):0});}
