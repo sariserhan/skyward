@@ -170,6 +170,7 @@ export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now
       }
       if(path==='/api/journeys'&&req.method==='GET') {send(200,{journeys:db.prepare('SELECT body FROM journeys WHERE user_id=? ORDER BY rowid DESC').all(u.id).map(r=>JSON.parse(r.body)),alerts:db.prepare('SELECT id,message,created FROM alerts WHERE user_id=? ORDER BY id DESC LIMIT 50').all(u.id)});return true;}
       if(path==='/api/journeys'&&req.method==='POST') {
+        if(b.remove!==true&&!await entitlement(u))fail(403,'Premium is required to save journeys.');
         const callsign=flightCode(b.callsign),hex=String(b.hex||'').toLowerCase(),date=String(b.date||'');
         if(!/^[a-f0-9]{6}$/.test(hex)||!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Number.isFinite(Date.parse(date))||new Date(date).toISOString().slice(0,10)!==date)fail(400,'Choose a valid flight and date.');
         const k=`${callsign}:${hex}:${date}`;

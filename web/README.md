@@ -375,7 +375,7 @@ A separate bounded motion cache retains up to 32 fixes for 4,000 aircraft, indep
 
 - **Aircraft details / Flight view → Why is this aircraft moving or waiting?** exposes fix age, estimated display behavior, retained fix count, median observation interval, current quality, camera-feed health and long gaps. It distinguishes estimates from missing motion data, stale observations and reduced motion.
 - **Explore tools → Spotter** follows fresh, consistently approaching aircraft within 20 nm of the selected airport. It requires at least three fixes, excludes ground/non-aircraft targets and waits when no candidate qualifies. A 10-second grace period avoids rapid switching between feed polls. Next, reset and stop controls are explicit. Manual aircraft/airport navigation or dragging ends automatic following; open tools pause the queue. These are inferred approaches, not confirmed arrivals or clearances.
-- **Record session / Explore tools → Sessions** starts and stops opt-in capture of camera-area, selected-airport and selected-aircraft observations. Memory limits are one hour, 1,000 aircraft and 100,000 fixes. Stop and save a JSON file before reloading or starting a replacement recording. Files include source/license metadata and the latest received identity for each track. Open/import validates the schema, unique identifiers, coordinates, time ordering and limits; files larger than 20 MiB are rejected. Nothing is uploaded.
+- **Record session · Premium / Explore tools → Sessions** requires Premium and starts and stops opt-in capture of camera-area, selected-airport and selected-aircraft observations. Memory limits are one hour, 1,000 aircraft and 100,000 fixes. Stop and save a JSON file before reloading or starting a replacement recording. Files include source/license metadata and the latest received identity for each track. Open/import validates the schema, unique identifiers, coordinates, time ordering and limits; files larger than 20 MiB are rejected. Nothing is uploaded.
 - Session replay shows recorded aircraft together on a separate globe layer, with play/pause, 1×/10×/60× speed and a keyboard-accessible time slider. It never adds imported fixes to live observations, alerts, density or discovery. Aircraft do not appear before their first fix; intervals over two minutes are not interpolated, and a record disappears after its last fix becomes more than two minutes old. Live traffic continues collecting behind this view. Exit replay or select Live airspace to return.
 - **Explore tools → Density** counts distinct airborne aircraft per 0.1° cell from retained motion fixes in the last 30 minutes, refreshed every 10 seconds. Repeated reports of the same aircraft do not inflate a cell. Up to 2,000 highest-count cells are shown, with no lines drawn across missing observations. The 4,000-aircraft / 32-fix-per-aircraft motion-cache limit still applies. This is a received-observation footprint, not complete global traffic or normalized aircraft-hours.
 - **Flight view → Below the aircraft** uses the existing Natural Earth country polygons and cities. Distance sums retained observed path segments, excluding gaps over two minutes; it is not total flight distance. Local time is explicitly approximate: the nearest IANA timezone reference within the mapped country supplies an Intl timezone. Near timezone boundaries it may differ; water/unmapped areas show UTC. `scripts/prepare-timezones.py` packages the host's public-domain IANA `zone.tab`, recording its version and hash in `public/data/timezone-references.json`. No geocoding/timezone subscription or API is used.
@@ -953,8 +953,8 @@ Celestial selection applies a validated outward camera pose directly, with a pol
 **Account & journeys** now contains Travel, Watchlist, Alerts, Viewing setups,
 Replays, Logbook and Simulator tabs.
 
-- **Free account watchlists:** 30 aircraft, synced on sign-in, window focus and
-  every minute while visible. Star changes save immediately. Guest stars remain
+- **Premium account watchlists:** 30 aircraft, synced on sign-in, window focus and
+  watchlist changes. Star changes save immediately. Free and guest stars remain
   separate; **Import this browser’s watchlist** explicitly copies them into the
   account. Logout restores the guest list, not the previous account’s data.
 - **Travel:** UTC upcoming/past journeys, optional origin/destination airports,
@@ -1049,7 +1049,7 @@ Production account storage is Neon Postgres. Better Auth owns passwords, verifie
 email identities and revocable cookie sessions; Skyward does not maintain a second
 production password/session system. Application tables reference Better Auth's
 user IDs, and every application query uses the authenticated user's ID.
-Free account watches, journeys, alerts, Premium libraries, simulator saves and
+Premium account watches, journeys, alerts, libraries, simulator summaries and
 usage limits are all stored in Postgres when `SKYWARD_ACCOUNTS=neon`.
 
 This is an integration prepared for deployment, **not a connected live deployment**.
@@ -1800,3 +1800,22 @@ Validation: `npm test`, `npm run build`, and `npm run test:weather` (Python
 Playwright required). Weather browser checks include cloud volume rendering from
 above, grey storm shading parameters, wind movement, reduced-motion pause, and
 cockpit rendering without engine errors.
+
+
+### Premium recording and account writes
+
+New session recordings and flight-moment captures require the server-reported
+Premium entitlement. Recording rechecks on account changes, focus, and every
+minute while active; losing access stops capture but preserves export. Existing
+local recordings can still be replayed, exported and removed without Premium.
+
+Both SQLite test accounts and Neon account routes reject free-user watchlist
+writes and saved journey creation/updates. Other account libraries and background
+monitoring already require Premium. Free watch stars remain on the device; the
+account screen still allows reading/removing existing account watches and journeys.
+Authentication, subscription management and the explicit local development Premium
+override remain available. Recordings remain local: upgrading does not upload
+full recordings or enlarge the account storage limits.
+
+Run the entitlement browser flow with `SKYWARD_QA_PYTHON=/path/to/python node
+scripts/browser-tests.mjs --recording-premium` from `web/` after building.

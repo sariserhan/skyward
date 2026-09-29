@@ -45,12 +45,12 @@ test('Accounts hash passwords, rotate/revoke sessions and reject cross-origin wr
 test('Free and forged-paid requests cannot trigger premium data, checkout returns do not grant access',async()=>{
   const f=await fixture();try{
     assert.equal((await f.call('/api/premium/details',{key:journeyKey},'premium=true')).code,401);
-    const cookie=await f.register();await f.call('/api/journeys',journey,cookie);
+    const cookie=await f.register();assert.equal((await f.call('/api/journeys',journey,cookie)).code,403);
     assert.equal((await f.call('/api/premium/details',{key:journeyKey,paid:true},cookie)).code,403);assert.equal(f.requests.length,0);
     const checkout=await f.call('/api/billing/checkout',{},cookie);assert.equal(checkout.code,200);
     assert.equal((await f.call('/api/account?account=return',undefined,cookie)).body.user.premium,false);
     assert.equal((await f.call('/api/premium/details',{key:journeyKey},cookie)).code,403);
-    f.paid(true);const details=await f.call('/api/premium/details',{key:journeyKey},cookie);assert.equal(details.code,200);assert.equal(details.body.mode,'demo');assert.equal(details.body.flight.callsign,'DEMO101');assert.equal(details.body.usage.requests,1);
+    f.paid(true);assert.equal((await f.call('/api/journeys',journey,cookie)).code,200);const details=await f.call('/api/premium/details',{key:journeyKey},cookie);assert.equal(details.code,200);assert.equal(details.body.mode,'demo');assert.equal(details.body.flight.callsign,'DEMO101');assert.equal(details.body.usage.requests,1);
     f.paid(false);assert.equal((await f.call('/api/premium/details',{key:journeyKey},cookie)).code,403);
     f.down(true);assert.equal((await f.call('/api/premium/details',{key:journeyKey},cookie)).code,503);
     assert.ok(f.requests.every(r=>!r.url.includes('airlabs')));
@@ -85,7 +85,7 @@ test('Budget stops requests before the configured cost ceiling',async()=>{
 });
 test('Saved journeys are isolated by account and alerts ignore wrong flights, stale checks and simulations',async()=>{
   const f=await fixture();try{
-    const a=await f.register(),b=await f.register('two@example.test');await f.call('/api/journeys',journey,a);
+    const a=await f.register(),b=await f.register('two@example.test');await f.call('/api/billing/checkout',{},a);f.paid(true);await f.call('/api/journeys',journey,a);
     assert.equal((await f.call('/api/journeys',undefined,b)).body.journeys.length,0);
     const user=f.membership.db.prepare('SELECT id FROM users WHERE email=?').get('one@example.test');
     const first={mode:'live',status:'MATCHED_RECENT_AIRCRAFT',fetchedAt:NOW,flight:{callsign:'AAL6',hex:'aab812',status:'scheduled',departure:{scheduledAt:Date.parse('2026-09-28T10:00:00Z'),gate:'A2'},arrival:{estimatedAt:NOW,gate:'B1'}}};
@@ -125,11 +125,14 @@ test('Trials, unpaid invoices, wrong prices, expired periods and live subscripti
   }
 });
 
-test('Free watchlists sync across sessions, isolate accounts, and cannot store forged Premium data',async()=>{
+test('Watchlist sync requires Premium, isolates accounts, and permits reading and removal after downgrade',async()=>{
  const f=await fixture();try{
   const a=await f.register(),b=await f.register('second@example.test');
   const watch={hex:'aab812',callsign:'AAL6',registration:'N123',aircraftType:'B738'};
+  assert.equal((await f.call('/api/account/library',{kind:'watchlist',key:watch.hex,value:watch,premium:true},a)).code,403);
+  await f.call('/api/billing/checkout',{},a);f.paid(true);
   assert.equal((await f.call('/api/account/library',{kind:'watchlist',key:watch.hex,value:watch},a)).code,200);
+  assert.equal((await f.call('/api/account/library',{kind:'watchlist',key:'000001',value:watch},a)).code,400);f.paid(false);
   const login=await f.call('/api/account/login',{email:'one@example.test',password:'correct horse battery staple'});
   assert.equal((await f.call('/api/account/library?kind=watchlist',undefined,login.cookie)).body.items[0].value.callsign,'AAL6');
   assert.equal((await f.call('/api/account/library?kind=watchlist',undefined,b)).body.items.length,0);
@@ -139,8 +142,9 @@ test('Free watchlists sync across sessions, isolate accounts, and cannot store f
   }
   assert.equal((await f.call('/api/account/library?kind=watchlist')).code,401);
   assert.equal((await f.call('/api/account/library?kind=__proto__',undefined,a)).code,400);
-  assert.equal((await f.call('/api/account/library',{kind:'watchlist',key:'000001',value:watch},a)).code,400);
-  assert.equal(f.requests.length,0);
+  assert.equal((await f.call('/api/account/library',{kind:'watchlist',key:watch.hex,value:watch},a)).code,403);
+  assert.equal((await f.call('/api/account/library',{kind:'watchlist',key:watch.hex,remove:true},a)).code,200);
+  assert.equal((await f.call('/api/account/library?kind=watchlist',undefined,a)).body.items.length,0);
  }finally{await f.close();}
 });
 test('Premium libraries persist, enforce optimistic edits and validate viewing settings and logbooks',async()=>{
@@ -177,7 +181,7 @@ test('New recordings stay local; storage caps prevent unbounded libraries',async
 });
 test('Dashboard distinguishes sample details from verified statuses; alerts read state stays private',async()=>{
  const f=await fixture();try{
-  const a=await f.register(),b=await f.register('other@example.test');await f.call('/api/journeys',{...journey,from:'IAD',to:'LHR'},a);await f.call('/api/billing/checkout',{},a);f.paid(true);
+  const a=await f.register(),b=await f.register('other@example.test');await f.call('/api/billing/checkout',{},a);f.paid(true);await f.call('/api/journeys',{...journey,from:'IAD',to:'LHR'},a);
   await f.call('/api/premium/details',{key:journeyKey},a);
   const dashboard=(await f.call('/api/account/dashboard',undefined,a)).body;
   assert.equal(dashboard.journeys[0].from,'IAD');assert.equal(dashboard.journeys[0].details.mode,'demo');assert.equal(dashboard.alerts.length,0);

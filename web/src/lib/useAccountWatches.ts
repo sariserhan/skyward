@@ -7,7 +7,7 @@ export function useAccountWatches(){
  const [watches,setWatches]=useState<WatchItem[]>(localWatches),[error,setError]=useState(''),account=useRef<string|null>(null),rows=useRef(watches),serial=useRef(0),busy=useRef(false);rows.current=watches;
  useEffect(()=>{
   let alive=true;const refresh=async(check=false)=>{if(document.hidden||busy.current&&!check)return;const ticket=++serial.current;
-   try{if(check){const a=await accountRequest<Account>('/api/account');if(!alive||ticket!==serial.current)return;const next=a.user?.email??null;if(next!==account.current){account.current=next;setWatches(next?[]:localWatches());}}
+   try{if(check){const a=await accountRequest<Account>('/api/account');if(!alive||ticket!==serial.current)return;const next=a.user?.premium?a.user.email:null;if(next!==account.current){account.current=next;setWatches(next?[]:localWatches());}}
     if(!account.current){if(alive)setWatches(localWatches());return;}
     const result=await listAccountItems<WatchItem>('watchlist');if(alive&&ticket===serial.current){setWatches(result.items.map(i=>i.value));setError('');}
    }catch(e){if(alive)setError(e instanceof Error?e.message:'Watchlist sync unavailable.');}

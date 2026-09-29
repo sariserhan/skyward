@@ -5,6 +5,8 @@ const features=[
  ['Schedule and arrival estimates','Basic received route hints','On-demand lookup · when available'],
  ['Gate and terminal','Not included','When the flight detail response includes them'],
  ['Flight status and change checks','Local observation alerts','Verified detail checks within plan limits'],
+ ['Session recording and flight-moment capture','Replay and export existing recordings','Create new recordings'],
+ ['Watchlists and saved journeys','Device-only watches','Account saving and cross-device sync'],
  ['Simulator and account extras','Preview / development access','With active Premium access'],
  ['Passenger names / actual onboard counts','Unavailable','Unavailable'],
 ];

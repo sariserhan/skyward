@@ -43,25 +43,28 @@ test('Better Auth + Postgres: verification, sessions, recovery, owned libraries 
  assert.equal((await request('/api/account',undefined,cookie)).data.user.email,email);
  const watch={kind:'watchlist',key:'abcdef',value:{hex:'abcdef',callsign:'THY111'}};
  assert.equal((await request('/api/account/library',watch,cookie,'https://evil.example')).status,403);
+ assert.equal((await request('/api/account/library',watch,cookie)).status,403);
+ assert.equal((await request('/api/account/library',{kind:'views',key:'one',revision:0,value:{settings:{}}},cookie)).status,403);
+ assert.equal((await membership.simulatorAccess({headers:{cookie}})).status,403);
+ await pool.query('INSERT INTO skyward_profiles VALUES($1,$2)',[ids[0],`cus_${randomUUID().replaceAll('-','')}`]);
  assert.equal((await request('/api/account/library',watch,cookie)).status,200);
  assert.equal((await request('/api/account/library?kind=watchlist',undefined,cookie)).data.items.length,1);
  assert.equal((await request('/api/account/library?kind=watchlist')).status,401);
- assert.equal((await request('/api/account/library',{kind:'views',key:'one',revision:0,value:{settings:{}}},cookie)).status,403);
- assert.equal((await membership.simulatorAccess({headers:{cookie}})).status,403);
  // A second verified user cannot read or overwrite the first user's saved items.
  const email2=`neon-${randomUUID()}@example.test`;
  r=await request('/api/auth/sign-up/email',{name:'Other Pilot',email:email2,password});assert.equal(r.status,200);ids.push(r.data.user.id);
  await new Promise(r=>setTimeout(r,20));const v2=new URL(outbox.find(x=>x.to===email2).text.match(/https?:\/\/\S+/)[0]);await request(v2.pathname+v2.search);
  r=await request('/api/auth/sign-in/email',{email:email2,password});assert.equal(r.status,200);const cookie2=r.cookie;
  assert.equal((await request('/api/account/library?kind=watchlist&key=abcdef',undefined,cookie2)).status,404);
+ assert.equal((await request('/api/account/library',watch,cookie2)).status,403);
+ await pool.query('INSERT INTO skyward_profiles VALUES($1,$2)',[ids[1],`cus_${randomUUID().replaceAll('-','')}`]);
  assert.equal((await request('/api/account/library',watch,cookie2)).status,200);
  assert.equal((await request('/api/account/library?kind=watchlist',undefined,cookie)).data.items.length,1);
- // Concurrent inserts must not bypass the free watchlist count limit.
+ // Concurrent inserts must not bypass the Premium watchlist count limit.
  const candidates=await Promise.all(Array.from({length:31},(_,i)=>{const hex=i.toString(16).padStart(6,'0');return request('/api/account/library',{kind:'watchlist',key:hex,value:{hex}},cookie2);}));
  assert.equal(candidates.filter(r=>r.status===200).length,29);assert.equal(candidates.filter(r=>r.status===429).length,2);
  assert.equal((await request('/api/account/library?kind=watchlist',undefined,cookie2)).data.items.length,30);
  // Only a server-side test subscription makes Premium libraries and simulation available.
- await pool.query('INSERT INTO skyward_profiles VALUES($1,$2)',[ids[0],`cus_${randomUUID().replaceAll('-','')}`]);
  const view={kind:'views',key:'one',revision:0,value:{name:'Tower',settings:{}}};
  const parallel=await Promise.all([request('/api/account/library',view,cookie),request('/api/account/library',view,cookie)]);assert.deepEqual(parallel.map(r=>r.status).sort(),[200,409]);
  assert.equal((await membership.simulatorAccess({headers:{cookie}})).allowed,true);

@@ -71,7 +71,7 @@ export function createAccountLibrary(db,{now,entitlement}){
   }
   if(path!=='/api/account/library')return false;
   const kind=method==='GET'?url.searchParams.get('kind'):b.kind,limit=Object.hasOwn(LIBRARY_LIMITS,kind)?LIBRARY_LIMITS[kind]:null;if(!limit)fail(400,'Unknown library.');
-  if(!limit.free&&!await entitlement(u))fail(403,'Premium is required for this library.');
+  if((!limit.free||(method==='POST'&&b.remove!==true))&&!await entitlement(u))fail(403,'Premium is required to save and sync account data.');
   if(method==='GET'){
    const key=url.searchParams.get('key');
    if(key){const row=get('SELECT key,body,revision,updated FROM account_library WHERE user_id=? AND kind=? AND key=?',u.id,kind,key);if(!row)fail(404,'Saved item not found.');send(200,{...row,value:JSON.parse(row.body),body:undefined});}
