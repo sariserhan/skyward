@@ -99,3 +99,20 @@ test('a retained landing cannot override a conflicting position or destination',
   assert.equal(motion.sample(updated,[],120000,false,mismatch==='destination'?{...route,airports:[route.airports[0],{iata:'OTHER',lat:2,lon:2}]}:route,airport).landingPhase,undefined);
  }
 });
+
+test('multi-stop route can land at its aligned intermediate stop and deploy approach gear',async()=>{
+ const {AircraftAnimation}=await import('../src/lib/aircraftAnimation.ts');
+ const multi={...route,status:'UNVERIFIED',airports:[route.airports[0],route.airports[1],{iata:'CCC',icao:'CCCC',lat:3,lon:3}]};
+ const original=structuredClone(multi),motion=new LiveMotion(),animation=new AircraftAnimation(),body={};let previous,phases=new Set();
+ for(let seconds=0;seconds<=600;seconds++){
+  const frame=motion.sample(a,[],a.observedAt+seconds*1000,false,multi,airport);assert.ok(frame.landingPhase);phases.add(frame.landingPhase);
+  assert.equal(animation.sample(body,frame,a.observedAt+seconds*1000).gear,1);
+  assert.ok(frame.lon<=.025*.85+1e-8,'Never fly beyond the runway');
+  if(previous)assert.ok(trackDistance(previous,frame)<.05);previous=frame;
+ }
+ assert.deepEqual([...phases],['approach','rollout','stopped']);assert.equal(previous.groundSpeed,0);assert.deepEqual(multi,original);
+ for(const patch of [{heading:115},{altitude:5000},{verticalRate:null},{verticalRate:0},{verticalRate:1500},{callsign:'OTHER'}])assert.equal(predictedLanding({...a,...patch},160000,multi,airport),null,JSON.stringify(patch));
+ assert.equal(predictedLanding(a,160000,{...multi,status:'POSITION_MISMATCH'},airport),null);
+ assert.equal(predictedLanding(a,160000,multi,{...airport,id:'UNLISTED'}),null);
+ const fresh={...a,ground:true,groundSpeed:15,heading:180,observedAt:701000},observed=motion.sample(fresh,[],701000,false,multi,airport);assert.equal(observed.ground,true);assert.equal(observed.landingPhase,undefined);assert.equal(observed.estimated,false);assert.equal(observed.time,701000);
+});

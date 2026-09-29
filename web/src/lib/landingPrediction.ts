@@ -1,7 +1,7 @@
+import {landingRouteMode} from './landingRoute.ts';
 import {planTaxi,taxiFrame} from './taxiRoute.ts';
 import type {Aircraft,AirportGeometry,FlightRoute} from '../types.ts';
 import {bearing} from './flightPresentation.ts';
-import {trackDistance} from './positionQuality.ts';
 const radians=Math.PI/180;
 const wrap=(n:number)=>((n+540)%360+360)%360-180;
 const clamp=(v:number,a:number,b:number)=>Math.max(a,Math.min(b,v));
@@ -11,10 +11,8 @@ export type LandingPhase='approach'|'rollout'|'stopped'|'taxi'|'parked';
 /** A presentation trajectory only. Never persist this as an aircraft observation. */
 export function predictedLanding(a:Aircraft,now:number,route:FlightRoute|null|undefined,airport:AirportGeometry|null|undefined){
  if(!airport||!Number.isFinite(airport.elevationFt)||a.ground||a.positionWarning||a.targetKind!=='aircraft')return null;
- // With no route, a nearby tower can infer a final approach only from strict runway alignment
- // and a measured descent. An explicit unrelated/unverified route must never be overridden.
- const inferred=!route||(route.status==='NOT_FOUND'&&route.callsign===a.callsign&&route.airports.length===0);
- if(route&&!inferred){if(route.status!=='PLAUSIBLE'||route.callsign!==a.callsign||route.airports.length!==2)return null;const arrival=route.airports[1];if(trackDistance(airport,arrival)>3||![arrival.iata,arrival.icao].includes(airport.id))return null;}
+ const mode=landingRouteMode(a.callsign,route,airport);if(!mode)return null;
+ const inferred=mode==='inferred';
  if(![a.lat,a.lon,a.altitude,a.observedAt,a.heading,a.groundSpeed,now].every(v=>typeof v==='number'&&Number.isFinite(v)))return null;
  const age=(now-a.observedAt!)/1000,rawAgl=a.altitude!-airport.elevationFt!,agl=Math.max(0,rawAgl);
  if(age<0||rawAgl< -200||agl>6000||a.groundSpeed!<60||a.groundSpeed!>260||(a.verticalRate!==null&&a.verticalRate>150))return null;

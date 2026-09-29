@@ -54,3 +54,5 @@ Weather rendering: `npm run test:weather` checks report-driven globe clouds, cha
 Globe clouds illustrate recent nearby station observations, not satellite imagery or coverage over unreported oceans. Cloud thickness, shapes and turbulence are visual approximations. Weather motion does not change live positions, tracks or reported instrument readings; it is suppressed on the ground and with reduced motion, and can be disabled in Weather settings.
 
 Cockpit recovery: `npm run test:cockpit` verifies cockpit opening with the former deferred-module URL blocked, then injects an audio startup effect failure to check that only the cockpit recovers. It exercises retry, return to side view, and the mobile recovery layout.
+
+Multi-stop arrival regression: `SKYWARD_LANDING_MULTISTOP=1 npm run test:landing` uses an illustrative A319 approach at IAD with the ATL → IAD → CLE route returned for UAL2131. It checks rendered landing gear, runway containment, mapped taxi, and cockpit handoff; the approach positions are test fixtures, not a recorded flight.

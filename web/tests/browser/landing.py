@@ -2,14 +2,17 @@
 Uses the bundled IAD geometry and local fixtures; no live aviation API required.
 """
 import time
+import os
 import urllib.parse
 import regression as f
 from playwright.sync_api import expect
 
 
 def run(page):
+    multi = os.environ.get('SKYWARD_LANDING_MULTISTOP') == '1'
+    callsign = 'UAL2131' if multi else 'THY111'
     stamp = int(time.time() * 1000)
-    base = f.rows()[0]
+    base = {**f.rows()[0], 'callsign': callsign, 'aircraftType': 'A319' if multi else 'B738'}
     f.rows = lambda: [{**base, 'observedAt': stamp, 'lat': 38.944,
                       'lon': -77.4597, 'altitude': 430, 'groundSpeed': 140,
                       'heading': .65, 'verticalRate': -200}]
@@ -23,20 +26,21 @@ def run(page):
             route.fulfill(json={'enabled': False, 'billingReady': False,
                                 'mode': 'test', 'user': None})
         elif path == '/api/route':
-            route.fulfill(json={'callsign': 'THY111', 'source': 'Fixture',
+            route.fulfill(json={'callsign': callsign, 'source': 'Fixture',
                                 'sourceUrl': 'https://example.invalid',
-                                'fetchedAt': stamp, 'status': 'PLAUSIBLE',
-                                'airports': [
+                                'fetchedAt': stamp, 'status': 'UNVERIFIED' if multi else 'PLAUSIBLE',
+                                'airports': ([{'icao':'KATL','iata':'ATL','lat':33.6367,'lon':-84.428101},{'icao':'KIAD','iata':'IAD','lat':38.9445,'lon':-77.455803},{'icao':'KCLE','iata':'CLE','lat':41.411701,'lon':-81.8498}] if multi else [
                                     {'icao': 'EGLL', 'iata': 'LHR', 'lat': 51.47, 'lon': -.45},
-                                    {'icao': 'KIAD', 'iata': 'IAD', 'lat': 38.947, 'lon': -77.46}]})
+                                    {'icao': 'KIAD', 'iata': 'IAD', 'lat': 38.947, 'lon': -77.46}])})
         else:
             f.mock(route)
 
     page.route('**/api/**', mock)
     page.goto(f.URL + '/#airport=IAD', wait_until='domcontentloaded')
-    page.get_by_role('button', name='View THY111', exact=True).click()
+    page.get_by_role('button', name=f'View {callsign}', exact=True).click()
     page.get_by_role('button', name='✈ Flight view', exact=True).click()
-    expect(page.locator('.map-flight-route')).to_have_text('LHR → IAD')
+    if not multi:
+        expect(page.locator('.map-flight-route')).to_have_text('LHR → IAD')
     assert page.evaluate('__viewer.scene.screenSpaceCameraController.enableCollisionDetection') is False
     page.wait_for_function("__viewer.entities.values.filter(e=>e.id.startsWith('landing-gear-')&&e.show).length>=6")
     # Freeze only the fixture clock to verify actual rendered wheel geometry,
@@ -49,7 +53,7 @@ def run(page):
         screen=C.SceneTransforms.worldToWindowCoordinates(v.scene,p);
         return screen&&v.scene.pick(screen,7,7)?.id?.id?.startsWith('landing-gear-');});})()""")
     page.evaluate('Date.now=window.__movingClock')
-    page.screenshot(path=str(f.ARTIFACTS / 'landing-gear.jpg'), type='jpeg', quality=75)
+    page.screenshot(path=str(f.ARTIFACTS / ('multistop-landing-gear.jpg' if multi else 'landing-gear.jpg')), type='jpeg', quality=75)
     flight = page.get_by_role('region', name='Passenger flight view')
     assert 'Predicted landing' in flight.inner_text()
     uri = page.evaluate("__viewer.entities.getById('aircraft-abcdef').model.uri.getValue(__viewer.clock.currentTime)")
@@ -62,7 +66,7 @@ def run(page):
           p=C.Cartographic.fromCartesian(e.position.getValue(v.clock.currentTime));
           return {lon:C.Math.toDegrees(p.longitude),lat:C.Math.toDegrees(p.latitude),height:p.height};})()""")
         assert pose['lat'] < 38.9707, pose
-        assert 2 < pose['height'] < 4.5, pose
+        assert (1 < pose['height'] < 2 if multi else 2 < pose['height'] < 4.5), pose
     assert 'taxiing toward' in flight.inner_text(), flight.inner_text()
     assert not errors, errors
     assert not page.locator('.recovery-screen,.cesium-widget-errorPanel').count()
@@ -79,7 +83,7 @@ def run(page):
     page.get_by_role('button', name='Close cockpit', exact=True).click()
     assert page.evaluate('__viewer.scene.screenSpaceCameraController.enableCollisionDetection') is True
     assert not errors, errors
-    print('PASS late runway fix lands, sourced gear stays visible, and mapped taxi follows touchdown', flush=True)
+    print(f'PASS {callsign}: late runway fix lands, sourced gear stays visible, and mapped taxi follows touchdown', flush=True)
 
 
 if __name__ == '__main__':
