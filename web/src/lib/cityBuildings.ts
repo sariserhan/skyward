@@ -1,8 +1,8 @@
 export type CityTile={x:number;y:number;z:number;key:string};
 export type CityBuilding={rings:number[][][];height:number;base:number};
-export function cityTiles(lon:number,lat:number,quality:string):CityTile[]{
+export function cityTiles(lon:number,lat:number,quality:string,z=14):CityTile[]{
  if(!Number.isFinite(lon)||!Number.isFinite(lat)||Math.abs(lat)>85)return [];
- const z=14,n=2**z,x=((lon+180)/360*n%n+n)%n,y=(1-Math.asinh(Math.tan(lat*Math.PI/180))/Math.PI)/2*n;
+ const n=2**z,x=((lon+180)/360*n%n+n)%n,y=(1-Math.asinh(Math.tan(lat*Math.PI/180))/Math.PI)/2*n;
  const candidates:CityTile[]=[];
  for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++){const tx=(Math.floor(x)+dx+n)%n,ty=Math.floor(y)+dy;if(ty>=0&&ty<n)candidates.push({x:tx,y:ty,z,key:`${z}/${tx}/${ty}`});}
  return candidates.sort((a,b)=>{const d=(t:CityTile)=>Math.min(Math.abs(t.x+.5-x),n-Math.abs(t.x+.5-x))**2+(t.y+.5-y)**2;return d(a)-d(b);}).slice(0,quality==='low'?4:9);

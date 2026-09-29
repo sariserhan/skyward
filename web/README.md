@@ -1466,3 +1466,20 @@ actual swept sectors; unswept glass remains wet. Instruments stay unobscured.
 Simulator/practice pause freezes the effect; reduced motion parks the blades
 and clears the view without animated sweeps. This is a visual effect, not
 an aircraft-specific windshield or weather physics model.
+
+## Moving water
+
+**Map tools → Layers → Water waves · 3D** enables nearby ocean, lake and
+river surface animation (on by default). The same effect runs in the flight
+simulator and pauses with the game. Free OpenFreeMap water polygons preserve
+shorelines and island holes; small streams without polygon coverage remain
+unchanged. Water uses a world-anchored procedural ripple/specular shader, not
+measured waves, tides, current direction, wakes or a fluid simulation. Inland
+water has gentler ripples; satellite colors remain visible through the overlay.
+
+Only nearby zoom-12/13 tiles are decoded, with 4/9 tiles for Low/other quality,
+two requests in flight, 20 cached tiles, and one-minute retries. The effect
+fades outside the local patch and stops above 25 km above the ground. Low
+quality animates at up to 10 fps, other modes at up to 20 fps. Reduced motion
+keeps the surface still. Unsupported graphics or unavailable tiles retain the
+base map; no paid service is called.
