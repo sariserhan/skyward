@@ -314,3 +314,5 @@ resolution, and **Performance** shows the current scene scale. See
 [visual realism](docs/visual-realism.md) for the approximations and current limits.
 
 Flight voices now lower engine, cabin and weather ambience while speaking, then restore your saved levels. In **Sound mix**, choose **Balanced**, **Quiet cabin**, or **Weather immersion**, or tune each slider. Warning tones are not ducked. **Flight voices → Recent dialogue** keeps the last eight messages for the current flight in memory; clear it at any time. A captain follow-up plays after sustained calmer conditions following a turbulence announcement, provided nearby weather and altitude remain available. These are illustrative simulation announcements, not live crew communications.
+
+The floating flight-view panel can be moved using **Move panel** (mouse or touch). Use **−** to minimize it and **＋** to restore; the flight keeps running. **↺** resets its position. With the drag handle focused, arrow keys move it (Shift moves faster), and Home resets it. Its position is remembered for the current page session and kept within the map when the window resizes.

@@ -353,3 +353,12 @@ body>.cesium-credit-lightbox-overlay .cesium-credit-lightbox-close{min-width:36p
 @media(max-width:759px){.cockpit-mode:has(.flight-voices){max-height:calc(50% - 94px)}}
 
 .voice-history ol{max-height:180px;overflow:auto;overscroll-behavior:contain;padding-left:22px}.voice-history li{margin:8px 0;line-height:1.5}.audio-mixer .flight-buttons{display:flex;gap:6px;flex-wrap:wrap}.audio-mixer small{display:block;line-height:1.5;color:#a8c2d0}
+
+.floating-panel-controls{display:flex;align-items:center;gap:5px;position:sticky;top:-16px;z-index:3;background:#102330;padding:5px 0;margin-bottom:8px}
+.floating-panel-controls .panel-drag-handle{display:flex;align-items:center;gap:6px;flex:1;min-width:0;cursor:grab;touch-action:none;user-select:none;text-align:left}
+.panel-drag-handle:active{cursor:grabbing}.panel-drag-handle span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.flight-experience.panel-minimized{height:auto!important;min-height:0!important;overflow:hidden;padding:8px}
+.flight-experience.panel-minimized>:not(.floating-panel-controls){display:none!important}
+.flight-experience.panel-minimized .floating-panel-controls{margin:0;padding:0;position:static}
+@media(max-width:759px){.floating-panel-controls{top:-10px}.floating-panel-controls button{min-height:36px}}
+.flight-experience:has(.floating-panel-controls){z-index:18}
