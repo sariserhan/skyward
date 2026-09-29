@@ -1,3 +1,4 @@
+import {airportBuildingHeight} from '../lib/airportBuildings';
 import {WeatherLayer} from './WeatherLayer';
 import {aircraftModelAttitude} from '../lib/aircraftAttitude';
 import {loadGeography} from '../lib/geographyLoader';
@@ -377,13 +378,13 @@ export function Globe(p: Props) {
     for (const airport of airports) {
       const allFacilities = airportFacilities(airport);
       allFacilities.forEach((f,i)=>facilities.current.set(`facility-${airport.id}-${i}`,f));
-      if(terrainActive){added.push(...addTerrainAirport(v,airport,allFacilities,p.camera.type==='tower'?{...p.preferences,structures:true}:p.preferences));continue;}
+      if(terrainActive){added.push(...addTerrainAirport(v,airport,allFacilities,(p.camera.type==='tower'||flightOpen)?{...p.preferences,structures:true}:p.preferences));continue;}
       let buildingIndex = airport.runways.length;
       for (const surface of airport.surfaces) {
         const coords = surface.points.flat();
         if (coords.length < 6) continue;
         if(surface.kind === 'apron' && satellite)continue;
-        meshes.push(new C.GeometryInstance({ id: surface.kind === 'apron' ? `airport-${airport.id}` : `facility-${airport.id}-${buildingIndex++}`, geometry: new C.PolygonGeometry({ polygonHierarchy: new C.PolygonHierarchy(C.Cartesian3.fromDegreesArray(coords)), height: surface.kind === 'apron' ? .3 : 1, extrudedHeight: surface.kind === 'apron' ? undefined : surface.height, vertexFormat: C.PerInstanceColorAppearance.VERTEX_FORMAT }), attributes: colorAttribute(surface.kind === 'apron' ? '#243d49' : surface.kind === 'terminal' ? (satellite ? '#b4b7b1' : '#799da5') : (satellite ? '#8d9699' : '#455e6b')) }));
+        meshes.push(new C.GeometryInstance({ id: surface.kind === 'apron' ? `airport-${airport.id}` : `facility-${airport.id}-${buildingIndex++}`, geometry: new C.PolygonGeometry({ polygonHierarchy: new C.PolygonHierarchy(C.Cartesian3.fromDegreesArray(coords)), height: surface.kind === 'apron' ? .3 : 1, extrudedHeight: airportBuildingHeight(surface), vertexFormat: C.PerInstanceColorAppearance.VERTEX_FORMAT }), attributes: colorAttribute(surface.kind === 'apron' ? '#243d49' : surface.kind === 'terminal' ? (satellite ? '#b4b7b1' : '#799da5') : (satellite ? '#8d9699' : '#455e6b')) }));
       }
       for (const path of airport.paths) if (path.points.length >= 2) lines.push(new C.GeometryInstance({ geometry: new C.PolylineGeometry({ positions: C.Cartesian3.fromDegreesArrayHeights(path.points.flatMap(pt => [...pt, 1])), width: satellite ? 1 : path.kind === 'parking_position' ? 1 : 3, vertexFormat: C.PolylineColorAppearance.VERTEX_FORMAT }), attributes: colorAttribute(path.kind === 'parking_position' ? '#aa9b62' : '#607478') }));
       for (const [runwayIndex, r] of airport.runways.entries()) {
@@ -396,11 +397,11 @@ export function Globe(p: Props) {
     }
     // This small, fixed airport snapshot is built synchronously so airport details
     // do not wait behind worldwide polygon jobs in Cesium's shared worker pool.
-    const surfaces = v.scene.primitives.add(new C.Primitive({ show:p.preferences.structures||p.camera.type==='tower', geometryInstances: meshes, appearance: new C.PerInstanceColorAppearance({ flat: false, closed: true, translucent: false }), asynchronous: false }));
-    const taxiways = v.scene.primitives.add(new C.Primitive({ show:p.preferences.structures||p.camera.type==='tower', geometryInstances: lines, appearance: new C.PolylineColorAppearance({ translucent: false }), asynchronous: false }));
+    const surfaces = v.scene.primitives.add(new C.Primitive({ show:p.preferences.structures||p.camera.type==='tower'||flightOpen, geometryInstances: meshes, appearance: new C.PerInstanceColorAppearance({ flat: false, closed: true, translucent: false }), asynchronous: false }));
+    const taxiways = v.scene.primitives.add(new C.Primitive({ show:p.preferences.structures||p.camera.type==='tower'||flightOpen, geometryInstances: lines, appearance: new C.PolylineColorAppearance({ translucent: false }), asynchronous: false }));
     if(!terrainActive)added.forEach(e=>{e.show=p.preferences.labels;});
     v.scene.requestRender(); return () => { if (!v.isDestroyed()) { for (const e of added) v.entities.remove(e); v.scene.primitives.remove(surfaces); v.scene.primitives.remove(taxiways); } };
-  }, [p.geometry,p.arrivalGeometry, ready, satellite, p.preferences.structures, p.preferences.labels,p.preferences.largeLabels,terrainActive,p.camera.type]);
+  }, [p.geometry,p.arrivalGeometry, ready, satellite, p.preferences.structures, p.preferences.labels,p.preferences.largeLabels,terrainActive,p.camera.type,flightOpen]);
   useEffect(() => {
     const v = viewer.current; if (!v || !ready) return;
     const C = window.Cesium;
@@ -470,7 +471,7 @@ export function Globe(p: Props) {
     }
     added.push(v.entities.add({id:'selected-facility-marker',position:C.Cartesian3.fromDegrees(f.lon,f.lat,30),point:{heightReference:terrainActive?C.HeightReference.RELATIVE_TO_GROUND:C.HeightReference.NONE,pixelSize:12,color:C.Color.fromCssColorString('#8fdfc8'),outlineColor:C.Color.WHITE,outlineWidth:2,disableDepthTestDistance:Infinity},label:{heightReference:terrainActive?C.HeightReference.RELATIVE_TO_GROUND:C.HeightReference.NONE,text:f.label,font:p.preferences.largeLabels?'600 18px sans-serif':'600 14px sans-serif',showBackground:true,backgroundColor:C.Color.fromCssColorString('#102b36'),pixelOffset:new C.Cartesian2(0,-30),disableDepthTestDistance:Infinity}}));
     v.scene.requestRender();return()=>{if(!v.isDestroyed())added.forEach(e=>v.entities.remove(e));};
-  },[ready,p.camera,p.preferences.largeLabels,terrainActive,p.camera.type]);
+  },[ready,p.camera,p.preferences.largeLabels,terrainActive,p.camera.type,flightOpen]);
   useEffect(()=>{
     const v=viewer.current;if(!v||!ready)return;const C=window.Cesium;const added:Cesium.Entity[]=[];
     if(flightOpen||p.playback)return;
@@ -592,7 +593,7 @@ export function Globe(p: Props) {
       const entity = isAircraft ? v.entities.getById(`aircraft-${aircraft.hex}`) : undefined;
       if (entity) entity.viewFrom = new C.ConstantProperty(new C.Cartesian3(0, -14000, 18000));
       v.camera.flyToBoundingSphere(new C.BoundingSphere(C.Cartesian3.fromDegrees(lon, lat, altitude), 1), {
-        offset: new C.HeadingPitchRange(0, C.Math.toRadians(p.mode === '2D' ? -90 : -65), facility?.range ?? (isAircraft ? (p.mode === '2D' ? 150000 : 18000) : (v.canvas.clientWidth > 700 ? 12500 : 10500))), duration,
+        offset: new C.HeadingPitchRange(0, C.Math.toRadians(p.mode === '2D' ? -90 : facility?.kind==='airport3d' ? -32 : -65), facility?.range ?? (isAircraft ? (p.mode === '2D' ? 150000 : 18000) : (v.canvas.clientWidth > 700 ? 12500 : 10500))), duration,
         complete: () => { if (entity && callbacks.current.following && !v.isDestroyed()) v.trackedEntity = entity; },
       });
     }
