@@ -76,3 +76,10 @@ regressions before deployment. Verify that `/account/` loads without requesting
 Cesium or the observatory module, `/airports/TAS/` renders with JavaScript disabled,
 and the globe still opens a selected flight and cockpit. Container and systemd
 examples must be smoke-tested on the deployment host before release.
+
+## Cloudflare free-tier target
+
+The Cloudflare deployment target and bounded resource policy are defined in
+[FREE_TIER_DESIGN.md](FREE_TIER_DESIGN.md). This is a design, not a completed Workers/D1
+migration or an enforced zero-overage configuration. It includes capacity ceilings,
+retention, R2 admission controls and required release tests.
