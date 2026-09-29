@@ -393,7 +393,7 @@ export function Globe(p: Props) {
     const v=viewer.current;if(!v||!ready||!p.preferences.autoQuality||p.preferences.quality==='low')return;
     let previous=0,frame=0;const samples:number[]=[];const start=performance.now();let reported=false;
     // Sample the browser animation clock, not intentional request-render idle intervals.
-    const sample=(now:number)=>{if(document.hidden||now-start<15000){previous=0;samples.length=0;}else{const gap=previous?now-previous:0;previous=now;if(gap<=0||gap>=250)samples.length=0;else{samples.push(gap);if(samples.length>90)samples.shift();const next=suggestedQuality(p.preferences.quality,samples);if(next&&!reported){reported=true;callbacks.current.onAutomaticQuality(next);}}}if(!reported)frame=requestAnimationFrame(sample);};
+    const sample=(now:number)=>{if(document.hidden||now-start<15000){previous=0;samples.length=0;}else{const gap=previous?now-previous:0;previous=now;if(gap<=0||gap>=1000)samples.length=0;else{samples.push(gap);if(samples.length>90)samples.shift();const next=suggestedQuality(p.preferences.quality,samples);if(next&&!reported){reported=true;callbacks.current.onAutomaticQuality(next);}}}if(!reported)frame=requestAnimationFrame(sample);};
     frame=requestAnimationFrame(sample);return()=>cancelAnimationFrame(frame);
   },[ready,p.preferences.autoQuality,p.preferences.quality]);
   useEffect(() => {

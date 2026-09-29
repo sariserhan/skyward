@@ -27,3 +27,32 @@ Validation: production build; 375 passing tests with one skipped; headless Chrom
 4. Performance: profile representative desktop/mobile GPUs before increasing cloud sample counts or adding reflections. Browser software-renderer checks establish correctness, not real-device frame rate.
 
 Prefer improvements to one representative flight/airport at a time with screenshot comparisons and frame-time measurements before rolling out more expensive effects globally. This first pass does not claim MSFS visual parity or its worldwide photogrammetry coverage.
+
+## Continuity and detail pass
+
+- Explicitly named glass, rubber, chrome and engine-interior materials receive
+  separate roughness/metal response in served/build copies. Alpha, textures,
+  authored material extensions and unknown surfaces are preserved. Original
+  source models and license files are unchanged.
+- Seeded cloud proportions vary silhouettes. Layer-entry haze and fog blend over
+  altitude instead of switching at the cloud base. Far cloud samples and resource
+  creation are reduced during sustained slow frames; the near aircraft remains.
+- Building tiles fade in and out using opaque dithering. Existing look-ahead
+  loading continues; background tile concurrency drops under frame pressure.
+  Long frames up to one second now count toward automatic quality reduction.
+- Decorative short boarding bridges, stand lead-in markings and parked baggage
+  carts require mapped terminal/apron/gate relationships and avoid runway areas.
+  Detail is bounded and loaded only within 12 km of an airport. Terrain refinement
+  updates bridge elevations. These are illustrative props, not observed vehicles
+  or surveyed bridges; insufficient geometry produces no placement.
+- Sourced landing-gear overlays spin wheels up at contact, let them coast when
+  airborne and use damped compression under touchdown/braking. Existing tire
+  smoke and contact audio remain. These are presentation effects, not measured
+  aircraft suspension or gear telemetry.
+
+The new `test:visual`, `test:scenery` and `test:account-recovery` commands make
+these changes repeatable. This pass recorded approximately 150–267 ms median and
+200–317 ms p95 frame intervals in headless Chromium software rendering. That is
+not smooth rendering and is not a representative hardware-GPU benchmark; no
+performance pass or improvement claim is inferred from it. See
+[customer readiness](customer-readiness.md) for remaining validation.

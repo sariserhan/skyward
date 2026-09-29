@@ -1,3 +1,4 @@
+import {readRenderStats} from '../lib/renderDiagnostics';
 import {createWeatherSky,weatherSkyAmount} from '../lib/weatherSky';
 import {publishWeatherAudio,publishThunder,clearWeatherAudio} from '../lib/weatherAudio';
 import {addCloudVolume} from '../lib/cloudVolumes';
@@ -8,7 +9,7 @@ import {publishWeather} from '../lib/weatherMotion';
 import {useEffect,useRef,useState} from 'react';
 import {createPortal} from 'react-dom';
 import type * as Cesium from 'cesium';
-import {reportDistanceKm,altitudeWeather,cloudThickness,weatherSummary,type LocalWeather,type WeatherFocus,type WeatherReport} from '../lib/localWeather';
+import {reportDistanceKm,cloudImmersion,altitudeWeather,cloudThickness,weatherSummary,type LocalWeather,type WeatherFocus,type WeatherReport} from '../lib/localWeather';
 import type {SimWeather} from '../lib/simulatorWeather';
 import {solarElevation,sunDirectionFixed} from '../lib/solarLighting';
 import './weather-layer.css';
@@ -35,7 +36,7 @@ export function WeatherLayer(props:Props){
   const fog={enabled:v.scene.fog.enabled,density:v.scene.fog.density,minimumBrightness:v.scene.fog.minimumBrightness};let changedFog=false;
   const restore=()=>{weatherSky.restore();if(changedFog){Object.assign(v.scene.fog,fog);changedFog=false;}};
   const remove=v.scene.preRender.addEventListener(()=>{const now=performance.now();if(now-last<(latest.current.lowQuality?65:32))return;const dt=Math.min(.25,(now-last)/1000||.033);last=now;
-   const p=latest.current,f=p.focus(),manual=f?p.manual?.():null,r=manual&&f?manualReport(manual,f):report.current,reduced=p.reduced||window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+   const p=latest.current,limited=readRenderStats(v).backgroundLimited,f=p.focus(),manual=f?p.manual?.():null,r=manual&&f?manualReport(manual,f):report.current,reduced=p.reduced||window.matchMedia('(prefers-reduced-motion: reduce)').matches;
    const w=v.canvas.clientWidth,h=v.canvas.clientHeight;if(w!==width||h!==height){width=w;height=h;canvas.width=w;canvas.height=h;}ctx.clearRect(0,0,width,height);
    if(!effectsRef.current||!f||!r||reportDistanceKm(r,f)>150||Date.now()-r.observedAt>7200000||document.hidden||v.scene.mode!==C.SceneMode.SCENE3D){strike=null;nextFlash=0;stormKey='';volumes.show=false;clearWeatherAudio(v);publishWeather(v,null);publishWindshieldWeather(v,null);restore();return;}volumes.show=true;publishWeather(v,motionRef.current?r:null);publishWindshieldWeather(v,r);
    if(!reduced){const bearing=((r.windDirection??0)+180)*Math.PI/180,speed=Math.min(25,r.windKnots??0)*.514444;windEast+=Math.sin(bearing)*speed*dt;windNorth+=Math.cos(bearing)*speed*dt;}
@@ -53,16 +54,18 @@ export function WeatherLayer(props:Props){
     }
    }
    // Spread GPU resource creation across frames; visible volumes stay in place.
-   let created=0;for(const [id,options] of pending){if(created++>=(p.lowQuality?1:2))break;pending.delete(id);const primitive=addCloudVolume(C,volumes,options);moving.set(id,{primitive,opacity:0,wanted:true,lon:options.lon-windEast/(111320*cos),lat:options.lat-windNorth/111320,height:options.base+options.thickness*.5});}
+   let created=0;for(const [id,options] of pending){if(created++>=((p.lowQuality||limited)?1:2))break;pending.delete(id);const primitive=addCloudVolume(C,volumes,options);moving.set(id,{primitive,opacity:0,wanted:true,lon:options.lon-windEast/(111320*cos),lat:options.lat-windNorth/111320,height:options.base+options.thickness*.5});}
 
-   for(const [id,cloud] of moving){cloud.opacity=Math.max(0,Math.min(1,cloud.opacity+(cloud.wanted?1:-1)*dt/2.5));if(!cloud.wanted&&cloud.opacity===0){volumes.remove(cloud.primitive);moving.delete(id);continue;}cloud.primitive.appearance.material!.uniforms.cloudOpacity=cloud.opacity;const position=C.Cartesian3.fromDegrees(cloud.lon+windEast/(111320*cos),cloud.lat+windNorth/111320,cloud.height);C.Matrix4.setTranslation(cloud.primitive.modelMatrix,position,cloud.primitive.modelMatrix);}
+   for(const [id,cloud] of moving){cloud.opacity=Math.max(0,Math.min(1,cloud.opacity+(cloud.wanted?1:-1)*dt/2.5));if(!cloud.wanted&&cloud.opacity===0){volumes.remove(cloud.primitive);moving.delete(id);continue;}cloud.primitive.appearance.material!.uniforms.cloudOpacity=cloud.opacity;
+    cloud.primitive.appearance.material!.uniforms.cloudSteps=id.startsWith('far:')?(limited?4:6):p.lowQuality?10:20;const position=C.Cartesian3.fromDegrees(cloud.lon+windEast/(111320*cos),cloud.lat+windNorth/111320,cloud.height);C.Matrix4.setTranslation(cloud.primitive.modelMatrix,position,cloud.primitive.modelMatrix);}
    const near=eyeAltitude<50000,inside=conditions.inside&&r.clouds.some(c=>cover(c.cover)>.7||hash(gx*73+gy*173)<cover(c.cover));
+   const immersion=inside?cloudImmersion(r,eyeAltitude):0;
    if(near)weatherSky.update(weatherSkyAmount(r,eyeAltitude),dt);
    publishWeatherAudio(v,near?conditions.precipitation*r.rain:0,near&&r.storm&&lightningRef.current&&!reduced);
-   if(near){v.scene.fog.enabled=true;v.scene.fog.density=inside?.0012:Math.min(.0002,.00002*10/Math.max(.2,r.visibilityKm??40));v.scene.fog.minimumBrightness=.28;changedFog=true;}else restore();
+   if(near){v.scene.fog.enabled=true;v.scene.fog.density=Math.max(immersion*.0012,Math.min(.0002,.00002*10/Math.max(.2,r.visibilityKm??40)));v.scene.fog.minimumBrightness=.28;changedFog=true;}else restore();
    if(!near){strike=null;nextFlash=0;return;}
    if(!inside&&conditions.precipitation&&r.clouds.some(c=>c.cover==='OVC')){ctx.fillStyle='rgba(120,129,139,.13)';ctx.fillRect(0,0,width,height);}
-   if(inside){ctx.fillStyle=r.storm?'rgba(83,92,103,.48)':'rgba(200,209,215,.35)';ctx.fillRect(0,0,width,height);}
+   if(inside){ctx.fillStyle=r.storm?`rgba(83,92,103,${.48*immersion})`:`rgba(200,209,215,${.35*immersion})`;ctx.fillRect(0,0,width,height);}
    const wet=conditions.precipitation*(r.rain||r.snow||Number(r.hail));const count=Math.round((p.lowQuality?85:210)*wet),snow=r.snow>0||r.hail;
    if(!reduced&&count){const slant=Math.sin((((r.windDirection??0)+180)*Math.PI/180)-v.camera.heading)*.35+.13;
     for(let i=0;i<count;i++){const d=particles[i],velocity=snow?.07+.13*d.depth:.7+1.1*d.depth;d.y=(d.y+dt*velocity)%1;d.x=(d.x+dt*(slant*velocity+(snow?Math.sin(now*.001+i)*.025:0))+1)%1;const x=d.x*width,y=d.y*height;

@@ -61,6 +61,9 @@
     "test:cockpit": "npm run build && node scripts/browser-tests.mjs --cockpit",
     "check:flyitaly": "node --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/check-flyitaly.mjs",
     "test:architecture": "npm run build && node scripts/browser-tests.mjs --architecture",
-    "test:release": "node scripts/release-check.mjs"
+    "test:release": "node scripts/release-check.mjs",
+    "test:visual": "npm run build && node scripts/browser-tests.mjs --visual-tour",
+    "test:account-recovery": "npm run build && node scripts/browser-tests.mjs --account-recovery",
+    "test:scenery": "npm run build && node scripts/browser-tests.mjs --scenery"
   }
 }

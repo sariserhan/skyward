@@ -7,3 +7,9 @@ export function altitudeWeather(report:WeatherReport,altitudeM:number){const thi
  return {inside,precipitation:below?1:0,top};}
 export function weatherSummary(r:WeatherReport){return [r.storm?'Thunderstorm':null,r.hail?'Hail':null,r.snow?'Snow':null,r.rain?'Rain':null,r.fog?'Mist / fog':null,r.clouds.length?(r.clouds.some(c=>c.cover==='OVC')?'Overcast':r.clouds.some(c=>c.cover==='BKN')?'Mostly cloudy':'Scattered clouds'):r.cloudsKnown?'Clear':null].filter(Boolean).join(' · ')||'Partial weather report';}
 export function reportDistanceKm(r:{lat:number;lon:number},f:{lat:number;lon:number}){const rad=Math.PI/180,a=(r.lat-f.lat)*rad,b=(r.lon-f.lon)*rad,h=Math.sin(a/2)**2+Math.cos(r.lat*rad)*Math.cos(f.lat*rad)*Math.sin(b/2)**2;return 12742*Math.asin(Math.sqrt(Math.min(1,h)));}
+
+/** Visual blend at layer boundaries; not a measurement of visibility inside clouds. */
+export function cloudImmersion(report:WeatherReport,altitude:number){
+ const thickness=cloudThickness(report),smooth=(x:number)=>{const t=Math.max(0,Math.min(1,x));return t*t*(3-2*t);};
+ return Math.max(0,...report.clouds.map(c=>smooth((altitude-c.baseM)/Math.min(180,thickness*.25))*smooth((c.baseM+thickness-altitude)/Math.min(180,thickness*.25))));
+}

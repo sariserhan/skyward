@@ -39,6 +39,7 @@ def run(page):
     page.goto(f.URL + '/#airport=IAD', wait_until='domcontentloaded')
     page.get_by_role('button', name=f'View {callsign}', exact=True).click()
     page.get_by_role('button', name='✈ Flight view', exact=True).click()
+    if os.environ.get('SKYWARD_VISUAL_NIGHT')=='1':page.evaluate("__viewer.clock.clockStep=Cesium.ClockStep.TICK_DEPENDENT;__viewer.clock.currentTime=Cesium.JulianDate.fromIso8601('2026-09-29T03:00:00Z');__viewer.clock.shouldAnimate=false")
     if not multi:
         expect(page.locator('.map-flight-route')).to_have_text('LHR → IAD')
     assert page.evaluate('__viewer.scene.screenSpaceCameraController.enableCollisionDetection') is False
@@ -67,6 +68,7 @@ def run(page):
           return {lon:C.Math.toDegrees(p.longitude),lat:C.Math.toDegrees(p.latitude),height:p.height};})()""")
         assert pose['lat'] < 38.9707, pose
         assert (1 < pose['height'] < 2 if multi else 2 < pose['height'] < 4.5), pose
+    page.screenshot(path=str(f.ARTIFACTS/'landing-taxi.jpg'),type='jpeg',quality=75)
     assert any(phase in page.locator('.flight-motion-status').inner_text() for phase in ['taxi', 'parked']), flight.inner_text()
     assert not errors, errors
     assert not page.locator('.recovery-screen,.cesium-widget-errorPanel').count()

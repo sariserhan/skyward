@@ -62,3 +62,26 @@ layout, standalone account loading without the globe engine, authenticated
 operational metrics, callsign deep links and the cockpit after its camera-loop
 refactor. It uses an isolated server, an in-memory test account database and
 fixture aircraft. A fixed test-only metrics token is scoped to that process.
+
+## Repeatable visual and readiness checks
+
+- `npm run test:visual` captures daylight, sunset and rain flight views with a
+  deliberately delayed model response, then exercises night landing and taxi.
+  Screenshots and `visual-frame-times.json` are saved outside the repository.
+  Frame timings are observations, not a passing performance threshold.
+- `npm run test:scenery` uses deterministic city-building fixtures to check
+  fade-in, departure cleanup, mapped airport bridges and distance culling.
+- `npm run test:account-recovery` checks a failed account load and retry,
+  password-reset request, expired reset link, URL token cleanup and mobile layout.
+  Requests are mocked; no email is sent and no production account is modified.
+- `node scripts/browser-tests.mjs --recording-premium` checks recording access,
+  subscription loss and absence of free-user account-library writes.
+
+The shared harness accepts `SKYWARD_QA_BROWSER=chromium|firefox|webkit` when that
+Playwright browser is installed. Chromium is the default. A missing engine fails
+rather than silently substituting another browser. WebKit testing is not a claim
+of testing Safari on physical Apple hardware. Physical devices, real network
+conditions and the Neon integration remain separate checks.
+
+The release runner includes these new flows. Review the
+[customer readiness matrix](../../../docs/customer-readiness.md) before release.

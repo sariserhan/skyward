@@ -18,6 +18,7 @@ export function MembershipPanel({openJourney}:{openJourney:(hex:string)=>Promise
   return <section className="membership-panel" aria-label="Your account">
     <h3>Your account &amp; journeys</h3>
     {!account&&!message&&<p>Loading account…</p>}
+    {!account&&message&&<button disabled={busy} onClick={()=>void perform(reload)}>Retry account connection</button>}
     {account&&!account.enabled&&<p>Account signup and subscriptions are coming soon. Free exploration is available now.</p>}
     {account?.enabled&&<><p className="account-test-note">{betterAuth?'Billing is in test mode · no real payments or live premium flight data.':'Test environment · no real payments or live premium flight data.'}</p>
       {!account.user||resetToken?<form onSubmit={e=>{e.preventDefault();const form=e.currentTarget,data=new FormData(form);void perform(async()=>{

@@ -64,7 +64,9 @@ def serve(test_flow):
     except Exception:time.sleep(.1)
    else:raise RuntimeError('Isolated server did not start')
    with sync_playwright() as p:
-    browser=p.chromium.launch(headless=True,args=['--no-sandbox','--enable-unsafe-swiftshader']);page=browser.new_page(viewport={'width':1440,'height':1000})
+    browser_name=os.environ.get('SKYWARD_QA_BROWSER','chromium')
+    if browser_name not in ('chromium','firefox','webkit'):raise ValueError('SKYWARD_QA_BROWSER must be chromium, firefox or webkit')
+    browser=getattr(p,browser_name).launch(headless=True,args=['--no-sandbox','--enable-unsafe-swiftshader'] if browser_name=='chromium' else []);page=browser.new_page(viewport={'width':1440,'height':1000})
     try:test_flow(page)
     except Exception:
      page.screenshot(path=str(ARTIFACTS/'failure.png'));raise

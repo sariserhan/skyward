@@ -83,6 +83,9 @@ npm --prefix web run test:browser # deterministic browser regression
 npm --prefix web run test:weather # report-driven weather rendering
 npm --prefix web run test:cockpit # cockpit loading and recovery
 npm --prefix web run test:landing # watched landing and taxi regression
+npm --prefix web run test:visual  # daylight/sunset/rain + night landing/taxi
+npm --prefix web run test:scenery # building fades and airport detail
+npm --prefix web run test:account-recovery # account recovery under failed requests
 ```
 
 Browser checks require Python Playwright and its Chromium installation. Set

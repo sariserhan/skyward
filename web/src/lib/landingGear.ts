@@ -1,3 +1,4 @@
+import {wheelMotion,type WheelMotion} from './wheelMotion.ts';
 import {gearLayout,detailBudget} from './arrivalExperience.ts';
 import type * as Cesium from 'cesium';
 import type {Aircraft} from '../types';
@@ -17,7 +18,7 @@ export function sourcedGearClearance(type:string,fallback=5){
 }
 /** Illustrative gear; the feed does not report actual configuration. Community airframes remain intact. */
 export function installLandingGear(C:typeof Cesium,v:Cesium.Viewer,getState:()=>{aircraft:Aircraft[];selected:Aircraft|null;quality?:string;reduced?:boolean}){
- type Entry={body:Cesium.Entity;parts:Cesium.Entity[];gear:Gear;extension:number;angle:number;compression:number};
+ type Entry={body:Cesium.Entity;parts:Cesium.Entity[];gear:Gear;extension:number;angle:number;compression:number;motion:WheelMotion};
  const entries=new Map<string,Entry>();let discovery=-Infinity,last=performance.now(),meanFrame=16;
  const removeEntry=(entry:Entry)=>{entry.parts.forEach(part=>v.entities.remove(part));compressionByBody.delete(entry.body);};
  const remove=v.scene.preRender.addEventListener(()=>{
@@ -37,7 +38,7 @@ export function installLandingGear(C:typeof Cesium,v:Cesium.Viewer,getState:()=>
     const target=aircraftGearConfiguration(body)?.gear??(a?.ground?1:0);
     if(!target&&(entries.get(body.id)?.extension??0)<=.01)continue;
     keep.add(body.id);const existing=entries.get(body.id);if(existing&&existing.gear===gear)continue;if(existing){removeEntry(existing);entries.delete(body.id);}
-    const entry:Entry={body,parts:[],gear,extension:0,angle:0,compression:0};
+    const entry:Entry={body,parts:[],gear,extension:0,angle:0,compression:0,motion:{angle:0,omega:0,compression:0,velocity:0,ground:false,speed:0}};
     const legs=[gear.nose,gear.main,[-gear.main[0],gear.main[1],gear.main[2]]];
     const layout=gearLayout(a!.aircraftType);
     type Part={kind:'strut'|'piston'|'axle'|'wheel'|'hub'|'door';leg:number;dx:number;dz:number};
@@ -65,8 +66,8 @@ export function installLandingGear(C:typeof Cesium,v:Cesium.Viewer,getState:()=>
   }
   for(const entry of entries.values()){
    const {body,parts}=entry,config=aircraftGearConfiguration(body),target=config?.gear??0;
-   if(!state.reduced&&config?.ground)entry.angle=(entry.angle+dt*(config.speed*.514444)/entry.gear.radius)%(Math.PI*2);
-   const compression=config?.ground?entry.gear.strut*.12:0;entry.compression+=(compression-entry.compression)*(1-Math.exp(-dt*5));compressionByBody.set(body,entry.compression);
+   entry.motion=wheelMotion(entry.motion,config?.speed??0,config?.ground??false,entry.gear.radius,entry.gear.strut,dt,!!state.reduced);
+   entry.angle=entry.motion.angle;entry.compression=entry.motion.compression;compressionByBody.set(body,entry.compression);
    entry.extension+=Math.max(-dt*.4,Math.min(dt*.4,target-entry.extension));
    const visible=body.show&&v.entities.contains(body)&&entry.extension>.01;
    parts.forEach(part=>{part.show=visible;});
