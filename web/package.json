@@ -60,6 +60,7 @@
     "test:weather": "npm run build && node scripts/browser-tests.mjs --weather",
     "test:cockpit": "npm run build && node scripts/browser-tests.mjs --cockpit",
     "check:flyitaly": "node --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/check-flyitaly.mjs",
-    "test:architecture": "npm run build && node scripts/browser-tests.mjs --architecture"
+    "test:architecture": "npm run build && node scripts/browser-tests.mjs --architecture",
+    "test:release": "node scripts/release-check.mjs"
   }
 }

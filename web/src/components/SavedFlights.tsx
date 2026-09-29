@@ -1,0 +1,13 @@
+import {useEffect,useState} from 'react';
+import type {Aircraft} from '../types';
+import type {WatchItem} from '../lib/useObservatory';
+const KEY='skyward.watch-notes.v1';
+type Note={group:string;observedAt:number|null;};
+function read():Record<string,Note>{try{const raw=JSON.parse(localStorage.getItem(KEY)??'{}');return Object.fromEntries(Object.entries(raw).filter(([hex,n])=>/^[a-f0-9]{6}$/.test(hex)&&n&&typeof (n as Note).group==='string'&&(n as Note).group.length<=30&&((n as Note).observedAt===null||Number.isFinite((n as Note).observedAt))).slice(0,100)) as Record<string,Note>;}catch{return {};}}
+export function SavedFlights({watches,observations,lookup}:{watches:WatchItem[];observations:Aircraft[];lookup:(kind:string,q:string)=>Promise<Aircraft|null>}){
+ const [notes,setNotes]=useState(read),[filter,setFilter]=useState('All'),[last]=useState(()=>{try{const v=JSON.parse(localStorage.getItem('skyward.last-flight.v1')??'null');return v&&/^[a-f0-9]{6}$/.test(v.hex)?v:null;}catch{return null;}});
+ useEffect(()=>{setNotes(old=>{let changed=false;const next={...old};for(const a of observations){if(!watches.some(w=>w.hex===a.hex)||!a.observedAt||a.observedAt>Date.now()+5000||a.observedAt<=(old[a.hex]?.observedAt??0))continue;next[a.hex]={group:old[a.hex]?.group??'Ungrouped',observedAt:a.observedAt};changed=true;}return changed?Object.fromEntries(Object.entries(next).slice(-100)):old;});},[observations,watches]);
+ useEffect(()=>{try{localStorage.setItem(KEY,JSON.stringify(notes));}catch{}},[notes]);
+ const groups=['All',...new Set(watches.map(w=>notes[w.hex]?.group||'Ungrouped'))];
+ return <section className="saved-flight-tools" aria-label="Organized watchlist">{last&&<button onClick={()=>void lookup('hex',last.hex)}>Resume last flight · {last.label||last.hex}</button>}<label>Group<select aria-label="Watchlist group" value={filter} onChange={e=>setFilter(e.target.value)}>{groups.map(g=><option key={g}>{g}</option>)}</select></label><small>Groups and last-seen notes stay on this device. Resume checks for a current observation.</small>{watches.filter(w=>filter==='All'||(notes[w.hex]?.group||'Ungrouped')===filter).map(w=><div className="saved-flight-item" key={w.hex}><button onClick={()=>void lookup('hex',w.hex)}>{w.callsign||w.registration||w.hex} · {w.aircraftType}</button><small>{notes[w.hex]?.observedAt?`Last observed ${new Date(notes[w.hex].observedAt!).toLocaleString()}`:'No position observed on this device yet'}</small><label>Group<input aria-label={`Group for ${w.callsign||w.hex}`} maxLength={30} value={notes[w.hex]?.group??''} placeholder="Ungrouped" onChange={e=>setNotes(n=>({...n,[w.hex]:{group:e.target.value,observedAt:n[w.hex]?.observedAt??null}}))}/></label></div>)}</section>;
+}

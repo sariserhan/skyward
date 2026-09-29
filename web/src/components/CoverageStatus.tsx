@@ -9,7 +9,7 @@ export function CoverageStatus(p:Props){
  const title=p.loading&&p.rows.length&&!p.error?'Updating traffic':message.title;
  return <aside className={`camera-traffic-status ${p.error||stale?'coverage-warning':''}`} aria-label="Traffic coverage">
   <details className="coverage-details">
-  <summary><strong role="status">{p.error?(p.rows.length?'Feed interrupted · retained positions':'Feed unavailable'):title}</strong><span className="coverage-details-label">Details</span></summary>
+  <summary><strong role="status">{title}</strong><span className="coverage-details-label">Details</span></summary>
   <div className="coverage-detail-content"><span className="coverage-description">{p.description}</span>
   <div className="coverage-counts"><span>{counts.fresh} recent</span><span>{counts.aging} aging</span><span>{counts.gap+counts.unknown} old / unknown</span></div>
   <span>{Math.max(0,p.completed-p.failed)}/{p.total} areas received{p.loading?' · updating':''}{p.limited?' · sampled region':''}</span>

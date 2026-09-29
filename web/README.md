@@ -1652,3 +1652,51 @@ Run `npm run test:architecture` for public-page, account bundle isolation,
 metrics authentication and cockpit browser checks. See
 [production deployment](../deployment/README.md) for the container, systemd/HTTPS
 examples, monitoring and current single-process feed capacity limit.
+
+### Empty coverage and optional Skyward traffic
+
+When the camera area has no received aircraft, coverage distinguishes loading,
+failed requests and successful empty results. The panel suggests nearby recent
+observations and airports when this session has them. “Try Skyward simulated
+traffic” starts a separate, opt-in scene at the nearest catalog airport. It never
+turns on automatically or feeds synthetic rows into tracking, alerts, account
+watchlists or observation recordings.
+
+Six fictional Skyward flights use random aircraft profiles and airport pairs.
+They demonstrate arrival, rollout, taxi, gate service, pushback, departure and an
+airborne circuit. The route label is a fictional itinerary; the animation is a
+local circuit, not a simulated intercontinental flight. A mapped taxi connection
+is used where available; missing geometry uses a visibly disclosed illustrative
+stand/route. An airport without usable runway geometry cannot start the demo.
+Models are our original illustrative profiles with rigged gear and Skyward tail
+and fuselage branding, not manufacturer CAD or a real airline livery. Regenerate
+branding with `scripts/brand-demo-fleet.py` using Python Playwright/Chromium.
+
+Real observed tracking remains free where feeds provide positions. Premium
+currently supplies protected, on-demand flight details through the existing paid
+integration; it does **not** promise complete global live positions, zero delay,
+actual gate movements or passenger manifests. A paid bulk position feed needs
+its own validated integration and usage budget before advertising that capability.
+
+### Flight usability and release checks
+
+- Search supports existing airline/type/registration/route filters and saved
+  recent searches, plus explicit callsign and registration lookups outside the
+  loaded region. Airport-pair filtering only uses verified session route hints.
+- Layers offers Battery saver, Balanced and High detail presets with automatic
+  reduction. The watched aircraft retains model priority under existing budgets.
+- Cockpit mini-maps offer route, nearby and world views, nearby zoom, nearest city
+  and direct distance to the reported destination. Expanded radar is positioned
+  away from the desktop route display; mobile radar height is bounded.
+- Watching includes device-local group labels, original last-observed timestamps
+  and resume via a fresh lookup. These annotations do not sync as account data.
+- Flight coach has an opt-in, eight-stage guided first flight. Prompts follow
+  simulator state and can highlight the corresponding control. Sound follows the
+  existing simulator audio setting; the coach does not take control of the plane.
+- `npm run test:release` runs unit/security checks, a production build, public
+  route/account checks, globe/customer flows, optional demo isolation, guided-flight/preset/watchlist controls, watched
+  landing and accelerated soak tests. Set `SKYWARD_QA_PYTHON` if needed. The report
+  defaults to the system temp directory (`skyward-release-check.json`). No deploy
+  occurs. The soak covers an accelerated six-hour timestamp span, not six hours
+  of wall-clock observation. Production Neon integration tests still need a test
+  database; the normal suite reports those skips explicitly.

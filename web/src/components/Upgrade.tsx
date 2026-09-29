@@ -10,7 +10,7 @@ export function Upgrade({openJourney}:{openJourney:(hex:string)=>Promise<void>})
   const trigger = useRef<HTMLButtonElement>(null);
   const close = () => dialog.current?.close();
   const show=(account=false)=>{setAccountOnly(account);setOpen(true);dialog.current?.showModal();};
-  useEffect(()=>{const account=()=>show(true);window.addEventListener('skyward-account',account);if(new URLSearchParams(location.search).has('account')){show(new URLSearchParams(location.search).get('account')!=='upgrade');const url=new URL(location.href);url.searchParams.delete('account');history.replaceState(null,'',url);}return()=>window.removeEventListener('skyward-account',account);},[]);
+  useEffect(()=>{const account=()=>show(true),upgrade=()=>show(false);window.addEventListener('skyward-account',account);window.addEventListener('skyward-upgrade',upgrade);if(new URLSearchParams(location.search).has('account')){show(new URLSearchParams(location.search).get('account')!=='upgrade');const url=new URL(location.href);url.searchParams.delete('account');history.replaceState(null,'',url);}return()=>{window.removeEventListener('skyward-account',account);window.removeEventListener('skyward-upgrade',upgrade);};},[]);
   return <>
     <button ref={trigger} className="upgrade-trigger" aria-haspopup="dialog" onClick={() => show()}><Sparkles size={14}/>Upgrade</button>
     <button className="account-trigger quiet-button" onClick={()=>show(true)} aria-haspopup="dialog">Account &amp; journeys</button>

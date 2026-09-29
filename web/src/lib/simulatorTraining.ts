@@ -34,3 +34,17 @@ export function lessonResult(p:FlightPlan,s:FlightState,log:FlightLog){if(s.prac
 export function practiceSuggestion(log:FlightLog){return log.events.some(e=>e.text.includes('STALL'))?'Practice maintaining airspeed with small pitch changes.':log.touchdown&&log.touchdown.rate< -500?'Practice a shallower descent and a gentle flare.':log.touchdown&&Math.abs(log.touchdown.cross)>10?'Practice centreline alignment with small heading corrections.':'Practice a complete manual traffic pattern with steady airspeed.';}
 
 export function landingPractice(p:FlightPlan):FlightState {const s=initialFlight({...p,coldStart:false,fuelPercent:p.lesson==='glide'?0:Math.max(25,p.fuelPercent??75)}),glide=p.lesson==='glide',position=movePoint(runwayStart(p.arrival),runwayHeading(p.arrival)+180,glide?2:5);return {...s,practiceReset:true,...position,navOrigin:position,nav:'final',phase:'approach',ground:false,altitude:glide?1600:1700,heading:runwayHeading(p.arrival),speed:glide?FUEL_PROFILES[p.aircraftType].glide:AIRFRAMES[p.aircraftType].approach,pitch:glide?-1:-3,verticalSpeed:-500,gear:true,gearPosition:1,flaps:glide?0:2,flapPosition:glide?0:2,brakes:false,throttle:glide?0:.45,enginePower:glide?0:.45,engineRunning:!glide,fuelExhausted:glide,warning:''};}
+
+/** State-driven lesson prompts, using the same control guidance as radio help. */
+export function guidedStage(s:FlightState,p:FlightPlan){
+ if(s.phase==='crashed')return {id:'review',number:8,title:'Review and retry',text:'Open the debrief to see what happened, then choose another flight.',target:'controls' as HelpTarget};
+ if(s.phase==='landed')return {id:'park',number:8,title:'Taxi and park',text:'Landing complete. Request taxi to a stand, then apply brakes and shut down.',target:'brakes' as HelpTarget};
+ if(s.phase==='rollout')return {id:'rollout',number:7,title:'Slow on the runway',text:'Throttle idle. Apply brakes and stay on the centreline.',target:'brakes' as HelpTarget};
+ if(s.fuelExhausted&&!s.ground)return {id:'glide',number:6,title:'Maintain glide speed',text:copilotHelp(s,p).text,target:'pitch' as HelpTarget};
+ if(!s.ground&&['approach','landing'].includes(s.phase))return {id:'approach',number:6,title:'Configure for landing',text:`${p.aircraftType==='C172'?'Gear is fixed. Select landing flaps.':'Extend gear and landing flaps.'} Aim for ${AIRFRAMES[p.aircraftType].approach} kt. Follow the glide-path guidance and flare gently near the runway.`,target:'gear' as HelpTarget};
+ if(!s.ground&&s.altitude<800)return {id:'climb',number:4,title:'Establish a climb',text:`Keep the wings level and climb steadily. ${p.aircraftType==='C172'?'Gear is fixed.':'Retract gear after a positive climb.'} Retract flaps as speed increases.`,target:'gear' as HelpTarget};
+ if(!s.ground)return {id:'navigate',number:5,title:'Follow the route',text:copilotHelp(s,p).text,target:copilotHelp(s,p).target};
+ if(!s.engineRunning||s.brakes)return {id:'prepare',number:1,title:'Prepare and release brakes',text:copilotHelp(s,p).text,target:copilotHelp(s,p).target};
+ if(s.speed<AIRFRAMES[p.aircraftType].rotate)return {id:'accelerate',number:2,title:'Accelerate on the centreline',text:`Select takeoff flaps, increase throttle smoothly and hold the runway centreline. Rotate at ${AIRFRAMES[p.aircraftType].rotate} kt.`,target:'throttle' as HelpTarget};
+ return {id:'rotate',number:3,title:'Rotate gently',text:'Raise the nose gently using W or pitch up. Avoid a steep pull; keep the wings level.',target:'pitch' as HelpTarget};
+}
