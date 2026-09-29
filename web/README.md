@@ -1595,13 +1595,13 @@ key the original feed works alone. ADSB.fi and ADSBHub remain removed.
 
 Restart the existing server yourself after setting the environment. If using a
 private `web/.env` file, Node must load it explicitly (from `web/`, for example,
-`node --env-file=.env server/index.mjs`); do not start a second server on the same
+`npm start` (loads `.env`, then `.env.local`)); do not start a second server on the same
 port. Never put this key in a `VITE_` variable, browser code, commits or chat.
 
 A one-area connectivity check, with no secret output:
 
 ```sh
-node --env-file=web/.env web/scripts/check-flyitaly.mjs
+npm --prefix web run check:flyitaly
 ```
 
 Camera areas, airport traffic, aircraft lookups and Trip follower use both feeds.
@@ -1622,3 +1622,13 @@ The adapter expects the readsb-style JSON envelope (`ac` array and `now` timesta
 and refuses malformed or stale responses. Requests, merge, cache, secret isolation,
 rate-limit handling and failure recovery are fixture-tested; live response-schema
 compatibility and coverage gains require checking with an actual issued key.
+
+### Private local configuration
+
+Keep local credentials in `web/.env.local` (ignored by git). Server startup,
+provider checks, migrations and usage commands load `web/.env` first and
+`web/.env.local` second; exported shell variables take precedence over both.
+Use `npm --prefix web run start:dev` for local development or
+`npm --prefix web start` for normal startup. Restart the running server after
+changing settings. Frontend Vite also reads `.env.local`; never give server
+credentials a `VITE_` prefix, which would expose them to the browser.
