@@ -3,6 +3,7 @@ extends SceneTree
 ## Exit code is the number of failed tests (0 = success).
 
 const SUITES := [
+	"res://tests/test_tower_control.gd",
 	"res://tests/test_dulles.gd",
 	"res://tests/test_passenger_flow.gd",
 	"res://tests/test_airport.gd",

@@ -25,6 +25,9 @@ var gate_arrival_tick: int = -1
 var gate_release_tick: int = -1
 var forced_delay_ticks: int = 0
 var runway_requested: bool = false
+## Controller instructions; default off preserves existing saves and automatic careers.
+var runway_cleared: bool = false
+var taxi_hold: bool = false
 
 # Scenario overrides (optional in config): -1 / "" use the scenario defaults.
 var load_permille: int = -1

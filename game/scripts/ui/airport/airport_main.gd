@@ -1,6 +1,7 @@
 extends Control
 var sim := AirportSimulation.new()
 var map: AirportMap
+var map3d: Airport3D
 var terminal_view: TerminalView
 var view_tabs: TabContainer
 var operations_tabs: TabContainer
@@ -113,6 +114,8 @@ func _ready() -> void:
 	# Scenario variants may not include the default first flight.
 	if not sim.airport.flights.has(selected_id): selected_id = sim.flight_order[0].id
 	_build()
+	operations_tabs.visible = false
+	detail_heading.get_parent().visible = false
 	_refresh()
 	if career.phase == "planning": _show_day_panel()
 	AirportPlaytestLog.log_event("airport_open", {"mode": career.mode, "day": career.day, "phase": career.phase, "seed": career.career_seed, "difficulty": career.difficulty})
@@ -161,6 +164,11 @@ func _build() -> void:
 			view_tabs.current_tab = 0
 			map.queue_redraw())
 		map_button.tooltip_text = "Expand airport map / restore operation panels"
+	_button(header, "3D focus", func():
+		var expand := operations_tabs.visible
+		operations_tabs.visible = not expand
+		detail_heading.get_parent().visible = not expand
+		view_tabs.current_tab = 2)
 	_button(header, "Save", _save)
 	_button(header, "?", func(): help.toggle()).tooltip_text = "Help (H)"
 	_button(header, "Menu", _toggle_menu).tooltip_text = "Menu (Esc)"
@@ -191,6 +199,13 @@ func _build() -> void:
 	terminal_view.sim = sim
 	terminal_view.passenger_selected.connect(_select_passenger)
 	view_tabs.add_child(terminal_view)
+	map3d = Airport3D.new()
+	map3d.name = "3D Tower"
+	map3d.sim = sim
+	map3d.selected_id = selected_id
+	map3d.flight_selected.connect(_select)
+	view_tabs.add_child(map3d)
+	view_tabs.current_tab = 2
 	operations_tabs = TabContainer.new()
 	operations_tabs.custom_minimum_size.y = 238
 	left.add_child(operations_tabs)
@@ -456,6 +471,7 @@ func _select(id: String) -> void:
 	selected_passenger_id = -1
 	terminal_view.selected_id = -1
 	map.selected_id = id
+	map3d.selected_id = id
 	var f: AirportFlight = sim.airport.flights[id]
 	gate_choice.select(sim.airport.gates.keys().find(f.assigned_gate_id))
 	board.set_block_signals(true)
@@ -672,6 +688,7 @@ func _load_save() -> void:
 func _adopt(day_sim: AirportSimulation) -> void:
 	sim = day_sim
 	map.sim = sim
+	map3d.sim = sim
 	terminal_view.sim = sim
 	boarding_overlay.visible = false
 	selected_passenger_id = -1

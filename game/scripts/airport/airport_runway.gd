@@ -11,6 +11,7 @@ var length_m: int = 0
 var status: String = "open"
 var a: String = ""
 var b: String = ""
+var manual_control: bool = false
 var occupied_until: int = 0
 var queue: Array = []
 var active_operation: Dictionary = {}

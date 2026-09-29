@@ -289,6 +289,7 @@ func _request_runway(f: AirportFlight, operation: String) -> void:
 	if operation == "landing" or f.runway_id.is_empty() or not airport.runways.has(f.runway_id): f.runway_id = _choose_runway(f, operation)
 	var runway: AirportRunway = airport.runways[f.runway_id]
 	f.runway_requested = true
+	f.runway_cleared = false
 	runway.queue.append({"flight_id": f.id, "operation": operation, "requested_at": clock.tick, "runway": runway.id})
 	runway.peak_queue = maxi(runway.peak_queue, runway.queue.size())
 	events.record(clock.tick, "RUNWAY_QUEUED", f.id, {"operation": operation, "runway": runway.id})
@@ -299,6 +300,7 @@ func _start_runway() -> void:
 		var runway: AirportRunway = airport.runways[id]
 		if not runway.active_operation.is_empty() or clock.tick < runway.occupied_until or runway.queue.is_empty():
 			continue
+		if runway.manual_control and not airport.flights[runway.queue[0].flight_id].runway_cleared: continue
 		# FIFO; ties use immutable scenario insertion order.
 		var operation: Dictionary = runway.queue.pop_front()
 		var duration := int(config.landing_ticks if operation.operation == "landing" else config.takeoff_ticks)
@@ -566,6 +568,16 @@ static func from_snapshot(data: Dictionary) -> AirportSimulation:
 		if not data.get(key) is Dictionary: return null
 	for key in ["events", "decisions"]:
 		if not data.get(key) is Array: return null
+	# Additive controller fields migrate older v13 saves without weakening type checks.
+	var saved_airport: Dictionary = data.airport
+	if saved_airport.get("flights") is Dictionary:
+		for f in saved_airport.flights.values():
+			if f is Dictionary:
+				if not f.has("taxi_hold"): f["taxi_hold"] = false
+				if not f.has("runway_cleared"): f["runway_cleared"] = false
+	if saved_airport.get("runways") is Dictionary:
+		for r in saved_airport.runways.values():
+			if r is Dictionary and not r.has("manual_control"): r["manual_control"] = false
 	if not _valid_snapshot(data): return null
 	if not PassengerFlowValidation.valid(data): return null
 	if not Turnaround.valid_snapshot(data): return null
@@ -1633,6 +1645,9 @@ func _begin_taxi(f: AirportFlight, direction: String) -> void:
 ## node being crossed, or (before starting) opposing traffic or an occupied gate.
 func _advance_taxi(f: AirportFlight) -> bool:
 	if f.taxi_state == "done": return true
+	if f.taxi_hold and f.taxi_state == "starting":
+		f.taxi_blocker = "controller hold"
+		return false
 	if f.taxi_state == "starting":
 		var inbound := f.status == "taxiing_in"
 		if inbound and _has_two_way(f.taxi_route):
@@ -1657,6 +1672,9 @@ func _advance_taxi(f: AirportFlight) -> bool:
 		if f.taxi_leg >= 0 and not airside.is_front(f.taxi_route[f.taxi_leg], f.id):
 			f.taxi_blocker = "taxiway"
 			_taxi_wait_on(f, f.taxi_route[f.taxi_leg])
+			return false
+		if f.taxi_hold:
+			f.taxi_blocker = "controller hold at next node"
 			return false
 		var next := f.taxi_leg + 1
 		if next >= f.taxi_route.size():
@@ -1856,3 +1874,37 @@ static func _valid_airside(data: Dictionary) -> bool:
 		if int(st.get("locks", -1)) != held[0]: return false
 		if held[0] > 0 and int(st.get("lock_dir", 0)) != held[1]: return false
 	return true
+
+## Tower commands never bypass FIFO, separation, taxi reservations or gate compatibility.
+func set_tower_control(enabled: bool) -> void:
+	for runway: AirportRunway in airport.runways.values(): runway.manual_control = enabled
+	if not enabled:
+		for f: AirportFlight in flight_order:
+			f.taxi_hold = false
+			if f.taxi_blocker.begins_with("controller hold"): f.taxi_blocker = ""
+	events.record(clock.tick, "TOWER_CONTROL", "", {"manual": enabled})
+
+func tower_command(flight_id: String, command: String) -> Dictionary:
+	if not airport.flights.has(flight_id): return {"ok": false, "message": "Select a flight first."}
+	var f: AirportFlight = airport.flights[flight_id]
+	var message := ""
+	if command in ["hold", "resume"]:
+		if not airside.enabled() or not f.status in ["taxiing_in", "taxiing_out"] or f.taxi_state == "done":
+			return {"ok": false, "message": "This aircraft is not taxiing."}
+		f.taxi_hold = command == "hold"
+		if not f.taxi_hold and f.taxi_blocker.begins_with("controller hold"): f.taxi_blocker = ""
+		message = "%s, %s." % [f.flight_number, "hold at the next taxiway node" if f.taxi_hold else "resume assigned taxi route"]
+	elif command == "clear":
+		if not airport.runways.has(f.runway_id): return {"ok": false, "message": "Flight has not requested a runway."}
+		var r: AirportRunway = airport.runways[f.runway_id]
+		if not r.manual_control: return {"ok": false, "message": "Enable manual tower control first."}
+		if r.status != "open" or not r.active_operation.is_empty() or clock.tick < r.occupied_until:
+			return {"ok": false, "message": "Runway occupied, closed, or separation interval active."}
+		if r.queue.is_empty() or r.queue[0].flight_id != f.id: return {"ok": false, "message": "Clear the first aircraft in the runway queue."}
+		if f.runway_cleared: return {"ok": false, "message": "Clearance already issued."}
+		f.runway_cleared = true
+		message = "%s, runway %s, cleared %s." % [f.flight_number, r.label, "to land" if r.queue[0].operation == "landing" else "for takeoff"]
+	else: return {"ok": false, "message": "Unknown tower command."}
+	decisions.append({"tick": clock.tick, "type": "tower", "flight_id": f.id, "command": command})
+	events.record(clock.tick, "TOWER_COMMAND", f.id, {"command": command, "message": message})
+	return {"ok": true, "message": message}
