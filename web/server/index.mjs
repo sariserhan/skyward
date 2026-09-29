@@ -1,3 +1,4 @@
+import {tripResponse,tripQuery,createTripDiscovery} from './trip-follower.mjs';
 import {createLocalWeather} from './local-weather.mjs';
 import http from 'node:http';
 import { gzip } from 'node:zlib';
@@ -22,6 +23,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const webRoot = resolve(here, '../dist');
 const gameRoot = resolve(here, '../../dist/web');
 const feed = new FeedClient();
+const tripDiscovery=createTripDiscovery(feed);
 const airportWeather=createAirportWeather();
 const localWeather=createLocalWeather();
 const rates = new Map();
@@ -50,6 +52,7 @@ export const server = http.createServer(async (req, res) => {
       if (rate.count > 60) { res.setHeader('Retry-After', String(Math.max(1, Math.ceil((rate.start + 60000 - Date.now()) / 1000)))); return json(res, 429, { error: 'Please wait a moment before refreshing.' }); }
       if (rates.size > 500) rates.delete(rates.keys().next().value);
       try {
+        if(url.pathname==='/api/trips'){try{return json(res,200,url.searchParams.get('sample')==='1'?await tripResponse(url.searchParams):tripDiscovery(tripQuery(url.searchParams)));}catch(e){return json(res,e.status||503,{error:e.status?e.message:'Trip lookup unavailable.'});}}
         if(url.pathname==='/api/weather-overview')return json(res,200,await localWeather.overview());
         if(url.pathname==='/api/local-weather'){const coords=['lat','lon'].map(k=>{const v=url.searchParams.get(k);return v!==null&&v.trim()!==''?Number(v):NaN;});try{return json(res,200,await localWeather(...coords));}catch(e){return json(res,e.status||503,{error:e.status?e.message:'Weather unavailable.'});}}
         if(url.pathname==='/api/airport-weather'){try{return json(res,200,await airportWeather(url.searchParams.get('airport')));}catch(e){return json(res,e.status||503,{error:e.status?e.message:'Weather observations are unavailable. Try again later.'});}}

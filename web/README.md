@@ -1548,3 +1548,38 @@ node web/scripts/prepare-aircraft-lights.mjs
 npm --prefix web run build
 npm --prefix web test
 ```
+
+
+### Free Trip follower
+
+Open **Trip follower** in the observatory footer, enter airport codes (for example
+IST → IAD), choose today, and select **Find flights**. A matched flight's **Watch
+flight** button verifies its current callsign, recent position and route before
+opening Flight view. Saved route/date searches stay on this browser. **Try
+sample** is explicitly synthetic and cannot open sample aircraft on the live map.
+
+`GET /api/trips?from=IST&to=IAD&date=YYYY-MM-DD` uses the existing free position
+and route client; it has no paid-provider dependency or subscription requirement.
+It returns progressive results while checking five bounded regions (origin,
+destination and three great-circle points), then up to 12 candidate routes per
+sweep. Results are shared/cached for 60 seconds, one sweep runs globally at a
+time, and subsequent sweeps rotate through candidates. The open dialog polls
+in-progress discovery every three seconds and refreshes completed discovery
+once a minute. Closing it stops polling; any already-started bounded sweep may
+finish. The existing provider cache, rate limits and backoff remain in effect.
+
+This is a partial observed-flight list, **not all flights or a schedule**. It
+excludes unverified routes and missing/stale positions during discovery; it
+cannot discover scheduled flights that have not transmitted. Dates refer to
+current observations, not a confirmed departure date. Prior dates are not
+supported. Ground proximity and descent infer the displayed phase. Previously
+matched observations, including landed aircraft, are retained in process memory
+for up to one hour with their original timestamps; restarts clear that history.
+No departure/arrival times are invented. Selecting a landed aircraft additionally
+requires a recent ground position at the destination.
+
+Validation: `node --test web/server/trip-follower.test.mjs`, `npm --prefix web test`,
+and `npm --prefix web run build`. Browser QA covers desktop/mobile search,
+phase groups, saved routes, input validation, synthetic isolation and verified
+click-through to Flight view. Discovery tests use deterministic feed fixtures;
+live availability varies with receiver and route-service coverage.
