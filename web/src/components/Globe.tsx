@@ -385,7 +385,8 @@ export function Globe(p: Props) {
   },[ready]);
   useEffect(()=>{
     const v=viewer.current;if(!v||!ready)return;
-    v.shadows=p.preferences.shadows&&p.preferences.quality==='high';v.shadowMap.maximumDistance=10000;v.shadowMap.size=1024;v.scene.requestRender();
+    v.shadows=p.preferences.shadows&&p.preferences.quality==='high';v.shadowMap.maximumDistance=10000;v.shadowMap.size=p.preferences.quality==='high'?2048:1024;
+    v.scene.msaaSamples=p.preferences.quality==='high'?4:1;v.scene.requestRender();
   },[ready,p.preferences.shadows,p.preferences.quality]);
   useEffect(()=>{
     const v=viewer.current;if(!v||!ready||!p.preferences.autoQuality||p.preferences.quality==='low')return;

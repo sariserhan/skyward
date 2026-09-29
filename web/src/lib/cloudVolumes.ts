@@ -27,11 +27,22 @@ void main(){
  vec3 a=(-vec3(1)-origin)*inv,b=(vec3(1)-origin)*inv,lo=min(a,b),hi=max(a,b);
  float begin=max(0.0,max(lo.x,max(lo.y,lo.z))),end=min(hi.x,min(hi.y,hi.z));if(end<=begin)discard;
  float stepSize=(end-begin)/float(${steps});vec4 sum=vec4(0);
+ // Transform the real scene sun into this cloud's local frame, including its scale.
+ vec3 sunlight=normalize((czm_inverseModelView*vec4(czm_sunDirectionEC,0)).xyz);
+ float elevation=dot(normalize(czm_modelView[2].xyz),czm_sunDirectionEC);
+ float day=smoothstep(-.12,.08,elevation);
+ float warm=(1.0-smoothstep(.02,.4,elevation))*day;
+ vec3 sunColor=mix(vec3(1.0,.99,.96),vec3(1.0,.65,.38),warm*.65);
  // Stable local noise: no screen-space randomization or time-driven swimming.
  for(int i=0;i<${steps};i++){
   vec3 p=origin+dir*(begin+(float(i)+.5)*stepSize);float d=density(p);
-  if(d>.01){float light=.25+.75*max(0.0,dot(cloudNormal,normalize(vec3(-.45,-.25,.86))));
-   vec3 base=mix(vec3(.43,.49,.58),vec3(1.0,.99,.96),light)*mix(1.0,.58,cloudParameters().z)*mix(1.0,.32,cloudParameters().y);
+  if(d>.01){float facing=max(0.0,dot(cloudNormal,sunlight));
+   // A short sunward density probe shades the interior of each puff.
+   float occlusion=density(p+sunlight*.18);
+   float light=(.25+.75*facing)*exp(-occlusion*1.8);
+   float rim=pow(max(0.0,dot(dir,sunlight)),8.0)*.18;
+   vec3 base=(mix(vec3(.43,.49,.58),sunColor,light)+sunColor*rim*day)
+     *mix(1.0,.58,cloudParameters().z)*mix(.32,1.0,day);
    float alpha=1.0-exp(-d*stepSize*7.0);sum.rgb+=(1.0-sum.a)*alpha*base;sum.a+=(1.0-sum.a)*alpha;if(sum.a>.985)break;
   }
  }

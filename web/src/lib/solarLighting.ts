@@ -1,3 +1,4 @@
+import {skyObscuration} from './weatherSky.ts';
 import {installNightMap} from './nightMap.ts';
 import type * as Cesium from 'cesium';
 type Engine=typeof Cesium;
@@ -18,6 +19,13 @@ export function solarElevation(C:Engine,position:Cesium.Cartesian3,sun:Cesium.Ca
  const normal=C.Ellipsoid.WGS84.geodeticSurfaceNormal(position,new C.Cartesian3());
  return Math.asin(Math.max(-1,Math.min(1,C.Cartesian3.dot(normal,sun))))*180/Math.PI;
 }
+/** Keep readable ambient light while direct sunlight warms near the horizon. */
+export function aircraftSunColor(elevation:number,altitude=0,cover=0,clarity=false){
+ const k=Math.max(clarity?.35:0,sunlightAmount(elevation,altitude));
+ const warmth=Math.max(0,Math.min(1,(15-elevation)/15))*k;
+ const direct=(1-.65*Math.max(0,Math.min(1,cover)))*k;
+ return [.025+1.975*direct,.035+(1.965-.45*warmth)*direct,.06+(1.94-.85*warmth)*direct];
+}
 /** One scene-wide sun. Each aircraft accounts for Earth's night-side occlusion. */
 export function installSolarLighting(C:Engine,v:Cesium.Viewer){
  const disposeNight=installNightMap(C,v);
@@ -33,7 +41,13 @@ export function installSolarLighting(C:Engine,v:Cesium.Viewer){
  const amount=(entity:Cesium.Entity)=>{const position=entity.position?.getValue(v.clock.currentTime);if(!position)return 1;return sunlightAmount(solarElevation(C,position,sun),C.Cartographic.fromCartesian(position).height);};
  const wire=(entity:Cesium.Entity)=>{
   const model=entity.model;if(!model||wired.has(model))return;wired.add(model);
-  model.lightColor=new C.CallbackProperty(()=>{const k=Math.max(clarityViews.has(v)?.35:0,amount(entity));return new C.Color(.025+1.975*k,.035+1.965*k,.06+1.94*k,1);},false);
+  model.lightColor=new C.CallbackProperty(()=>{
+   const position=entity.position?.getValue(v.clock.currentTime);if(!position)return C.Color.WHITE;
+   // Weather is local to the watched scene: don't dim distant aircraft globally.
+   const local=C.Cartesian3.distance(position,v.camera.positionWC)<20000;
+   const rgb=aircraftSunColor(solarElevation(C,position,sun),C.Cartographic.fromCartesian(position).height,local?skyObscuration(v):0,clarityViews.has(v));
+   return new C.Color(rgb[0],rgb[1],rgb[2],1);
+  },false);
   model.imageBasedLightingFactor=new C.CallbackProperty(()=>{const k=Math.max(clarityViews.has(v)?.5:0,amount(entity));return new C.Cartesian2(.12+.88*k,.06+.94*k);},false);
  };
  const update=()=>{
