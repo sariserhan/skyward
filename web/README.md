@@ -1776,3 +1776,27 @@ career backup and sends only an allowlisted progress summary when syncing. Summa
 are not resumable game backups. Existing cloud copies remain readable/exportable and
 deletable. These policies run on the existing SQLite development and Neon adapters;
 Cloudflare/D1 deployment remains governed by `deployment/FREE_TIER_DESIGN.md`.
+
+### Dimensional clouds and scene preparation
+
+Nearby reported cloud layers now use bounded, ray-marched 3D volumes with uneven
+upper surfaces and shaded undersides. Rain clouds are greyer and thunderstorm
+clouds darker; fair-weather clouds stay brighter. Reported wind gently advects
+nearby volumes. Reduced motion pauses drift. Distant clouds retain the cheaper
+billboard representation; the globe overview remains a station-based illustration,
+not satellite imagery or a measured 3D weather volume.
+
+Clouds survive local grid crossings and new/retiring volumes fade over 2.5 seconds.
+A nearby valid report stays visible while the next area report loads. Terrain
+preloads neighboring tiles (160/320 retained tiles by quality); city buildings
+look up to 25 seconds ahead with a bounded tile set. Height-adjusted building
+meshes retain their old version until their replacements are ready. Flight view
+warms selected and nearby local model files, one request at a time, with a limit
+of 24 models per watched flight. This adds no paid tracking requests. Initial
+network loads, uncached scenery, GPU compilation and unavailable sources can still
+cause visible refinement; these changes reduce popping, not guarantee its absence.
+
+Validation: `npm test`, `npm run build`, and `npm run test:weather` (Python
+Playwright required). Weather browser checks include cloud volume rendering from
+above, grey storm shading parameters, wind movement, reduced-motion pause, and
+cockpit rendering without engine errors.

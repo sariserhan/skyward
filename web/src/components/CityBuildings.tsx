@@ -12,14 +12,14 @@ export function CityBuildings({viewer:v,enabled,quality,terrain,airports,airport
   const C=window.Cesium;
   let worker:Worker;
   try{worker=new Worker(new URL('../workers/cityBuildings.worker.ts',import.meta.url),{type:'module'});}catch{setStatus('3D city buildings are unavailable in this browser.');return;}
-  const cache=new Map<string,CityBuilding[]>(),pending=new Set<string>(),failed=new Map<string,number>(),meshes=new Map<string,Cesium.Primitive>();
-  let desired:CityTile[]=[],disposed=false,lastUpdate=0,terrainTimer:ReturnType<typeof setTimeout>|undefined;
+  const cache=new Map<string,CityBuilding[]>(),pending=new Set<string>(),failed=new Map<string,number>(),meshes=new Map<string,Cesium.Primitive>(),replacements=new Map<string,Cesium.Primitive>();
+  let previous:{lon:number;lat:number;time:number}|null=null;let desired:CityTile[]=[],disposed=false,lastUpdate=0,terrainTimer:ReturnType<typeof setTimeout>|undefined;
   const credit=new C.Credit('<a href="https://openmaptiles.org/">© OpenMapTiles</a> · <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>',true);
   v.creditDisplay.addStaticCredit(credit);
   const exclusions=airportStructures?airports.flatMap(a=>a.surfaces.filter(s=>s.kind!=='apron').map(s=>({minX:Math.min(...s.points.map(p=>p[0])),maxX:Math.max(...s.points.map(p=>p[0])),minY:Math.min(...s.points.map(p=>p[1])),maxY:Math.max(...s.points.map(p=>p[1]))}))):[];
-  function clear(){for(const mesh of meshes.values())v!.scene.primitives.remove(mesh);meshes.clear();}
-  function draw(key:string,buildings:CityBuilding[]){
-   if(disposed||v!.isDestroyed()||meshes.has(key))return;
+  function clear(){for(const mesh of [...meshes.values(),...replacements.values()])v!.scene.primitives.remove(mesh);meshes.clear();replacements.clear();}
+  function draw(key:string,buildings:CityBuilding[],replace=false){
+   if(disposed||v!.isDestroyed()||replacements.has(key)||(!replace&&meshes.has(key)))return;
    const instances:Cesium.GeometryInstance[]=[];
    for(const [index,b] of buildings.entries()){
     const ring=b.rings[0];if(!ring?.length)continue;
@@ -29,7 +29,7 @@ export function CityBuildings({viewer:v,enabled,quality,terrain,airports,airport
     const hierarchy=new C.PolygonHierarchy(C.Cartesian3.fromDegreesArray(ring.flat()),b.rings.slice(1).map(hole=>new C.PolygonHierarchy(C.Cartesian3.fromDegreesArray(hole.flat()))));
     instances.push(new C.GeometryInstance({id:`city-building-${key}-${index}`,geometry:new C.PolygonGeometry({polygonHierarchy:hierarchy,height:base+b.base,extrudedHeight:base+b.height,vertexFormat:C.PerInstanceColorAppearance.VERTEX_FORMAT}),attributes:{color:C.ColorGeometryInstanceAttribute.fromColor(C.Color.fromCssColorString(b.height>80?'#acb9c0':b.height>25?'#b5b9b7':'#c1bcb0'))}}));
    }
-   if(instances.length)meshes.set(key,v!.scene.primitives.add(new C.Primitive({geometryInstances:instances,appearance:new C.PerInstanceColorAppearance({closed:true,translucent:false,flat:false}),asynchronous:true,allowPicking:false})));
+   if(instances.length)(replace&&meshes.has(key)?replacements:meshes).set(key,v!.scene.primitives.add(new C.Primitive({geometryInstances:instances,appearance:new C.PerInstanceColorAppearance({closed:true,translucent:false,flat:false}),asynchronous:true,allowPicking:false})));
    v!.scene.requestRender();
   }
   function pump(){
@@ -57,14 +57,22 @@ export function CityBuildings({viewer:v,enabled,quality,terrain,airports,airport
    const ray=cam.getPickRay(new C.Cartesian2(v!.canvas.clientWidth/2,v!.canvas.clientHeight*.6));
    const hit=ray?v!.scene.globe.pick(ray,v!.scene):undefined;
    const focus=hit?C.Cartographic.fromCartesian(hit):cam.positionCartographic;
-   desired=cityTiles(C.Math.toDegrees(focus.longitude),C.Math.toDegrees(focus.latitude),quality);
-   const keys=new Set(desired.map(t=>t.key));for(const [key,mesh] of meshes)if(!keys.has(key)){v!.scene.primitives.remove(mesh);meshes.delete(key);}
+   const lon=C.Math.toDegrees(focus.longitude),lat=C.Math.toDegrees(focus.latitude);
+   const current=cityTiles(lon,lat,quality),elapsed=previous?(now-previous.time)/1000:0;
+   const dx=previous?((lon-previous.lon+540)%360)-180:0,dy=previous?lat-previous.lat:0;
+   // Look 25 seconds ahead while following a flight; don't prefetch after a camera teleport.
+   const ahead=elapsed>0&&Math.hypot(dx,dy)<.08?cityTiles(lon+Math.max(-.035,Math.min(.035,dx/elapsed*25)),lat+Math.max(-.035,Math.min(.035,dy/elapsed*25)),quality):[];
+   previous={lon,lat,time:now};
+   desired=[...new Map([...current,...ahead].map(t=>[t.key,t])).values()];
+   const keys=new Set(desired.map(t=>t.key));for(const [key,mesh] of meshes)if(!keys.has(key)){v!.scene.primitives.remove(mesh);meshes.delete(key);const replacement=replacements.get(key);if(replacement){v!.scene.primitives.remove(replacement);replacements.delete(key);}}
    pump();
   }
   const remove=v.camera.moveEnd.addEventListener(update),timer=setInterval(update,1500);
-  const terrainRemove=terrain?v.scene.globe.tileLoadProgressEvent.addEventListener((count:number)=>{if(count)return;clearTimeout(terrainTimer);terrainTimer=setTimeout(()=>{if(disposed||v.isDestroyed())return;clear();pump();},1000);}):()=>{};
+  const terrainRemove=terrain?v.scene.globe.tileLoadProgressEvent.addEventListener((count:number)=>{if(count)return;clearTimeout(terrainTimer);terrainTimer=setTimeout(()=>{if(disposed||v.isDestroyed())return;for(const tile of desired){const buildings=cache.get(tile.key);if(buildings)draw(tile.key,buildings,true);}},1500);}):()=>{};
+  // Keep the existing mesh visible while an elevation-adjusted replacement builds.
+  const swap=v.scene.postRender.addEventListener(()=>{for(const [key,mesh] of replacements){if(!mesh.ready)continue;const old=meshes.get(key);if(old)v.scene.primitives.remove(old);meshes.set(key,mesh);replacements.delete(key);v.scene.requestRender();}});
   update();
-  return()=>{disposed=true;clearInterval(timer);clearTimeout(terrainTimer);remove();terrainRemove();worker.terminate();if(!v.isDestroyed()){clear();v.creditDisplay.removeStaticCredit(credit);v.scene.requestRender();}};
+  return()=>{disposed=true;clearInterval(timer);clearTimeout(terrainTimer);remove();terrainRemove();swap();worker.terminate();if(!v.isDestroyed()){clear();v.creditDisplay.removeStaticCredit(credit);v.scene.requestRender();}};
  },[v,enabled,quality,terrain,airports,airportStructures]);
  return enabled&&statusHost?createPortal(<small className="city-buildings-status" role="status">{status}</small>,statusHost):null;
 }

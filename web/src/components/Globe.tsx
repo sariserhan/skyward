@@ -1,3 +1,4 @@
+import {createModelWarmup} from '../lib/sceneWarmup';
 import {rotorRig} from '../lib/rotorAnimation';
 import {installTouchdownEffects} from '../lib/touchdownEffects';
 import {readCabinAudio} from '../lib/cabinAudio';
@@ -91,6 +92,15 @@ export function Globe(p: Props) {
   const selectRef = useRef(p.select); selectRef.current = p.select;
   const [flightOpen,setFlightOpen]=useState(false);const flightOpenRef=useRef(false);flightOpenRef.current=flightOpen;
   const [modelCameraRevision,setModelCameraRevision]=useState(0);
+  useEffect(()=>{
+    if(!p.selected||p.obscured)return;
+    const warmer=createModelWarmup(new URL(BASE,location.href).href);
+    const warm=()=>{const state=callbacks.current,a=state.selected;if(!a||!hasPosition(a)||document.hidden)return;
+      warmer.add(fleetUri(a));if(!flightOpen)return;
+      state.aircraft.filter(b=>b.hex!==a.hex&&b.targetKind==='aircraft'&&hasPosition(b)).map(b=>({b,d:Math.hypot((b.lon!-a.lon!)*Math.cos(a.lat!*Math.PI/180),b.lat!-a.lat!)})).filter(x=>x.d<.25).sort((a,b)=>a.d-b.d).slice(0,state.preferences.quality==='low'?1:3).forEach(({b})=>warmer.add(fleetUri(b)));
+    };warm();const timer=setInterval(warm,10000);return()=>{clearInterval(timer);warmer.dispose();};
+  },[flightOpen,p.obscured,p.selected?.hex]);
+
   const cameraMoving=useRef(false);
 
 
@@ -143,6 +153,10 @@ export function Globe(p: Props) {
       v.scene.backgroundColor = C.Color.fromCssColorString('#07121b');
       v.resolutionScale = Math.min(devicePixelRatio, 1.5);
       v.scene.globe.maximumScreenSpaceError = 1.5;
+      // Retain nearby detail and load adjacent tiles before the following camera reaches them.
+      v.scene.globe.preloadSiblings = true;
+      v.scene.globe.preloadAncestors = true;
+      v.scene.globe.tileCacheSize = callbacks.current.preferences.quality==='low'?160:320;
       v.scene.postProcessStages.fxaa.enabled = true;
       if(v.scene.skyAtmosphere) v.scene.skyAtmosphere.show = true;
       v.scene.globe.baseColor = C.Color.fromCssColorString('#10283b');
