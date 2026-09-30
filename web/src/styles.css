@@ -180,12 +180,13 @@
 .upgrade-trigger{display:inline-flex;align-items:center;justify-content:center;gap:6px;flex-shrink:0;white-space:nowrap;padding:7px 11px;border:1px solid #8fdfc8;border-radius:7px;background:#173c3c;color:#b8ffe5;font-size:11px;font-weight:600}
 .upgrade-trigger:hover{background:#225451}
 .upgrade-dialog{box-sizing:border-box;width:min(620px,calc(100vw - 28px));max-height:calc(100dvh - 32px);overflow:auto;margin:auto;padding:24px;border:1px solid #527276;border-radius:16px;background:#0c202c;color:#e6f1f4;box-shadow:0 24px 100px #0008;text-align:left;font-size:14px;line-height:1.6}
+.upgrade-dialog-expanded{width:min(980px,calc(100vw - 28px))}
 .upgrade-dialog::backdrop{background:#020d18c9;backdrop-filter:blur(5px)}
 .upgrade-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;color:#9fe8d0;font-size:10px;letter-spacing:1px}
 .upgrade-heading button{min-width:44px;min-height:44px;flex-shrink:0}
 .upgrade-dialog h2{font-size:28px;line-height:1.2;margin:14px 0}
 .upgrade-dialog p{color:#b8cbd4;margin:12px 0}
-.upgrade-plans{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}
+.upgrade-plans{display:grid;grid-template-columns:minmax(200px,1fr) minmax(0,2.6fr);gap:12px;margin:22px 0}
 .upgrade-plans section{padding:16px;border:1px solid #35515e;border-radius:10px;min-width:0}
 .upgrade-plans .upgrade-premium{border-color:#75bfa7;background:#153333}
 .upgrade-plans h3{font-size:19px;margin:0}.upgrade-plans p,.upgrade-plans li{font-size:12px}
@@ -194,6 +195,7 @@
 .upgrade-dialog .upgrade-availability{font-size:12px;color:#d8e7ed}.upgrade-dialog .upgrade-privacy{font-size:11px}
 .upgrade-return{min-height:44px;padding:10px 16px;margin-top:8px;background:#9ce5ce;border-radius:7px;color:#102822;font-weight:600}
 .upgrade-dialog :focus-visible,.upgrade-trigger:focus-visible{outline:2px solid #b0ffe2;outline-offset:3px}
+@media(max-width:899px){.upgrade-plans{grid-template-columns:1fr}}
 @media(max-width:759px){.statusbar>.upgrade-trigger{display:inline-flex!important;order:4;min-height:40px;padding:6px 10px;font-size:11px}.upgrade-dialog{padding:18px}.upgrade-dialog h2{font-size:24px}.upgrade-plans{grid-template-columns:1fr;gap:10px}.upgrade-plans section{padding:12px}}
 
 /* One shared row keeps primary map controls aligned in every viewing mode. */

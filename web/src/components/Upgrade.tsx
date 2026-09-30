@@ -18,7 +18,7 @@ export function Upgrade({openJourney}:{openJourney:(hex:string)=>Promise<void>})
   return <>
     <button ref={trigger} className="upgrade-trigger" aria-haspopup="dialog" onClick={() => show()}><Sparkles size={14}/>Upgrade</button>
     <button className="account-trigger quiet-button" onClick={()=>show(true)} aria-haspopup="dialog">Account &amp; journeys</button>
-    <dialog ref={dialog} className="upgrade-dialog" aria-labelledby="upgrade-title" aria-describedby="upgrade-description" onClose={() => {setOpen(false);trigger.current?.focus();}} onClick={e => {if(e.target === e.currentTarget) close();}}>
+    <dialog ref={dialog} className={`upgrade-dialog${accountOnly?'':' upgrade-dialog-expanded'}`} aria-labelledby="upgrade-title" aria-describedby="upgrade-description" onClose={() => {setOpen(false);trigger.current?.focus();}} onClick={e => {if(e.target === e.currentTarget) close();}}>
       <div className="upgrade-heading"><span>SKYWARD PREMIUM{account?.billingReady?(account.mode==='test'?' · TEST CHECKOUT':''):account?' · CHECKOUT UNAVAILABLE':''}</span><button className="icon-button" aria-label="Close upgrade details" onClick={close}><X size={20}/></button></div>
       <h2 id="upgrade-title">{accountOnly?'Your Skyward':'Your flight. Their window to the world.'}</h2>
       <p id="upgrade-description">Scan your boarding pass or add your flight and seat. Keep a personal travel companion—and choose to bring others along.</p>
