@@ -53,3 +53,31 @@ Unregistered customers and unrelated events are acknowledged without writes. Ful
 ## Verification before accepting money
 
 Automated tests use fake Stripe responses and signed local fixtures. Browser tests mock the Stripe form boundary; they cannot certify actual payment-method behavior. With test credentials, complete a Stripe test-card payment, a decline, required authentication, a duplicate event, a cancellation and a payment-failure scenario. Confirm account access, secret mode separation, Customer Portal, accurate annual total/tax display and working webhook deliveries. No real charge or remote Stripe configuration is made by this repository change.
+
+## Local sandbox verification — 2026-09-30
+
+Run `npm --prefix web run check:stripe` for read-only validation of active local test
+keys and the annual price. It refuses live keys and never prints credentials or
+creates payment objects. The active local `STRIPE_PRICE_ANNUAL_ID` was corrected
+from a product ID to its existing $59.99 USD/year test price. Commented live values
+were left untouched; `.env.local` remains untracked.
+
+Validation used a separate temporary SQLite database, loopback port 8793, test keys,
+no development Premium bypass, and an example.invalid test account:
+
+- Eleven checkout/webhook/D1 integration regression tests passed, including annual
+  price validation, ownership, signature checks, duplicate events and reconciliation.
+- A real Stripe sandbox embedded Checkout Session loaded through the local account
+  screen with the correct yearly price and no JavaScript runtime errors.
+- A real Stripe sandbox subscription paid using Stripe's test token became active;
+  the local account endpoint granted Premium based on Stripe's state. Canceling the
+  subscription removed Premium on the next account check.
+- The test subscription was canceled, open Checkout Sessions expired, and the
+  isolated Stripe customer deleted after testing. No live payment was attempted.
+- Browser plugin was unavailable; Chromium Playwright was used. The embedded form
+  displayed verification challenges, and the card interaction could not complete
+  in the headless run. A successful browser Checkout submission, declined-card UI,
+  3DS flow and Stripe-to-local webhook delivery remain unverified. The API-side
+  subscription test is not a claim that browser Checkout completed.
+
+Production configuration and deployment were not changed by these local tests.

@@ -79,6 +79,7 @@
     "dev:cloudflare": "wrangler dev --local",
     "check:cloudflare": "wrangler deploy --dry-run --outdir .cloudflare/worker",
     "db:migrate:d1:local": "wrangler d1 migrations apply skyward-accounts --local",
-    "assets:r2:plan": "node scripts/upload-cloudflare-assets.mjs"
+    "assets:r2:plan": "node scripts/upload-cloudflare-assets.mjs",
+    "check:stripe": "node --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/check-stripe.mjs"
   }
 }
