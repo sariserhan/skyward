@@ -19,8 +19,9 @@ export function CityLabels({viewer,cities,enabled,large,flight=false,aircraftHex
    if(v.isDestroyed()||document.hidden)return;
    const picked=v.camera.pickEllipsoid(new C.Cartesian2(v.canvas.clientWidth*.5,v.canvas.clientHeight*.65),v.scene.globe.ellipsoid);
    const frame=aircraftHex?sharedLiveMotion.displayed(aircraftHex):null;
-   const center=picked?C.Cartographic.fromCartesian(picked):frame?C.Cartographic.fromDegrees(frame.lon,frame.lat):v.camera.positionCartographic;
-   const tiles=cityTiles(C.Math.toDegrees(center.longitude),C.Math.toDegrees(center.latitude),'low',placeLabelZoom(v.camera.positionCartographic.height)),key=tiles.map(t=>t.key).join('|');desired=tiles.map(t=>t.key);
+   const entityPosition=aircraftHex?v.entities.getById(`aircraft-${aircraftHex}`)?.position?.getValue(v.clock.currentTime):undefined;
+   const center=entityPosition?C.Cartographic.fromCartesian(entityPosition):frame?C.Cartographic.fromDegrees(frame.lon,frame.lat):picked?C.Cartographic.fromCartesian(picked):v.camera.positionCartographic;
+   const tiles=cityTiles(C.Math.toDegrees(center.longitude),C.Math.toDegrees(center.latitude),'balanced',placeLabelZoom(v.camera.positionCartographic.height)),key=tiles.map(t=>t.key).join('|');desired=tiles.map(t=>t.key);
    if(key!==lastKey){lastKey=key;publishNearbyFeatures(desired.flatMap(k=>features.get(k)??[]));publish();}
    for(const tile of tiles)if(pending.size<4&&!cache.has(tile.key)&&!pending.has(tile.key)&&(failed.get(tile.key)??0)<Date.now()){pending.add(tile.key);worker.postMessage({tile,limit:150,places:true});}
   };
@@ -35,7 +36,7 @@ export function CityLabels({viewer,cities,enabled,large,flight=false,aircraftHex
  useEffect(()=>{if(viewer&&!viewer.isDestroyed())viewer.scene.requestRender();},[viewer,places]);
  useEffect(()=>{
   if(!viewer||!enabled)return;const v=viewer,C=window.Cesium;
-  const makeEntry=(city:City,key:string)=>{const position=C.Cartesian3.fromDegrees(city.lon,city.lat,40);return {city,position,cartographic:C.Cartographic.fromDegrees(city.lon,city.lat),normal:v.scene.globe.ellipsoid.geodeticSurfaceNormal(position),e:v.entities.add({id:`city-${key}`,show:false,position,label:{text:`• ${city.name}`,font:`${city.capital?'600':'400'} ${large?17:13}px sans-serif`,fillColor:C.Color.fromCssColorString('#fff2d2'),style:C.LabelStyle.FILL_AND_OUTLINE,outlineColor:C.Color.fromCssColorString('#15252c'),outlineWidth:4,heightReference:C.HeightReference.RELATIVE_TO_GROUND,disableDepthTestDistance:0,horizontalOrigin:C.HorizontalOrigin.LEFT,pixelOffset:new C.Cartesian2(5,0)}})};};
+  const makeEntry=(city:City,key:string)=>{const position=C.Cartesian3.fromDegrees(city.lon,city.lat,40);return {city,position,cartographic:C.Cartographic.fromDegrees(city.lon,city.lat),normal:v.scene.globe.ellipsoid.geodeticSurfaceNormal(position),e:v.entities.add({id:`city-${key}`,show:false,position,label:{text:`• ${city.name}`,font:`${city.capital?'600':'400'} ${large?17:13}px sans-serif`,fillColor:C.Color.fromCssColorString('#fff2d2'),style:C.LabelStyle.FILL_AND_OUTLINE,outlineColor:C.Color.fromCssColorString('#15252c'),outlineWidth:4,heightReference:flight?C.HeightReference.NONE:C.HeightReference.RELATIVE_TO_GROUND,disableDepthTestDistance:flight?Number.POSITIVE_INFINITY:0,horizontalOrigin:C.HorizontalOrigin.LEFT,pixelOffset:new C.Cartesian2(5,0)}})};};
   const entries=new Map<string,ReturnType<typeof makeEntry>>();let activePlaces:City[]|null=null,orderedEntries:ReturnType<typeof makeEntry>[]=[];
   let last=0;const delta=new C.Cartesian3();
   const update=()=>{
@@ -48,8 +49,8 @@ export function CityLabels({viewer,cities,enabled,large,flight=false,aircraftHex
     orderedEntries=ordered;
    }
    const h=v.camera.positionCartographic.height;const maxRank=flight?10:h>7000000?2:h>2500000?4:h>800000?6:10;
-   // These are WebGL labels, not DOM layers: depth-test them and reserve
-   // screen space for each visible aircraft model or marker before placing text.
+   // Reserve screen space for aircraft models and markers before placing text.
+   // Flight annotations bypass terrain depth, but never aircraft exclusion.
    const aircraftBoxes:ScreenBox[]=[],modelBounds=new Map<string,Cesium.BoundingSphere>();
    for(let i=0;i<v.scene.primitives.length;i++){const primitive=v.scene.primitives.get(i);if(primitive instanceof C.Model&&primitive.ready&&primitive.show&&primitive.id instanceof C.Entity)modelBounds.set(primitive.id.id,primitive.boundingSphere);}
    for(const aircraft of v.entities.values){
@@ -66,7 +67,7 @@ export function CityLabels({viewer,cities,enabled,large,flight=false,aircraftHex
     aircraftBoxes.push({x:pt.x-radius,y:pt.y-radius,width:radius*2,height:radius*2});
    }
    const density=readFlightPreferences().labelDensity;const boxes:{x:number;y:number;w:number}[]=[];
-   for(const e of v.entities.values){if(!e.show||!e.id.startsWith('atlas-country-')||!e.position||!e.label)continue;const position=e.position.getValue(v.clock.currentTime);if(!position)continue;const point=C.SceneTransforms.worldToWindowCoordinates(v.scene,position);if(point){const w=String(e.label.text?.getValue(v.clock.currentTime)??'').length*(large?8.5:6.5);boxes.push({x:point.x-w/2,y:point.y,w});}}
+   for(const e of v.entities.values){if(!e.show||!e.id.startsWith('atlas-country-')||!e.position||!e.label)continue;const position=e.position.getValue(v.clock.currentTime);if(!position)continue;const point=C.SceneTransforms.worldToWindowCoordinates(v.scene,position);if(point){const w=String(e.label.text?.getValue(v.clock.currentTime)??'').length*(large?8.5:6.5);if(point.x+w/2>0&&point.x-w/2<v.canvas.clientWidth&&point.y>=0&&point.y<v.canvas.clientHeight)boxes.push({x:point.x-w/2,y:point.y,w});}}
    const limit=flight?(density==='sparse'?8:density==='rich'?40:24):65;
    for(const {city,position:base,cartographic,normal,e} of orderedEntries){
     // Reject labels that cannot be drawn before querying terrain. The conservative
@@ -82,6 +83,10 @@ export function CityLabels({viewer,cities,enabled,large,flight=false,aircraftHex
      const pt=C.SceneTransforms.worldToWindowCoordinates(v.scene,position),w=city.name.length*(large?9:7)+18;
      if(pt&&!overlapsAircraft({x:pt.x,y:pt.y-14,width:w+10,height:28},aircraftBoxes)&&pt.x>=10&&pt.y>=12&&pt.x+w<v.canvas.clientWidth-10&&pt.y<v.canvas.clientHeight-35&&boxes.length<limit&&!boxes.some(b=>Math.abs(b.y-pt.y)<26&&pt.x<b.x+b.w+14&&pt.x+w+14>b.x)){visible=true;boxes.push({x:pt.x,y:pt.y,w});}
     }
+    // Use the same terrain-adjusted position for visibility and drawing. Flight
+    // labels are map annotations; keep them readable over terrain, with aircraft
+    // exclusion above handling priority instead of terrain depth testing.
+    if(visible&&flight){const current=e.position?.getValue(v.clock.currentTime);if(!current||!C.Cartesian3.equalsEpsilon(current,position,0,.5)){if(e.position instanceof C.ConstantPositionProperty)e.position.setValue(position);else e.position=new C.ConstantPositionProperty(position);}}
     e.show=visible;
    }
   };
