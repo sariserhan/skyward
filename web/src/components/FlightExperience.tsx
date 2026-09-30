@@ -72,6 +72,10 @@ export function FlightExperience(p:Props){
   const layout=()=>{const canvas=v.canvas.getBoundingClientRect(),panel=panelRef.current?.getBoundingClientRect();box=panel?{left:panel.left-canvas.left,top:panel.top-canvas.top,right:panel.right-canvas.left,bottom:panel.bottom-canvas.top}:null;layoutDirty=true;};
   const observedPanel=panelRef.current;observedPanel?.addEventListener('panelpositionchange',layout);
   const resize=new ResizeObserver(layout);resize.observe(v.canvas);if(panelRef.current)resize.observe(panelRef.current);layout();
+  function pose(entity:Cesium.Entity,position:Cesium.Cartesian3,orientation:Cesium.Quaternion){
+   if(entity.position instanceof C.ConstantPositionProperty)entity.position.setValue(position);else entity.position=new C.ConstantPositionProperty(position);
+   if(entity.orientation instanceof C.ConstantProperty)entity.orientation.setValue(orientation);else entity.orientation=new C.ConstantProperty(orientation);
+  }
   function gear(entity:Cesium.Entity,a:Aircraft,amount:number,speed:number,moving:boolean,heading?:number,flaps=amount*.5,ground=false){
    if(!entity.model)return;
    applyAircraftRig(entity,elapsed.current,moving||sourcedModel(a.aircraftType)?speed:0,amount,0,flaps,heading,ground,!!state.current.p.reducedMotion);
@@ -117,8 +121,10 @@ export function FlightExperience(p:Props){
    return (view==='cabin'&&(Math.abs(windowSeat-s.cabinSeat)>.0001||Math.abs(windowLook-s.cabinLook)>.01))||blendBack<1||Math.abs(targetRange-cameraRange)>.05||Math.abs(((targetAngle-cameraAngle+540)%360)-180)>.02;
   }
   let cameraMoving=true;const motion=sharedLiveMotion,weatherMotion=createWeatherMotion();
+  // Follow the display cadence: a 33ms gate drops alternating frames at 60Hz
+  // (and often falls to 20Hz with timer jitter), affecting every flight view.
   const tick=(now:number)=>{
-   if(v.isDestroyed())return;frame.current=requestAnimationFrame(tick);if(document.hidden||state.current.p.suspended)return;if(last.current&&now-last.current<33)return;
+   if(v.isDestroyed())return;frame.current=requestAnimationFrame(tick);if(document.hidden||state.current.p.suspended){last.current=0;return;}
    const s=state.current;controller.enableCollisionDetection=s.view==='free'||s.view==='route'?originalCollision:false;const dt=last.current?Math.min(.1,(now-last.current)/1000):.033;last.current=now;elapsed.current+=dt;
    let fraction=s.progress;if(s.demo&&s.playing){fraction=Math.min(1,fraction+dt/45);state.current.progress=fraction;setProgress(fraction);if(fraction===1)setPlaying(false);}
    const a=s.p.aircraft;if(!a)return;const r=s.p.geometry?.airports[0]?.runways[s.runway],actual=v.entities.getById(`aircraft-${a.hex}`);if(actual)actual.show=!s.demo&&s.view!=='cockpit';
@@ -138,10 +144,10 @@ export function FlightExperience(p:Props){
      if(!shown)shown=v.entities.add({id:'flight-simulation',model:{uri:import.meta.env.BASE_URL+(s.p.modelStage==='primary'?fleetUri(a):fallbackFleetUri(a)),minimumPixelSize:0,maximumScale:1,heightReference:C.HeightReference.NONE,shadows:C.ShadowMode.ENABLED},label:{text:'SIMULATION',font:'bold 14px sans-serif',fillColor:C.Color.ORANGE,pixelOffset:new C.Cartesian2(0,-65)}});
      if(shown.model?.uri?.getValue(v.clock.currentTime)!==import.meta.env.BASE_URL+(s.p.modelStage==='primary'?fleetUri(a):fallbackFleetUri(a)))shown.model!.uri=new C.ConstantProperty(import.meta.env.BASE_URL+(s.p.modelStage==='primary'?fleetUri(a):fallbackFleetUri(a)));
      gear(shown,a,illustrativeGear(s.demo,fraction),s.demo==='takeoff'?fraction*220:(1-fraction)*140,movingWheels,heading,illustrativeGear(s.demo,fraction)*.5,!!fix.ground);
-     shown.position=new C.ConstantPositionProperty(position);shown.orientation=new C.ConstantProperty(C.Transforms.headingPitchRollQuaternion(position,new C.HeadingPitchRoll((heading-90)*Math.PI/180,pitch*Math.PI/180,0)));
+     pose(shown,position,C.Transforms.headingPitchRollQuaternion(position,new C.HeadingPitchRoll((heading-90)*Math.PI/180,pitch*Math.PI/180,0)));
     }else{
      if(shown){v.entities.remove(shown);shown=undefined;}
-     if(actual){if(actual.model)actual.model.heightReference=new C.ConstantProperty(C.HeightReference.NONE);if(actual.billboard)actual.billboard.heightReference=new C.ConstantProperty(C.HeightReference.NONE);actual.position=new C.ConstantPositionProperty(position);actual.orientation=new C.ConstantProperty(C.Transforms.headingPitchRollQuaternion(position,new C.HeadingPitchRoll(...aircraftModelAttitude(heading,pitch+rough.pitch,animation.bank+rough.roll))));}
+     if(actual){if(actual.model&&actual.model.heightReference?.getValue(v.clock.currentTime)!==C.HeightReference.NONE)actual.model.heightReference=new C.ConstantProperty(C.HeightReference.NONE);if(actual.billboard&&actual.billboard.heightReference?.getValue(v.clock.currentTime)!==C.HeightReference.NONE)actual.billboard.heightReference=new C.ConstantProperty(C.HeightReference.NONE);pose(actual,position,C.Transforms.headingPitchRollQuaternion(position,new C.HeadingPitchRoll(...aircraftModelAttitude(heading,pitch+rough.pitch,animation.bank+rough.roll))));}
     }
    }
    if(!s.demo&&actual)gear(actual,a,animation.gear,fix&&'groundSpeed' in fix?fix.groundSpeed??0:a.groundSpeed??0,movingWheels,heading,animation.flaps,!!fix?.ground);
