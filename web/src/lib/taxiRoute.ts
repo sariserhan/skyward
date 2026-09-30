@@ -1,3 +1,4 @@
+import {airportParkingStands} from './airportScenery.ts';
 import {groundSegmentClear,groundRouteClear} from './groundSafety.ts';
 import type {AirportGeometry} from '../types.ts';
 import {bearing} from './flightPresentation.ts';
@@ -24,7 +25,7 @@ export function planTaxi(airport:AirportGeometry,from:{lon:number;lat:number},to
   }
  }
  const gates=new Map<number,string>();
- for(const gate of airport.gates){const p=project(...gate.position);let best=-1,near=60;nodes.forEach((n,i)=>{const d=distance(p,n);if(n.parking&&d<near){near=d;best=i;}});if(best>=0)gates.set(best,gate.label);}
+ for(const gate of airportParkingStands(airport,clearance)){const p=project(...gate.position);let best=-1,near=2;nodes.forEach((n,i)=>{const d=distance(p,n);if(n.parking&&d<near){near=d;best=i;}});if(best>=0)gates.set(best,gate.label);}
  if(!gates.size)return fail();
  const a=project(from.lon,from.lat),b=project(to.lon,to.lat),dx=b.x-a.x,dy=b.y-a.y,L=Math.hypot(dx,dy);if(L<400)return fail();
  const costs=nodes.map(()=>Infinity),parents=nodes.map(()=>-1),roots=nodes.map(()=>-1),stops=new Map<number,Point>();

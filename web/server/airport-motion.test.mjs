@@ -51,3 +51,13 @@ test('a late touchdown cannot taxi backward to an exit already passed',()=>{
   const frame=predictedLanding(plane,100000+seconds*1000,route,airport);assert.ok(frame);assert.ok(frame.lon>=previous-1e-8);assert.notEqual(frame.landingPhase,'taxi');previous=frame.lon;
  }
 });
+
+test('terminal gate pins share a safe mapped stand center with the 3D boarding bridge',async()=>{
+ const {airportParkingStands,airportStandDetails}=await import('../src/lib/airportScenery.ts');
+ const port={...airport,gates:[{label:'A1',position:[.02,.0024]}],surfaces:[{kind:'apron',height:0,points:[[.019,.0008],[.021,.0008],[.021,.0024],[.019,.0024]]},{kind:'terminal',height:12,points:[[.019,.0024],[.021,.0024],[.021,.0028],[.019,.0028]]}]};
+ const stands=airportParkingStands(port,30);assert.equal(stands.length,1);assert.deepEqual(stands[0].position,[.02,.002]);
+ const route=planTaxi(port,{lon:0,lat:0},{lon:.025,lat:0},30);assert.ok(route);const parked=taxiFrame(route,10000);assert.equal(parked.gate,'A1');assert.equal(parked.groundSpeed,0);
+ const bridge=airportStandDetails(port)[0];assert.ok(bridge);assert.deepEqual(bridge.gate,stands[0].position);assert.ok(trackDistance(parked,{lon:bridge.gate[0],lat:bridge.gate[1]})<1e-8);
+ assert.ok(trackDistance({lon:bridge.start[0],lat:bridge.start[1]},{lon:bridge.end[0],lat:bridge.end[1]})*1852<8.1,'bridge remains retracted during taxi');
+ assert.equal(airportParkingStands(port,48).length,0,'widebody cannot fit a narrow terminal stand');
+});

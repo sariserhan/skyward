@@ -508,6 +508,8 @@ rate limiting uses bounded transient connection-address state, as other APIs do.
 
 ### Airport ground clearance
 
+Mapped parking-path endpoints are shared by the taxi planner and 3D gate scenery, rather than treating terminal gate pins as aircraft centers. Nearby gates include raised boarding bridges, supports, docking cabins and labels. For a watched parked aircraft, its selected bridge extends toward an approximate left-forward door position; other bridges remain retracted. This is illustrative docking and stand selection, not a reported gate assignment or a surveyed model-specific door connection. Missing/disconnected mapping retains the safe fallback behavior.
+
 Mapped taxi routes, rounded turns and illustrative stand connectors are checked against building footprints using aircraft-sized clearance envelopes. Unsafe routes are rejected; fallback parking tries clear alternatives and returns unavailable if none fits. Simulated stand placement is checked too, with blocked initial ground positions replaced by airborne demo traffic.
 
 Watched-arrival and Skyward traffic use a separate presentation clock to brake, hold for ground separation and resume without altering received observations. After touchdown, the watched arrival remains grounded through taxi and parking even if feed callsigns change or reduced-motion preferences are toggled; “Return to live tracking” explicitly releases that presentation. Occupied touchdowns trigger an illustrative go-around; tower ground demonstrations also check swept paths and publish their occupancy. Ground aircraft render at physical scale rather than being enlarged for visibility. Building checks are cached, and approach/runway checks are throttled.
