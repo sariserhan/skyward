@@ -514,3 +514,9 @@ suspicious imports. Facility buttons enable automatically when data is available
 See [import, validation, and static/R2 delivery instructions](web/scripts/AIRPORT_FACILITIES.md).
 The build produces a checksummed airport asset manifest without uploading or
 writing geometry to the account database. Source coverage remains partial.
+
+Flight-view location maps remain available when a route is missing, loading, or
+unconfirmed. Their marker follows the displayed aircraft position, including
+interpolated/predicted motion; it is not a new position observation. Nearby
+city/town/village labels use bounded, cached place tiles during flight view, with
+the bundled reference cities retained if detailed tiles are unavailable.
