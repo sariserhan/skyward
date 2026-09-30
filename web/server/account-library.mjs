@@ -1,6 +1,5 @@
 import airframeSource from '../data/airframe-catalog.json' with {type:'json'};
-import {normalizedFollows,publishedCatalog} from '../src/lib/airframeCatalog.ts';
-const airframeCatalog=publishedCatalog(airframeSource);
+import {normalizedFollows} from '../src/lib/airframeCatalog.ts';
 import {librarySummary} from './simulator-replay.mjs';
 import {validBackupValue} from '../src/lib/localBackup.ts';
 import {ACCOUNT_LIBRARY_LIMITS,ACCOUNT_LIBRARY_BYTES,careerProgress} from '../src/lib/accountStoragePolicy.ts';
@@ -19,7 +18,7 @@ export function validateLibrary(kind,value){
   // Explicit allowlist: raw barcode, images, PNR, full scanned name, ticket and sequence never persist.
   return {displayName,flight,from,to,seat,date:value.date,callsign,journeyKey};
  }
- if(kind==='aircraftfollows'){try{return {ids:normalizedFollows(airframeCatalog,value.ids)};}catch(e){fail(400,e.message);}}
+ if(kind==='aircraftfollows'){try{return {ids:normalizedFollows(airframeSource,value.ids)};}catch(e){fail(400,e.message);}}
  if(kind==='watchlist'){
   if(!/^[a-f0-9]{6}$/.test(value.hex))fail(400,'Invalid aircraft identifier.');
   return {hex:value.hex,callsign:text(value.callsign,16),registration:text(value.registration,32),aircraftType:text(value.aircraftType,16)};

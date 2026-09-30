@@ -60,6 +60,18 @@ def run(page):
  assert page.get_by_role('button',name='Check available shortly',exact=True).is_disabled()
  assert page.get_by_role('link',name='View aircraft on globe',exact=True).get_attribute('href')=='/#aircraft=abcdef'
  assert len(lookup)==1
+ page.reload()
+ page.get_by_text('Airborne',exact=True).wait_for()
+ assert page.get_by_role('button',name='Check available shortly',exact=True).is_disabled()
+ assert len(lookup)==1
+ # Withdrawing a catalog entry must not erase a user's explicit follow.
+ page.evaluate("localStorage.setItem('skyward.airframe-follows.v1',JSON.stringify(['unavailable-frame']))")
+ page.goto(f.URL+'/following/')
+ page.get_by_role('heading',name='Aircraft currently unavailable').wait_for()
+ page.get_by_role('button',name='Unfollow unavailable aircraft').click()
+ page.get_by_text('No aircraft followed yet.',exact=False).wait_for()
+ page.goto(f.URL+'/aircraft/nasa-sca-905/')
+ page.get_by_text('Airborne',exact=True).wait_for()
  page.set_viewport_size({'width':1440,'height':1000})
  page.screenshot(path=str(f.ARTIFACTS/'airframes-profile.png'))
  assert not errors,errors

@@ -87,3 +87,11 @@ Official references:
 | Shared-account free-tier guarantee | NOT ESTABLISHED | No code can infer or control other projects' traffic. Incremental budgets above are enforced; full account headroom needs account-level measurement. |
 
 Run `node --test web/server/airframes.test.mjs`, `npm --prefix web test`, `npm --prefix web run build`, and `python web/tests/browser/airframe-following.py` with the documented Playwright environment. Browser fixtures do not prove worldwide feed coverage. No production publication or schema migration was performed.
+
+### V1 follow-up: observation continuity and withdrawn entries
+
+Profiles now retain the latest validated observation in sessionStorage (one per aircraft, ten aircraft maximum, 30-minute expiry). Reloading does not trigger a lookup or reset the one-minute cooldown. Stored positions are revalidated against the current catalog; original observation timestamps are preserved. Older feed responses cannot replace a newer observation. Conflicting registrations/hex identities, malformed coordinates, future timestamps, synthetic records and observations beyond the retention window are rejected. No tracks or additional server storage are created.
+
+A followed ID that disappears from the public catalog is retained as an unavailable entry, with an explicit unfollow control. Existing account follows can still reference the underlying source-catalog identity without publishing withdrawn metadata. This prevents a later catalog withdrawal plus account sync from silently erasing the follow. Arbitrary IDs absent from the source catalog remain invalid for account storage.
+
+Additional evidence: `web/server/airframe-observations.test.mjs` and the reload/withdrawal cases in `web/tests/browser/airframe-following.py`.
