@@ -86,9 +86,10 @@ Production configuration and deployment were not changed by these local tests.
 ## Launch checkpoint — September 30, 2026
 
 The production public-route check passes for home, account, terms, privacy, contact,
-missing-page 404, and unauthenticated Premium/simulator denial. At this checkpoint
-`/api/account` reports `mode: live`, `billingReady: false`, and
-`liveDetailsReady: false`. Do not describe this as a completed payment launch.
+missing-page 404, and unauthenticated Premium/simulator denial. The initial check
+reported `mode: live`, `billingReady: false`, and `liveDetailsReady: false`.
+After the authorized production credential correction below, billing now reports
+ready. Do not describe configuration readiness as a completed payment launch.
 
 Read-only Stripe checks found the live USD 59.99/year price
 `price_1ULGXnRksGpoxxAiGXOwVtT7` and an enabled webhook at
@@ -142,9 +143,10 @@ outbox; signed webhook reconciliation; user/global/accounting-budget exhaustion;
 shared cached lookups; denial of paid cached results to free users; paywall live,
 test and unavailable UI states; responsive account layouts and recovery errors.
 These fixture tests do not establish actual inbox delivery or successful browser
-payment completion. A designated test inbox is still needed; real email delivery,
-browser checkout completion and Stripe-to-deployment webhook delivery remain
-unverified. No real payment was created.
+payment completion. The operator subsequently designated a Yahoo test inbox; the
+production email requests and rendering checks are recorded below. Browser
+checkout completion and Stripe-to-deployment webhook delivery remain unverified.
+No real payment was created.
 
 ### Limits and observability
 
@@ -166,3 +168,41 @@ disabled; this is lightweight operational visibility, not retained crash analyti
 Protected totals are available at `GET /api/travel-metrics` with
 `Authorization: Bearer <SKYWARD_METRICS_TOKEN>` after configuring a secret token
 of at least 24 characters. Public reads stay denied. Do not put the token in a URL.
+
+
+## Production billing correction and email checks — September 30, 2026
+
+At the user's explicit request, the Worker received the existing matching live
+`STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET` and verified
+live annual `STRIPE_PRICE_ANNUAL_ID`. The price was read from Stripe and verified
+as active, live, recurring once per year, USD 59.99, before uploading. Local active
+test credentials were left unchanged. The production `/api/account` endpoint now
+reports `mode: live` and `billingReady: true` in repeated checks. This was a runtime
+secret correction, not a code deployment. No customer charge or subscription was
+created. Aviation readiness still requires deployment of the committed live-mode
+configuration.
+
+The operator's designated Yahoo address had no existing production account. A
+new account was created with a cryptographically random, undisclosed password;
+the production signup and password-reset endpoints both returned HTTP 200. The
+verification and reset links were left unconsumed so the operator can verify the
+address and choose a password. No existing account password was changed.
+
+A third, clearly labeled branded delivery-check email was accepted by Resend
+(HTTP 200 with a message ID). The configured Resend key is send-only: retrieval
+of delivery status returns `restricted_api_key`, so inbox delivery is not claimed
+without recipient confirmation. Do not broaden the key's permissions merely to
+run this test. Auth responses alone do not prove inbox delivery.
+
+Both email templates were rendered at 320, 390 and 800 pixels with an unusually
+long fixture token: no horizontal overflow, the existing orbit PNG loaded, and
+the appropriate action button was visible. The production email-logo URL returned
+HTTP 200/image/png. These browser checks do not replace testing in every email
+client. Sixteen focused email/auth/billing/webhook tests passed.
+
+Automatic approval review rejected a synthetic signed-event probe against the
+production webhook because test-event injection was not explicitly authorized.
+No production probe was sent. Local signature, duplicate, reconciliation and
+mode-separation tests passed; actual Stripe-originated webhook delivery remains
+to be observed independently. The configured webhook and Customer Portal were
+already verified through Stripe's API in both modes.
