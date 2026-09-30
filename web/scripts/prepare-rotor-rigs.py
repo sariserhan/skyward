@@ -71,7 +71,7 @@ for profile in ['turboprop','light','pc12']:
   for k,prims in enumerate(meshes):
    if not prims:continue
    mi=len(g['meshes']);g['meshes'].append({'primitives':prims});ni=len(g['nodes']);g['nodes'].append({'name':f'SkywardProp{k}','mesh':mi});g['scenes'][g.get('scene',0)]['nodes'].append(ni)
-  filename=f'{profile}-rotor-indices.bin';(fleet/filename).write_bytes(raw);g['buffers'].append({'uri':filename,'byteLength':len(raw)});file.write_text(json.dumps(g,separators=(',',':')))
+  filename=f'{profile}-rotor-indices.bin';(fleet/filename).write_bytes(raw);g['buffers'].append({'uri':filename+'?detail=5','byteLength':len(raw)});file.write_text(json.dumps(g,separators=(',',':')))
  rigs['fleet:'+profile]={'groups':[{'nodes':[f'SkywardProp{k}'],'axis':2,'pivot':hub,'kind':'propeller'} for k,hub in enumerate(hubs)],'hide':[]}
 (root/'src/lib/rotorRigs.json').write_text(json.dumps(rigs,indent=2)+'\n')
 print('Prepared rotor/propeller rigs for',len(rigs),'model families')

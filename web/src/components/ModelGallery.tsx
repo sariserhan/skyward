@@ -14,7 +14,7 @@ export function ModelGallery({reducedMotion,observations=[]}:{reducedMotion:bool
  const root=useRef<HTMLDivElement>(null),widget=useRef<Cesium.CesiumWidget|null>(null),model=useRef<Cesium.Model|null>(null),view=useRef({yaw:1.6,pitch:-.2,zoom:1,orbit:false,gearDemo:false});view.current.zoom=zoom;view.current.orbit=orbit&&!reducedMotion;view.current.gearDemo=gearDemo&&!reducedMotion;
  const chosen=models.find(m=>`${m.kind}:${m.id}`===selected)??models[0],livery=chosen.kind==='source'?liveries.find(l=>l.model===chosen.id&&l.operator===operator):null;
  const paint=fleetPaint(operator);
- const uri=chosen.kind==='fallback'?`models/fleet/${chosen.id}-${paint}-v4.gltf?tail=2`:livery?.uri??(paint==='neutral'?chosen.uri:`models/sourced/branded/${chosen.id}-${paint}-v1.gltf?tail=2`);
+ const uri=chosen.kind==='fallback'?`models/fleet/${chosen.id}-${paint}-v4.gltf?tail=2&detail=5`:livery?.uri??(paint==='neutral'?chosen.uri:`models/sourced/branded/${chosen.id}-${paint}-v1.gltf?tail=2`);
  const rows=useMemo(()=>models.filter(m=>(kind==='all'||m.kind===kind)&&`${m.label} ${m.types}`.toLowerCase().includes(query.toLowerCase())),[query,kind]);
  useEffect(()=>{if(reducedMotion){setOrbit(false);setGearDemo(false);}},[reducedMotion]);
  useEffect(()=>{

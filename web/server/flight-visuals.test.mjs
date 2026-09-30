@@ -36,7 +36,7 @@ test('rigged fallback wheels rotate around local axles under the gear parent',()
  const g=JSON.parse(readFileSync(new URL('../public/'+fallbackFleetUri({aircraftType:'B38M',callsign:'THY1'}),import.meta.url)));
  const gear=g.nodes.find(n=>n.name==='Gear');assert.equal(gear.children.length,3);
  for(const index of gear.children){const n=g.nodes[index];assert.match(n.name,/^Wheel[LRN]$/);assert.ok(n.translation[1]<0);for(const primitive of g.meshes[n.mesh].primitives){const a=g.accessors[primitive.attributes.POSITION];assert.ok(a.max.every(v=>v<=.41));assert.ok(a.min.every(v=>v>=-.41));}}
- assert.match(fallbackFleetUri({aircraftType:'B38M',callsign:'THY1'}),/-v4.gltf\?tail=2$/);
+ assert.match(fallbackFleetUri({aircraftType:'B38M',callsign:'THY1'}),/-v4.gltf\?tail=2&detail=5$/);
 });
 
 test('tower retains bounded detailed traffic at approach distances even on low quality',()=>{
