@@ -1,3 +1,5 @@
+import {apronSurfaceMaterial} from '../lib/apronSurface';
+import {airportPolygonHierarchy} from '../lib/airportBuildings';
 import {runwayDatums} from '../lib/runwayTerrain';
 import {runwayDatum} from '../lib/runwayDatum';
 import {runwaySurfaceCorners,runwaySurfaceMaterial} from '../lib/runwaySurface';
@@ -19,11 +21,13 @@ export function AirportDetailLayer({viewer,airports,enabled,lightingEnabled=enab
  useEffect(()=>{if(!viewer||viewer.isDestroyed()||!lightingEnabled)return;return installRunwayLights(window.Cesium,viewer,airports,{quality,reduced:()=>reduced});},[viewer,airports,lightingEnabled,quality,reduced]);
  useEffect(()=>{const v=viewer;if(!v||v.isDestroyed()||!enabled||!nearby)return;const C=window.Cesium,source=new C.CustomDataSource('mapped-airport-detail');let alive=true;const resample:Array<()=>void>=[];let terrainTimer:ReturnType<typeof setTimeout>|undefined;
  void v.dataSources.add(source).then(()=>{if(!alive&&!v.isDestroyed())v.dataSources.remove(source,true);});
- const pavement=runwaySurfaceMaterial(C,v);
+ const pavement=runwaySurfaceMaterial(C,v),apron=apronSurfaceMaterial(C);
  for(const airport of airports.slice(0,2)){
+  // Real apron boundaries only: do not cover surrounding roads, water or courtyards.
+  for(const [i,surface] of airport.surfaces.entries())if(surface.kind==='apron'&&surface.points.length>=3)source.entities.add({id:`apron-surface-${airport.id}-${i}`,name:'Mapped apron · illustrative pavement',polygon:{hierarchy:airportPolygonHierarchy(C,surface),height:runwayDatums.has(airport.id)?runwayDatum(v,airport)+.15:new C.CallbackProperty(()=>runwayDatum(v,airport)+.15,false),material:apron,distanceDisplayCondition:new C.DistanceDisplayCondition(0,12000)}});
   if(quality!=='low')for(const [i,runway] of airport.runways.slice(0,6).entries()){const corners=runwaySurfaceCorners(runway);if(corners.length)source.entities.add({id:`runway-surface-${airport.id}-${i}`,name:'Illustrative runway surface',polygon:{hierarchy:C.Cartesian3.fromDegreesArray(corners.flat()),granularity:C.Math.toRadians(.001),height:runwayDatums.has(airport.id)?runwayDatum(v,airport)+.3:new C.CallbackProperty(()=>runwayDatum(v,airport)+.3,false),material:pavement,stRotation:Math.atan2(runway.b[1]-runway.a[1],(runway.b[0]-runway.a[0])*Math.cos(airport.lat*Math.PI/180))-Math.PI/2,distanceDisplayCondition:new C.DistanceDisplayCondition(0,6500)}});}
 
-  for(const [i,stand] of airportStandDetails(airport,quality==='low'?4:16).entries()){
+  for(const [i,stand] of airportStandDetails(airport,quality==='low'?12:64).entries()){
    const height=(p:[number,number])=>surfaceHeight(v.scene.globe.getHeight(C.Cartographic.fromDegrees(...p)));
    const bridge=source.entities.add({id:`illustrative-bridge-${airport.id}-${i}`,name:'Illustrative boarding bridge',polylineVolume:{positions:C.Cartesian3.fromDegreesArrayHeights([stand.start,stand.end].flatMap(p=>[...p,height(p)+4.2])),shape:[new C.Cartesian2(-1.2,-1.1),new C.Cartesian2(1.2,-1.1),new C.Cartesian2(1.2,1.1),new C.Cartesian2(-1.2,1.1)],material:C.Color.fromCssColorString('#83959d'),distanceDisplayCondition:new C.DistanceDisplayCondition(0,2500)}});
    const support=source.entities.add({id:`illustrative-bridge-support-${airport.id}-${i}`,position:C.Cartesian3.fromDegrees(...stand.end,height(stand.end)+1.5),cylinder:{length:3,topRadius:.3,bottomRadius:.3,material:C.Color.DARKGRAY,distanceDisplayCondition:new C.DistanceDisplayCondition(0,1500)}});
