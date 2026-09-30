@@ -1,3 +1,5 @@
+import {registerRecoveryProvider,captureRecovery,restoredRecovery,recoveryCamera} from './lib/errorRecovery';
+import {saveSyntheticFlight,restoreSyntheticFlight} from './lib/syntheticTraffic';
 import {LoadingSkeleton} from './components/SystemState';
 import {SharedTraveler} from './components/SharedTraveler';
 import {premiumDemoRecording} from './lib/premiumDemo';
@@ -78,7 +80,7 @@ export default function App() {
   const [session,setSession]=useState<Recording|null>(null),[sessionTime,setSessionTime]=useState(0);
   const sharedViewer=useRef<Cesium.Viewer|null>(null);
   const onViewer=useCallback((v:Cesium.Viewer|null)=>{sharedViewer.current=v;},[]);
-  const [globeKey,setGlobeKey]=useState(0),[recoveryPose,setRecoveryPose]=useState<RecoveryPose|null>(()=>{const v=parseView(initialHash);return v.aircraft||v.facility?null:v.camera;});
+  const [globeKey,setGlobeKey]=useState(0),[recoveryPose,setRecoveryPose]=useState<RecoveryPose|null>(()=>{const v=parseView(initialHash);return recoveryCamera()??(v.aircraft||v.facility?null:v.camera);});
   const recoveryAttempts=useRef(0);
   const recoverGlobe=(pose:RecoveryPose|null,manual=false)=>{if(!manual&&recoveryAttempts.current>=2)return false;recoveryAttempts.current=manual?0:recoveryAttempts.current+1;setRecoveryPose(pose);setReady(false);setGlobeKey(n=>n+1);return true;};
   const offline=useOfflineMaps(preferences.offlineMaps);
@@ -91,7 +93,7 @@ export default function App() {
   const [help, setHelp] = useState(false);
   const [phone,setPhone]=useState(()=>matchMedia('(max-width:759px), (max-height:500px) and (pointer:coarse)').matches);
   useEffect(()=>{const mq=matchMedia('(max-width:759px), (max-height:500px) and (pointer:coarse)');const update=()=>{setPhone(mq.matches);setMobileOpen(false);setMobileMore(false);};mq.addEventListener('change',update);return()=>mq.removeEventListener('change',update);},[]);
-  const [guide,setGuide]=useState(()=>{try{return !matchMedia('(max-width:759px), (max-height:500px) and (pointer:coarse)').matches&&!location.hash&&!location.search&&localStorage.getItem('skyward.guide.v1')!=='done';}catch{return false;}});
+  const [guide,setGuide]=useState(()=>{try{return !restoredRecovery()&&!matchMedia('(max-width:759px), (max-height:500px) and (pointer:coarse)').matches&&!location.hash&&!location.search&&localStorage.getItem('skyward.guide.v1')!=='done';}catch{return false;}});
   const closeGuide=()=>{setGuide(false);try{localStorage.setItem('skyward.guide.v1','done');}catch{}};
   const [shared] = useState(()=>parseView(initialHash));
   const initialIntent = useRef(true);
@@ -149,6 +151,20 @@ export default function App() {
   const flightScene=useRef<FlightScene|null>(null),lastDiscovery=useRef(''),requestSerial=useRef(0);
   const rememberScene=useCallback((scene:FlightScene|null)=>{flightScene.current=scene;},[]);
   const [panel,setPanel] = useState<'aircraft'|'airport'|'none'>(shared.hasView?'airport':'none');
+  const recoveryState=useRef({airport,mode,selectedAircraft,following,session,camera});recoveryState.current={airport,mode,selectedAircraft,following,session,camera};
+  useEffect(()=>{
+    let syntheticHex='',syntheticSnapshot:string|undefined;
+    const unregister=registerRecoveryProvider(()=>{
+      const s=recoveryState.current,pose=cameraSnapshot(sharedViewer.current);if(!pose||s.session)return null;
+      const q=new URLSearchParams({airport:s.airport,mode:s.mode,camera:encodeCamera(pose)}),a=s.selectedAircraft,scene=flightScene.current;
+      if(a&&!a.simulation)q.set('aircraft',a.hex);if(s.camera.facility?.id)q.set('facility',s.camera.facility.id);
+      if(scene&&scene.hex===a?.hex){q.set('scene','flight');q.set('view',scene.view);}
+      if(a?.simulation&&a.hex!==syntheticHex){syntheticHex=a.hex;syntheticSnapshot=saveSyntheticFlight(a.hex);}
+      return {hash:'#'+q,time:Date.now(),aircraft:a&&!a.simulation?a:undefined,synthetic:a?.simulation?syntheticSnapshot:undefined,following:s.following};
+    });
+    const timer=setInterval(captureRecovery,2000);return()=>{clearInterval(timer);unregister();};
+  },[]);
+
   const [command,setCommand] = useState<MapCommand>({action:'north',serial:0});
   const [replayPoints,setReplayPoints]=useState<TrailPoint[]>([]);
   const changeReplay=useCallback((n:number|null)=>{setSpotter(false);setFollowing(false);if(n!==null&&replayIndex===null)setReplayPoints(feed.trail.slice());setReplay(n);},[feed.trail,replayIndex]);
@@ -187,6 +203,15 @@ export default function App() {
   const closeDetails = () => {setSyntheticSelection(null);setSpotter(false);setSession(null);setPanel('none');setFollowing(false);feed.clearSelected();};
   useEffect(()=>{
     if(!initialIntent.current)return;
+    const recovered=restoredRecovery();
+    if(recovered){
+      initialIntent.current=false;
+      const simulated=restoreSyntheticFlight(recovered.synthetic),saved=simulated??recovered.aircraft;
+      const restore=(a:Aircraft)=>{if(a.simulation){setSyntheticSelection(a);feed.clearSelected();}else{feed.ingest([a]);feed.select(a);}setPanel('aircraft');setFollowing(!!recovered.following);if(shared.sceneView)setFlightRequest({hex:a.hex,view:shared.sceneView,serial:++requestSerial.current});};
+      if(saved)restore(saved);
+      if(!saved&&shared.aircraft)void feed.lookup('hex',shared.aircraft).then(a=>{if(a&&initialIntent.current===false&&(!recoveryState.current.selectedAircraft||recoveryState.current.selectedAircraft.hex===a.hex))restore(a);});
+      return;
+    }
     const requestedCallsign=new URLSearchParams(location.search).get('flight');
     if(requestedCallsign&&/^[A-Z0-9]{2,10}$/i.test(requestedCallsign)){initialIntent.current=false;void lookup('callsign',requestedCallsign.toUpperCase());return;}
     if(shared.aircraft){initialIntent.current=false;void lookup('hex',shared.aircraft).then(a=>{if(a&&shared.sceneView)setFlightRequest({hex:a.hex,view:shared.sceneView,serial:++requestSerial.current});if(shared.camera){setRecoveryPose(shared.camera);setReady(false);setGlobeKey(n=>n+1);}});return;}

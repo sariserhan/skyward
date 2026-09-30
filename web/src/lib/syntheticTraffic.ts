@@ -37,3 +37,13 @@ export function syntheticRoute(a:Aircraft):FlightRoute|null {const s=a.simulatio
 export function clearSyntheticTraffic(){flights.clear();}
 
 export function regionalSyntheticAircraft(a:Aircraft,center:{lat:number;lon:number},radius:number,now:number){const f=flights.get(a.hex);let current=f?snapshot(f,now):a;if(f&&pinned!==a.hex&&current.lat!==null&&current.lon!==null&&trackDistance(current as {lat:number;lon:number},center)>Math.max(25,radius)){f.start=now;current=snapshot(f,now);}return current;}
+
+/** Same-tab error recovery only; keep the original simulation clock and itinerary. */
+export function saveSyntheticFlight(hex:string){const f=flights.get(hex);return f?JSON.stringify(f):undefined;}
+export function restoreSyntheticFlight(raw:string|undefined):Aircraft|null{
+ try{if(!raw||raw.length>1500000)return null;const f=JSON.parse(raw) as Flight;
+  if(!f.aircraft?.simulation||!/^skyward-[a-z0-9-]+-\d+$/.test(f.aircraft.hex)||!Number.isFinite(f.start)||!Number.isFinite(f.offset)||!Number.isFinite(f.op?.end))return null;
+  const a=snapshot(f,Date.now());if(!Number.isFinite(a.lat)||!Number.isFinite(a.lon)||!Number.isFinite(a.altitude))return null;
+  flights.set(a.hex,f);return a;
+ }catch{return null;}
+}

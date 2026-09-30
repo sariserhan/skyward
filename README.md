@@ -508,6 +508,8 @@ rate limiting uses bounded transient connection-address state, as other APIs do.
 
 ### Loading and error recovery
 
+The observatory’s error-notice and error-screen Reload buttons restore the selected real or simulated flight, flight camera, following state, and map position in the same tab. Recovery is independent of optional session resume; its one-use session snapshot expires after an hour and preserves original observation timestamps. Simulated flights retain their itinerary and clock. Browser regression: `web/tests/browser/error-recovery.py` (build first).
+
 Unknown pages return a branded HTTP 404. `/404` and `/500` expose the generic
 error pages for inspection; server failures return HTTP 500. These pages are
 self-contained and work without JavaScript or app assets. API errors remain JSON.

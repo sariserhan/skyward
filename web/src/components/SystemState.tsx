@@ -1,5 +1,6 @@
+import {reloadWithRecovery} from '../lib/errorRecovery';
 import {systemMessage} from '../lib/systemState';
-export function ErrorScreen({status='error',reload=()=>location.reload()}:{status?:number|'error';reload?:()=>void}){
+export function ErrorScreen({status='error',reload=reloadWithRecovery}:{status?:number|'error';reload?:()=>void}){
  const m=systemMessage(status);
  return <main className="system-screen"><section className="system-card" role="alert"><a className="system-brand" href="/">SKYWARD</a><div className="system-orbit" aria-hidden="true"/><small className="system-code">{m.code}</small><h1>{m.title}</h1><p>{m.description}</p><nav aria-label="Recovery actions">{status!==404&&<button className="primary-button" onClick={reload}>Reload {status==='error'?'observatory':'page'}</button>}<a className={status===404?'system-primary':''} href="/">Back to globe</a><a href="/account/">Your account</a></nav></section></main>;
 }
