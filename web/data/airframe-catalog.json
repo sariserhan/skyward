@@ -1,0 +1,201 @@
+{
+  "version": 1,
+  "aircraft": [
+    {
+      "id": "nasa-sca-905",
+      "manufacturer": "Boeing",
+      "model": "747",
+      "variant": "Shuttle Carrier Aircraft",
+      "category": "Historic aircraft",
+      "retired": true,
+      "registrations": [
+        {
+          "sourceUrl": "https://www.nasa.gov/wp-content/uploads/2025/01/sca-historical-narrative.pdf",
+          "sourceName": "NASA Shuttle Carrier Aircraft historical narrative",
+          "verifiedAt": "2026-09-30",
+          "confidence": "HIGH",
+          "value": "N905NA",
+          "country": "US",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.nasa.gov/wp-content/uploads/2025/01/sca-historical-narrative.pdf",
+          "sourceName": "NASA Shuttle Carrier Aircraft historical narrative",
+          "verifiedAt": "2026-09-30",
+          "confidence": "HIGH"
+        },
+        {
+          "sourceUrl": "https://www.nasa.gov/centers-and-facilities/armstrong/nasa-armstrong-fact-sheet-shuttle-carrier-aircraft/",
+          "sourceName": "NASA Armstrong Shuttle Carrier Aircraft fact sheet",
+          "verifiedAt": "2026-09-30",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "nasa-sca-911",
+      "manufacturer": "Boeing",
+      "model": "747",
+      "variant": "Shuttle Carrier Aircraft",
+      "category": "Historic aircraft",
+      "retired": true,
+      "registrations": [
+        {
+          "sourceUrl": "https://www.nasa.gov/wp-content/uploads/2025/01/sca-historical-narrative.pdf",
+          "sourceName": "NASA Shuttle Carrier Aircraft historical narrative",
+          "verifiedAt": "2026-09-30",
+          "confidence": "HIGH",
+          "value": "N911NA",
+          "country": "US",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.nasa.gov/wp-content/uploads/2025/01/sca-historical-narrative.pdf",
+          "sourceName": "NASA Shuttle Carrier Aircraft historical narrative",
+          "verifiedAt": "2026-09-30",
+          "confidence": "HIGH"
+        },
+        {
+          "sourceUrl": "https://www.nasa.gov/centers-and-facilities/armstrong/nasa-armstrong-fact-sheet-shuttle-carrier-aircraft/",
+          "sourceName": "NASA Armstrong Shuttle Carrier Aircraft fact sheet",
+          "verifiedAt": "2026-09-30",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "noaa-orion-42",
+      "manufacturer": "Lockheed",
+      "model": "WP-3D Orion",
+      "category": "Public-service aircraft",
+      "operator": "NOAA",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/lockheed-wp-3d-orion",
+          "sourceName": "NOAA aircraft fleet: Lockheed WP-3D Orion",
+          "verifiedAt": "2026-09-30",
+          "confidence": "HIGH",
+          "value": "N42RF",
+          "country": "US",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/lockheed-wp-3d-orion",
+          "sourceName": "NOAA aircraft fleet: Lockheed WP-3D Orion",
+          "verifiedAt": "2026-09-30",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "noaa-orion-43",
+      "manufacturer": "Lockheed",
+      "model": "WP-3D Orion",
+      "category": "Public-service aircraft",
+      "operator": "NOAA",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/lockheed-wp-3d-orion",
+          "sourceName": "NOAA aircraft fleet: Lockheed WP-3D Orion",
+          "verifiedAt": "2026-09-30",
+          "confidence": "HIGH",
+          "value": "N43RF",
+          "country": "US",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/lockheed-wp-3d-orion",
+          "sourceName": "NOAA aircraft fleet: Lockheed WP-3D Orion",
+          "verifiedAt": "2026-09-30",
+          "confidence": "HIGH"
+        }
+      ]
+    }
+  ],
+  "entities": [
+    {
+      "id": "nasa",
+      "slug": "nasa",
+      "displayName": "NASA",
+      "entityType": "ORGANIZATION",
+      "description": "Historic aircraft associated with the Space Shuttle program. These retired aircraft are not presented as live flights."
+    },
+    {
+      "id": "noaa",
+      "slug": "noaa",
+      "displayName": "NOAA",
+      "entityType": "ORGANIZATION",
+      "description": "Public-service aircraft used for hurricane and atmospheric research. Observation availability varies by receiver coverage."
+    }
+  ],
+  "associations": [
+    {
+      "sourceUrl": "https://www.nasa.gov/centers-and-facilities/armstrong/nasa-armstrong-fact-sheet-shuttle-carrier-aircraft/",
+      "sourceName": "NASA Armstrong Shuttle Carrier Aircraft fact sheet",
+      "verifiedAt": "2026-09-30",
+      "confidence": "HIGH",
+      "id": "nasa-sca-905-association",
+      "aircraftId": "nasa-sca-905",
+      "entityId": "nasa",
+      "associationType": "FORMERLY_ASSOCIATED",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true
+    },
+    {
+      "sourceUrl": "https://www.nasa.gov/centers-and-facilities/armstrong/nasa-armstrong-fact-sheet-shuttle-carrier-aircraft/",
+      "sourceName": "NASA Armstrong Shuttle Carrier Aircraft fact sheet",
+      "verifiedAt": "2026-09-30",
+      "confidence": "HIGH",
+      "id": "nasa-sca-911-association",
+      "aircraftId": "nasa-sca-911",
+      "entityId": "nasa",
+      "associationType": "FORMERLY_ASSOCIATED",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true
+    },
+    {
+      "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/lockheed-wp-3d-orion",
+      "sourceName": "NOAA aircraft fleet: Lockheed WP-3D Orion",
+      "verifiedAt": "2026-09-30",
+      "confidence": "HIGH",
+      "id": "noaa-orion-42-association",
+      "aircraftId": "noaa-orion-42",
+      "entityId": "noaa",
+      "associationType": "OPERATOR",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true
+    },
+    {
+      "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/lockheed-wp-3d-orion",
+      "sourceName": "NOAA aircraft fleet: Lockheed WP-3D Orion",
+      "verifiedAt": "2026-09-30",
+      "confidence": "HIGH",
+      "id": "noaa-orion-43-association",
+      "aircraftId": "noaa-orion-43",
+      "entityId": "noaa",
+      "associationType": "OPERATOR",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import {airframePage,airframeDocument} from './airframe-pages.mjs';
 import {SITE_ORIGIN} from './site.mjs';
 import {sendHttpError} from './error-pages.mjs';
 import {createTravelMetrics} from './travel-metrics.mjs';
@@ -56,6 +57,8 @@ export const server = http.createServer(async (req, res) => {
       if(!authorizedMetrics(req.headers.authorization,process.env.SKYWARD_METRICS_TOKEN))return json(res,401,{error:'Unauthorized'});
       return json(res,200,{server:operations.snapshot(),feeds:feed.diagnostics});
     }
+    const aircraftPage=airframePage(url.pathname);
+    if(aircraftPage){if(aircraftPage.redirect){res.writeHead(308,{Location:aircraftPage.redirect});return res.end();}res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'public, max-age=300'});return res.end(req.method==='HEAD'?undefined:airframeDocument(aircraftPage,await readFile(resolve(webRoot,'index.html'),'utf8')));}
     const published=publicPage(url,{SKYWARD_PUBLIC_ORIGIN:SITE_ORIGIN,...process.env});
     if(published){if(published.location){res.writeHead(published.status,{Location:published.location,'Cache-Control':'no-store'});return res.end();}if(published.observatory)published.body=observatoryDocument(published,await readFile(resolve(webRoot,'index.html'),'utf8'));res.writeHead(published.status,{'Content-Type':published.type,'Cache-Control':published.status===200?'public, max-age=300':'no-store'});return res.end(req.method==='HEAD'?undefined:published.body);}
     if (url.pathname === '/healthz' || url.pathname === '/readyz') {

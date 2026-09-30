@@ -53,6 +53,11 @@ test('D1 paid library writes round-trip, preserve ownership and delete cleanly',
  try{
  let r=await request('/api/account/library',{kind:'watchlist',key:'abcdef',value:{hex:'abcdef',callsign:'TEST1'}});assert.equal(r.status,200,await r.clone().text());
  r=await request('/api/account/library?kind=watchlist&key=abcdef');assert.equal(r.status,200);assert.equal((await r.json()).value.hex,'abcdef');
+ r=await request('/api/account/library',{kind:'aircraftfollows',key:'airframes',revision:0,value:{ids:['nasa-sca-905','nasa-sca-905']}});assert.equal(r.status,200,await r.clone().text());
+ r=await request('/api/account/library?kind=aircraftfollows&key=airframes');assert.deepEqual((await r.json()).value.ids,['nasa-sca-905']);
+ assert.equal((await request('/api/account/library',{kind:'aircraftfollows',key:'airframes',revision:0,value:{ids:[]}})).status,409);
+ assert.equal((await request('/api/account/library?kind=aircraftfollows&key=airframes',null,false)).status,401);
+
  assert.equal((await request('/api/account/library?kind=watchlist&key=abcdef',null,false)).status,401);
  assert.equal((await request('/api/account/dashboard')).status,200);
  const raw=JSON.stringify({id:'evt_d1test',type:'invoice.paid',livemode:false,data:{object:{customer:'cus_test'}}}),t=Math.floor(Date.now()/1000),signature=createHmac('sha256','whsec_fixture').update(t+'.'+raw).digest('hex');

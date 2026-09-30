@@ -1,3 +1,4 @@
+import {airframePaths,airframePage} from './airframe-pages.mjs';
 import {legalPages} from './legal-pages.mjs';
 import {SITE_ORIGIN,CONTACT_EMAIL,SUPPORT_EMAIL,BILLING_EMAIL,PRIVACY_EMAIL,SECURITY_EMAIL,siteSchema} from './site.mjs';
 import {errorPage} from './error-pages.mjs';
@@ -15,8 +16,8 @@ export function publicPage(url,env=process.env){
  const origin=publicOrigin(env.SKYWARD_PUBLIC_ORIGIN),path=url.pathname;
  if(['/404','/404/'].includes(path))return errorPage(404);
  if(['/500','/500/'].includes(path))return errorPage(500);
- if(path==='/robots.txt')return {status:200,type:'text/plain; charset=utf-8',body:`User-agent: *\nDisallow: /api/\nDisallow: /account/\nDisallow: /share/\nDisallow: /flight-simulator/\nDisallow: /airport-simulation/\n${origin?`Sitemap: ${origin}/sitemap.xml\n`:''}`};
- if(path==='/sitemap.xml')return origin?{status:200,type:'application/xml; charset=utf-8',body:`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${['/','/terms/','/privacy/','/contact/','/explore/','/airports/','/flights/','/premium/','/about/',...airports.map(([id])=>`/airports/${id}/`)].map(p=>`<url><loc>${escape(origin+p)}</loc></url>`).join('')}</urlset>`}:{status:503,type:'text/plain',body:'Set SKYWARD_PUBLIC_ORIGIN to enable the sitemap.'};
+ if(path==='/robots.txt')return {status:200,type:'text/plain; charset=utf-8',body:`User-agent: *\nDisallow: /api/\nDisallow: /account/\nDisallow: /following/\nDisallow: /admin/\nDisallow: /share/\nDisallow: /flight-simulator/\nDisallow: /airport-simulation/\n${origin?`Sitemap: ${origin}/sitemap.xml\n`:''}`};
+ if(path==='/sitemap.xml')return origin?{status:200,type:'application/xml; charset=utf-8',body:`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${['/','/terms/','/privacy/','/contact/','/explore/','/airports/','/flights/','/premium/','/about/',...airports.map(([id])=>`/airports/${id}/`),...airframePaths().filter(p=>{const page=airframePage(p);return !page.privatePage&&!page.redirect;})].map(p=>`<url><loc>${escape(origin+p)}</loc></url>`).join('')}</urlset>`}:{status:503,type:'text/plain',body:'Set SKYWARD_PUBLIC_ORIGIN to enable the sitemap.'};
  if(['/terms','/privacy','/contact','/airports','/explore','/about','/premium','/flights','/account'].includes(path))return {status:308,location:path+'/'+url.search};
  const airportMatch=path.match(/^\/airports\/([a-z0-9-]{3,12})\/?$/i);
  if(airportMatch){const id=airportMatch[1].toUpperCase(),a=catalog[id];if(!a)return errorPage(404);

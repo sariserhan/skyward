@@ -1,3 +1,4 @@
+import {airframePage,airframeDocument,airframePaths} from '../server/airframe-pages.mjs';
 import {publicPage} from '../server/public-pages.mjs';
 import {observatoryDocument} from '../server/observatory-document.mjs';
 import catalog from '../data/airport-catalog.json' with {type:'json'};
@@ -14,6 +15,7 @@ try{await stat(resolve(root,'../dist/web/index.html'));await walk(resolve(root,'
 // Airport entry pages are generated once per build and served by Static Assets, not Workers.
 const shell=await readFile(resolve(dist,'index.html'),'utf8');
 for(const id of Object.keys(catalog)){const path=`/airports/${id}/`,page=publicPage(new URL(path,'https://skyvvard.com'),{SKYWARD_PUBLIC_ORIGIN:'https://skyvvard.com'});await mkdir(resolve(assets,'airports',id),{recursive:true});await writeFile(resolve(assets,'airports',id,'index.html'),observatoryDocument(page,shell));staticCount++;}
+for(const path of airframePaths()){const page=airframePage(path);if(page.redirect)continue;await mkdir(resolve(assets,'.'+path),{recursive:true});await writeFile(resolve(assets,'.'+path,'index.html'),airframeDocument(page,shell));staticCount++;}
 if(staticCount>19000)throw Error('Static asset count exceeds the conservative free-plan budget');
 const bytes=media.reduce((n,m)=>n+m.bytes,0);if(bytes>4*1024**3)throw Error('A release must stay below 4 GiB (two retained releases within 8 GiB).');
 const release=createHash('sha256').update(JSON.stringify(media.map(({key,sha256})=>({key,sha256})))).digest('hex').slice(0,16);

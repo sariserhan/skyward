@@ -1,3 +1,4 @@
+import {airframePage} from '../server/airframe-pages.mjs';
 import {observatoryDocument} from '../server/observatory-document.mjs';
 import {publicPage} from '../server/public-pages.mjs';
 import {errorPage} from '../server/error-pages.mjs';
@@ -19,6 +20,7 @@ async function r2Asset(request,env,key,privateAsset=false){
 export async function handle(request,env){
  const url=new URL(request.url),path=url.pathname;
  if(url.hostname==='www.skyvvard.com')return Response.redirect('https://skyvvard.com'+path+url.search,308);
+ const aircraftPage=airframePage(path);if(aircraftPage?.redirect)return Response.redirect(url.origin+aircraftPage.redirect,308);
  if(path.startsWith('/internal/'))return error(404);
  if(path==='/healthz'||path==='/readyz')return Response.json({service:'skyward',status:'ok',accountsConfigured:!!(env.BETTER_AUTH_SECRET&&env.RESEND_API_KEY),assetsConfigured:!!env.SKYWARD_ASSET_RELEASE},{headers:{'Cache-Control':'no-store'}});
  if(path.startsWith('/api/')||path.startsWith('/share/')||path.startsWith('/travelers')){

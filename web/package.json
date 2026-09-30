@@ -34,7 +34,7 @@
     "prepare:assets": "node scripts/copy-cesium.mjs",
     "predev": "npm run prepare:assets",
     "dev": "vite --host 0.0.0.0",
-    "build": "npm run prepare:assets && node scripts/prepare-coverage.mjs && node scripts/prepare-airport-assets.mjs && tsc -b && vite build",
+    "build": "npm run prepare:assets && node scripts/prepare-airframes.mjs && node scripts/prepare-coverage.mjs && node scripts/prepare-airport-assets.mjs && tsc -b && vite build",
     "start": "node --env-file-if-exists=.env --env-file-if-exists=.env.local server/index.mjs",
     "test": "node --test server/*.test.mjs",
     "prepare:fleet": "python3 scripts/make-aircraft.py",
@@ -82,6 +82,8 @@
     "db:migrate:d1:local": "wrangler d1 migrations apply skyward-accounts --local",
     "assets:r2:plan": "node scripts/upload-cloudflare-assets.mjs",
     "check:stripe": "node --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/check-stripe.mjs",
-    "check:launch": "node scripts/check-launch.mjs"
+    "check:launch": "node scripts/check-launch.mjs",
+    "catalog:check": "node scripts/prepare-airframes.mjs",
+    "catalog:import": "node scripts/import-airframes.mjs"
   }
 }
