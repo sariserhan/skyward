@@ -1,9 +1,10 @@
+import jetFans from './jetFanRigs.json' with {type:'json'};
 import rigs from './rotorRigs.json' with {type:'json'};
 import type * as Cesium from 'cesium';
 interface Group {nodes:string[];axis:number;pivot:number[];kind:string;}
 interface Rig {groups:Group[];hide:string[];}
-export function rotorRig(uri:string):Rig|null {const name=uri.split('/').at(-1)?.split('-')[0]??'';return (rigs as Record<string,Rig>)[uri.includes('/fleet/')?'fleet:'+name:name]??null;}
-export function rotorRate(kind:string,ground:boolean,speed:number,engineRunning?:boolean){if(engineRunning===false||ground&&speed<.5&&engineRunning!==true)return 0;return (kind==='main'?26:kind==='tail'?80:65)*(ground?.55:1);}
+export function rotorRig(uri:string):Rig|null {const name=uri.split('/').at(-1)?.split('-')[0]??'';return (rigs as Record<string,Rig>)[uri.includes('/fleet/')?'fleet:'+name:name]??(!uri.includes('/fleet/')?(jetFans as Record<string,Rig>)[name]:null)??null;}
+export function rotorRate(kind:string,ground:boolean,speed:number,engineRunning?:boolean){if(engineRunning===false||ground&&speed<.5&&engineRunning!==true)return 0;return (kind==='fan'?18+Math.min(1,Math.max(0,speed)/250)*10:kind==='main'?26:kind==='tail'?80:65)*(ground?.55:1);}
 const states=new WeakMap<Cesium.Entity,{time:number;angles:number[];rates:number[];uri:string}>();
 /** Animate only explicitly audited nodes around their local hub; RPM is illustrative. */
 export function applyRotorRig(entity:Cesium.Entity,uri:string,speed:number,ground:boolean,reduced=false,engineRunning?:boolean){

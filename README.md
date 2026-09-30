@@ -407,3 +407,9 @@ user reviews the flight date before saving. Raw files and booking references sta
 out of account storage. Supported installed browsers can use Share to Skyward;
 manual import is the fallback. Private trips can be linked to matching saved
 journeys, with no guessed aircraft assignment or access to airline manifests.
+
+Jet-engine fans now animate on 26 sourced model families and compatible liveries,
+including the 737/MAX, A320 family, 777 and A350. Fan-only node rigs preserve the
+engine casings, use illustrative spool-up/taxi speeds, and respect known engine-off
+and reduced-motion settings. Models without separate audited fan meshes remain
+static. Regenerate metadata with `python3 web/scripts/prepare-jet-fan-rigs.py`.
