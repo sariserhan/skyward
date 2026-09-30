@@ -495,9 +495,9 @@ error pages for inspection; server failures return HTTP 500. These pages are
 self-contained and work without JavaScript or app assets. API errors remain JSON.
 
 Startup, lazy-loaded views, account details, and shared trips use accessible
-loading skeletons that respect reduced motion. Uncaught application errors and
-unhandled promise failures show a global recovery screen with reload, globe,
-and account navigation. Reload does not clear saved browser settings. Expected
+loading skeletons that respect reduced motion. React rendering failures show a global recovery screen with reload, globe,
+and account navigation. Background script errors and unhandled promise failures
+show a dismissible notice while preserving the current globe and controls. Reload does not clear saved browser settings. Expected
 request failures stay in their own panels; cancelled requests do not trigger
 global recovery. Entry-script download failures also provide a recovery message.
 
