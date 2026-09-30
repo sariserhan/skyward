@@ -22,6 +22,7 @@ export function CabinPassengers({aircraft:a}:{aircraft:Aircraft}) {
       <p><a href={r.url} target="_blank" rel="noreferrer">{r.publisher} cabin reference</a> · checked {r.checked}</p>
       <Scenario key={`${a.hex}:${a.callsign}:${r.id}`} reference={r}/></>:<p>No sourced passenger-cabin reference for this reported type. Seating and simulation are unavailable.</p>}
     {guide&&<p><a href={guide.url} target="_blank" rel="noreferrer">{guide.label}</a><br/>{guide.description} Operator inferred from callsign.</p>}
+    {!a.simulation&&a.callsign&&<p><a href={'/travelers/?flight='+encodeURIComponent(a.callsign.trim())} target="_blank" rel="noreferrer">Travelers sharing this flight →</a><br/>Voluntary trip posts and simulated window views.</p>}
     <p className="cabin-actual"><strong>Actual onboard: Not available</strong><br/>No authorized airline passenger feed is connected. Passenger names are not supplied by the flight-tracking feed.</p>
   </details>;
 }

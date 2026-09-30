@@ -421,3 +421,20 @@ including the 737/MAX, A320 family, 777 and A350. Fan-only node rigs preserve th
 engine casings, use illustrative spool-up/taxi speeds, and respect known engine-off
 and reduced-motion settings. Models without separate audited fan meshes remain
 static. Regenerate metadata with `python3 web/scripts/prepare-jet-fan-rigs.py`.
+
+**Travel together** (`/travelers/`) lists voluntary, self-reported traveler posts.
+Premium members can publish from **Account → Boarding passes → Share my journey**
+after linking a tracking journey. A separate public alias, flight/route/date and
+chosen approximate window position are shared for 1 or 24 hours (three active
+posts per account). Exact seat numbers, barcode files, account emails and booking
+references remain private. Sharing can be withdrawn even after Premium expires;
+expired posts are removed by the existing background cleanup.
+
+Anyone can browse the directory or open a shared trip without signing in. The
+window button finds a recent same-callsign observation on the trip's UTC date;
+unmatched, stale and fictional aircraft do not open as the traveler's flight.
+This is a simulated window viewpoint, not an exact airline seat map, live camera,
+verified boarding status or airline passenger manifest. Directory reads use
+bounded existing account storage and cached traffic; public viewing never invokes
+the paid details API. Premium marketing includes a direct **Start with my trip**
+entry point at `/account/?trips=1`.

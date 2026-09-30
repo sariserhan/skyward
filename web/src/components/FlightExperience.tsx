@@ -57,7 +57,7 @@ export function FlightExperience(p:Props){
  const eligible=p.aircraft?.targetKind==='aircraft'&&p.aircraft.lat!==null&&p.aircraft.lon!==null&&p.aircraft.altitude!==null;const airport=p.geometry?.airports[0];const runways=airport?.runways??[];
  useEffect(()=>{setOpen(false);setDemo(null);setPlaying(false);setProgress(0);},[p.aircraft?.hex,p.mode,p.replay,p.navigationKey]);
  const consumedRequest=useRef<number|null>(null);
- useEffect(()=>{const r=p.request;if(!r||r.serial===consumedRequest.current||r.hex!==p.aircraft?.hex||!p.viewer||!eligible||p.mode!=='3D'||p.replay)return;consumedRequest.current=r.serial;setView(sceneViews.includes(r.view as typeof sceneViews[number])?r.view as View:'side');setOpen(true);},[p.request,p.aircraft?.hex,p.viewer,eligible,p.mode,p.replay]);
+ useEffect(()=>{const r=p.request;if(!r||r.serial===consumedRequest.current||r.hex!==p.aircraft?.hex||!p.viewer||!eligible||p.mode!=='3D'||p.replay)return;consumedRequest.current=r.serial;if(r.window){setCabinSide(r.window.side);setCabinSeat(r.window.position==='front'?.2:r.window.position==='rear'?-.28:-.06);}setView(sceneViews.includes(r.view as typeof sceneViews[number])?r.view as View:'side');setOpen(true);},[p.request,p.aircraft?.hex,p.viewer,eligible,p.mode,p.replay]);
  useEffect(()=>{if(open&&p.aircraft){try{localStorage.setItem('skyward.last-flight.v1',JSON.stringify({hex:p.aircraft.hex,label:p.aircraft.callsign||p.aircraft.registration||p.aircraft.hex}));}catch{}}p.onScene(open&&p.aircraft&&sceneViews.includes(view as typeof sceneViews[number])?{hex:p.aircraft.hex,view}:null);return()=>p.onScene(null);},[open,p.aircraft?.hex,view,p.onScene]);
  useEffect(()=>{if(p.reducedMotion)setPlaying(false);},[p.reducedMotion]);
  useEffect(()=>{

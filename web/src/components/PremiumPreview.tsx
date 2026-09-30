@@ -1,5 +1,6 @@
 import {useState} from 'react';
 const features=[
+ ['Travel together and shared window views','Browse and watch published journeys','Publish your own expiring trip with a chosen display name and simulated window view'],
  ['Boarding passes and private passenger trips','Not included','Local barcode scanning, reviewed import and manual name/flight/seat entry'],
  ['Personal home and calendar tools','Feature preview','Upcoming journeys, family flights and reviewed .ics import/export'],
  ['Personalized aviation feed','Explore the observed map','Saved airports and favourite aircraft types'],

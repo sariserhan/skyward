@@ -1,3 +1,4 @@
+import {createTravelers} from './travelers.mjs';
 import {createPremiumExtras} from './premium-extras.mjs';
 import {randomBytes,createHash} from 'node:crypto';
 import webpush from 'web-push';
@@ -11,11 +12,13 @@ export function validSubscription(value){
  return {endpoint:url.href,keys:{p256dh:value.keys.p256dh,auth:value.keys.auth}};
 }
 export function createPremiumTools({store,entitlement,userById,readJourney,lookup,listJourneys,observations,env=process.env,now=Date.now,sendPush=webpush.sendNotification}){
+ const travelers=createTravelers({store,entitlement,userById,readJourney,observations,now});
  const vapid=env.SKYWARD_VAPID_PUBLIC_KEY&&env.SKYWARD_VAPID_PRIVATE_KEY&&env.SKYWARD_VAPID_SUBJECT?{subject:env.SKYWARD_VAPID_SUBJECT,publicKey:env.SKYWARD_VAPID_PUBLIC_KEY,privateKey:env.SKYWARD_VAPID_PRIVATE_KEY}:null;
  const month=()=>new Date(now()).toISOString().slice(0,7),monthlyLimit=30;
  async function eligible(id){const u=await userById(id);return u&&await entitlement(u)?u:null;}
  const extras=createPremiumExtras({store,entitlement,userById,readJourney,listJourneys,observations,notifyVerified,now,env});
  async function handle(path,method,u,b){
+  const trip=await travelers.handle(path,method,u,b);if(trip)return trip;
   const extra=await extras.handle(path,method,u,b);if(extra)return extra;
   if(!['/api/premium/monitoring','/api/premium/notifications','/api/premium/shares'].includes(path))return null;
   if(path.endsWith('/notifications')&&method==='POST'&&b.remove){await store.drop(u.id,'push',String(b.key||''));return {ok:true};}
@@ -41,6 +44,7 @@ export function createPremiumTools({store,entitlement,userById,readJourney,looku
   const token=randomBytes(32).toString('hex'),key=digest(token),expires=now()+b.hours*3600000;await store.put(u.id,'share',key,{journeyKey:j.key,expires},20);return {url:'/share/'+token,key,expires};
  }
  async function publicHandle(req,res,url){
+  if(await travelers.publicHandle(req,res,url))return true;
   if(await extras.publicHandle(req,res,url))return true;
   if(!url.pathname.startsWith('/share/'))return false;
   res.setHeader('Cache-Control','private, no-store');res.setHeader('Referrer-Policy','no-referrer');res.setHeader('X-Robots-Tag','noindex, nofollow');res.setHeader('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'");
@@ -61,6 +65,7 @@ export function createPremiumTools({store,entitlement,userById,readJourney,looku
  }
  let running=false;
  async function tick(){if(running)return;running=true;try{
+  await travelers.tick();
   await extras.tick();
   for(const r of await store.scan('monitor')){
    if(r.value.nextAt>now()||!r.value.enabled)continue;
