@@ -50,3 +50,18 @@ test('watched rejoin does not inherit extended gear during its approach circuit'
  }
  assert.ok(rejoined);assert.ok(landed);
 });
+
+test('a landed watched arrival survives missing, stale and changed feed callsigns without restarting approach',()=>{
+ const motion=new LiveMotion();motion.watch(a.hex);let previous,parked=false;
+ for(let second=0;second<=1000;second++){
+  const now=a.observedAt+second*1000;
+  const input=previous?.ground?{...a,callsign:second%4===0?'':second%4===1?' KAL2129 ':second%4===2?'KAL999':a.callsign,observedAt:now-90000,altitude:1800,ground:false}:a;
+  const frame=motion.sample(input,[],now,!!previous?.ground&&second%2===0,route,airport);
+  assert.equal(frame.arrivalAnimation,true);
+  if(previous?.ground){assert.equal(frame.ground,true,`ground arrival restarted at ${second}`);assert.ok(trackDistance(previous,frame)<.05);assert.equal(frame.altitude,airport.elevationFt);}
+  if(frame.landingPhase==='parked'){parked=true;if(previous?.landingPhase==='parked')assert.ok(trackDistance(previous,frame)<1e-9);}
+  previous=frame;
+ }
+ assert.ok(parked);
+ motion.stopArrival(a.hex);assert.equal(motion.sample(a,[],a.observedAt+1001000,false,route,airport).arrivalAnimation,undefined);
+});

@@ -96,7 +96,7 @@ export class LiveMotion {
  private frames=new Map<string,{signature:string;frame:LiveFrame;start:number;duration:number;verticalDuration:number;dx:number;dy:number;dz:number;dh:number}>();
  sample(a:Aircraft,points:TrailPoint[],now:number,reduced=false,route?:FlightRoute|null,arrivalGeometry?:AirportGeometry|null){
   if(a.simulation)return syntheticFrame(a,now);
-  const controlled=!reduced?this.watchedArrival.sample(a,now,route,arrivalGeometry,this.frames.get(a.hex)?.frame):null;
+  const controlled=this.watchedArrival.sample(a,now,route,arrivalGeometry,this.frames.get(a.hex)?.frame,!reduced);
   if(controlled){const previous=this.frames.get(a.hex)?.frame;if(previous?.landingPhase!==controlled.landingPhase){qualityEvent('arrival','ready',`Presentation phase: ${controlled.landingPhase??'airborne'}`);if(previous?.ground&&!controlled.ground)qualityEvent('arrival','warning','Ground-to-air transition during controlled arrival');}this.frames.set(a.hex,{signature:'controlled',frame:controlled,start:now,duration:2000,verticalDuration:2000,dx:0,dy:0,dz:0,dh:0});return controlled;}
   let target=liveFrame(a,points,now,reduced,route,arrivalGeometry);if(!target)return null;
   const anchor=this.approaches.get(a.hex);

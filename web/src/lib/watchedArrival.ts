@@ -8,18 +8,20 @@ import {predictedLanding} from './landingPrediction.ts';
 import {bearing} from './flightPresentation.ts';
 import {trackDistance} from './positionQuality.ts';
 const wrap=(n:number)=>((n+540)%360)-180;
-interface Plan {clock?:GroundMotionClock;runwayStart:{lon:number;lat:number};runwayEnd:{lon:number;lat:number};goAround?:boolean;checked?:number;conflict?:string;aircraft:Aircraft;airport:AirportGeometry;route:FlightRoute|null;sourceTime:number;seed:Aircraft|null;pose:LiveFrame;entry:{lat:number;lon:number};last:number;heading:number;stage:'entry'|'final';layout?:TaxiRoute;}
+interface Plan {landed?:boolean;clock?:GroundMotionClock;runwayStart:{lon:number;lat:number};runwayEnd:{lon:number;lat:number};goAround?:boolean;checked?:number;conflict?:string;aircraft:Aircraft;airport:AirportGeometry;route:FlightRoute|null;sourceTime:number;seed:Aircraft|null;pose:LiveFrame;entry:{lat:number;lon:number};last:number;heading:number;stage:'entry'|'final';layout?:TaxiRoute;}
 export class WatchedArrival {
  private watched=new Set<string>();private plans=new Map<string,Plan>();private blocked=new Set<string>();
  watch(hex:string){this.watched.add(hex);this.blocked.delete(hex);return()=>{forgetGroundTraffic(hex);this.watched.delete(hex);this.plans.delete(hex);this.blocked.delete(hex);};}
  layout(hex:string){return this.plans.get(hex)?.layout??null;}
  stop(hex:string){forgetGroundTraffic(hex);this.plans.delete(hex);this.blocked.add(hex);}
- sample(a:Aircraft,now:number,route:FlightRoute|null|undefined,airport:AirportGeometry|null|undefined,displayed?:LiveFrame):LiveFrame|null{
+ sample(a:Aircraft,now:number,route:FlightRoute|null|undefined,airport:AirportGeometry|null|undefined,displayed?:LiveFrame,allowStart=true):LiveFrame|null{
   if(!this.watched.has(a.hex)||this.blocked.has(a.hex))return null;
   let p=this.plans.get(a.hex);
-  if(p&&p.aircraft.callsign!==a.callsign){this.plans.delete(a.hex);return null;}
+  // Feed identity can be blank, padded or stale. Once wheels are down, this
+  // watched arrival owns taxi/parking until the user explicitly releases it.
+  if(p&&!p.landed&&a.callsign.trim()&&p.aircraft.callsign.trim()!==a.callsign.trim()&&a.observedAt!==null&&a.observedAt>p.sourceTime){forgetGroundTraffic(a.hex);this.plans.delete(a.hex);return null;}
   if(!p){
-   if(!airport||a.ground)return null;
+   if(!allowStart||!airport||a.ground)return null;
    const fresh={...a,observedAt:now};let candidate=predictedLanding(fresh,now,route,airport);
    // A watched destination arrival can be on a base leg before runway alignment.
    // Select an illustrative runway, then fly a continuous intercept instead of snapping to it.
@@ -41,7 +43,7 @@ export class WatchedArrival {
    this.plans.set(a.hex,p);
   }
   if(p.checked===undefined||now-p.checked>=500){p.checked=now;p.conflict=groundConflict(a.hex,p.airport,p.runwayStart,p.runwayEnd,aircraftRadius(a.aircraftType),now);}const runwayConflict=p.conflict;
-  if(p.seed&&runwayConflict){const current=p.clock?.currentTime()??now,approach=predictedLanding(p.seed,current,p.route,p.airport,true);if(approach&&!approach.ground&&approach.altitude-p.airport.elevationFt!<1800){p.pose={...approach};p.seed=null;p.clock=undefined;p.stage='entry';p.last=now;p.goAround=true;}}
+  if(!p.landed&&p.seed&&runwayConflict){const current=p.clock?.currentTime()??now,approach=predictedLanding(p.seed,current,p.route,p.airport,true);if(approach&&!approach.ground&&approach.altitude-p.airport.elevationFt!<1800){p.pose={...approach};p.seed=null;p.clock=undefined;p.stage='entry';p.last=now;p.goAround=true;}}
   if(!p.seed){
    // If a stale display has already overshot, turn around through a circuit;
    // never snap or translate backward to an earlier received coordinate.
@@ -56,6 +58,7 @@ export class WatchedArrival {
    }
   }
   const f=p.seed?(p.clock??=new GroundMotionClock()).advance(a.hex,now,p.airport,aircraftRadius(a.aircraftType),time=>predictedLanding(p!.seed!,time,p!.route,p!.airport,true)!):{...p.pose,gear:0,landingPhase:'approach' as const,estimated:true as const};
+  if(f?.ground)p.landed=true;
   return f?{...f,time:p.sourceTime,age:Math.max(0,now-p.sourceTime),arrivalAnimation:true,arrivalGoAround:p.goAround,arrivalElevationFt:p.airport.elevationFt,arrivalRejoin:!p.seed}:null;
  }
 }
