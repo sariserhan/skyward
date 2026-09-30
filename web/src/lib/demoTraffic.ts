@@ -7,10 +7,10 @@ import {towerCycle,usableDemoRunway} from './towerCycle.ts';
 import {bearing} from './flightPresentation.ts';
 export const DEMO_MODELS=['b737','a320','b787','regional','bizjet','turboprop'] as const;
 export interface DemoFlight {id:string;name:string;model:typeof DEMO_MODELS[number];destination:string;offset:number;}
-export function demoPlan(airport:AirportGeometry):GroundPlan|null{
- const mapped=groundPlan(airport);if(mapped)return mapped;
+export function demoPlan(airport:AirportGeometry,clearance=30):GroundPlan|null{
+ const mapped=groundPlan(airport,clearance);if(mapped)return mapped;
  const runway=airport.runways.find(usableDemoRunway);if(!runway)return null;
- const inbound=arrivalParking(airport,{lon:runway.a[0],lat:runway.a[1]},{lon:runway.b[0],lat:runway.b[1]}),points=[...inbound.points].reverse(),outbound={...inbound,points,meters:[...inbound.meters].reverse().map(n=>inbound.length-n),stop:points[0]};
+ const inbound=arrivalParking(airport,{lon:runway.a[0],lat:runway.a[1]},{lon:runway.b[0],lat:runway.b[1]},clearance);if(!inbound)return null;const points=[...inbound.points].reverse(),outbound={...inbound,points,meters:[...inbound.meters].reverse().map(n=>inbound.length-n),stop:points[0]};
  const taxiSeconds=taxiSpeedProfile(inbound).times.at(-1)!,outboundSeconds=taxiSpeedProfile(outbound).times.at(-1)!;
  return {inbound,outbound,runway,taxiSeconds,outboundSeconds,end:taxiSeconds+outboundSeconds+93.75};
 }

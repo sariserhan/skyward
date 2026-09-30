@@ -1,3 +1,4 @@
+import {aircraftRadius} from './groundSafety.ts';
 import {arrivalParking} from './arrivalParking.ts';
 import {landingRouteMode} from './landingRoute.ts';
 import {planTaxi,taxiFrame} from './taxiRoute.ts';
@@ -73,7 +74,7 @@ export function predictedLanding(a:Aircraft,now:number,route:FlightRoute|null|un
   const gear=height<=1800&&Math.hypot(touch.x-p.x,touch.y-p.y)<=4&&crossTrack<=.15&&Math.abs(wrap(aircraftHeading-heading))<=10&&a.groundSpeed!+(touchdownSpeed-a.groundSpeed!)*elapsed<=200?1:0;
   return {...base,...geo(p),gear,altitude:airport.elevationFt!+height,ground:false,heading:aircraftHeading,pitch:2+2*elapsed*elapsed*(3-2*elapsed),groundSpeed:a.groundSpeed!+(touchdownSpeed-a.groundSpeed!)*elapsed,landingPhase:'approach' as LandingPhase};
  }
- const proposedTaxi=planTaxi(airport,geo(start),geo(end))??(completeArrival?arrivalParking(airport,geo(start),geo(end)):null);
+ const proposedTaxi=planTaxi(airport,geo(start),geo(end),aircraftRadius(a.aircraftType))??(completeArrival?arrivalParking(airport,geo(start),geo(end),aircraftRadius(a.aircraftType)):null);
  const touchAlong=((touch.x-start.x)*(end.x-start.x)+(touch.y-start.y)*(end.y-start.y))/length;
  const taxiStop=proposedTaxi?local(proposedTaxi.stop.lon,proposedTaxi.stop.lat):null;
  // Never reverse along the runway to reach an exit behind a late touchdown.

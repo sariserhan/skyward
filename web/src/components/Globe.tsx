@@ -1,3 +1,4 @@
+import {updateGroundTraffic} from '../lib/groundSafety';
 import {globeAltitude} from '../lib/globeFraming';
 import {updateGraphics} from '../lib/updateGraphics';
 import {FollowFlightPath} from './FollowFlightPath';
@@ -91,6 +92,7 @@ export function Globe(p: Props) {
   const retryModel=()=>{const a=callbacks.current.selected;if(!a)return;const id=`aircraft-${a.hex}`,old=modelAttempts.current.get(id);if(old){modelAttempts.current.set(id,{...old,stage:'primary',ready:false,since:Date.now(),retry:old.retry+1});readyModels.current.delete(id);rendered.current.delete(id);const e=viewer.current?.entities.getById(id);if(e)e.model=undefined;setModelRevision(n=>n+1);}};
   const readyModels=useRef(new Set<string>());const [selectedModelReady,setSelectedModelReady]=useState(false);
   const previousCommand=useRef(p.command.serial);
+  useEffect(()=>{updateGroundTraffic(p.groundObservations,Date.now());},[p.groundObservations]);
   const [contextLost,setContextLost]=useState(false);const lostRef=useRef(false),firstRecovery=useRef(p.recoveryPose);
   const animatedIds=useRef(new Set<string>());
   const container = useRef<HTMLDivElement>(null);
@@ -500,9 +502,10 @@ export function Globe(p: Props) {
       if(showModel){
         // Preserve ModelGraphics between fixes so moving traffic does not recreate GPU models.
         if(!e.model){attempt.since=Date.now();attempt.ready=false;}
-        if(!e.model)e.model=new C.ModelGraphics({minimumPixelSize:protectedModel?18:tower?12:0,maximumScale:protectedModel?3:tower?2:1,scale:1,shadows:C.ShadowMode.ENABLED});
+        const groundSize=a.ground||sharedLiveMotion.displayed(a.hex)?.ground;
+        if(!e.model)e.model=new C.ModelGraphics({minimumPixelSize:groundSize?0:protectedModel?18:tower?12:0,maximumScale:groundSize?1:protectedModel?3:tower?2:1,scale:1,shadows:C.ShadowMode.ENABLED});
         if(e.model.uri?.getValue(v.clock.currentTime)!==uri){e.model.uri=new C.ConstantProperty(uri);e.model.nodeTransformations=new C.PropertyBag();}
-        updateGraphics(e.model,{minimumPixelSize:protectedModel?18:tower?12:0,maximumScale:protectedModel?3:tower?2:1,heightReference:C.HeightReference.NONE,distanceDisplayCondition:new C.DistanceDisplayCondition(0,modelRange(selected,tower))});
+        updateGraphics(e.model,{minimumPixelSize:groundSize?0:protectedModel?18:tower?12:0,maximumScale:groundSize?1:protectedModel?3:tower?2:1,heightReference:C.HeightReference.NONE,distanceDisplayCondition:new C.DistanceDisplayCondition(0,modelRange(selected,tower))});
         e.model.color=new C.CallbackProperty(()=>{const pos=e!.position?.getValue(v.clock.currentTime);return C.Color.WHITE.withAlpha(pos?modelOpacity(C.Cartesian3.distance(v.camera.positionWC,pos),selected,tower):1);},false);
         if(!animationOwnsPosition&&!detailed&&!flightOpen){const down=(replay?.ground??a.ground)?1:0;e.model.nodeTransformations=new C.PropertyBag({Gear:new C.TranslationRotationScale(C.Cartesian3.ZERO,C.Quaternion.IDENTITY,new C.Cartesian3(down,down,down))});}
       }else if(e.model)e.model=undefined;

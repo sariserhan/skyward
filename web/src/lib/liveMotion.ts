@@ -7,7 +7,7 @@ import {bearing} from './flightPresentation.ts';
 import {contiguous,trackDistance} from './positionQuality.ts';
 const wrap=(n:number)=>((n+540)%360+360)%360-180;
 const finite=(n:unknown):n is number=>typeof n==='number'&&Number.isFinite(n);
-export interface LiveFrame { simulated?:boolean;simulationElevationFt?:number;gear?:number;arrivalAnimation?:boolean;arrivalElevationFt?:number;arrivalRejoin?:boolean;lon:number;lat:number;altitude:number;heading:number;time:number;ground:boolean;groundClearance?:number;estimated:boolean;age:number;turnRate?:number;verticalRate?:number;correcting?:boolean;predictionLimited?:boolean;landingPhase?:LandingPhase;runway?:string;groundSpeed?:number;pitch?:number;gate?:string;}
+export interface LiveFrame { arrivalGoAround?:boolean; groundHold?:string; simulated?:boolean;simulationElevationFt?:number;gear?:number;arrivalAnimation?:boolean;arrivalElevationFt?:number;arrivalRejoin?:boolean;lon:number;lat:number;altitude:number;heading:number;time:number;ground:boolean;groundClearance?:number;estimated:boolean;age:number;turnRate?:number;verticalRate?:number;correcting?:boolean;predictionLimited?:boolean;landingPhase?:LandingPhase;runway?:string;groundSpeed?:number;pitch?:number;gate?:string;}
 function destination(lat:number,lon:number,heading:number,nm:number){
  const r=Math.PI/180,p=lat*r,l=lon*r,h=heading*r,d=nm/3440.065;
  const y=Math.asin(Math.max(-1,Math.min(1,Math.sin(p)*Math.cos(d)+Math.cos(p)*Math.sin(d)*Math.cos(h))));
@@ -71,6 +71,8 @@ export function liveFrame(a:Aircraft,points:TrailPoint[],now:number,reduced=fals
 }
 export function liveMotionStatus(a:Aircraft,points:TrailPoint[],now:number,reduced=false,route?:FlightRoute|null,arrivalGeometry?:AirportGeometry|null,displayed?:LiveFrame|null){
  if(a.simulation)return 'Skyward · Simulated flight · '+(a.simulation.phase);
+ if(displayed?.arrivalGoAround)return 'Arrival animation · go-around for runway clearance';
+ if(displayed?.groundHold)return `Airport animation · holding for ${displayed.groundHold} · awaiting a clear path`;
  if(displayed?.arrivalAnimation)return displayed.arrivalRejoin?'Arrival animation · turning to intercept final approach':`Arrival animation · ${displayed.landingPhase} · runway ${displayed.runway??'selected'}${displayed.gate?' · '+displayed.gate:''} · runway and stand unconfirmed`;
  if(reduced)return 'Reduced motion · showing received positions';
  if(a.ground)return now-(a.observedAt??0)>8000?'On ground · awaiting position update':'Ground tracking · short motion estimate';

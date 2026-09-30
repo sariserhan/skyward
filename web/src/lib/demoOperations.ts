@@ -1,3 +1,4 @@
+import {groundRouteClear,groundSegmentClear} from './groundSafety.ts';
 import type {AirportGeometry} from '../types.ts';
 import {AIRPORTS} from './airportCatalog.ts';
 import {demoPlan,type DemoFlight} from './demoTraffic.ts';
@@ -26,15 +27,18 @@ function rounded(points:Point[],radius:number):Point[]{
  const result=[sparse[0]];for(let i=1;i<sparse.length-1;i++){const a=sparse[i-1],b=sparse[i],c=sparse[i+1],d1=trackDistance(a,b)*1852,d2=trackDistance(b,c)*1852,cut=Math.min(radius,d1*.4,d2*.4),u=line(b,a,cut/Math.max(1,d1)),v=line(b,c,cut/Math.max(1,d2));result.push(u);for(let j=1;j<=8;j++){const t=j/8;result.push(line(line(u,b,t),line(b,v,t),t));}}result.push(sparse.at(-1)!);return result;
 }
 function route(points:Point[],gate:string):TaxiRoute {const meters=[0];for(let i=1;i<points.length;i++)meters.push(meters.at(-1)!+trackDistance(points[i-1],points[i])*1852);return {points,meters,stop:points[0],length:meters.at(-1)!,gate};}
+const basePlans=new WeakMap<AirportGeometry,Map<DemoModel,ReturnType<typeof demoPlan>>>();
 /** Assigned stands are fictional. One aircraft owns the whole movement area at a time. */
 export function operation(port:AirportGeometry,model:DemoModel,index=0):Operation|null {
  const h=DEMO_HANDLING[model],eligible={...port,runways:port.runways.filter(r=>r.length>=h.runway)};
- const base=demoPlan(eligible);if(!base)return null;
+ const clearance=model==='b787'?48:model==='bizjet'?23:30;let plans=basePlans.get(port);if(!plans){plans=new Map();basePlans.set(port,plans);}if(!plans.has(model))plans.set(model,demoPlan(eligible,clearance));const base=plans.get(model);if(!base)return null;
  const start={lon:base.runway.a[0],lat:base.runway.a[1]},heading=bearing(start,{lon:base.runway.b[0],lat:base.runway.b[1]}),stop=base.inbound.stop;
  // A broad illustrative stand fan avoids assigning six aircraft to one real gate.
- const original=base.inbound.points.at(-1)!,offset=index*100,gate=movePoint(original,heading+90,offset/1852);
+ const original=base.inbound.points.at(-1)!,offset=index*120;
+ const gate=index===0?original:[90,-90,180,0,135,-135,45,-45].map(angle=>movePoint(original,heading+angle,offset/1852)).find(p=>groundSegmentClear(port,original,p,clearance));if(!gate)return null;
  const points=[...base.inbound.points];if(index>0)points.push(gate);
- const roundedPoints=rounded(points,h.turn);
+ const curved=rounded(points,h.turn),roundedPoints=groundRouteClear(port,curved,clearance)?curved:points;
+ if(!groundRouteClear(port,roundedPoints,clearance))return null;
  const inbound=route(roundedPoints,index?`Skyward stand ${index+1} (illustrative)`:base.inbound.gate),out=route([...roundedPoints].reverse(),inbound.gate);
  const taxi=taxiSpeedProfile(inbound).times.at(-1)!*12/h.taxi,service=h.service,push=18;
  const touch=movePoint(start,heading,Math.min(350,base.runway.length*.12)/1852),approach=movePoint(start,heading+180,3.5);

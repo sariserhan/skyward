@@ -1,3 +1,4 @@
+import {GroundMotionClock,aircraftRadius,forgetGroundTraffic,groundConflict} from './groundSafety.ts';
 import {arrivalParking} from './arrivalParking.ts';
 import {planTaxi,type TaxiRoute} from './taxiRoute.ts';
 import {landingRouteMode} from './landingRoute.ts';
@@ -7,12 +8,12 @@ import {predictedLanding} from './landingPrediction.ts';
 import {bearing} from './flightPresentation.ts';
 import {trackDistance} from './positionQuality.ts';
 const wrap=(n:number)=>((n+540)%360)-180;
-interface Plan {aircraft:Aircraft;airport:AirportGeometry;route:FlightRoute|null;sourceTime:number;seed:Aircraft|null;pose:LiveFrame;entry:{lat:number;lon:number};last:number;heading:number;stage:'entry'|'final';layout?:TaxiRoute;}
+interface Plan {clock?:GroundMotionClock;runwayStart:{lon:number;lat:number};runwayEnd:{lon:number;lat:number};goAround?:boolean;checked?:number;conflict?:string;aircraft:Aircraft;airport:AirportGeometry;route:FlightRoute|null;sourceTime:number;seed:Aircraft|null;pose:LiveFrame;entry:{lat:number;lon:number};last:number;heading:number;stage:'entry'|'final';layout?:TaxiRoute;}
 export class WatchedArrival {
  private watched=new Set<string>();private plans=new Map<string,Plan>();private blocked=new Set<string>();
- watch(hex:string){this.watched.add(hex);this.blocked.delete(hex);return()=>{this.watched.delete(hex);this.plans.delete(hex);this.blocked.delete(hex);};}
+ watch(hex:string){this.watched.add(hex);this.blocked.delete(hex);return()=>{forgetGroundTraffic(hex);this.watched.delete(hex);this.plans.delete(hex);this.blocked.delete(hex);};}
  layout(hex:string){return this.plans.get(hex)?.layout??null;}
- stop(hex:string){this.plans.delete(hex);this.blocked.add(hex);}
+ stop(hex:string){forgetGroundTraffic(hex);this.plans.delete(hex);this.blocked.add(hex);}
  sample(a:Aircraft,now:number,route:FlightRoute|null|undefined,airport:AirportGeometry|null|undefined,displayed?:LiveFrame):LiveFrame|null{
   if(!this.watched.has(a.hex)||this.blocked.has(a.hex))return null;
   let p=this.plans.get(a.hex);
@@ -35,10 +36,12 @@ export class WatchedArrival {
    const runway=airport.runways.find(r=>r.id.split('/').includes(candidate.runway));if(!runway)return null;
    const reverse=runway.id.split('/')[1]===candidate.runway,from=reverse?runway.b:runway.a,to=reverse?runway.a:runway.b,heading=bearing({lon:from[0],lat:from[1]},{lon:to[0],lat:to[1]});
    const nm=Math.max(6,Math.min(9,(visible.altitude-airport.elevationFt!)/318)),rad=heading*Math.PI/180;
-   p={aircraft:{...a},airport,route:route?structuredClone(route):null,sourceTime:a.observedAt!,seed:predictedLanding(seed,now,route,airport)?seed:null,pose:visible,entry:{lat:from[1]-Math.cos(rad)*nm/60,lon:from[0]-Math.sin(rad)*nm/(60*Math.cos(from[1]*Math.PI/180))},last:now,heading,stage:'entry'};
-   const start={lon:from[0],lat:from[1]},end={lon:to[0],lat:to[1]};if(!planTaxi(airport,start,end)){const parking=arrivalParking(airport,start,end);if(parking.gate.startsWith('illustrative'))p.layout=parking;}
+   p={runwayStart:{lon:from[0],lat:from[1]},runwayEnd:{lon:to[0],lat:to[1]},aircraft:{...a},airport,route:route?structuredClone(route):null,sourceTime:a.observedAt!,seed:predictedLanding(seed,now,route,airport)?seed:null,pose:visible,entry:{lat:from[1]-Math.cos(rad)*nm/60,lon:from[0]-Math.sin(rad)*nm/(60*Math.cos(from[1]*Math.PI/180))},last:now,heading,stage:'entry'};
+   const start={lon:from[0],lat:from[1]},end={lon:to[0],lat:to[1]};if(!planTaxi(airport,start,end,aircraftRadius(a.aircraftType))){const parking=arrivalParking(airport,start,end,aircraftRadius(a.aircraftType));if(parking?.gate.startsWith('illustrative'))p.layout=parking;}
    this.plans.set(a.hex,p);
   }
+  if(p.checked===undefined||now-p.checked>=500){p.checked=now;p.conflict=groundConflict(a.hex,p.airport,p.runwayStart,p.runwayEnd,aircraftRadius(a.aircraftType),now);}const runwayConflict=p.conflict;
+  if(p.seed&&runwayConflict){const current=p.clock?.currentTime()??now,approach=predictedLanding(p.seed,current,p.route,p.airport,true);if(approach&&!approach.ground&&approach.altitude-p.airport.elevationFt!<1800){p.pose={...approach};p.seed=null;p.clock=undefined;p.stage='entry';p.last=now;p.goAround=true;}}
   if(!p.seed){
    // If a stale display has already overshot, turn around through a circuit;
    // never snap or translate backward to an earlier received coordinate.
@@ -49,10 +52,10 @@ export class WatchedArrival {
     p.pose={...p.pose,altitude:p.pose.altitude+Math.max(-10*dt,Math.min(15*dt,p.airport.elevationFt!+1800-p.pose.altitude)),heading,groundSpeed:speed,lat:p.pose.lat+Math.cos(heading*Math.PI/180)*distance/60,lon:wrap(p.pose.lon+Math.sin(heading*Math.PI/180)*distance/(60*Math.cos(p.pose.lat*Math.PI/180)))};
     if(p.stage==='entry'&&trackDistance(p.pose,p.entry)<.5)p.stage='final';else if(p.stage==='final'&&along>6)p.stage='entry';
     const seed={...p.aircraft,...p.pose,ground:false,observedAt:now,verticalRate:-600};
-    if(p.stage==='final'&&predictedLanding(seed,now,p.route,p.airport)){p.seed=seed;break;}
+    if(p.stage==='final'&&!runwayConflict&&predictedLanding(seed,now,p.route,p.airport)){p.seed=seed;p.goAround=false;break;}
    }
   }
-  const f=p.seed?predictedLanding(p.seed,now,p.route,p.airport,true):{...p.pose,gear:0,landingPhase:'approach' as const,estimated:true as const};
-  return f?{...f,time:p.sourceTime,age:Math.max(0,now-p.sourceTime),arrivalAnimation:true,arrivalElevationFt:p.airport.elevationFt,arrivalRejoin:!p.seed}:null;
+  const f=p.seed?(p.clock??=new GroundMotionClock()).advance(a.hex,now,p.airport,aircraftRadius(a.aircraftType),time=>predictedLanding(p!.seed!,time,p!.route,p!.airport,true)!):{...p.pose,gear:0,landingPhase:'approach' as const,estimated:true as const};
+  return f?{...f,time:p.sourceTime,age:Math.max(0,now-p.sourceTime),arrivalAnimation:true,arrivalGoAround:p.goAround,arrivalElevationFt:p.airport.elevationFt,arrivalRejoin:!p.seed}:null;
  }
 }

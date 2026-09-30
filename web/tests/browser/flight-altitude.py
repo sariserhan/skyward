@@ -13,6 +13,8 @@ def run(page):
  expect(page.locator('.flight-readings')).to_contain_text('Ground')
  expect(page.locator('.flight-readings')).to_contain_text('0 ft above ground')
  expect(page.locator('.flight-readings')).not_to_contain_text('1,026')
+ page.wait_for_function("__viewer.entities.getById('aircraft-abcdef')?.model?.maximumScale?.getValue(__viewer.clock.currentTime)===1",timeout=20000)
+ assert page.evaluate("__viewer.entities.getById('aircraft-abcdef').model.minimumPixelSize.getValue(__viewer.clock.currentTime)")==0
  page.screenshot(path=str(f.ARTIFACTS/'ground-altitude.png'))
  assert not errors,errors
  print('PASS reported ground at 1026 ft shows Ground / 0 ft above ground',flush=True)

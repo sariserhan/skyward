@@ -506,6 +506,14 @@ activity totals, not unique-user conversion rates. No names, route/seat data,
 boarding contents, account IDs or durable analytics rows are collected. Request
 rate limiting uses bounded transient connection-address state, as other APIs do.
 
+### Airport ground clearance
+
+Mapped taxi routes, rounded turns and illustrative stand connectors are checked against building footprints using aircraft-sized clearance envelopes. Unsafe routes are rejected; fallback parking tries clear alternatives and returns unavailable if none fits. Simulated stand placement is checked too, with blocked initial ground positions replaced by airborne demo traffic.
+
+Watched-arrival and Skyward traffic use a separate presentation clock to brake, hold for ground separation and resume without altering received observations. Occupied touchdowns trigger an illustrative go-around; tower ground demonstrations also check swept paths and publish their occupancy. Ground aircraft render at physical scale rather than being enlarged for visibility. Building checks are cached, and approach/runway checks are throttled.
+
+These are conservative presentation safeguards, not a certified physics/ATC engine. Missing building geometry, delayed/unavailable traffic and inaccurate real observations limit coverage. Real position reports remain unchanged. Checks: `web/server/ground-safety.test.mjs`, including sustained IAD traffic, swept-wall and wing-clearance cases, braking, resumption and an occupied-touchdown circuit.
+
 ### Airport and flight URLs
 
 - `/airports/SFO/` opens the airport on the globe; the initial HTML contains catalog facts, canonical/social metadata and Airport structured data. Airport pages remain in the sitemap.
