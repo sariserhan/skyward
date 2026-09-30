@@ -4,7 +4,7 @@ import * as C from 'cesium';
 import {updateGraphics} from '../src/lib/updateGraphics.ts';
 test('unchanged marker updates preserve graphics properties and emit no changes',()=>{
  globalThis.window={Cesium:C};try{
-  for(const graphics of [new C.BillboardGraphics(),new C.LabelGraphics(),new C.PointGraphics()]){
+  for(const graphics of [new C.BillboardGraphics(),new C.LabelGraphics(),new C.PointGraphics(),new C.ModelGraphics()]){
    updateGraphics(graphics,{show:true,distanceDisplayCondition:new C.DistanceDisplayCondition(20,5000)});
    const property=graphics.distanceDisplayCondition;let changes=0;graphics.definitionChanged.addEventListener(()=>changes++);
    for(let i=0;i<100;i++)updateGraphics(graphics,{show:true,distanceDisplayCondition:new C.DistanceDisplayCondition(20,5000)});

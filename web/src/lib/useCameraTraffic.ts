@@ -26,12 +26,13 @@ export function useCameraTraffic(area:CameraArea|null,ingest:(rows:Aircraft[])=>
      if(!r.ok)retryAt.current=Math.max(retryAt.current,providerRetryAt(r.headers.get('Retry-After'),Date.now(),r.status));
      const data=await r.json().catch(()=>{if(!r.ok)return {};throw Error('Invalid traffic response.');}) as FeedResponse&{error?:string;retryAfter?:number};if(!r.ok){retryAt.current=Math.max(retryAt.current,providerRetryAt(r.headers.get('Retry-After')??data.retryAfter,Date.now(),r.status));throw new Error(data.error||'Camera traffic unavailable.');}
      if(!Array.isArray(data.aircraft)||!Number.isFinite(data.fetchedAt))throw new Error('Invalid traffic response.');
-     results.push({region,rows:data.aircraft});fetchedAt=fetchedAt===null?data.fetchedAt:Math.min(fetchedAt,data.fetchedAt);lastSuccess.current=fetchedAt;
+     if(!alive)break;
+     results.push({region,rows:ingest(data.aircraft)});fetchedAt=fetchedAt===null?data.fetchedAt:Math.min(fetchedAt,data.fetchedAt);lastSuccess.current=fetchedAt;
     }catch(e){if(!alive)break;results.push({region,rows:null});errors.push(e instanceof Error?e.message:'Camera traffic unavailable.');}
     if(alive){
      // Pending regions keep their previous fixes until their own response arrives.
      const pending=regions.slice(results.length).map(region=>({region,rows:null}));
-     const rows=ingest(combineRegions([...results,...pending],previous.current,a));
+     const rows=combineRegions([...results,...pending],previous.current,a);
      previous.current=rows;setState({key,aircraft:rows,loading:results.length<regions.length,error:errors.length?`${errors.length}/${regions.length} areas unavailable. ${errors[0]}`:'',updatedAt:fetchedAt??stateUpdateTime,completed:results.length,total:regions.length,failed:errors.length});
     }
    }}finally{busy=false;if(alive){

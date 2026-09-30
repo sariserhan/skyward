@@ -69,3 +69,17 @@ test('feed transport is called without a client receiver for Workers compatibili
  const client=new FeedClient(function(){assert.equal(this,undefined);return Promise.resolve(Response.json({now:Date.now(),ac:[]}));});
  assert.deepEqual((await client.cameraArea(39,-77,50)).aircraft,[]);
 });
+
+test('wide viewport edge samples stay covered near dateline and poles within the same request budget',()=>{
+ for(const [center,edge] of [
+  [{lat:0,lon:0},{lat:0,lon:12}],
+  [{lat:0,lon:179},{lat:0,lon:-169}],
+  [{lat:80,lon:0},{lat:80,lon:70}],
+  [{lat:-80,lon:0},{lat:-80,lon:-70}],
+ ]){
+  const area=cameraArea(center,[edge]);
+  assert.ok(inCameraArea(edge,area),JSON.stringify({center,edge,area}));
+  assert.equal(trafficRegions(area).length,2);
+  assert.ok(area.limited);
+ }
+});

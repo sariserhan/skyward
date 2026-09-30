@@ -18,8 +18,14 @@ export function cameraArea(center:{lat:number;lon:number},points:{lat:number;lon
    if(regions.length===5)break;
    if(regions.some(r=>distanceNm(r.lat,r.lon,p.lat,p.lon)<r.radius-8))continue;
    const d=distanceNm(lat,lon,p.lat,p.lon);if(d>750)continue;
-   const dl=((p.lon-lon+540)%360)-180,f=Math.min(1,300/Math.max(1,d));
-   const r={lat:Math.round((lat+(p.lat-lat)*f)*10)/10,lon:Number((((Math.round((lon+dl*f)*10)/10+540)%360)-180).toFixed(1)),radius:250};
+   // Follow the great-circle bearing, including polar/dateline viewports.
+   // Place the circle far enough out to include the sampled edge, with padding.
+   const rad=Math.PI/180,phi=lat*rad,target=p.lat*rad,dl=(((p.lon-lon+540)%360)-180)*rad;
+   const bearing=Math.atan2(Math.sin(dl)*Math.cos(target),Math.cos(phi)*Math.sin(target)-Math.sin(phi)*Math.cos(target)*Math.cos(dl));
+   const angle=Math.min(d,Math.max(300,d-240))/3440.065;
+   const nextLat=Math.asin(Math.max(-1,Math.min(1,Math.sin(phi)*Math.cos(angle)+Math.cos(phi)*Math.sin(angle)*Math.cos(bearing))));
+   const nextLon=lon*rad+Math.atan2(Math.sin(bearing)*Math.sin(angle)*Math.cos(phi),Math.cos(angle)-Math.sin(phi)*Math.sin(nextLat));
+   const r={lat:Math.round(nextLat/rad*10)/10,lon:Number((((Math.round(nextLon/rad*10)/10+540)%360)-180).toFixed(1)),radius:250};
    if(!regions.some(q=>distanceNm(q.lat,q.lon,r.lat,r.lon)<100))regions.push(r);
   }
  }

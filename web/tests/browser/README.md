@@ -93,3 +93,9 @@ The recording uses real browser timing, not a shortened test-only duration.
 installed Chromium/Firefox/WebKit and writes an explicit release matrix. Limit it
 with `npm run test:devices -- --browser=chromium`. Missing engines are BLOCKED and
 produce a nonzero exit status. No browsers are installed automatically.
+
+For request-efficiency regressions, run `python3 tests/browser/route-requests.py`
+and `python3 tests/browser/traffic-requests.py` from `web/` with Playwright
+installed. These use mocked feeds to verify that fresh results survive repeated
+visibility events without extra requests, expired routes refresh, and airport
+refreshes respect `Retry-After` even when a rate-limit response is plain text.

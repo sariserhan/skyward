@@ -1,3 +1,4 @@
+import {providerRetryAt} from './trafficRetry';
 import {nextObservationLookup} from './observationPolling';
 import {useAccountWatches} from './useAccountWatches';
 import {qualityRows} from './positionQuality';
@@ -10,8 +11,8 @@ export type WatchItem = Pick<Aircraft, 'hex' | 'callsign' | 'registration' | 'ai
 async function fetchFeed(url: string, signal: AbortSignal) {
   if(!navigator.onLine)throw new Error('Offline · waiting for connection.');
   const response = await fetch(url, { signal: AbortSignal.any([signal, AbortSignal.timeout(25000)]) });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error ?? 'Unable to connect to the position feed.');
+  const data = await response.json().catch(()=>{if(!response.ok)return {};throw new Error('Invalid traffic response.');});
+  if (!response.ok) throw Object.assign(new Error(data.error ?? 'Unable to connect to the position feed.'),{retryAt:providerRetryAt(response.headers.get('Retry-After')??data.retryAfter,Date.now(),response.status)});
   return data as FeedResponse;
 }
 export function useObservatory(airport: AirportId, alertsEnabled = false) {
@@ -60,25 +61,26 @@ export function useObservatory(airport: AirportId, alertsEnabled = false) {
   }, []);
   const select = useCallback((a: Aircraft) => { a=qualityRows([a],accepted.current)[0]; if((histories.current.get(a.hex)?.length??0)<(motionHistories.current.get(a.hex)?.length??0)){histories.current.set(a.hex,[...motionHistories.current.get(a.hex)!]);if(histories.current.size>250){const oldest=[...histories.current.keys()].find(hex=>hex!==a.hex);if(oldest)histories.current.delete(oldest);}} selectedRef.current = a; setSelected(a); setSelectedError(''); setTrail(histories.current.get(a.hex) ?? []); }, []);
   useEffect(() => {
-    let alive = true, inFlight = false;
+    let alive = true, inFlight = false, nextAttempt = 0, cooldown = 0, failures = 0;
     const controller = new AbortController();
     setAircraft([]); setError(''); setUpdatedAt(null); setLoading(true);
-    async function refresh() {
-      if (inFlight || document.hidden) return;
-      inFlight = true;
+    async function refresh(force=false) {
+      if (inFlight || document.hidden || Date.now()<cooldown || !force&&Date.now()<nextAttempt) return;
+      inFlight = true;nextAttempt=Date.now()+25000;
       try {
         const data = await fetchFeed(`/api/aircraft?airport=${airport}`, controller.signal);
         if (!alive) return;
-        data.aircraft=ingest(data.aircraft);
+        failures=0;data.aircraft=ingest(data.aircraft);
         setActivity(old=>{const next={...old,[airport]:recordActivity(old[airport]??[],data.aircraft,airport,data.sourceAt)};const keys=Object.keys(next);if(keys.length>8)delete next[keys.find(k=>k!==airport)!];return next;});
         setAircraft(data.aircraft); setUpdatedAt(data.fetchedAt); setError('');
-      } catch (e) { if (alive) setError(e instanceof Error ? e.message : 'Live feed unavailable.'); }
+      } catch (e) { if (alive) {failures++;cooldown=e&&typeof e==='object'&&'retryAt' in e&&typeof e.retryAt==='number'?e.retryAt:0;nextAttempt=Math.max(cooldown,Date.now()+Math.min(180000,25000*2**Math.min(3,failures)));setError(e instanceof Error ? e.message : 'Live feed unavailable.');} }
       finally { inFlight = false; if (alive) setLoading(false); }
     }
-    refreshRef.current = refresh; void refresh();
-    const id = window.setInterval(refresh, 25000);
-    document.addEventListener('visibilitychange', refresh);window.addEventListener('online',refresh);
-    return () => { alive = false; controller.abort(); clearInterval(id); document.removeEventListener('visibilitychange', refresh);window.removeEventListener('online',refresh); };
+    const automatic=()=>{void refresh();};
+    refreshRef.current = ()=>{void refresh(true);};automatic();
+    const id = window.setInterval(automatic, 25000);
+    document.addEventListener('visibilitychange', automatic);window.addEventListener('online',automatic);
+    return () => { alive = false; controller.abort(); clearInterval(id); document.removeEventListener('visibilitychange', automatic);window.removeEventListener('online',automatic); };
   }, [airport, ingest]);
   const watchedKey=watches.slice(-5).map(w=>w.hex).join(',');
   useEffect(()=>{
@@ -105,7 +107,7 @@ export function useObservatory(airport: AirportId, alertsEnabled = false) {
         failures=0;nextAttempt=startedAt+10000;
         if (data.aircraft.length) { data.aircraft=ingest(data.aircraft); setSelectedError(''); }
         else setSelectedError('No current observation. Showing the last known position.');
-      } catch { nextAttempt=Date.now()+Math.min(60000,10000*2**Math.min(3,failures++));if (alive) setSelectedError('Tracking feed unavailable. Awaiting a fresh position; arrival unconfirmed.'); }
+      } catch (e) { const cooldown=e&&typeof e==='object'&&'retryAt' in e&&typeof e.retryAt==='number'?e.retryAt:0;nextAttempt=Math.max(cooldown,Date.now()+Math.min(60000,10000*2**Math.min(3,failures++))); if (alive) setSelectedError('Tracking feed unavailable. Awaiting a fresh position; arrival unconfirmed.'); }
       finally { busy = false; }
     }
     void follow(); const id = window.setInterval(follow, 1000);window.addEventListener('online',follow);document.addEventListener('visibilitychange',follow);

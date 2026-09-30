@@ -480,9 +480,7 @@ export function Globe(p: Props) {
         if(!e.model){attempt.since=Date.now();attempt.ready=false;}
         if(!e.model)e.model=new C.ModelGraphics({minimumPixelSize:protectedModel?18:tower?12:0,maximumScale:protectedModel?3:tower?2:1,scale:1,shadows:C.ShadowMode.ENABLED});
         if(e.model.uri?.getValue(v.clock.currentTime)!==uri){e.model.uri=new C.ConstantProperty(uri);e.model.nodeTransformations=new C.PropertyBag();}
-        e.model.minimumPixelSize=new C.ConstantProperty(protectedModel?18:tower?12:0);e.model.maximumScale=new C.ConstantProperty(protectedModel?3:tower?2:1);
-        e.model.heightReference=new C.ConstantProperty(C.HeightReference.NONE);
-        e.model.distanceDisplayCondition=new C.ConstantProperty(new C.DistanceDisplayCondition(0,modelRange(selected,tower)));
+        updateGraphics(e.model,{minimumPixelSize:protectedModel?18:tower?12:0,maximumScale:protectedModel?3:tower?2:1,heightReference:C.HeightReference.NONE,distanceDisplayCondition:new C.DistanceDisplayCondition(0,modelRange(selected,tower))});
         e.model.color=new C.CallbackProperty(()=>{const pos=e!.position?.getValue(v.clock.currentTime);return C.Color.WHITE.withAlpha(pos?modelOpacity(C.Cartesian3.distance(v.camera.positionWC,pos),selected,tower):1);},false);
         if(!animationOwnsPosition&&!detailed&&!flightOpen){const down=(replay?.ground??a.ground)?1:0;e.model.nodeTransformations=new C.PropertyBag({Gear:new C.TranslationRotationScale(C.Cartesian3.ZERO,C.Quaternion.IDENTITY,new C.Cartesian3(down,down,down))});}
       }else if(e.model)e.model=undefined;
