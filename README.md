@@ -520,3 +520,15 @@ unconfirmed. Their marker follows the displayed aircraft position, including
 interpolated/predicted motion; it is not a new position observation. Nearby
 city/town/village labels use bounded, cached place tiles during flight view, with
 the bundled reference cities retained if detailed tiles are unavailable.
+
+### Flight-view journey companion
+
+Flight details now include a compact received-position / predicted-motion / fictional-flight / simulated-arrival indicator, a “What’s below?” card, optional journey highlights, an arrival preview and a retained-observation review map. Review freezes a bounded snapshot of available fixes (up to 2,000), leaves the 3D scene running and offers an explicit return to current position. Gaps remain gaps, and fictional traffic is excluded from observation review.
+
+The below-aircraft card uses the displayed location, bundled city/country references and available loaded terrain. Named mountain, water and landmark points reuse the place-label tile requests; coverage depends on the map source and loaded region. No landmark names or terrain measurements are invented when absent. Nearby-feature distances do not imply visibility through cloud or terrain. Optional notices cover nearby cities, approximate country changes and sustained descent.
+
+Arrival weather loads only when the preview opens, through the existing cached weather endpoint. Report time and distance are shown; unavailable reports remain unavailable. Destination time and direct-distance estimates retain their existing limitations. Loaded destination geometry supplies runway/stand counts, not an assigned runway or gate. Scenic discovery in Map tools uses recent airborne observations near twilight or loaded named landscape features; it is not a worldwide scenic-flight search.
+
+Camera choice, window side/seat/look/shade, mini-map zoom, ground-label density and highlight preference are remembered on the device. Window positioning scales with the existing airframe dimensions; cabin framing remains illustrative, not a verified airline interior. Existing sound preferences are reused. These additions do not create database records or enable paid API calls.
+
+Validation: `npm --prefix web test`, `npm --prefix web run build`, and `python web/tests/browser/flight_companion.py` with Playwright installed exercise the companion controls, history review, weather-unavailable state and window preferences against an isolated local server.

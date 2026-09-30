@@ -1,4 +1,4 @@
-import {tilePlace} from '../lib/placeLabels';
+import {tilePlace,tileFeature} from '../lib/placeLabels';
 import {VectorTile,classifyRings} from '@mapbox/vector-tile';
 import {PbfReader} from 'pbf';
 import {cityHeight,clipCityRing,type CityTile,type CityBuilding} from '../lib/cityBuildings';
@@ -14,9 +14,11 @@ self.onmessage=async(event:MessageEvent<{tile:CityTile;limit:number;water?:boole
   const response=await fetch(url,{signal:AbortSignal.timeout(15000)});if(!response.ok)throw Error('City tile unavailable');
   const buffer=await response.arrayBuffer();if(buffer.byteLength>8*1024*1024)throw Error('City tile too large');
   if(places){
-   const layer=new VectorTile(new PbfReader(buffer)).layers.place,rows=[];
+   const vector=new VectorTile(new PbfReader(buffer)),layer=vector.layers.place,rows=[];
    if(layer)for(let i=0;i<Math.min(layer.length,5000);i++){const f=layer.feature(i);if(f.type!==1)continue;const place=tilePlace(f.properties,f.loadGeometry()[0]?.[0],f.extent,tile);if(place)rows.push(place);if(rows.length>=limit)break;}
-   self.postMessage({key:tile.key,places:rows});return;
+   const features=[];
+   for(const name of ['mountain_peak','water_name','poi']){const source=vector.layers[name];if(!source)continue;for(let i=0;i<Math.min(source.length,2000)&&features.length<150;i++){const f=source.feature(i);if(f.type!==1&&!(name==='water_name'&&f.type===2))continue;const line=f.loadGeometry()[0],point=line?.[Math.floor(line.length/2)];const feature=tileFeature(f.properties,point,f.extent,tile,name);if(feature)features.push(feature);}}
+   self.postMessage({key:tile.key,places:rows,features});return;
   }
   const layer=new VectorTile(new PbfReader(buffer)).layers[water?'water':'building'],buildings:(CityBuilding&{kind?:string})[]=[];
   if(layer){

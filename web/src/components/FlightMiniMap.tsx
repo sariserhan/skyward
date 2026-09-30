@@ -1,3 +1,4 @@
+import {readFlightPreferences,saveFlightPreferences} from '../lib/flightPreferences';
 import {sharedLiveMotion} from '../lib/liveMotion';
 import {nearestCity} from '../lib/cities';
 import {trackDistance} from '../lib/positionQuality';
@@ -13,7 +14,8 @@ export function FlightMiniMap({aircraft:reported,cities,route,trail=[],routeView
  useEffect(()=>{setDisplayed(null);if(!followDisplayed)return;const update=()=>{const frame=sharedLiveMotion.displayed(reported.hex);setDisplayed(frame?{hex:reported.hex,lat:frame.lat,lon:frame.lon,heading:frame.heading}:null);};update();const timer=setInterval(update,1000);return()=>clearInterval(timer);},[followDisplayed,reported.hex]);
  const a=followDisplayed&&displayed?.hex===reported.hex?{...reported,...displayed}:reported;
  const hasRoute=!!route&&['PLAUSIBLE','UNVERIFIED'].includes(route.status)&&route.airports.length===2;
- const canvas=useRef<HTMLCanvasElement>(null),[world,setWorld]=useState(cached),[error,setError]=useState(false),[view,setView]=useState<'route'|'regional'|'world'>(routeView?'route':'regional'),[zoom,setZoom]=useState(8),[nearbyCities,setNearbyCities]=useState<City[]>([]);const effectiveView=view==='route'&&!hasRoute?'regional':view,wide=effectiveView==='world';
+ const canvas=useRef<HTMLCanvasElement>(null),[world,setWorld]=useState(cached),[error,setError]=useState(false),[view,setView]=useState<'route'|'regional'|'world'>(routeView?'route':'regional'),[zoom,setZoom]=useState(()=>readFlightPreferences().mapZoom),[nearbyCities,setNearbyCities]=useState<City[]>([]);const effectiveView=view==='route'&&!hasRoute?'regional':view,wide=effectiveView==='world';
+ useEffect(()=>{saveFlightPreferences({mapZoom:zoom});},[zoom]);
  useEffect(()=>{if(cities.length)return;const c=new AbortController();fetch(`${import.meta.env.BASE_URL}data/cities.json`,{signal:c.signal}).then(r=>r.ok?r.json():null).then(d=>{if(!c.signal.aborted&&Array.isArray(d?.cities))setNearbyCities(d.cities);}).catch(()=>{});return()=>c.abort();},[cities.length]);
  const city= a.lon!==null&&a.lat!==null?nearestCity(cities.length?cities:nearbyCities,a.lon,a.lat):null;
  const destination=route&&['PLAUSIBLE','UNVERIFIED'].includes(route.status)&&route.airports.length===2?route.airports[1]:null;
