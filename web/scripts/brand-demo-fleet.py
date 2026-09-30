@@ -13,6 +13,7 @@ with sync_playwright() as pw:
 profiles={'b737':(40,3.8),'a320':(38,4),'b787':(63,5.8),'regional':(32,3),'bizjet':(22,2.5),'turboprop':(23,2.8)}
 for name,(length,diameter) in profiles.items():
  p=root/'models/fleet'/f'{name}-THY-v4.gltf';g=json.loads(p.read_text());g['asset']['generator']='Skyward original fictional demonstration airline';g['images'][0]['uri']='../../airlines/SKYWARD.png'
+ g['meshes'][0]['primitives']=[part for part in g['meshes'][0]['primitives'] if g['materials'][part['material']].get('name')!='Operator title']
  for idx in (2,7):g['materials'][idx]['pbrMetallicRoughness']['baseColorFactor']=[.035,.23,.23,1]
  g['materials'][0]['pbrMetallicRoughness']['baseColorFactor']=[.035,.12,.16,1]
  # Wordmark panels conform approximately to the upper fuselage sides.

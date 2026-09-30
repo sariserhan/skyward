@@ -13,7 +13,7 @@ export function GroundAnimation({viewer,airport,observations,close,reduced,suspe
  useEffect(()=>{if(reduced)setPlaying(false);},[reduced]);
  useEffect(()=>{if(!viewer||viewer.isDestroyed()||!available||!runway||!airport)return;const v=viewer,C=window.Cesium;let time=plan&&embedded?(cue==='taxi'?45:cue==='takeoff'?plan.taxiSeconds+plan.outboundSeconds+95.25:0):0,completed=0,last=performance.now(),report=0,lastDrawn='';setCount(0);setStatus('Ready');
  const source=new C.CustomDataSource('illustrative-ground-operations');let alive=true;void v.dataSources.add(source).then(()=>{if(!alive&&!v.isDestroyed())v.dataSources.remove(source,true);});
- const plane=source.entities.add({id:'ground-demo-plane',model:{uri:import.meta.env.BASE_URL+'models/fleet/ground-b737.gltf?detail=5',minimumPixelSize:0,maximumScale:1},label:{text:'SIMULATION',font:'12px sans-serif',pixelOffset:new C.Cartesian2(0,-45),showBackground:true}});
+ const plane=source.entities.add({id:'ground-demo-plane',model:{uri:import.meta.env.BASE_URL+'models/fleet/ground-b737.gltf?detail=6',minimumPixelSize:0,maximumScale:1},label:{text:'SIMULATION',font:'12px sans-serif',pixelOffset:new C.Cartesian2(0,-45),showBackground:true}});
  const service=(id:string,dimensions:Cesium.Cartesian3,color:string)=>source.entities.add({id,box:{dimensions,material:C.Color.fromCssColorString(color)}});
  const tug=service('ground-demo-tug',new C.Cartesian3(3,5,1.5),'#e4ba55'),cart=service('ground-demo-baggage',new C.Cartesian3(2,6,1.5),'#7895a3'),bridge=service('ground-demo-bridge',new C.Cartesian3(3,14,3),'#bec8ca');
  const sample=(t:number)=>plan?(embedded?towerCycle(plan,t):groundFrame(plan,t)):runwayDemonstration(runway,cue==='takeoff'?'takeoff':'landing',t),end=plan?plan.end+(embedded?46.5:0):45;

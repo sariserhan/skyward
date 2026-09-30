@@ -22,11 +22,20 @@ profiles={'a319':(34,34,4,2),'a320':(38,35,4,2),'a321':(45,36,4,2),'a220':(38,35
 paints={'neutral':'70899c','THY':'c81932','UAL':'2266bd','AAL':'397daf','DAL':'b71b39','BAW':'263f81','DLH':'173c72','AFR':'263d7e','KLM':'23a5d5','QTR':'721e49','UAE':'ca2635','PGT':'e5b620','SWA':'254cc2','JBU':'193979','ETH':'258b50','SAS':'234d9b'}
 profiles.update({'b772':(64,61,6.2,2),'b788':(57,60,5.8,2),'b78x':(68,60,5.8,2),'a35k':(74,65,6,2),'e190':(36,29,3,2),'crj':(36,25,2.7,2),'pc12':(14,16,1.5,1)})
 paints.update({'RYR': '16457c', 'EZY': 'f16b22', 'WZZ': 'c5197b', 'SIA': '172f5c', 'CPA': '126259', 'ANA': '234d9b', 'JAL': 'c81932', 'QFA': 'cb2033', 'ACA': 'b51c30'})
-fan_rigs={}
+fan_rigs={};detail_rigs={}
 for name,(L,span,dia,engines) in profiles.items():
     if args.profile and name!=args.profile:continue
     family={'b772':'b777','b788':'b787','b78x':'b787','a35k':'a350'}.get(name,name)
-    r=dia/2;groups=[[] for _ in range(11)];wing_groups=[];fan_groups=[];fan_hubs=[]
+    r=dia/2;groups=[[] for _ in range(11)];wing_groups=[];fan_groups=[];fan_hubs=[];surface_groups={};surface_specs={};wheel_hubs=[]
+    # Family proportions are illustrative, not engineering drawings.
+    sweep={'a220':.15,'a319':.16,'a320':.16,'a321':.17,'b757':.18,'b767':.18,'b777':.20,'b787':.21,'a330':.20,'a350':.22,'a380':.18,'b747':.20,'bizjet':.22,'regional':.15,'e190':.17,'crj':.20}.get(family,.19)
+    fin_height={'a380':.12,'b747':.13,'b777':.12,'b787':.12,'a350':.12,'bizjet':.18,'crj':.16,'light':.12,'pc12':.15}.get(family,.145)
+    def capture_surface(key,kind,pivot,axis,sign,start):
+        target=surface_groups.setdefault(key,[])
+        target.extend((m,g[start[m]:]) for m,g in enumerate(groups) if len(g)>start[m])
+        for m,g in enumerate(groups):del g[start[m]:]
+        surface_specs[key]={'kind':kind,'pivot':[pivot[1],pivot[2],pivot[0]],'axis':axis,'sign':sign}
+
     def tri(a,b,c,mat=0,normals=None,uv=None):
         u=[b[k]-a[k] for k in range(3)];v=[c[k]-a[k] for k in range(3)];n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];d=math.sqrt(sum(x*x for x in n)) or 1;n=tuple(x/d for x in n)
         for i,p in enumerate([a,b,c]):groups[mat].append((p,normals[i] if normals else n,uv[i] if uv else (0,0)))
@@ -71,7 +80,12 @@ for name,(L,span,dia,engines) in profiles.items():
             for sign in [-1,1]:
                 for j in range(24):
                     u=(1-math.cos(math.pi*j/24))/2;v=(1-math.cos(math.pi*(j+1)/24))/2
+                    start=[len(g) for g in groups]
                     quad(point(a,u,sign),point(b,u,sign),point(b,v,sign),point(a,v,sign),1)
+                    kind='flap' if u>=.82 else 'slat' if v<=.06 else 'spoiler' if sign==1 and u>=.60 and v<=.80 else None
+                    if kind and b[0]<=span*.45:
+                        pivot=point(sections[0],.82 if kind=='flap' else .06 if kind=='slat' else .60,1)
+                        capture_surface(kind.title()+('L' if side<0 else 'R'),kind,pivot,0,1,start)
                 # Fine spoiler/flap seams and leading-edge metal strips.
                 for u in [.68,.82]:
                     aa=point(a,u,1);bb=point(b,u,1);cc=point(b,u+.003,1);dd=point(a,u+.003,1)
@@ -83,6 +97,8 @@ for name,(L,span,dia,engines) in profiles.items():
                 y=side*span*fraction;a,b=next((a,b) for a,b in zip(sections,sections[1:]) if a[0]<=abs(y)<=b[0]);t=(abs(y)-a[0])/(b[0]-a[0]);x=a[2]+(b[2]-a[2])*t+L*.008;z=a[3]+(b[3]-a[3])*t-.10
                 tube([(x-.045*L,.005,y,z),(x-.025*L,.16,y,z),(x+.02*L,.19,y,z),(x+.04*L,.005,y,z)],1)
     nose=[(.34,1),(.39,.91),(.44,.68),(.477,.38),(.5,.01)] if name.startswith('a') else [(.31,1),(.37,.96),(.425,.76),(.47,.39),(.5,.01)]
+    if name in ['bizjet','crj']:nose=[(.27,1),(.34,.91),(.41,.66),(.465,.31),(.5,.01)]
+    elif name=='a220':nose=[(.32,1),(.38,.93),(.43,.74),(.477,.36),(.5,.01)]
     body_rings=[(x*L,rr*r,0,0) for x,rr in [(-.5,.015),(-.47,.22),(-.42,.48),(-.35,.8),(-.27,.98),(-.19,1)]+nose]
     tube(body_rings,ellipse=1.18 if name=='a380' else 1)
     skin=smooth_rings(body_rings)
@@ -112,22 +128,28 @@ for name,(L,span,dia,engines) in profiles.items():
 
     for side in [-1,1]:
         wing_start=[len(g) for g in groups]
-        swept=name not in ['light','turboprop','pc12'];tipx=-.19*L if swept else -.03*L;wingz=-r*.45 if swept else r*.65
+        swept=name not in ['light','turboprop','pc12'];tipx=-sweep*L if swept else -.03*L;wingz=-r*.45 if swept else r*.65
         airfoil(side,tipx,wingz)
         if family not in ['b777','b787','b767','b747','light','turboprop','pc12']:
             foil([(tipx,side*span*.48,1),(tipx-.055*L,side*span*.50,3.2), (tipx-.08*L,side*span*.50,3.0),(tipx-.075*L,side*span*.48,1)],.04,2)
         if name=='b737max':foil([(tipx,side*span*.48,.8),(tipx-.065*L,side*span*.51,-.9),(tipx-.085*L,side*span*.5,-.7),(tipx-.06*L,side*span*.48,.8)],.04,2)
         wing_groups.append([(m,g[wing_start[m]:]) for m,g in enumerate(groups) if len(g)>wing_start[m]])
         for m,g in enumerate(groups):del g[wing_start[m]:]
-        tailz=r*1.8 if name in ['bizjet','crj','pc12'] else r*.4
-        foil([(-.32*L,side*r*.5,tailz),(-.43*L,side*span*.18,tailz+.6),(-.49*L,side*span*.18,tailz+.6),(-.45*L,side*r*.4,tailz)],.08)
+        tailz=r+L*fin_height*.88 if name in ['bizjet','crj'] else r*1.8 if name=='pc12' else r*.4
+        foil([(-.32*L,side*r*.5,tailz),(-.43*L,side*span*.18,tailz+.6),(-.465*L,side*span*.18,tailz+.6),(-.415*L,side*r*.4,tailz)],.08)
+        start=[len(g) for g in groups]
+        foil([(-.415*L,side*r*.4,tailz),(-.465*L,side*span*.18,tailz+.6),(-.49*L,side*span*.18,tailz+.6),(-.45*L,side*r*.4,tailz)],.06)
+        capture_surface('Elevator'+('L' if side<0 else 'R'),'elevator',(-.415*L,0,tailz),0,1,start)
         for e in range(engines//2):
             y=side*span*(.19+e*.13);x=.005*L-e*L*.105;z=-r*1.15;er=r*(.66 if family in ['b777','b787','a350','b737max'] else .54)
             if name in ['bizjet','crj']:x=-L*.29;y=side*r*1.8;z=r*.45;er=r*.48
             if name=='turboprop':er=r*.45;z=r*.3
-            foil([(x-.07*L,y-.14,-r*.4),(x+.04*L,y-.14,-r*.4),(x+.02*L,y-.14,z),(x-.07*L,y-.14,z)],.14,1)
+            if name in ['bizjet','crj']:foil([(x-.03*L,side*r,z),(x+.02*L,side*r,z),(x+.01*L,y,z),(x-.04*L,y,z)],.1,1)
+            else:foil([(x-.07*L,y-.14,wingz),(x+.04*L,y-.14,wingz),(x+.02*L,y-.14,z),(x-.07*L,y-.14,z)],.14,1)
             tube([(x-.065*L,er*.67,y,z),(x-.04*L,er*.92,y,z),(x+.045*L,er,y,z),(x+.05*L,er*.94,y,z)],7)
             tube([(x+.051*L,er*.94,y,z),(x+.05*L,er*.80,y,z)],6)
+            # A thin nacelle service band follows the engine contour.
+            tube([(x-.02*L,er*.981,y,z),(x-.0195*L,er*.982,y,z)],6)
             tube([(x+.049*L,er*.80,y,z),(x+.025*L,er*.75,y,z),(x+.024*L,.001,y,z)],3)
             # Recessed swept fan blades and a rounded spinner, separate from the cowl.
             fan_start=[len(g) for g in groups]
@@ -171,12 +193,21 @@ for name,(L,span,dia,engines) in profiles.items():
                 xx=door_x+(w+expand)*math.copysign(abs(math.cos(angle))**.35,math.cos(angle));zz=cz+(h+expand)*math.copysign(abs(math.sin(angle))**.35,math.sin(angle))
                 return (xx,side*(math.sqrt(max(.01,r*r-zz*zz))+.024),zz)
             for j in range(32):quad(seal(j*math.tau/32,0),seal((j+1)*math.tau/32,0),seal((j+1)*math.tau/32,.015),seal(j*math.tau/32,.015),6)
+        # Lower cargo-hold access outline, sized to the airframe (illustrative).
+        if L>25:
+            for cx in [-L*.15,L*.16]:
+                for j in range(32):
+                    def cargo(t):
+                        xx=cx+L*.026*math.copysign(abs(math.cos(t))**.3,math.cos(t));zz=-r*.48+r*.20*math.copysign(abs(math.sin(t))**.3,math.sin(t))
+                        return (xx,side*(math.sqrt(max(.01,r*r-zz*zz))+.032),zz)
+                    a=cargo(j*math.tau/32);b=cargo((j+1)*math.tau/32)
+                    quad(a,b,(b[0],b[1],b[2]+.018),(a[0],a[1],a[2]+.018),6)
         # Correct-facing logo decals on each side of the fin and forward fuselage.
         def decal(x0,x1,z0,z1,y):
             a=(x0,y,z0);b=(x1,y,z0);c=(x1,y,z1);d=(x0,y,z1)
             uv=[(0,1),(1,1),(1,0),(0,0)] if side<0 else [(1,1),(0,1),(0,0),(1,0)]
             tri(a,b,c,5,uv=uv[:3]);tri(a,c,d,5,uv=[uv[0],uv[2],uv[3]])
-        decal(-.448*L,-.406*L,r+L*.069,r+L*.111,side*.12)
+        decal(-.448*L,-.406*L,r+L*fin_height*.46,r+L*fin_height*.74,side*.12)
         decal(.19*L,.19*L+r*.85,-r*.42,r*.43,side*(r+.04))
     # A subtle operator-colored lower fuselage stripe; geometry follows the body.
     for side in [-1,1]:
@@ -184,7 +215,10 @@ for name,(L,span,dia,engines) in profiles.items():
         y0=side*(math.sqrt(r*r-z0*z0)+.025);y1=side*(math.sqrt(r*r-z1*z1)+.025)
         quad((-.19*L,y0,z0),(.30*L,y0,z0),(.30*L,y1,z1),(-.19*L,y1,z1),7)
     # Solid swept fin, rather than a paper triangle.
-    fin=[(-.28*L,r*.65),(-.425*L,r+L*.145),(-.46*L,r+L*.145),(-.495*L,r*.4)]
+    fin=[(-.28*L,r*.65),(-.425*L,r+L*fin_height),(-.448*L,r+L*fin_height),(-.465*L,r*.4)]
+    start=[len(g) for g in groups]
+    foil([(-.448*L,0,r+L*fin_height),(-.46*L,0,r+L*fin_height),(-.495*L,0,r*.4),(-.465*L,0,r*.4)],.08,2)
+    capture_surface('Rudder','rudder',(-.457*L,0,r*.5),1,1,start)
     for side in [-1,1]:
         for i in range(1,len(fin)-1):tri((fin[0][0],side*.1,fin[0][1]),(fin[i][0],side*.1,fin[i][1]),(fin[i+1][0],side*.1,fin[i+1][1]),2)
     for i in range(len(fin)):j=(i+1)%len(fin);quad((fin[i][0],-.1,fin[i][1]),(fin[j][0],-.1,fin[j][1]),(fin[j][0],.1,fin[j][1]),(fin[i][0],.1,fin[i][1]),2)
@@ -199,23 +233,50 @@ for name,(L,span,dia,engines) in profiles.items():
         def point(center,t):return tuple(center[k]+radius*(u[k]*math.cos(t)+v[k]*math.sin(t)) for k in range(3))
         for j in range(16):quad(point(a,j*math.tau/16),point(a,(j+1)*math.tau/16),point(b,(j+1)*math.tau/16),point(b,j*math.tau/16),mat)
     gear_start=[len(g) for g in groups]
-    wheel_positions=[(L*.29,0),(-L*.1,-r*.8),(-L*.1,r*.8)]
+    wide=family in ['b767','b777','b787','a330','a350','a380','b747']
+    axles=3 if family=='b777' or name=='a35k' else 2 if wide or family=='b757' else 1
+    # Each axle has its own local wheel mesh; paired tires rotate about that axle.
+    wheel_positions=[(L*.29,0)];wheel_names=['WheelN'];wheel_radii=[.28 if L<20 else .4]
+    for axle in range(axles):
+        for side,label in [(-1,'L'),(1,'R')]:
+            wheel_positions.append((-L*.1+(axle-(axles-1)/2)*1.05,side*r*(1.10 if wide else .8)))
+            wheel_names.append('Wheel'+label+(str(axle+1) if axle else ''));wheel_radii.append(.52 if wide else .4 if L>20 else .25)
+    if family in ['b747','a380']:
+        body_axles=3 if family=='a380' else 2
+        for axle in range(body_axles):
+            for side,label in [(-1,'L'),(1,'R')]:
+                wheel_positions.append((-L*.16+(axle-(body_axles-1)/2)*1.05,side*r*.42));wheel_names.append('WheelB'+label+str(axle));wheel_radii.append(.52)
+    groups.extend([] for _ in range(len(wheel_positions)-3))
     for wheel,(x,y) in enumerate(wheel_positions):
+        radius=wheel_radii[wheel];paired=L>20;centers=[-.25,.25] if paired else [0]
         strut((x,y,-r*.7),(x,y,-r-1.45),.09)
         strut((x+.4,y,-r*.85),(x,y,-r-1.2),.055)
-        strut((x,y-.29,-r-1.6),(x,y+.29,-r-1.6),.20)
+        strut((x,y-.42,-r-1.6),(x,y+.42,-r-1.6),.09)
         strut((x,y,-r-.6),(x,y,-r-1.2),.12,1)
-        # Tires are separate meshes centered on their axle, with a faceted tread.
-        for j in range(40):
-            a=j*math.tau/40;b=(j+1)*math.tau/40
-            profile=[(-.25,.22),(-.245,.31),(-.20,.38),(-.12,.40),(.12,.40),(.20,.38),(.245,.31),(.25,.22)]
-            for (yy,rr),(yyy,rrr) in zip(profile,profile[1:]):
-                quad((rr*math.cos(a),yy,rr*math.sin(a)),(rr*math.cos(b),yy,rr*math.sin(b)),(rrr*math.cos(b),yyy,rrr*math.sin(b)),(rrr*math.cos(a),yyy,rrr*math.sin(a)),8+wheel)
-            for yy in [-.25,.25]:tri((0,yy,0),(.22*math.cos(a),yy,.22*math.sin(a)),(.22*math.cos(b),yy,.22*math.sin(b)),8+wheel)
+        if wheel<3:
+            # Open gear-bay doors attached to retracting assembly.
+            foil([(x-.65,y-.48,-r*.75),(x+.65,y-.48,-r*.75),(x+.65,y-.62,-r-1),(x-.65,y-.62,-r-1)],.025,0)
+        hubs=[]
+        for center in centers:
+            for j in range(32):
+                a=j*math.tau/32;b=(j+1)*math.tau/32
+                profile=[(-.16,.55),(-.155,.78),(-.12,.95),(-.08,1),(.08,1),(.12,.95),(.155,.78),(.16,.55)]
+                for (yy,rr),(yyy,rrr) in zip(profile,profile[1:]):
+                    rr*=radius;rrr*=radius
+                    quad((rr*math.cos(a),yy+center,rr*math.sin(a)),(rr*math.cos(b),yy+center,rr*math.sin(b)),(rrr*math.cos(b),yyy+center,rrr*math.sin(b)),(rrr*math.cos(a),yyy+center,rrr*math.sin(a)),8+wheel)
+                start=len(groups[6])
+                for yy in [-.161,.161]:tri((0,yy+center,0),(.55*radius*math.cos(a),yy+center,.55*radius*math.sin(a)),(.55*radius*math.cos(b),yy+center,.55*radius*math.sin(b)),6)
+                hubs.extend(groups[6][start:]);del groups[6][start:]
+        wheel_hubs.append(hubs)
     gear_groups=[(m,g[gear_start[m]:]) for m,g in enumerate(groups[:8]) if len(g)>gear_start[m]]
     for m,g in enumerate(groups[:8]):del g[gear_start[m]:]
+    # Merge each moving surface by material to keep draw calls bounded.
+    for key,parts in surface_groups.items():
+        merged={}
+        for material,vertices in parts:merged.setdefault(material,[]).extend(vertices)
+        surface_groups[key]=list(merged.items())
     blob=bytearray();views=[];access=[];prims=[]
-    for mat,items,wing in [(m,g,None) for m,g in enumerate(groups)]+[(m,g,side) for side,parts in enumerate(wing_groups) for m,g in parts]+[(m,g,100+i) for i,parts in enumerate(fan_groups) for m,g in parts]+[(m,g,-1) for m,g in gear_groups]:
+    for mat,items,wing in [(m,g,None) for m,g in enumerate(groups)]+[(m,g,side) for side,parts in enumerate(wing_groups) for m,g in parts]+[(m,g,100+i) for i,parts in enumerate(fan_groups) for m,g in parts]+[(m,g,-1) for m,g in gear_groups]+[(m,g,200+i) for i,parts in enumerate(surface_groups.values()) for m,g in parts]+[(6,g,300+i) for i,g in enumerate(wheel_hubs)]:
         if not items:continue
         # Weld repeated triangle corners; keep prop/window geometry unindexed
         # because the existing propeller-rig preparation splits those triangles.
@@ -237,14 +298,16 @@ for name,(L,span,dia,engines) in profiles.items():
         indexed={}
         if indices:
             raw=struct.pack('<'+'I'*len(indices),*indices);views.append({'buffer':0,'byteOffset':len(blob),'byteLength':len(raw),'target':34963});blob.extend(raw);access.append({'bufferView':len(views)-1,'componentType':5125,'count':len(indices),'type':'SCALAR'});indexed={'indices':len(access)-1}
-        prims.append({**indexed,'attributes':attrs,'material':min(mat,4) if mat>=8 else mat,**({'extras':{'gear':True} if wing==-1 else {'fan':wing-100} if wing>=100 else {'wing':wing}} if wing is not None else {'extras':{'wheel':mat-8}} if mat>=8 else {})})
+        prims.append({**indexed,'attributes':attrs,'material':min(mat,4) if mat>=8 else mat,**({'extras':{'gear':True} if wing==-1 else {'wheel':wing-300} if wing>=300 else {'surface':wing-200} if wing>=200 else {'fan':wing-100} if wing>=100 else {'wing':wing}} if wing is not None else {'extras':{'wheel':mat-8}} if mat>=8 else {})})
     (out/(name+'-v4.bin')).write_bytes(blob)
     for airline,color in paints.items():
         rgb=[int(color[i:i+2],16)/255 for i in (0,2,4)];body=[.94,.95,.96] if airline!='SWA' else [.03,.16,.6]
         materials=[{'doubleSided':True,'pbrMetallicRoughness':{'baseColorFactor':c+[1],'metallicFactor':.04 if i in [0,1,2,7] else .8 if i==6 else 0,'roughnessFactor':.27 if i in [0,2,7] else .4 if i==1 else .12 if i==3 else .86 if i==4 else .28}} for i,c in enumerate([body,[.64,.68,.72],rgb,[.02,.055,.085],[.07,.08,.09],[1,1,1],[.36,.4,.44],rgb if airline!='neutral' else body])]
         materials[5].update(alphaMode='MASK',alphaCutoff=.08);materials[5]['pbrMetallicRoughness'].update(metallicFactor=0,roughnessFactor=.75,baseColorTexture={'index':0})
-        main=[q for q in prims if 'wing' not in q.get('extras',{}) and 'fan' not in q.get('extras',{}) and 'gear' not in q.get('extras',{}) and q['material']!=4 and (airline!='neutral' or q['material']!=5)]
-        g={'asset':{'version':'2.0','generator':'Skyward detailed procedural '+name+' fallback v5; approximate airframe; operator identification logos'},'scene':0,'scenes':[{'nodes':[0,1]}],'nodes':[{'mesh':0},{'mesh':1,'name':'Gear','children':[2,3,4]}]+[{'mesh':2+i,'name':['WheelN','WheelL','WheelR'][i],'translation':[y,-r-1.6,x]} for i,(x,y) in enumerate(wheel_positions)],'meshes':[{'name':'AirframeWithCockpitGlazing','primitives':main},{'primitives':[q for q in prims if q.get('extras',{}).get('gear') or q['material']==4 and 'extras' not in q]}]+[{'primitives':[q for q in prims if q.get('extras',{}).get('wheel')==i]} for i in range(3)],'materials':materials,'buffers':[{'uri':name+'-v4.bin?tail=2&rig=1&detail=5','byteLength':len(blob)}],'bufferViews':views,'accessors':access}
+        main=[q for q in prims if 'wing' not in q.get('extras',{}) and 'fan' not in q.get('extras',{}) and 'gear' not in q.get('extras',{}) and 'surface' not in q.get('extras',{}) and 'wheel' not in q.get('extras',{}) and q['material']!=4 and (airline!='neutral' or q['material']!=5)]
+        g={'asset':{'version':'2.0','generator':'Skyward detailed procedural '+name+' fallback v6; approximate airframe; operator identification logos'},'scene':0,'scenes':[{'nodes':[0,1]}],'nodes':[{'mesh':0},{'mesh':1,'name':'Gear','children':list(range(2,2+len(wheel_positions)))}]+[{'mesh':2+i,'name':wheel_names[i],'translation':[y,-r-1.6,x]} for i,(x,y) in enumerate(wheel_positions)],'meshes':[{'name':'AirframeWithCockpitGlazing','primitives':main},{'primitives':[q for q in prims if q.get('extras',{}).get('gear') or q['material']==4 and 'extras' not in q]}]+[{'primitives':[q for q in prims if q.get('extras',{}).get('wheel')==i]} for i in range(len(wheel_positions))],'materials':materials,'buffers':[{'uri':name+'-v4.bin?tail=2&rig=1&detail=6','byteLength':len(blob)}],'bufferViews':views,'accessors':access}
+        for i,key in enumerate(surface_groups):
+            node=len(g['nodes']);mesh=len(g['meshes']);g['scenes'][0]['nodes'].append(node);g['nodes'].append({'mesh':mesh,'name':key});g['meshes'].append({'primitives':[q for q in prims if q.get('extras',{}).get('surface')==i]})
         for side in range(2):
             node=len(g['nodes']);mesh=len(g['meshes']);g['scenes'][0]['nodes'].append(node);g['nodes'].append({'mesh':mesh,'name':['FlexWingL','FlexWingR'][side]});g['meshes'].append({'primitives':[q for q in prims if q.get('extras',{}).get('wing')==side]})
         for i in range(len(fan_groups)):
@@ -253,6 +316,7 @@ for name,(L,span,dia,engines) in profiles.items():
         else:materials[5]['pbrMetallicRoughness'].pop('baseColorTexture')
         g.setdefault('images',[]);g.setdefault('textures',[]);g.setdefault('samplers',[{'magFilter':9729,'minFilter':9987,'wrapS':10497,'wrapT':10497}]);texture=len(g['textures']);g['textures'].append({'source':len(g['images']),'sampler':0});g['images'].append({'uri':'fallback-paint-v5.png'});materials[0]['pbrMetallicRoughness']['baseColorTexture']={'index':texture}
         (out/(name+'-'+airline+'-v4.gltf')).write_text(json.dumps(g,separators=(',',':')))
+    detail_rigs[name]={'surfaces':surface_specs,'wheels':[{'name':n,'radius':radius} for n,radius in zip(wheel_names,wheel_radii)]}
     fan_rigs['fleet:'+name]={'groups':[{'nodes':[f'SkywardFan{i}'],'axis':2,'pivot':hub,'kind':'fan'} for i,hub in enumerate(fan_hubs)],'hide':[]}
     template=json.loads((out/(name+'-THY-v4.gltf')).read_text())
     for path in out.glob(name+'-*-v4.gltf'):
@@ -264,3 +328,5 @@ rig_path=out.parents[2]/'src/lib/fallbackFanRigs.json'
 previous=json.loads(rig_path.read_text()) if rig_path.exists() else {}
 previous.update(fan_rigs);rig_path.write_text(json.dumps(previous,separators=(',',':')))
 print('Generated',1 if args.profile else len(profiles),'enhanced profiles with shared buffers and operator decals.')
+
+detail_path=rig_path.with_name('fallbackDetailRigs.json');previous=json.loads(detail_path.read_text()) if detail_path.exists() else {};previous.update(detail_rigs);detail_path.write_text(json.dumps(previous,separators=(',',':')))
