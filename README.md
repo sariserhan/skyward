@@ -508,6 +508,8 @@ rate limiting uses bounded transient connection-address state, as other APIs do.
 
 ### Airport ground clearance
 
+Skyward simulated departures use a clearance-checked tug turn, forward taxi, curved runway backtrack/line-up, and a stopped takeoff start. Taxi profiles limit acceleration and turn rate; liftoff gains vertical speed gradually, and journey speed blends from initial climb to cruise and back to approach. Airports where these maneuvers cannot fit are rejected rather than receiving an unsafe generated departure.
+
 Mapped parking-path endpoints are shared by the taxi planner and 3D gate scenery, rather than treating terminal gate pins as aircraft centers. Nearby gates include raised boarding bridges, supports, docking cabins and labels. For a watched parked aircraft, its selected bridge extends toward an approximate left-forward door position; other bridges remain retracted. This is illustrative docking and stand selection, not a reported gate assignment or a surveyed model-specific door connection. Missing/disconnected mapping retains the safe fallback behavior.
 
 Mapped taxi routes, rounded turns and illustrative stand connectors are checked against building footprints using aircraft-sized clearance envelopes. Unsafe routes are rejected; fallback parking tries clear alternatives and returns unavailable if none fits. Simulated stand placement is checked too, with blocked initial ground positions replaced by airborne demo traffic.

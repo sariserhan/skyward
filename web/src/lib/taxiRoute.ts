@@ -4,7 +4,7 @@ import type {AirportGeometry} from '../types.ts';
 import {bearing} from './flightPresentation.ts';
 type Point={x:number;y:number};
 interface Node extends Point {lon:number;lat:number;parking:boolean;edges:Map<number,number>;}
-export interface TaxiRoute {stop:{lon:number;lat:number};points:{lon:number;lat:number}[];meters:number[];length:number;gate:string;}
+export interface TaxiRoute {startStopped?:boolean;stop:{lon:number;lat:number};points:{lon:number;lat:number}[];meters:number[];length:number;gate:string;}
 const cache=new WeakMap<AirportGeometry,Map<string,TaxiRoute|null>>();
 const distance=(a:Point,b:Point)=>Math.hypot(a.x-b.x,a.y-b.y);
 /** Connect only mapped taxiway/taxilane/stand vertices. Never invent a gate assignment. */
@@ -51,7 +51,8 @@ export function taxiSpeedProfile(route:TaxiRoute){
  const cached=profiles.get(route);if(cached)return cached;
  const distances=[0];for(let d=2;d<route.length;d+=2)distances.push(d);distances.push(route.length);
  const at=(d:number)=>{let k=1;while(k<route.meters.length-1&&route.meters[k]<d)k++;const f=(d-route.meters[k-1])/Math.max(.001,route.meters[k]-route.meters[k-1]),a=route.points[k-1],b=route.points[k];return {lon:a.lon+(b.lon-a.lon)*f,lat:a.lat+(b.lat-a.lat)*f};};
- const speeds=distances.map(d=>{if(d<4||d>route.length-4)return 6;const angle=Math.abs(((bearing(at(d),at(d+4))-bearing(at(d-4),at(d))+540)%360)-180)*Math.PI/180;return Math.min(6,Math.sqrt(.8/Math.max(.001,angle/4)));});
+ const speeds=distances.map(d=>{if(d<4||d>route.length-4)return 6;const angle=Math.abs(((bearing(at(d),at(d+4))-bearing(at(d-4),at(d))+540)%360)-180)*Math.PI/180;const curvature=Math.max(.001,angle/4);return Math.min(6,Math.sqrt(.8/curvature),.12/curvature);});
+ if(route.startStopped)speeds[0]=0;
  speeds[speeds.length-1]=0;
  for(let i=speeds.length-2;i>=0;i--)speeds[i]=Math.min(speeds[i],Math.sqrt(speeds[i+1]**2+1.6*(distances[i+1]-distances[i])));
  for(let i=1;i<speeds.length;i++)speeds[i]=Math.min(speeds[i],Math.sqrt(speeds[i-1]**2+1.2*(distances[i]-distances[i-1])));

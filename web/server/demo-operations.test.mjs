@@ -23,3 +23,20 @@ test('complete journeys connect both airports continuously and finish parked at 
 test('invalid saved demo sessions and unsuitable aircraft are rejected',()=>{
  const v={version:2,airport:'TAS',seed:7,time:10,journeyTime:50,speed:15,paused:false,flight:'skyward-demo-0',camera:'cockpit',journey:true};assert.deepEqual(parseDemoSave(JSON.stringify(v),'TAS'),v);for(const bad of [{speed:999},{time:-1},{seed:-1},{camera:'bad'},{flight:'real-abc'},{airport:'IAD'},{journeyTime:null}])assert.equal(parseDemoSave(JSON.stringify({...v,...bad}),'TAS'),null);assert.equal(compatibleModel({...airport('TAS'),runways:[]},'b787'),null);
 });
+
+test('departure headings, taxi speeds and liftoff remain continuous through pushback and runway line-up',()=>{
+ for(const model of ['b737','b787','turboprop']){
+  const o=operation(airport('IAD'),model);assert.ok(o);let previous;
+  for(let t=o.serviceAt+o.service-.2;t<=o.end;t+=.2){const f=operationFrame(o,t);
+   if(previous){const turn=Math.abs(((f.heading-previous.heading+540)%360)-180);assert.ok(turn<5,`${model} ${f.phase} heading jump ${turn} at ${t}`);
+    const measured=trackDistance(previous,f)*1852/.2,expected=(previous.groundSpeed+f.groundSpeed)*.514444/2;assert.ok(Math.abs(measured-expected)<1.2,`${f.phase} speed mismatch ${measured}/${expected}`);}
+   previous=f;
+  }
+  const liftoff=o.departAt+o.takeoff,before=operationFrame(o,liftoff-.01),after=operationFrame(o,liftoff+.01);assert.ok(after.altitude-before.altitude<.01);assert.ok(Math.abs(after.groundSpeed-before.groundSpeed)<.1);
+  const departure=operationFrame(o,o.departAt);assert.ok(departure.groundSpeed<1e-8);assert.ok(Math.abs(departure.heading-o.heading)<.001);
+ }
+});
+test('journeys accelerate from initial climb speed rather than jumping to cruise speed',()=>{
+ const j=journey(operation(airport('IAD'),'b737'),operation(airport('JFK'),'b737'));
+ for(const boundary of [j.departureSeconds,j.departureSeconds+j.cruiseSeconds]){const a=journeyFrame(j,boundary-.01),b=journeyFrame(j,boundary+.01);assert.ok(Math.abs(a.groundSpeed-b.groundSpeed)<.1);assert.ok(trackDistance(a,b)*1852<3);}
+});

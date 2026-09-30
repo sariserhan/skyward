@@ -17,7 +17,7 @@ export const DEMO_HANDLING={
 } as const;
 type Point={lat:number;lon:number};
 export type DemoModel=keyof typeof DEMO_HANDLING;
-export interface Operation {airport:AirportGeometry;model:DemoModel;route:TaxiRoute;out:TaxiRoute;heading:number;start:Point;stop:Point;touch:Point;approach:Point;depart:Point;gate:Point;gateHeading:number;illustrative:boolean;arrival:number;rollout:number;taxi:number;service:number;push:number;backtrack:number;takeoff:number;climb:number;serviceAt:number;departAt:number;end:number;}
+export interface Operation {pushRoute:TaxiRoute;outSeconds:number;airport:AirportGeometry;model:DemoModel;route:TaxiRoute;out:TaxiRoute;heading:number;start:Point;stop:Point;touch:Point;approach:Point;depart:Point;gate:Point;gateHeading:number;illustrative:boolean;arrival:number;rollout:number;taxi:number;service:number;push:number;backtrack:number;takeoff:number;climb:number;serviceAt:number;departAt:number;end:number;}
 export interface DemoPose extends Point {altitude:number;heading:number;pitch:number;bank:number;ground:boolean;groundSpeed:number;gear:number;phase:string;gate:string;service:number;airport:string;}
 const clamp=(n:number)=>Math.max(0,Math.min(1,n));
 const smooth=(n:number)=>{const u=clamp(n);return u*u*(3-2*u);};
@@ -39,13 +39,38 @@ export function operation(port:AirportGeometry,model:DemoModel,index=0):Operatio
  const points=[...base.inbound.points];if(index>0)points.push(gate);
  const curved=rounded(points,h.turn),roundedPoints=groundRouteClear(port,curved,clearance)?curved:points;
  if(!groundRouteClear(port,roundedPoints,clearance))return null;
- const inbound=route(roundedPoints,index?`Skyward stand ${index+1} (illustrative)`:base.inbound.gate),out=route([...roundedPoints].reverse(),inbound.gate);
- const taxi=taxiSpeedProfile(inbound).times.at(-1)!*12/h.taxi,service=h.service,push=18;
+ const inbound=route(roundedPoints,index?`Skyward stand ${index+1} (illustrative)`:base.inbound.gate),reversed=[...roundedPoints].reverse();
+ // Reverse through a tug turn, stop, then taxi forward from that same heading.
+ const outward=bearing(gate,reversed[1]),r=Math.min(15,h.turn*.5),local=(x:number,y:number)=>movePoint(movePoint(gate,outward,x/1852),outward+90,y/1852);
+ let pushRoute:TaxiRoute|undefined,outPoints:Point[]|undefined;
+ let join=1;while(join<reversed.length-1&&trackDistance(gate,reversed[join])*1852<80)join++;
+ for(const side of [1,-1]){
+  const pushPoints=[gate,local(20,0),...Array.from({length:32},(_,i)=>{const angle=(i+1)/32*Math.PI;return local(20+r*Math.sin(angle),side*r*(1-Math.cos(angle)));})];
+  pushPoints.push(local(10,side*2*r));
+  const q=pushPoints.at(-1)!,mergeStart=movePoint(q,outward,10/1852),end=reversed[join],endHeading=bearing(reversed[Math.max(0,join-1)],end),c=movePoint(mergeStart,outward,20/1852),d=movePoint(end,endHeading+180,20/1852);
+  const merge=Array.from({length:33},(_,i)=>{const u=i/32,k=1-u;return {lon:k*k*k*mergeStart.lon+3*k*k*u*c.lon+3*k*u*u*d.lon+u*u*u*end.lon,lat:k*k*k*mergeStart.lat+3*k*k*u*c.lat+3*k*u*u*d.lat+u*u*u*end.lat};});
+  const outgoing=rounded([q,...merge,...reversed.slice(join+1)],h.turn);
+  if(groundRouteClear(port,pushPoints,clearance)&&groundRouteClear(port,outgoing,clearance)){pushRoute={...route(pushPoints,inbound.gate),startStopped:true};outPoints=outgoing;break;}
+ }
+ if(!pushRoute||!outPoints)return null;
+ // Backtrack with a lateral offset and a rolling semicircle, never rotate in place.
+ const turnRadius=Math.min(h.turn,Math.max(10,(base.runway.width-8)/2)),lineupAlong=turnRadius+30,stopAlong=trackDistance(start,stop)*1852;
+ if(lineupAlong+15+h.roll+50>base.runway.length)return null;
+ const runwayPoint=(along:number,side:number)=>movePoint(movePoint(start,heading,along/1852),heading+90,side/1852);
+ let departurePoints:Point[]|undefined;
+ for(const side of [1,-1]){
+  const back=Array.from({length:65},(_,i)=>{const u=i/64;return runwayPoint(stopAlong+(lineupAlong-stopAlong)*u,side*2*turnRadius*smooth(u));});
+  const turn=Array.from({length:49},(_,i)=>{const angle=i/48*Math.PI;return runwayPoint(lineupAlong-turnRadius*Math.sin(angle),side*turnRadius*(1+Math.cos(angle)));});
+  const candidate=[...outPoints,...back.slice(1),...turn.slice(1),runwayPoint(lineupAlong+15,0)];if(groundRouteClear(port,candidate,clearance)){departurePoints=candidate;break;}
+ }
+ if(!departurePoints)return null;
+ const out={...route(departurePoints,inbound.gate),startStopped:true},outSeconds=taxiSpeedProfile(out).times.at(-1)!*12/h.taxi;
+ const taxi=taxiSpeedProfile(inbound).times.at(-1)!*12/h.taxi,service=h.service,push=taxiSpeedProfile(pushRoute).times.at(-1)!/.3;
  const touch=movePoint(start,heading,Math.min(350,base.runway.length*.12)/1852),approach=movePoint(start,heading+180,3.5);
  const arrival=trackDistance(approach,touch)/h.approach*3600,rollout=trackDistance(touch,stop)*1852/((h.approach*.514444+6)/2);
- const backtrack=trackDistance(stop,start)/h.taxi*3600,takeoff=2*h.roll/(h.rotate*.514444),climb=45;
- const serviceAt=arrival+rollout+taxi,departAt=serviceAt+service+push+taxi+backtrack;
- return {airport:port,model,route:inbound,out,heading,start,stop,touch,approach,depart:movePoint(start,heading,(h.roll+h.rotate*.514444*climb)/1852),gate,gateHeading:bearing(points.at(-2)!,gate),illustrative:index>0||inbound.gate.includes('illustrative'),arrival,rollout,taxi,service,push,backtrack,takeoff,climb,serviceAt,departAt,end:departAt+takeoff+climb};
+ const backtrack=0,takeoff=2*h.roll/(h.rotate*.514444),climb=60;
+ const serviceAt=arrival+rollout+taxi,departAt=serviceAt+service+push+outSeconds;
+ return {pushRoute,outSeconds,airport:port,model,route:inbound,out,heading,start:departurePoints.at(-1)!,stop,touch,approach,depart:movePoint(departurePoints.at(-1)!,heading,(h.roll+h.rotate*.514444*climb)/1852),gate,gateHeading:bearing(points.at(-2)!,gate),illustrative:index>0||inbound.gate.includes('illustrative'),arrival,rollout,taxi,service,push,backtrack,takeoff,climb,serviceAt,departAt,end:departAt+takeoff+climb};
 }
 export function operationFrame(o:Operation,time:number):DemoPose {
  const h=DEMO_HANDLING[o.model],e=o.airport.elevationFt??0,t=Math.max(0,time),base={...o.approach,altitude:e+1900,heading:o.heading,pitch:2,bank:0,ground:false,groundSpeed:h.approach,gear:1,phase:'landing',gate:o.route.gate,service:0,airport:o.airport.id};
@@ -58,17 +83,14 @@ export function operationFrame(o:Operation,time:number):DemoPose {
  const parked={...base,...o.gate,heading:o.gateHeading,altitude:e,ground:true,groundSpeed:0,pitch:0};
  if(x<o.service)return {...parked,phase:x<o.service*.3?'deboarding':x<o.service*.65?'servicing':x<o.service*.9?'boarding':'ready for pushback',service:x/o.service};
  x-=o.service;
- // Pushback moves through the first 18 seconds of the reversed taxi path at walking speed.
- const pushTravel=Math.min(5,taxiSpeedProfile(o.out).times.at(-1)!*.05);
- if(x<o.push){const f=taxiFrame(o.out,pushTravel*smooth(x/o.push));return {...parked,...f,heading:o.gateHeading,phase:'pushback',groundSpeed:3};}
+ // Pushback heading opposes tug travel; both ends stop before forward taxi.
+ if(x<o.push){const f=taxiFrame(o.pushRoute,x*.3);return {...parked,...f,heading:(f.heading+180)%360,phase:'pushback',groundSpeed:f.groundSpeed*.3};}
  x-=o.push;
- if(x<o.taxi){const outDuration=taxiSpeedProfile(o.out).times.at(-1)!,f=taxiFrame(o.out,pushTravel+(outDuration-pushTravel)*x/o.taxi);return {...parked,...f,heading:x<12?o.gateHeading+(((f.heading-o.gateHeading+540)%360)-180)*smooth(x/12):f.heading,phase:'taxi out',groundSpeed:f.groundSpeed*h.taxi/12};}
- x-=o.taxi;
- if(x<o.backtrack)return {...parked,...line(o.stop,o.start,smooth(x/o.backtrack)),heading:o.heading+180,phase:'runway backtrack',groundSpeed:h.taxi};
- x-=o.backtrack;
+ if(x<o.outSeconds){const f=taxiFrame(o.out,x*h.taxi/12);return {...parked,...f,phase:trackDistance(f,o.stop)*1852<150||trackDistance(f,o.start)<trackDistance(o.stop,o.start)?'runway backtrack':'taxi out',groundSpeed:f.groundSpeed*h.taxi/12};}
+ x-=o.outSeconds;
  if(x<o.takeoff){const u=x/o.takeoff;return {...parked,...movePoint(o.start,o.heading,h.roll*u*u/1852),heading:o.heading,phase:'takeoff',groundSpeed:h.rotate*u,pitch:8*smooth((u-.85)/.15)};}
  x-=o.takeoff;const u=clamp(x/o.climb),distance=h.roll+h.rotate*.514444*o.climb*u;
- return {...base,...movePoint(o.start,o.heading,distance/1852),phase:'climb',altitude:e+1900*u,ground:false,groundSpeed:h.rotate,pitch:8,gear:1-smooth((u-.1)/.4)};
+ return {...base,...movePoint(o.start,o.heading,distance/1852),phase:'climb',altitude:e+1900*smooth(u),ground:false,groundSpeed:h.rotate,pitch:8-4*smooth(u),gear:1-smooth((u-.1)/.4)};
 }
 export function trafficSchedule(operations:Operation[]){const slot=Math.max(...operations.map(o=>o.end))+120;return {slot,period:slot*operations.length};}
 /** A conservative reservation: only one flight approaches, taxis or departs per slot. */
@@ -94,12 +116,18 @@ export function journey(origin:Operation,destination:Operation):Journey {
  const anchors=[a,c,...Array.from({length:31},(_,i)=>greatCircle(c,d,(i+1)/32)),d,b];
  for(let i=0;i<anchors.length-1;i++){const prev=anchors[Math.max(0,i-1)],p=anchors[i],q=anchors[i+1],next=anchors[Math.min(anchors.length-1,i+2)];for(let j=0;j<8;j++){const u=j/8,u2=u*u,u3=u2*u,lon=(v:number)=>p.lon+((v-p.lon+540)%360-180);const calc=(k:'lat'|'lon')=>{const z=k==='lon'?[lon(prev.lon),p.lon,lon(q.lon),lon(next.lon)]:[prev.lat,p.lat,q.lat,next.lat];return .5*((2*z[1])+(-z[0]+z[2])*u+(2*z[0]-5*z[1]+4*z[2]-z[3])*u2+(-z[0]+3*z[1]-3*z[2]+z[3])*u3);};points.push({lat:calc('lat'),lon:((calc('lon')+540)%360)-180});}}
  points.push(b);const meters=[0];for(let i=1;i<points.length;i++)meters.push(meters.at(-1)!+trackDistance(points[i-1],points[i])*1852);
- const cruiseSeconds=meters.at(-1)!/(h.cruise*.514444),departureSeconds=origin.end-origin.serviceAt;
+ const ramp=Math.min(90,meters.at(-1)!/(h.cruise*.514444*4)),cruiseSeconds=meters.at(-1)!/(h.cruise*.514444)+ramp*(1-(a.groundSpeed+b.groundSpeed)/(2*h.cruise)),departureSeconds=origin.end-origin.serviceAt;
  return {origin,destination,model:origin.model,departureSeconds,cruiseSeconds,end:departureSeconds+cruiseSeconds+destination.serviceAt,distance:meters.at(-1)!/1852,points,meters};
 }
-function enroute(j:Journey,time:number):DemoPose {const u=clamp(time/j.cruiseSeconds),distance=j.meters.at(-1)!*u;let k=1;while(k<j.meters.length-1&&j.meters[k]<distance)k++;const f=(distance-j.meters[k-1])/Math.max(.01,j.meters[k]-j.meters[k-1]),p=line(j.points[k-1],j.points[k],f),a=operationFrame(j.origin,j.origin.end),b=operationFrame(j.destination,0),cruise=Math.max(a.altitude,b.altitude,Math.min(DEMO_HANDLING[j.model].height,Math.min(a.altitude,b.altitude)+j.cruiseSeconds*.25*35/1.5)),altitude=u<.25?a.altitude+(cruise-a.altitude)*smooth(u*4):u>.75?b.altitude+(cruise-b.altitude)*smooth((1-u)*4):cruise;
+function enroute(j:Journey,time:number):DemoPose {
+ const u=clamp(time/j.cruiseSeconds),total=j.meters.at(-1)!,h=DEMO_HANDLING[j.model],ramp=Math.min(90,total/(h.cruise*.514444*4)),v0=h.rotate*.514444,v1=DEMO_HANDLING[j.destination.model].approach*.514444,vc=total/(j.cruiseSeconds-ramp)-(v0+v1)*ramp/(2*(j.cruiseSeconds-ramp)),t=Math.max(0,Math.min(time,j.cruiseSeconds));
+ const integral=(x:number)=>{const a=clamp(x);return a*a*a-a*a*a*a/2;};
+ const first=v0*ramp+(vc-v0)*ramp*.5,middle=vc*(j.cruiseSeconds-2*ramp);
+ const distance=t<ramp?v0*t+(vc-v0)*ramp*integral(t/ramp):t<j.cruiseSeconds-ramp?first+vc*(t-ramp):first+middle+vc*(t-j.cruiseSeconds+ramp)+(v1-vc)*ramp*integral((t-j.cruiseSeconds+ramp)/ramp);
+ const speed=t<ramp?v0+(vc-v0)*smooth(t/ramp):t<j.cruiseSeconds-ramp?vc:vc+(v1-vc)*smooth((t-j.cruiseSeconds+ramp)/ramp);
+ let k=1;while(k<j.meters.length-1&&j.meters[k]<distance)k++;const f=(distance-j.meters[k-1])/Math.max(.01,j.meters[k]-j.meters[k-1]),p=line(j.points[k-1],j.points[k],f),a=operationFrame(j.origin,j.origin.end),b=operationFrame(j.destination,0),cruise=Math.max(a.altitude,b.altitude,Math.min(DEMO_HANDLING[j.model].height,Math.min(a.altitude,b.altitude)+j.cruiseSeconds*.25*35/1.5)),altitude=u<.25?a.altitude+(cruise-a.altitude)*smooth(u*4):u>.75?b.altitude+(cruise-b.altitude)*smooth((1-u)*4):cruise;
  const heading=bearing(j.points[k-1],j.points[k]),previous=bearing(j.points[Math.max(0,k-2)],j.points[k-1]),delta=((heading-previous+540)%360)-180,segmentSeconds=(j.meters[k]-j.meters[k-1])/(DEMO_HANDLING[j.model].cruise*.514444),bank=Math.max(-25,Math.min(25,Math.atan(DEMO_HANDLING[j.model].cruise*.514444*(delta*Math.PI/180)/Math.max(1,segmentSeconds)/9.81)*180/Math.PI));
- return {...a,...p,heading,bank,altitude,gear:smooth((u-.97)/.025),pitch:u<.25?4:u>.75?-3:0,phase:u<.25?'climb':u>.75?'descent':'cruise',airport:u>.5?j.destination.airport.id:j.origin.airport.id,groundSpeed:DEMO_HANDLING[j.model].cruise};}
+ return {...a,...p,heading,bank,altitude,gear:smooth((u-.97)/.025),pitch:u<.25?4:u>.75?-3:0,phase:u<.25?'climb':u>.75?'descent':'cruise',airport:u>.5?j.destination.airport.id:j.origin.airport.id,groundSpeed:speed/.514444};}
 export function journeyFrame(j:Journey,time:number):DemoPose {if(time<j.departureSeconds)return operationFrame(j.origin,j.origin.serviceAt+Math.max(0,time));if(time<j.departureSeconds+j.cruiseSeconds)return enroute(j,time-j.departureSeconds);const t=time-j.departureSeconds-j.cruiseSeconds;if(t>=j.destination.serviceAt)return {...operationFrame(j.destination,j.destination.serviceAt),phase:'parked at destination',service:1};const f=operationFrame(j.destination,t);return f;}
 export interface DemoSave {version:2;airport:string;seed:number;time:number;speed:number;paused:boolean;flight:string;camera:string;journey:boolean;journeyTime:number;}
 export function parseDemoSave(raw:string|null,airport:string):DemoSave|null {try{const v=JSON.parse(raw??'null');if(v?.version!==2||v.airport!==airport||!Number.isInteger(v.seed)||v.seed<0||v.seed>4294967295||![v.time,v.journeyTime].every(n=>Number.isFinite(n)&&n>=0&&n<=1e9)||![1,5,15,60,120].includes(v.speed)||typeof v.paused!=='boolean'||typeof v.journey!=='boolean'||!/^skyward-demo-[0-5]$|^$/.test(v.flight)||!['side','cockpit','cabin','tower','free'].includes(v.camera))return null;return v;}catch{return null;}}

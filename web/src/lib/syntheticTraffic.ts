@@ -45,7 +45,7 @@ export function regionalSyntheticAircraft(a:Aircraft,center:{lat:number;lon:numb
 export function saveSyntheticFlight(hex:string){const f=flights.get(hex);if(!f)return undefined;const at=clocks.get(f)?.currentTime();return JSON.stringify({...f,start:f.start+(at?Math.max(0,Date.now()-at):0)});}
 export function restoreSyntheticFlight(raw:string|undefined):Aircraft|null{
  try{if(!raw||raw.length>1500000)return null;const f=JSON.parse(raw) as Flight;
-  if(!f.aircraft?.simulation||!/^skyward-[a-z0-9-]+-\d+$/.test(f.aircraft.hex)||!Number.isFinite(f.start)||!Number.isFinite(f.offset)||!Number.isFinite(f.op?.end))return null;
+  if(!f.aircraft?.simulation||!/^skyward-[a-z0-9-]+-\d+$/.test(f.aircraft.hex)||!Number.isFinite(f.start)||!Number.isFinite(f.offset)||!Number.isFinite(f.op?.end)||!f.op?.pushRoute||!Number.isFinite(f.op?.outSeconds))return null;
   const a=snapshot(f,Date.now());if(!Number.isFinite(a.lat)||!Number.isFinite(a.lon)||!Number.isFinite(a.altitude))return null;
   flights.set(a.hex,f);return a;
  }catch{return null;}
