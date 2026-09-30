@@ -6,17 +6,18 @@ def run(page):
  page.add_init_script("""const p=JSON.parse(localStorage.getItem('skyward.map.v1'));Object.assign(p,{structures:true,cityBuildings:true,quality:'balanced'});localStorage.setItem('skyward.map.v1',JSON.stringify(p));
  const NativeWorker=window.Worker;window.Worker=new Proxy(NativeWorker,{construct(T,args){if(!String(args[0]).includes('cityBuildings'))return Reflect.construct(T,args);return {onmessage:null,onerror:null,done:false,postMessage({tile}){setTimeout(()=>{if(this.done)return;const n=2**tile.z,x=(tile.x+.5)/n*360-180,y=Math.atan(Math.sinh(Math.PI*(1-2*(tile.y+.5)/n)))*180/Math.PI;this.onmessage?.({data:{key:tile.key,buildings:[{rings:[[[x-.0003,y-.0003],[x+.0003,y-.0003],[x+.0003,y+.0003],[x-.0003,y+.0003]]],height:25,base:0}]}})},150)},terminate(){this.done=true}}}});""")
  for path in ['area?*','aircraft?*','route?*','status']:page.route('**/api/'+path,f.mock)
+ page.add_init_script("window.__allPrimitives=()=>{const walk=c=>c._primitives.flatMap(p=>p._primitives?[p,...walk(p)]:[p]);return walk(__viewer.scene.primitives)}")
  page.goto(f.URL+'/#airport=IAD');page.get_by_role('button',name='Close airport details',exact=True).click(timeout=30000)
  page.evaluate("__viewer.camera.setView({destination:Cesium.Cartesian3.fromDegrees(-77.44,38.95,1400),orientation:{heading:0,pitch:-1.2,roll:0}});__viewer.scene.requestRender()")
- page.wait_for_function("__viewer.scene.primitives._primitives.some(p=>p.appearance?.material?.type==='SkywardBuildingFade'&&p.appearance.material.uniforms.visibility<1)",timeout=30000)
+ page.wait_for_function("__allPrimitives().some(p=>p.appearance?.material?.type==='SkywardBuildingFade'&&p.appearance.material.uniforms.visibility<1)",timeout=30000)
  page.wait_for_function("__viewer.dataSources._dataSources.some(s=>s.name==='mapped-airport-detail'&&s.entities.values.some(e=>e.id.startsWith('illustrative-bridge-')))")
  page.wait_for_function("__viewer.dataSources._dataSources.some(s=>s.entities.values.some(e=>e.id.startsWith('runway-surface-')))")
  page.wait_for_timeout(3000)
- assert page.evaluate("__viewer.scene.primitives._primitives.some(p=>p.appearance?.material?.type==='SkywardBuildingFade'&&p.appearance.material.uniforms.visibility===1)")
+ assert page.evaluate("__allPrimitives().some(p=>p.appearance?.material?.type==='SkywardBuildingFade'&&p.appearance.material.uniforms.visibility===1)")
  # Tile coordinates must be uniforms: literal coordinates make every tile compile
  # a new program and caused repeated 200–400 ms stalls in flight orbit.
- page.wait_for_function("__viewer.scene.primitives._primitives.filter(p=>p.appearance?.material?.type==='SkywardBuildingFade'&&p.allowPicking===false).length>=2")
- shaders=page.evaluate("(()=>{const rows=__viewer.scene.primitives._primitives.filter(p=>p.appearance?.material?.type==='SkywardBuildingFade'&&p.allowPicking===false);return new Set(rows.map(p=>p.appearance.vertexShaderSource+p.appearance.fragmentShaderSource+p.appearance.material.shaderSource)).size;})()")
+ page.wait_for_function("__allPrimitives().filter(p=>p.appearance?.material?.type==='SkywardBuildingFade'&&p.allowPicking===false).length>=2")
+ shaders=page.evaluate("(()=>{const rows=__allPrimitives().filter(p=>p.appearance?.material?.type==='SkywardBuildingFade'&&p.allowPicking===false);return new Set(rows.map(p=>p.appearance.vertexShaderSource+p.appearance.fragmentShaderSource+p.appearance.material.shaderSource)).size;})()")
  assert shaders==1,shaders
  page.screenshot(path=str(f.ARTIFACTS/'scenery-detail.jpg'),type='jpeg',quality=75)
  page.evaluate("__viewer.camera.setView({destination:Cesium.Cartesian3.fromDegrees(-77.2,39.05,1400),orientation:{heading:0,pitch:-1.2,roll:0}});__viewer.scene.requestRender()")

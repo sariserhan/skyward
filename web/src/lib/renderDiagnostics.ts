@@ -2,7 +2,7 @@ import {qualityEvent} from './qualityEvents.ts';
 import type * as Cesium from 'cesium';
 export function frameSummary(samples:number[]){const rows=samples.filter(n=>Number.isFinite(n)&&n>0).sort((a,b)=>a-b);return {maxFrameMs:rows.at(-1)??0,p95:rows.length?rows[Math.min(rows.length-1,Math.floor(rows.length*.95))]:0,slowPercent:rows.length?Math.round(100*rows.filter(n=>n>50).length/rows.length):0};}
 /** Repeated 100+ ms stalls matter even when most frames still meet 60 Hz. */
-export function backgroundFramePressure(summary:{p95:number;slowPercent:number;maxFrameMs:number},count:number){return count>=30&&(summary.slowPercent>25||(summary.p95>=100&&summary.slowPercent>=5)||summary.maxFrameMs>=1000);}
+export function backgroundFramePressure(summary:{p95:number;slowPercent:number;maxFrameMs:number},count:number){return count>=30&&(summary.slowPercent>25||(summary.p95>=100&&summary.slowPercent>=5)||(summary.maxFrameMs>=250&&summary.slowPercent>=1));}
 export interface RenderStats {backgroundLimited:boolean;maxFrameMs:number;p95:number;slowPercent:number;pendingModels:number;slowModels:number;lastModelMs:number;}
 const stats=new WeakMap<object,RenderStats>();
 export function readRenderStats(viewer:object):RenderStats{return stats.get(viewer)??{backgroundLimited:false,maxFrameMs:0,p95:0,slowPercent:0,pendingModels:0,slowModels:0,lastModelMs:0};}

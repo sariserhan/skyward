@@ -20,3 +20,8 @@ test('intermittent severe scenery stalls trigger backpressure before a quarter o
  assert.equal(backgroundFramePressure({p95:16.7,slowPercent:1,maxFrameMs:1500},180),true);
  assert.equal(backgroundFramePressure({p95:300,slowPercent:20,maxFrameMs:717},4),false);
 });
+
+test('repeated half-second stalls pause scenery even when ordinary frames remain fast',()=>{
+ assert.equal(backgroundFramePressure({p95:33.6,slowPercent:2,maxFrameMs:601},180),true);
+ assert.equal(backgroundFramePressure({p95:16.7,slowPercent:1,maxFrameMs:250},180),true);
+});

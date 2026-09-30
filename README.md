@@ -599,3 +599,5 @@ and configuration readiness. See [the billing launch checkpoint](deployment/STRI
 for verified behavior, outstanding Stripe/email/aviation setup, API limits and
 privacy-preserving reliability counters. Premium currently shares the free map's
 observed aircraft coverage; live billing does not activate paid aviation data.
+
+City-building streaming admits up to 48 buildings / roughly 2,000 footprint vertices per geometry batch and waits for each upload before admitting the next. Severe frame pressure pauses new scenery work while loaded scenery remains; terrain-driven city-tile replacements wait until flight following ends and terrain settles. Performance exports include bounded long-task timelines and optional Chrome long-animation-frame script attribution. These are diagnostic CPU/browser timings, not GPU measurements.
