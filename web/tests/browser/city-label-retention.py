@@ -10,6 +10,9 @@ def run(page):
  page.evaluate("window.__oldCities=new Map(__viewer.entities.values.filter(e=>e.id.startsWith('city-')).map(e=>[JSON.stringify([e.label.text.getValue(),e.position.getValue()]),e]));for(const {worker,data} of __placeWorkers)worker.dispatchEvent(new MessageEvent('message',{data:{key:data.tile.key,places:[{name:'New fixture town',lon:-77.3,lat:39,rank:10,capital:false}],features:[]}}))")
  page.wait_for_function("__viewer.entities.values.some(e=>e.label?.text?.getValue()==='• New fixture town')");page.wait_for_timeout(300)
  result=page.evaluate("(()=>{const cities=__viewer.entities.values.filter(e=>e.id.startsWith('city-'));return {existing:__oldCities.size,replaced:cities.filter(e=>__oldCities.has(JSON.stringify([e.label.text.getValue(),e.position.getValue()]))&&__oldCities.get(JSON.stringify([e.label.text.getValue(),e.position.getValue()]))!==e).length}})()")
+ page.evaluate("window.__retainedTown=__viewer.entities.values.find(e=>e.label?.text?.getValue()==='• New fixture town');for(const {worker,data} of __placeWorkers)worker.dispatchEvent(new MessageEvent('message',{data:{key:data.tile.key,places:[],features:[]}}))")
+ page.wait_for_timeout(700)
+ assert page.evaluate("__viewer.entities.values.includes(__retainedTown)"),'a temporarily empty tile must not remove the existing town'
  assert result['existing']>1000 and result['replaced']==0,result
  assert page.evaluate('__viewer.targetFrameRate === undefined')
  assert not errors,errors

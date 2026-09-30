@@ -1,3 +1,4 @@
+import {retainPlaceLabels,PlaceLabelVisibility} from '../lib/stablePlaceLabels';
 import {overlapsAircraft,type ScreenBox} from '../lib/labelPriority';
 import {publishNearbyFeatures} from '../lib/nearbyFeatures';
 import {placeLabelZoom,type NearbyFeature} from '../lib/placeLabels';
@@ -14,7 +15,7 @@ export function CityLabels({viewer,cities,enabled,large,flight=false,aircraftHex
   let worker:Worker;try{worker=new Worker(new URL('../workers/cityBuildings.worker.ts',import.meta.url),{type:'module'});}catch{return;}
   let disposed=false,desired:string[]=[],lastKey='',flush:ReturnType<typeof setTimeout>|undefined;
   const cache=new Map<string,City[]>(),pending=new Set<string>(),failed=new Map<string,number>();
-  const publish=()=>{clearTimeout(flush);flush=setTimeout(()=>{if(!disposed)setLocal(desired.flatMap(key=>cache.get(key)??[]));},200);};
+  const publish=()=>{clearTimeout(flush);flush=setTimeout(()=>{if(!disposed)setLocal(previous=>retainPlaceLabels(previous,desired.flatMap(key=>cache.get(key)??[])));},200);};
   const update=()=>{
    if(v.isDestroyed()||document.hidden)return;
    const picked=v.camera.pickEllipsoid(new C.Cartesian2(v.canvas.clientWidth*.5,v.canvas.clientHeight*.65),v.scene.globe.ellipsoid);
@@ -31,12 +32,12 @@ export function CityLabels({viewer,cities,enabled,large,flight=false,aircraftHex
   update();const timer=setInterval(update,2000);
   return()=>{disposed=true;clearInterval(timer);clearTimeout(flush);worker.terminate();if(!v.isDestroyed())v.creditDisplay.removeStaticCredit(credit);};
  },[viewer,enabled,flight,aircraftHex]);
- const places=useMemo(()=>{const names=new Set<string>();return [...local,...cities].filter(c=>{const key=`${c.name.toLowerCase()}:${c.lon.toFixed(1)}:${c.lat.toFixed(1)}`;if(names.has(key))return false;names.add(key);return true;});},[cities,local]);
+ const places=useMemo(()=>{const names=new Set<string>();return [...cities,...local].filter(c=>{const key=`${c.name.toLowerCase()}:${c.lon.toFixed(1)}:${c.lat.toFixed(1)}`;if(names.has(key))return false;names.add(key);return true;});},[cities,local]);
  const latestPlaces=useRef(places);latestPlaces.current=places;
  useEffect(()=>{if(viewer&&!viewer.isDestroyed())viewer.scene.requestRender();},[viewer,places]);
  useEffect(()=>{
   if(!viewer||!enabled)return;const v=viewer,C=window.Cesium;
-  const makeEntry=(city:City,key:string)=>{const position=C.Cartesian3.fromDegrees(city.lon,city.lat,40);return {city,position,cartographic:C.Cartographic.fromDegrees(city.lon,city.lat),normal:v.scene.globe.ellipsoid.geodeticSurfaceNormal(position),e:v.entities.add({id:`city-${key}`,show:false,position,label:{text:`• ${city.name}`,font:`${city.capital?'600':'400'} ${large?17:13}px sans-serif`,fillColor:C.Color.fromCssColorString('#fff2d2'),style:C.LabelStyle.FILL_AND_OUTLINE,outlineColor:C.Color.fromCssColorString('#15252c'),outlineWidth:4,heightReference:flight?C.HeightReference.NONE:C.HeightReference.RELATIVE_TO_GROUND,disableDepthTestDistance:flight?Number.POSITIVE_INFINITY:0,horizontalOrigin:C.HorizontalOrigin.LEFT,pixelOffset:new C.Cartesian2(5,0)}})};};
+  const makeEntry=(city:City,key:string)=>{const position=C.Cartesian3.fromDegrees(city.lon,city.lat,40);return {visibility:new PlaceLabelVisibility(),city,position,cartographic:C.Cartographic.fromDegrees(city.lon,city.lat),normal:v.scene.globe.ellipsoid.geodeticSurfaceNormal(position),e:v.entities.add({id:`city-${key}`,show:false,position,label:{text:`• ${city.name}`,font:`${city.capital?'600':'400'} ${large?17:13}px sans-serif`,fillColor:C.Color.fromCssColorString('#fff2d2'),style:C.LabelStyle.FILL_AND_OUTLINE,outlineColor:C.Color.fromCssColorString('#15252c'),outlineWidth:4,heightReference:flight?C.HeightReference.NONE:C.HeightReference.RELATIVE_TO_GROUND,disableDepthTestDistance:flight?Number.POSITIVE_INFINITY:0,horizontalOrigin:C.HorizontalOrigin.LEFT,pixelOffset:new C.Cartesian2(5,0)}})};};
   const entries=new Map<string,ReturnType<typeof makeEntry>>();let activePlaces:City[]|null=null,orderedEntries:ReturnType<typeof makeEntry>[]=[];
   let last=0;const delta=new C.Cartesian3();
   const update=()=>{
@@ -69,13 +70,15 @@ export function CityLabels({viewer,cities,enabled,large,flight=false,aircraftHex
    const density=readFlightPreferences().labelDensity;const boxes:{x:number;y:number;w:number}[]=[];
    for(const e of v.entities.values){if(!e.show||!e.id.startsWith('atlas-country-')||!e.position||!e.label)continue;const position=e.position.getValue(v.clock.currentTime);if(!position)continue;const point=C.SceneTransforms.worldToWindowCoordinates(v.scene,position);if(point){const w=String(e.label.text?.getValue(v.clock.currentTime)??'').length*(large?8.5:6.5);if(point.x+w/2>0&&point.x-w/2<v.canvas.clientWidth&&point.y>=0&&point.y<v.canvas.clientHeight)boxes.push({x:point.x-w/2,y:point.y,w});}}
    const limit=flight?(density==='sparse'?8:density==='rich'?40:24):65;
-   for(const {city,position:base,cartographic,normal,e} of orderedEntries){
+   // Keep incumbents ahead of newly loaded labels so tile completion cannot evict them.
+   orderedEntries.sort((a,b)=>Number(b.e.show)-Number(a.e.show)||a.city.rank-b.city.rank);
+   for(const {city,position:base,cartographic,normal,e,visibility} of orderedEntries){
     // Reject labels that cannot be drawn before querying terrain. The conservative
     // 9km margin preserves mountains and below-sea-level scenery near the horizon.
-    if(city.rank>maxRank||boxes.length>=limit){e.show=false;continue;}
+    if(city.rank>maxRank||boxes.length>=limit){e.show=visibility.update(false,now);continue;}
     if(v.scene.mode===C.SceneMode.SCENE3D){
      C.Cartesian3.subtract(base,v.camera.positionWC,delta);
-     if(C.Cartesian3.dot(v.camera.directionWC,delta)<-9000||C.Cartesian3.dot(normal,delta)>9000){e.show=false;continue;}
+     if(C.Cartesian3.dot(v.camera.directionWC,delta)<-9000||C.Cartesian3.dot(normal,delta)>9000){e.show=visibility.update(false,now);continue;}
     }
     const position=flight?C.Cartesian3.fromRadians(cartographic.longitude,cartographic.latitude,(v.scene.globe.getHeight(cartographic)??0)+40):base;
     let visible=false;
@@ -87,7 +90,7 @@ export function CityLabels({viewer,cities,enabled,large,flight=false,aircraftHex
     // labels are map annotations; keep them readable over terrain, with aircraft
     // exclusion above handling priority instead of terrain depth testing.
     if(visible&&flight){const current=e.position?.getValue(v.clock.currentTime);if(!current||!C.Cartesian3.equalsEpsilon(current,position,0,.5)){if(e.position instanceof C.ConstantPositionProperty)e.position.setValue(position);else e.position=new C.ConstantPositionProperty(position);}}
-    e.show=visible;
+    e.show=visibility.update(visible,now);
    }
   };
   const remove=v.scene.preRender.addEventListener(update);update();v.scene.requestRender();
