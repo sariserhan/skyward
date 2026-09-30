@@ -515,7 +515,9 @@ export function Globe(p: Props) {
   useEffect(()=>{
     const v=viewer.current;if(!ready||!v)return;const C=window.Cesium;
     const quality=p.preferences.quality;
-    v.targetFrameRate=p.preferences.batterySaver?20:60;
+    // Let requestAnimationFrame follow the display refresh rate; a second 60Hz
+    // timer gate can skip browser frames. Battery saver retains its explicit cap.
+    if(p.preferences.batterySaver)v.targetFrameRate=20;else Reflect.set(v,'targetFrameRate',undefined); // Cesium supports undefined; its declaration omits it.
     v.resolutionScale=Math.min(p.preferences.batterySaver?.8:devicePixelRatio,quality==='low'?.8:quality==='high'?2:1.25);
     v.scene.globe.maximumScreenSpaceError=quality==='low'?6:quality==='high'?1.5:3;
     v.scene.postProcessStages.fxaa.enabled=quality!=='low';v.scene.requestRender();

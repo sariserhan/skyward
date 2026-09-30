@@ -4,7 +4,7 @@ import {placeLabelZoom,type NearbyFeature} from '../lib/placeLabels';
 import {readFlightPreferences} from '../lib/flightPreferences';
 import {cityTiles} from '../lib/cityBuildings';
 import {sharedLiveMotion} from '../lib/liveMotion';
-import {useEffect,useMemo,useState} from 'react';
+import {useEffect,useMemo,useRef,useState} from 'react';
 import type * as Cesium from 'cesium';
 import type {City} from '../lib/cities';
 export function CityLabels({viewer,cities,enabled,large,flight=false,aircraftHex}:{viewer:Cesium.Viewer|null;cities:City[];enabled:boolean;large:boolean;flight?:boolean;aircraftHex?:string}){
@@ -31,12 +31,22 @@ export function CityLabels({viewer,cities,enabled,large,flight=false,aircraftHex
   return()=>{disposed=true;clearInterval(timer);clearTimeout(flush);worker.terminate();if(!v.isDestroyed())v.creditDisplay.removeStaticCredit(credit);};
  },[viewer,enabled,flight,aircraftHex]);
  const places=useMemo(()=>{const names=new Set<string>();return [...local,...cities].filter(c=>{const key=`${c.name.toLowerCase()}:${c.lon.toFixed(1)}:${c.lat.toFixed(1)}`;if(names.has(key))return false;names.add(key);return true;});},[cities,local]);
+ const latestPlaces=useRef(places);latestPlaces.current=places;
+ useEffect(()=>{if(viewer&&!viewer.isDestroyed())viewer.scene.requestRender();},[viewer,places]);
  useEffect(()=>{
-  if(!viewer||!enabled||!places.length)return;const v=viewer,C=window.Cesium;
-  const entries=places.map((city,i)=>{const position=C.Cartesian3.fromDegrees(city.lon,city.lat,40);return {city,position,cartographic:C.Cartographic.fromDegrees(city.lon,city.lat),normal:v.scene.globe.ellipsoid.geodeticSurfaceNormal(position),e:v.entities.add({id:`city-${i}`,show:false,position,label:{text:`• ${city.name}`,font:`${city.capital?'600':'400'} ${large?17:13}px sans-serif`,fillColor:C.Color.fromCssColorString('#fff2d2'),style:C.LabelStyle.FILL_AND_OUTLINE,outlineColor:C.Color.fromCssColorString('#15252c'),outlineWidth:4,heightReference:C.HeightReference.RELATIVE_TO_GROUND,disableDepthTestDistance:0,horizontalOrigin:C.HorizontalOrigin.LEFT,pixelOffset:new C.Cartesian2(5,0)}})};});
+  if(!viewer||!enabled)return;const v=viewer,C=window.Cesium;
+  const makeEntry=(city:City,key:string)=>{const position=C.Cartesian3.fromDegrees(city.lon,city.lat,40);return {city,position,cartographic:C.Cartographic.fromDegrees(city.lon,city.lat),normal:v.scene.globe.ellipsoid.geodeticSurfaceNormal(position),e:v.entities.add({id:`city-${key}`,show:false,position,label:{text:`• ${city.name}`,font:`${city.capital?'600':'400'} ${large?17:13}px sans-serif`,fillColor:C.Color.fromCssColorString('#fff2d2'),style:C.LabelStyle.FILL_AND_OUTLINE,outlineColor:C.Color.fromCssColorString('#15252c'),outlineWidth:4,heightReference:C.HeightReference.RELATIVE_TO_GROUND,disableDepthTestDistance:0,horizontalOrigin:C.HorizontalOrigin.LEFT,pixelOffset:new C.Cartesian2(5,0)}})};};
+  const entries=new Map<string,ReturnType<typeof makeEntry>>();let activePlaces:City[]|null=null,orderedEntries:ReturnType<typeof makeEntry>[]=[];
   let last=0;const delta=new C.Cartesian3();
   const update=()=>{
-   const now=performance.now();if(now-last<250)return;last=now;
+   const now=performance.now();if(activePlaces===latestPlaces.current&&now-last<250)return;last=now;
+   // Tile arrivals preserve existing labels and their terrain/GPU registrations.
+   if(activePlaces!==latestPlaces.current){
+    activePlaces=latestPlaces.current;const keep=new Set<string>(),ordered:ReturnType<typeof makeEntry>[]=[];
+    for(const city of activePlaces){const key=JSON.stringify([city.name,city.lon,city.lat,city.rank,city.capital]);keep.add(key);if(!entries.has(key))entries.set(key,makeEntry(city,key));ordered.push(entries.get(key)!);}
+    for(const [key,entry] of entries)if(!keep.has(key)){v.entities.remove(entry.e);entries.delete(key);}
+    orderedEntries=ordered;
+   }
    const h=v.camera.positionCartographic.height;const maxRank=flight?10:h>7000000?2:h>2500000?4:h>800000?6:10;
    // These are WebGL labels, not DOM layers: depth-test them and reserve
    // screen space for each visible aircraft model or marker before placing text.
@@ -58,7 +68,7 @@ export function CityLabels({viewer,cities,enabled,large,flight=false,aircraftHex
    const density=readFlightPreferences().labelDensity;const boxes:{x:number;y:number;w:number}[]=[];
    for(const e of v.entities.values){if(!e.show||!e.id.startsWith('atlas-country-')||!e.position||!e.label)continue;const position=e.position.getValue(v.clock.currentTime);if(!position)continue;const point=C.SceneTransforms.worldToWindowCoordinates(v.scene,position);if(point){const w=String(e.label.text?.getValue(v.clock.currentTime)??'').length*(large?8.5:6.5);boxes.push({x:point.x-w/2,y:point.y,w});}}
    const limit=flight?(density==='sparse'?8:density==='rich'?40:24):65;
-   for(const {city,position:base,cartographic,normal,e} of entries){
+   for(const {city,position:base,cartographic,normal,e} of orderedEntries){
     // Reject labels that cannot be drawn before querying terrain. The conservative
     // 9km margin preserves mountains and below-sea-level scenery near the horizon.
     if(city.rank>maxRank||boxes.length>=limit){e.show=false;continue;}
@@ -77,6 +87,6 @@ export function CityLabels({viewer,cities,enabled,large,flight=false,aircraftHex
   };
   const remove=v.scene.preRender.addEventListener(update);update();v.scene.requestRender();
   return()=>{remove();if(!v.isDestroyed()){entries.forEach(({e})=>v.entities.remove(e));v.scene.requestRender();}};
- },[viewer,places,enabled,large,flight]);
+ },[viewer,enabled,large,flight]);
  return null;
 }
