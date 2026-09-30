@@ -1,7 +1,7 @@
 /** Compact account data only. Binary assets and full replays stay outside SQL. */
 export const ACCOUNT_LIBRARY_BYTES=512*1024;
 export const ACCOUNT_LIBRARY_LIMITS={
- watchlist:{count:30,bytes:1024,free:true},views:{count:10,bytes:16*1024},
+ boardingpasses:{count:50,bytes:1024,free:true},watchlist:{count:30,bytes:1024,free:true},views:{count:10,bytes:16*1024},
  recordings:{count:0,bytes:0,localOnly:true},logbook:{count:100,bytes:2048},
  simulator:{count:5,bytes:4096,summaryOnly:true},trips:{count:20,bytes:8192},
  journal:{count:50,bytes:4096},airports:{count:12,bytes:16*1024},

@@ -1,0 +1,3 @@
+import {recordingBounds,type Recording} from './sessionRecording.ts';
+export function replayInterval(recording:Recording,startSeconds:number,endSeconds:number){const b=recordingBounds(recording),start=b.start+startSeconds*1000,end=b.start+endSeconds*1000;if(!Number.isFinite(start)||!Number.isFinite(end)||start<b.start||end>b.end||end<=start)throw Error('Choose an interval within this recording.');return {start,end};}
+export function replayCamera(progress:number,sequence:string){return sequence==='side-bird'?(progress<.5?'side':'bird'):sequence==='bird-side'?(progress<.5?'bird':'side'):sequence==='bird'?'bird':'side';}

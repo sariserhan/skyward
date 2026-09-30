@@ -10,6 +10,12 @@ export {ACCOUNT_LIBRARY_BYTES};
 const setupKeys=new Set(['skyward.map.v1','skyward.flight-view.v1','skyward.camera-bookmarks.v1','skyward.favorites.v1','skyward.cabin-audio.v1']);
 export function validateLibrary(kind,value){
  if(!value||typeof value!=='object'||Array.isArray(value))fail(400,'Choose a valid saved item.');
+ if(kind==='boardingpasses'){
+  const displayName=text(value.displayName,40),flight=text(value.flight,10).toUpperCase(),from=text(value.from,3).toUpperCase(),to=text(value.to,3).toUpperCase(),seat=text(value.seat,6).toUpperCase(),callsign=text(value.callsign,10).toUpperCase(),journeyKey=text(value.journeyKey,120);
+  if(!displayName||/[\x00-\x1f\x7f]/.test(displayName)||!date(value.date)||! /^(?:[A-Z0-9]{2}|[A-Z]{3})[0-9]{1,4}[A-Z]?$/.test(flight)||! /^[A-Z]{3}$/.test(from)||! /^[A-Z]{3}$/.test(to)||from===to||seat&&! /^[A-Z0-9-]{1,6}$/.test(seat)||callsign&&! /^[A-Z]{3}[A-Z0-9]{1,7}$/.test(callsign)||journeyKey&&! /^[A-Z0-9]+:(?:[a-f0-9]{6}|unassigned):\d{4}-\d{2}-\d{2}$/.test(journeyKey))fail(400,'Enter a name or display name, flight, date, two airport codes and a valid seat.');
+  // Explicit allowlist: raw barcode, images, PNR, full scanned name, ticket and sequence never persist.
+  return {displayName,flight,from,to,seat,date:value.date,callsign,journeyKey};
+ }
  if(kind==='watchlist'){
   if(!/^[a-f0-9]{6}$/.test(value.hex))fail(400,'Invalid aircraft identifier.');
   return {hex:value.hex,callsign:text(value.callsign,16),registration:text(value.registration,32),aircraftType:text(value.aircraftType,16)};
@@ -84,9 +90,10 @@ export function createAccountLibrary(db,{now,entitlement}){
   db.exec('BEGIN IMMEDIATE');
   try{
   const old=get('SELECT revision,body FROM account_library WHERE user_id=? AND kind=? AND key=?',u.id,kind,key);
-  if(!limit.free&&b.revision!==(old?.revision??0))fail(409,'This item changed on another device. Refresh before saving.');
+  if((!limit.free||kind==='boardingpasses')&&b.revision!==(old?.revision??0))fail(409,'This item changed on another device. Refresh before saving.');
   if(b.remove===true){db.prepare('DELETE FROM account_library WHERE user_id=? AND kind=? AND key=?').run(u.id,kind,key);db.exec('COMMIT');send(200,{ok:true});return true;}
   const value=validateLibrary(kind,b.value),body=JSON.stringify(value);
+  if(kind==='boardingpasses'&&value.journeyKey){const saved=get('SELECT body FROM journeys WHERE user_id=? AND key=?',u.id,value.journeyKey);const j=saved?JSON.parse(saved.body):null;if(!j||j.date!==value.date||j.from&&j.from!==value.from||j.to&&j.to!==value.to||j.callsign!==value.callsign)fail(400,'Link a matching journey from your own account.');}
   if(kind==='watchlist'&&key!==value.hex)fail(400,'Watch key must match its aircraft.');
   if(Buffer.byteLength(body)>limit.bytes)fail(413,'Saved item exceeds its storage limit.');
   if(!old&&get('SELECT COUNT(*) n FROM account_library WHERE user_id=? AND kind=?',u.id,kind).n>=limit.count)fail(429,'Library is full. Remove an item before adding another.');

@@ -21,11 +21,11 @@ export function createPremiumTools({store,entitlement,userById,readJourney,looku
   if(path.endsWith('/notifications')&&method==='POST'&&b.remove){await store.drop(u.id,'push',String(b.key||''));return {ok:true};}
   if(!await entitlement(u))fail(403,'Premium is required for this feature.');
   if(path.endsWith('/monitoring')){
-   if(method==='GET')return {items:await store.list(u.id,'monitor'),mode:'test',monthlyLimit,used:(await store.get(u.id,'monitor-budget',month()))?.used??0,intervalMinutes:15};
+   if(method==='GET')return {items:await store.list(u.id,'monitor'),mode:env.SKYWARD_ACCOUNTS==='neon'&&env.SKYWARD_AIRLABS_MODE==='live'?'live':'test',monthlyLimit,used:(await store.get(u.id,'monitor-budget',month()))?.used??0,intervalMinutes:15};
    const key=String(b.key||''),j=await readJourney(u.id,key);if(!j)fail(404,'Save this journey first.');
    if(b.enabled===false){await store.drop(u.id,'monitor',key);return {ok:true};}
    const date=Date.parse(j.date);if(!Number.isFinite(date)||date+2*86400000<now()||date>now()+366*86400000)fail(400,'Choose a current or upcoming journey.');
-   await store.put(u.id,'monitor',key,{enabled:true,nextAt:Math.max(now(),date-12*3600000),endsAt:date+2*86400000,lastChecked:null,message:'Queued for a synthetic test check. No live flight alerts are generated.'},10);return {ok:true};
+   await store.put(u.id,'monitor',key,{enabled:true,nextAt:Math.max(now(),date-12*3600000),endsAt:date+2*86400000,lastChecked:null,message:env.SKYWARD_ACCOUNTS==='neon'&&env.SKYWARD_AIRLABS_MODE==='live'?'Queued. Live checks require a verified paid subscription and remaining allowance.':'Queued for a synthetic test check. No live flight alerts are generated.'},10);return {ok:true};
   }
   if(path.endsWith('/notifications')){
    if(method==='GET')return {configured:!!vapid,publicKey:vapid?.publicKey??null,devices:(await store.list(u.id,'push')).map(r=>({key:r.key,created:r.value.created}))};

@@ -1,3 +1,4 @@
+import {createPremiumHome} from './premium-home.mjs';
 import {randomBytes,createHash} from 'node:crypto';
 import airports from '../data/airport-catalog.json' with {type:'json'};
 import {parseCamera} from '../src/lib/sharedCamera.ts';
@@ -25,16 +26,18 @@ export function inboundEvidence(journey,journeys){
  return {available:true,hex:f.hex,flight:p,lateInbound:arrival>f.departure.scheduledAt,message:'Possible preceding leg: same assigned aircraft and connecting airport in your verified journeys. Aircraft swaps and missing intervening legs remain possible; this is not a delay prediction.'};
 }
 export function createPremiumExtras({store,entitlement,userById,readJourney,listJourneys=async()=>[],observations=()=>[],notifyVerified,now=Date.now,env=process.env}){
+ const home=createPremiumHome({store,listJourneys,observations,now});
  const rooms=new Map(),rates=new Map();
  function sweep(){for(const [k,r]of rooms)if(r.expires<=now())rooms.delete(k);for(const [k,v]of rates)if(v<now())rates.delete(k);}
  function limited(key,ms){sweep();if((rates.get(key)||0)>now())fail(429,'Please wait before updating again.');if(rates.size>=2000)fail(503,'Watch rooms are busy. Try again shortly.');rates.set(key,now()+ms);}
  const roomPublic=r=>({expires:r.expires,updatedAt:r.updatedAt,state:r.state,reactions:r.reactions});
  async function handle(path,method,u,b){
-  if(!['/api/premium/family','/api/premium/spotter','/api/premium/spotter/check','/api/premium/inbound','/api/premium/rooms'].includes(path))return null;
+  if(!['/api/premium/home','/api/premium/preferences','/api/premium/family','/api/premium/spotter','/api/premium/spotter/check','/api/premium/inbound','/api/premium/rooms'].includes(path))return null;
   const kind=path.endsWith('/family')?'family':'spotter';
   if(b.remove===true&&['/api/premium/family','/api/premium/spotter'].includes(path)){await store.drop(u.id,kind,text(b.key,120));if(kind==='spotter')await store.drop(u.id,'spotter-state',text(b.key,120));return {ok:true};}
   if(path==='/api/premium/rooms'&&b.remove===true){const key=text(b.key,64),r=rooms.get(key);if(!r||r.userId!==u.id)fail(404,'Room expired or unavailable.');rooms.delete(key);return {ok:true};}
   if(!await entitlement(u))fail(403,'Premium is required for this feature.');
+  const homeResult=await home(path,method,u,b);if(homeResult)return homeResult;
   if(path==='/api/premium/inbound'){const j=await readJourney(u.id,text(b.key,120));if(!j)fail(404,'Save this journey first.');return inboundEvidence(j,await listJourneys(u.id));}
   if(path==='/api/premium/rooms'){
    sweep();if(method==='GET')return {items:[...rooms].filter(([,r])=>r.userId===u.id).map(([key,r])=>({key,...roomPublic(r)})),limit:2};

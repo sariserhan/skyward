@@ -179,7 +179,8 @@ export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now
         else {if(!get('SELECT key FROM journeys WHERE user_id=? AND key=?',u.id,k)&&get('SELECT COUNT(*) n FROM journeys WHERE user_id=?',u.id).n>=50)fail(429,'Keep up to 50 saved journeys.');run('INSERT INTO journeys VALUES(?,?,?) ON CONFLICT(user_id,key) DO UPDATE SET body=excluded.body',u.id,k,JSON.stringify({key:k,callsign,hex,date,...metadata,alerts:b.alerts===true}));}
         send(200,{ok:true});return true;
       }
-      if(path==='/api/premium/details'&&req.method==='POST') {
+      if(path==='/api/premium/schedules')fail(503,'Live schedules require the production account service and verified paid access. No paid request was made.');
+   if(path==='/api/premium/details'&&req.method==='POST') {
         if(inflight.has(u.id))fail(429,'A lookup is already running.');inflight.add(u.id);
         try{send(200,await lookup(u,b.key));return true;}finally{inflight.delete(u.id);}
       }

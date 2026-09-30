@@ -60,7 +60,7 @@ not aircraft-feed coverage.
   airport game is at `/airport-simulation/` when its web export is available.
 - **Accounts and Premium:** local test mode and a Neon PostgreSQL + Better Auth
   account path; Premium gates for simulators, recording, account libraries and
-  configured paid flight details. Checkout remains test-only.
+  configured paid flight details. Checkout defaults to test mode; the Neon backend supports explicit live billing configuration.
 
 For richer scenery choose **Map tools → Layers → Performance preset → High
 detail**. It enables satellite imagery, approximate terrain, structures, sharper
@@ -385,6 +385,25 @@ Premium journey tools now include family flight groups, a personal flight passpo
 observation-based spotter rules, private watch-together rooms, and cinematic replay
 highlights with local video export. Open **Account → Premium tools**; recordings
 remain under **Explore tools → Sessions**. See [Premium experience](docs/premium-experience.md)
-for usage, limits and availability. Live flight-status monitoring remains test-only
+for usage, limits and availability. Live flight-status monitoring remains disabled by default
 until an authorized status source is connected; private rooms currently require a
 single server instance and expire after two hours.
+
+
+Premium now opens on **Account → Home**, with the next journey, family flights,
+guided setup, a personalized observation feed and usage counters. **Travel** imports
+reviewed `.ics` events and exports saved departure dates. **Sessions → Cinematic
+highlights** trims a replay, sequences side/bird cameras, adds a title and exports
+portrait or landscape video locally. Try `/?premiumPreview=1` for a fictional 3D
+sample without signup. The paywall and public Premium page list these tools.
+
+See [Premium live service setup](docs/premium-live-service.md) before enabling
+paid data: development access never authorizes a paid provider request.
+
+
+**Account → Boarding passes** adds camera/photo/PDF barcode import and manual
+name/display-name, flight and seat entry. Scanned names become initials, and the
+user reviews the flight date before saving. Raw files and booking references stay
+out of account storage. Supported installed browsers can use Share to Skyward;
+manual import is the fallback. Private trips can be linked to matching saved
+journeys, with no guessed aircraft assignment or access to airline manifests.
