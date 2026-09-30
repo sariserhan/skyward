@@ -1,3 +1,4 @@
+import {Wordmark} from './Wordmark';
 import {useEffect,useRef,useState} from 'react';
 import type {StripeEmbeddedCheckout} from '@stripe/stripe-js';
 import {accountRequest} from '../lib/membership';
@@ -20,7 +21,7 @@ export function EmbeddedCheckout({mode,onClose}:{mode:'test'|'live';onClose:()=>
   return()=>{canceled=true;checkout?.destroy();};
  },[session]);
  async function start(plan:Plan['id']){if(starting.current)return;starting.current=true;setBusy(true);setError('');try{const s=await accountRequest<Session>('/api/billing/checkout',{plan,uiMode:'embedded'});if(active.current)setSession(s);}catch(e){if(active.current)setError(e instanceof Error?e.message:'Checkout unavailable.');}finally{starting.current=false;if(active.current)setBusy(false);}}
- return <section className="embedded-checkout" aria-label="Secure Premium checkout"><header><div><small>SKYWARD PREMIUM {mode==='test'?'· TEST CHECKOUT':''}</small><h3>Your next journey starts here.</h3></div><button type="button" onClick={onClose} aria-label="Close checkout">Close</button></header>
+ return <section className="embedded-checkout" aria-label="Secure Premium checkout"><header><div><small><Wordmark/> Premium {mode==='test'?'· TEST CHECKOUT':''}</small><h3>Your next journey starts here.</h3></div><button type="button" onClick={onClose} aria-label="Close checkout">Close</button></header>
  <p>Both simulators, saved trips, boarding-pass scanning and expanded flight details within your account allowance. Coverage varies.</p>
  {allowance!==null&&<p>{allowance} premium flight-data lookups per calendar month. Limits reset monthly even with annual billing; no automatic overage charges. Coverage and service capacity vary.</p>}
  {!session&&!returnId&&<div className="checkout-plans">{plans.map(p=><button key={p.id} type="button" disabled={busy} onClick={()=>void start(p.id)}><strong>Yearly</strong><span>{new Intl.NumberFormat(undefined,{style:'currency',currency:p.currency}).format(p.amount/100)} / {p.interval}</span><small>Billed once each year · renews automatically</small></button>)}{!plans.length&&!error&&<p role="status">Loading subscription prices…</p>}</div>}
