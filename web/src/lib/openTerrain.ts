@@ -1,3 +1,4 @@
+import {flattenRunwayTile} from './runwayTerrain.ts';
 import {qualityEvent} from './qualityEvents.ts';
 import type * as Cesium from 'cesium';
 // Mapzen/Terrarium open elevation; no key, account, trial, or billable endpoint.
@@ -27,7 +28,7 @@ export function createOpenTerrain(failed:()=>void, updated:()=>void) {
           // Imagery depicts sea surface, not the bathymetric sea floor.
           heights[row*65+col]=Math.max(0,terrariumHeight(rgba[i],rgba[i+1],rgba[i+2]));
         }
-        cache.set(key,heights);if(cache.size>128)cache.delete(cache.keys().next().value!);return heights;
+        const leveled=flattenRunwayTile(heights,x,y,z);cache.set(key,leveled);if(cache.size>128)cache.delete(cache.keys().next().value!);return leveled;
       }finally{bitmap.close();}
     })().catch(error=>{if(!disposed&&!reported&&!prefetch){reported=true;qualityEvent('terrain','failed','Some elevation tiles unavailable; retaining loaded terrain');failed();}
       // Cesium upsamples failed child tiles from their loaded parent. A flat root

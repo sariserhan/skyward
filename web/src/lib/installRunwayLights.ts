@@ -1,7 +1,7 @@
+import {runwayDatum} from './runwayDatum';
 import type * as Cesium from 'cesium';
 import type {AirportGeometry} from '../types';
 import {runwayLighting,runwayFlash,runwayLampColor} from './runwayLighting';
-import {surfaceHeight} from './surfaceHeight';
 import {solarElevation,sunDirectionFixed} from './solarLighting';
 
 export function installRunwayLights(C:typeof Cesium,v:Cesium.Viewer,airports:AirportGeometry[],options:{quality?:string;reduced?:()=>boolean;flat?:boolean}={}){
@@ -12,7 +12,7 @@ export function installRunwayLights(C:typeof Cesium,v:Cesium.Viewer,airports:Air
  const groups=selected.flatMap(airport=>airport.runways.map((runway,ri)=>{
   const center=C.Cartesian3.fromDegrees(((runway.a[0]+(((runway.b[0]-runway.a[0]+540)%360)-180)/2+540)%360)-180,(runway.a[1]+runway.b[1])/2),frame=C.Transforms.eastNorthUpToFixedFrame(center),inverse=C.Matrix4.inverseTransformation(frame,new C.Matrix4()),a=C.Matrix4.multiplyByPoint(inverse,C.Cartesian3.fromDegrees(...runway.a),new C.Cartesian3()),b=C.Matrix4.multiplyByPoint(inverse,C.Cartesian3.fromDegrees(...runway.b),new C.Cartesian3()),axis=C.Cartesian3.subtract(b,a,new C.Cartesian3()),length2=C.Cartesian3.magnitudeSquared(axis);
   const lamps=runwayLighting(runway,Math.max(low?120:60,runway.length/Math.max(4,Math.floor((budget-50)/3)))).map((lamp,i)=>({lamp,point:lights.add({id:`runway-light-${airport.id}-${ri}-${lamp.kind}-${i}`,position:C.Cartesian3.fromDegrees(lamp.lon,lamp.lat,2.5),pixelSize:3,color:C.Color.WHITE,outlineColor:C.Color.WHITE.withAlpha(.15),outlineWidth:2,distanceDisplayCondition:new C.DistanceDisplayCondition(0,35000),show:false})}));
-  return {runway,center,inverse,a,axis,length2,lamps,night:false};
+  return {airport,runway,center,inverse,a,axis,length2,lamps,night:false};
  }));
  let lastTerrain=-Infinity,lastFrame=0,near=false;
  const update=()=>{if(v.isDestroyed()||document.hidden)return;const now=performance.now();if(now-lastFrame<40)return;lastFrame=now;
@@ -25,7 +25,7 @@ export function installRunwayLights(C:typeof Cesium,v:Cesium.Viewer,airports:Air
    for(const {lamp,point} of group.lamps){
     // Atlas pavement is 1 m above the ellipsoid; lamps must clear it.
     // Ellipsoid tile chords can report negative heights, so only sample real terrain.
-    if(refresh){const ground=options.flat||v.terrainProvider instanceof C.EllipsoidTerrainProvider?0:surfaceHeight(v.scene.globe.getHeight(C.Cartographic.fromDegrees(lamp.lon,lamp.lat)));point.position=C.Cartesian3.fromDegrees(lamp.lon,lamp.lat,ground+2.5);}
+    if(refresh){const ground=options.flat||v.terrainProvider instanceof C.EllipsoidTerrainProvider?0:runwayDatum(v,group.airport);point.position=C.Cartesian3.fromDegrees(lamp.lon,lamp.lat,ground+2.5);}
     const outward=lamp.end===0?along<0:along>1,approach=['approach','crossbar','reil'].includes(lamp.kind),visibleApproach=lamp.end===0?along<.15:along>.85;
     point.show=(!approach||visibleApproach)&&(group.night||approach||lamp.kind==='threshold');
     const pulse=runwayFlash(lamp.kind,lamp.sequence,now/1000,!!reduced),hex=runwayLampColor(lamp,group.runway.length,reverse,outward);let color=colors.get(hex);if(!color){color=C.Color.fromCssColorString(hex);colors.set(hex,color);}
