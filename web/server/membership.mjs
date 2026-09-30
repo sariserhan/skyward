@@ -1,3 +1,5 @@
+import {createStripeWebhook} from './stripe-webhook.mjs';
+import {embeddedCheckout,existingSubscription,stripePrices,configuredPrices,selectedPrice,checkoutPlans,checkoutStatus} from './stripe-checkout.mjs';
 import {developmentPremium} from './development-premium.mjs';
 import {sqlitePremiumStore} from './premium-store.mjs';
 import {createPremiumTools} from './premium-tools.mjs';
@@ -44,7 +46,7 @@ export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now
   `);
   const run=(sql,...args)=>db.prepare(sql).run(...args),get=(sql,...args)=>db.prepare(sql).get(...args);
   const limits={userRequests:integer(env.SKYWARD_MONTHLY_LOOKUPS,100),globalRequests:integer(env.SKYWARD_GLOBAL_LOOKUPS,1000),budgetMicros:integer(env.SKYWARD_BUDGET_MICROS,1000000),requestMicros:integer(env.SKYWARD_REQUEST_MICROS,1000)};
-  const key=env.STRIPE_SECRET_KEY||'',price=env.STRIPE_PRICE_ID||'';
+  const key=env.STRIPE_SECRET_KEY||'',price=stripePrices(env).annual;
   // Live keys deliberately rejected: test subscriptions must never buy real flight data.
   const billing=enabled&&key.startsWith('sk_test_')&&/^price_[A-Za-z0-9]+$/.test(price);
   const inflight=new Set();
@@ -72,7 +74,7 @@ export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now
     if(!billing||!u.customer)return false;
     const q=new URLSearchParams({customer:u.customer,status:'active',limit:'100','expand[]':'data.latest_invoice'});
     const subscriptions=await stripe(`subscriptions?${q}`);
-    return (subscriptions.data||[]).some(s=>s.livemode===false&&s.status==='active'&&customerId(s.customer)===u.customer&&s.latest_invoice?.status==='paid'&&s.latest_invoice.amount_paid>0&&customerId(s.latest_invoice.customer)===u.customer&&s.items?.data?.some(i=>i.price?.id===price&&i.current_period_end*1000>now()));
+    return (subscriptions.data||[]).some(s=>s.livemode===false&&s.status==='active'&&customerId(s.customer)===u.customer&&s.latest_invoice?.status==='paid'&&s.latest_invoice.amount_paid>0&&customerId(s.latest_invoice.customer)===u.customer&&s.items?.data?.some(i=>configuredPrices(env).includes(i.price?.id)&&i.current_period_end*1000>now()));
   }
   function usage(u) {const month=new Date(now()).toISOString().slice(0,7);return {...(get('SELECT requests,cost FROM usage WHERE user_id=? AND month=?',u.id,month)||{requests:0,cost:0}),limit:limits.userRequests,month,mode:'test',actualProviderSpend:0};}
   function reserve(u) {
@@ -106,6 +108,7 @@ export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now
     const raw=Buffer.concat(chunks).toString('utf8');
     try{const value=JSON.parse(raw||'{}');if(!value||typeof value!=='object'||Array.isArray(value))throw Error();return value;}catch{fail(400,'Invalid request.');}
   }
+  const billingWebhook=createStripeWebhook({env,store:sqlitePremiumStore(db),findUser:async customer=>get('SELECT id FROM users WHERE customer=?',customer),entitlement,live:false,now});
   async function handle(req,res,url) {
     // Local development gets a private browser session on first entry. Never
     // bootstrap on mutations, static assets, shared pages, or in other modes.
@@ -119,6 +122,7 @@ export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now
     if(!/^\/api\/(account(?:\/|$)|billing(?:\/|$)|journeys(?:\/|$)|premium(?:\/|$))/.test(url.pathname))return false;
     const send=(status,value)=>{res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify(value));};
     try {
+      if(url.pathname==='/api/billing/webhook'){if(!enabled)fail(503,'Billing is not configured.');send(200,await billingWebhook(req));return true;}
       if(!['GET','POST'].includes(req.method))fail(405,'Method not allowed.');
       if(req.method==='POST'&&(req.headers.origin!==origin||!String(req.headers['content-type']||'').startsWith('application/json')))fail(403,'Use the account controls on this site.');
       throttle(req.socket.remoteAddress||'local',60,60000);
@@ -153,12 +157,17 @@ export function createMembership({env=process.env, fetchImpl=fetch, now=Date.now
       const extra=await premium.handle(path,req.method,u,b);if(extra){send(200,extra);return true;}
       if(await accountLibrary(path,req.method,u,url,b,send))return true;
       if(path==='/api/account/logout'&&req.method==='POST'){run('DELETE FROM sessions WHERE token=?',digest(token(req)));cookie(res,'',0);send(200,{ok:true});return true;}
+      if(path==='/api/billing/plans'&&req.method==='GET'){send(200,{...await checkoutPlans(env,stripe,false),monthlyLookups:limits.userRequests});return true;}
+      if(path==='/api/billing/session'&&req.method==='GET'){send(200,await checkoutStatus(url.searchParams.get('session_id'),u,stripe,entitlement,false));return true;}
       if(path==='/api/billing/checkout'&&req.method==='POST') {
+        const plan=b.plan??'annual',chosenPrice=selectedPrice(env,plan),embedded=b.uiMode==='embedded';if(b.uiMode!==undefined&&!embedded)fail(400,'Invalid checkout mode.');await checkoutPlans(env,stripe,false);
         if(inflight.has(u.id))fail(429,'A request is already running.');inflight.add(u.id);
         try {
           if(await entitlement(u))fail(409,'Premium is already active. Use Manage subscription.');
           if(!u.customer){const c=await stripe('customers',{email:u.email,'metadata[skyward_user]':u.id},`skyward-test-customer-${u.id}`);if(c.livemode!==false||!/^cus_/.test(c.id))fail(503,'Invalid checkout configuration.');run('UPDATE users SET customer=? WHERE id=?',c.id,u.id);u.customer=c.id;}
-          const checkout=await stripe('checkout/sessions',{mode:'subscription',customer:u.customer,'line_items[0][price]':price,'line_items[0][quantity]':'1',success_url:origin+'/?account=return',cancel_url:origin+'/?account=cancel',client_reference_id:u.id},`skyward-test-checkout-${u.id}-${Math.floor(now()/1800000)}`);
+          await existingSubscription(u,env,stripe);
+          if(embedded){send(200,await embeddedCheckout({env,live:false,user:u,origin,stripe,now}));return true;}
+          const checkout=await stripe('checkout/sessions',{mode:'subscription',customer:u.customer,'line_items[0][price]':chosenPrice,'line_items[0][quantity]':'1',success_url:origin+'/?account=return',cancel_url:origin+'/?account=cancel',client_reference_id:u.id},`skyward-test-checkout-${u.id}-${Math.floor(now()/1800000)}`);
           if(checkout.livemode!==false||!String(checkout.url).startsWith('https://checkout.stripe.com/'))fail(503,'Invalid checkout configuration.');
           send(200,{url:checkout.url});return true;
         }finally{inflight.delete(u.id);}

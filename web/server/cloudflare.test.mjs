@@ -1,3 +1,4 @@
+import {createHmac} from 'node:crypto';
 import test from 'node:test';import assert from 'node:assert/strict';import {DatabaseSync} from 'node:sqlite';import {readFileSync} from 'node:fs';
 import {d1Pool,d1Statement} from '../cloudflare/d1-pool.mjs';import {createD1Auth} from '../cloudflare/auth.mjs';import {createAccountMembership} from './account-membership.mjs';import {nodeHandler} from '../cloudflare/node-handler.mjs';import {handle} from '../cloudflare/router.mjs';import {resendSender} from './resend.mjs';import {publicPage} from './public-pages.mjs';
 const origin='https://skyvvard.com';
@@ -45,7 +46,7 @@ test('D1 paid library writes round-trip, preserve ownership and delete cleanly',
  const user={id:'paid-u',name:'Member',email:'paid@example.invalid',emailVerified:true};
  db.prepare('INSERT INTO user VALUES(?,?,?,?,?,?,?)').run(user.id,user.name,user.email,1,null,'2026-01-01','2026-01-01');
  db.prepare('INSERT INTO skyward_profiles(user_id,stripe_customer) VALUES(?,?)').run(user.id,'cus_test');
- const env={NODE_ENV:'production',SKYWARD_ACCOUNTS:'d1',SKYWARD_PUBLIC_ORIGIN:origin,STRIPE_SECRET_KEY:'sk_test_fixture',STRIPE_PRICE_ID:'price_fixture'};
+ const env={NODE_ENV:'production',SKYWARD_ACCOUNTS:'d1',SKYWARD_PUBLIC_ORIGIN:origin,STRIPE_SECRET_KEY:'sk_test_fixture',STRIPE_PRICE_ID:'price_fixture',STRIPE_WEBHOOK_SECRET:'whsec_fixture'};
  const auth={handler:async()=>new Response('unused'),api:{getSession:async({headers})=>headers.get('cookie')==='member=1'?{user}:null}};
  const membership=createAccountMembership({env,pool,auth,origin,transact:transaction,throttleRequest:async()=>{},fetchImpl:async()=>Response.json({data:[{livemode:false,status:'active',customer:'cus_test',latest_invoice:{customer:'cus_test',status:'paid',amount_paid:100},items:{data:[{price:{id:'price_fixture'},current_period_end:Math.floor(Date.now()/1000)+3600}]}}]})});
  const request=(path,body,member=true)=>nodeHandler(new Request(origin+path,{method:body?'POST':'GET',headers:{Origin:origin,...(member?{Cookie:'member=1'}:{}),'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined}),(req,res,url)=>membership.handle(req,res,url));
@@ -54,6 +55,9 @@ test('D1 paid library writes round-trip, preserve ownership and delete cleanly',
  r=await request('/api/account/library?kind=watchlist&key=abcdef');assert.equal(r.status,200);assert.equal((await r.json()).value.hex,'abcdef');
  assert.equal((await request('/api/account/library?kind=watchlist&key=abcdef',null,false)).status,401);
  assert.equal((await request('/api/account/dashboard')).status,200);
+ const raw=JSON.stringify({id:'evt_d1test',type:'invoice.paid',livemode:false,data:{object:{customer:'cus_test'}}}),t=Math.floor(Date.now()/1000),signature=createHmac('sha256','whsec_fixture').update(t+'.'+raw).digest('hex');
+ r=await nodeHandler(new Request(origin+'/api/billing/webhook',{method:'POST',headers:{'stripe-signature':`t=${t},v1=${signature}`},body:raw}),(req,res,url)=>membership.handle(req,res,url));assert.equal(r.status,200,await r.clone().text());assert.equal(JSON.parse(db.prepare("SELECT body FROM skyward_premium_state WHERE kind='billing'").get().body).premium,true);
+
  r=await request('/api/account/library',{kind:'watchlist',key:'abcdef',remove:true});assert.equal(r.status,200,await r.clone().text());assert.equal((await request('/api/account/library?kind=watchlist&key=abcdef')).status,404);
  }finally{db.close();}
 });

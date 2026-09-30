@@ -1,5 +1,6 @@
 import {LoadingSkeleton} from './SystemState';
 import {lazy,Suspense} from 'react';
+const EmbeddedCheckout=lazy(()=>import('./EmbeddedCheckout').then(m=>({default:m.EmbeddedCheckout})));
 const AccountWorkspace=lazy(()=>import('./AccountWorkspace').then(m=>({default:m.AccountWorkspace})));
 import {accountChanged} from '../lib/accountEvents';
 import {useEffect,useState} from 'react';
@@ -7,6 +8,7 @@ import {accountRequest,disconnectAccountNotifications,type Account} from '../lib
 export function MembershipPanel({openJourney}:{openJourney:(hex:string)=>Promise<void>}) {
   const [account,setAccount]=useState<Account|null>(null),[message,setMessage]=useState(''),[busy,setBusy]=useState(false),[register,setRegister]=useState(false),[recover,setRecover]=useState(false);
   const [resetToken,setResetToken]=useState(()=>new URLSearchParams(window.location.search).get('token')||'');
+  const [checkout,setCheckout]=useState(()=>new URLSearchParams(window.location.search).get('checkout')==='return');
   const betterAuth=account?.authProvider==='better-auth';
   useEffect(()=>{if(resetToken){const url=new URL(window.location.href);url.searchParams.delete('token');history.replaceState(history.state,'',url);}},[resetToken]);
 
@@ -37,7 +39,8 @@ export function MembershipPanel({openJourney}:{openJourney:(hex:string)=>Promise
         {betterAuth&&!register&&!recover&&!resetToken&&<><button type="button" disabled={busy} onClick={()=>setRecover(true)}>Forgot password?</button><button type="button" disabled={busy} onClick={e=>{const form=e.currentTarget.closest('form');if(!form)return;const email=form.querySelector<HTMLInputElement>('input[name="email"]');if(!email?.reportValidity())return;void perform(async()=>{await accountRequest('/api/auth/send-verification-email',{email:email.value,callbackURL:window.location.origin+'/?account=return'});setMessage('If verification is needed, an email will arrive shortly.');});}}>Resend verification email</button></>}
         </div>
       </form>:<><p>{account.user.email} · <strong>{account.user.premium?(account.mode==='live'?'Premium':'Premium · test'):'Free'}</strong></p>
-        <div className="membership-actions"><button disabled={busy||!account.billingReady} onClick={()=>void perform(()=>billing('/api/billing/checkout'))}>{account.mode==='live'?'Upgrade to Premium':'Test premium checkout'}</button><button disabled={busy||!account.billingReady} onClick={()=>void perform(()=>billing('/api/billing/portal'))}>Manage subscription</button><button disabled={busy} onClick={()=>void perform(reload)}>Refresh subscription</button><button disabled={busy} onClick={()=>void perform(async()=>{await disconnectAccountNotifications();await accountRequest(betterAuth?'/api/auth/sign-out':'/api/account/logout',{});accountChanged(true);await reload();})}>Sign out</button></div>
+        <div className="membership-actions"><button disabled={busy||!account.billingReady} onClick={()=>setCheckout(true)}>{account.mode==='live'?'Upgrade to Premium':'Test premium checkout'}</button><button disabled={busy||!account.billingReady} onClick={()=>void perform(()=>billing('/api/billing/portal'))}>Manage subscription</button><button disabled={busy} onClick={()=>void perform(reload)}>Refresh subscription</button><button disabled={busy} onClick={()=>void perform(async()=>{await disconnectAccountNotifications();await accountRequest(betterAuth?'/api/auth/sign-out':'/api/account/logout',{});accountChanged(true);await reload();})}>Sign out</button></div>
+        {checkout&&<Suspense fallback={<p role="status">Loading checkout…</p>}><EmbeddedCheckout mode={account.mode} onClose={()=>{setCheckout(false);const url=new URL(location.href);url.searchParams.delete('checkout');url.searchParams.delete('session_id');history.replaceState(history.state,'',url);void perform(reload);}}/></Suspense>}
         {!account.billingReady&&<p>Checkout setup is pending. No payment can be taken yet.</p>}
         {account.usage&&<p>Monthly {account.mode==='test'?'test ':''}lookups: {account.usage.requests} / {account.usage.limit}. {account.mode==='test'?'No provider spend in test mode.':'Provider requests count conservatively toward service limits.'} Background checks run only for journeys enabled in Premium tools.</p>}
         {account.user.premium&&<p><a href="/airport-simulation/">Play airport simulator →</a></p>}

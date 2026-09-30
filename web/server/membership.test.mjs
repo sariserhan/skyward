@@ -7,14 +7,16 @@ import {join} from 'node:path';
 import {createMembership,changesSince} from './membership.mjs';
 const NOW=1790593200000;
 async function fixture(options={}) {
-  let paid=false,down=false;const requests=[];
-  const env={SKYWARD_ACCOUNTS:'test',SKYWARD_PUBLIC_ORIGIN:'https://skyward.test',STRIPE_SECRET_KEY:'sk_test_fixture',STRIPE_PRICE_ID:'price_example',...options.env};
+  let paid=false,down=false,checkoutSession=null;const requests=[];
+  const env={SKYWARD_ACCOUNTS:'test',SKYWARD_PUBLIC_ORIGIN:'https://skyward.test',STRIPE_SECRET_KEY:'sk_test_fixture',STRIPE_PUBLISHABLE_KEY:'pk_test_fixture',STRIPE_PRICE_ID:'price_example',...options.env};
   const membership=createMembership({env,dbPath:options.dbPath||':memory:',now:()=>NOW,...options.clock,fetchImpl:async(url,request)=>{
     requests.push({url,request});assert.ok(url.startsWith('https://api.stripe.com/'));if(down)throw Error('secret-provider-error');
     let data={};
     if(url.endsWith('/customers'))data={id:'cus_test',livemode:false};
     else if(url.includes('/subscriptions?'))data={data:paid?[{customer:'cus_test',livemode:false,status:'active',latest_invoice:{status:'paid',amount_paid:900,customer:'cus_test'},items:{data:[{price:{id:'price_example'},current_period_end:NOW/1000+86400}]},...options.subscription}]:[]};
-    else if(url.endsWith('/checkout/sessions'))data={url:'https://checkout.stripe.com/c/pay/cs_test_fixture',livemode:false};
+    else if(url.endsWith('/prices/price_example'))data={id:'price_example',livemode:false,active:true,type:'recurring',unit_amount:5999,currency:'usd',recurring:{interval:'year',interval_count:1}};
+    else if(url.endsWith('/checkout/sessions')){const p=request.body;checkoutSession={id:'cs_test_fixture',client_secret:'cs_test_fixture_secret_fixture',customer:p.get('customer'),client_reference_id:p.get('client_reference_id'),mode:'subscription',status:'open',payment_status:'unpaid',url:'https://checkout.stripe.com/c/pay/cs_test_fixture',livemode:false};data=checkoutSession;}
+    else if(url.endsWith('/checkout/sessions/cs_test_fixture'))data={...checkoutSession,status:paid?'complete':'open',payment_status:paid?'paid':'unpaid'};
     else if(url.endsWith('/billing_portal/sessions'))data={url:'https://billing.stripe.com/p/session/test_fixture'};
     return {ok:true,json:async()=>data};
   }});
@@ -231,5 +233,14 @@ test('Development accounts unlock Premium libraries, tools and simulators withou
   const detail=await f.call('/api/premium/details',{key:journeyKey},cookie,{Origin:origin});assert.equal(detail.code,200);assert.equal(detail.body.mode,'demo');
   assert.equal(f.requests.length,0,'No billing or paid API requests');
   assert.equal(f.membership.db.prepare('SELECT count(*) AS n FROM local_test_access').get().n,0);
+ }finally{await f.close();}
+});
+
+test('embedded yearly checkout returns only scoped session secrets and confirms payment on server',async()=>{
+ const f=await fixture();try{const cookie=await f.register();assert.equal((await f.call('/api/billing/plans',undefined,cookie)).body.plans[0].interval,'year');
+ const checkout=await f.call('/api/billing/checkout',{uiMode:'embedded',plan:'annual'},cookie);assert.equal(checkout.code,200,JSON.stringify(checkout.body));assert.ok(checkout.body.clientSecret);assert.equal(checkout.body.url,undefined);
+ const created=f.requests.find(r=>r.url.endsWith('/checkout/sessions'));assert.equal(created.request.body.get('ui_mode'),'embedded_page');assert.equal(created.request.body.get('success_url'),null);
+ assert.equal((await f.call('/api/billing/session?session_id=cs_test_fixture',undefined,cookie)).body.premium,false);const other=await f.register('other-checkout@example.test');assert.equal((await f.call('/api/billing/session?session_id=cs_test_fixture',undefined,other)).code,404);
+ assert.equal((await f.call('/api/billing/checkout',{plan:'monthly'},cookie)).code,400);f.paid(true);assert.equal((await f.call('/api/billing/session?session_id=cs_test_fixture',undefined,cookie)).body.premium,true);
  }finally{await f.close();}
 });

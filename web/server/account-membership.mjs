@@ -1,3 +1,5 @@
+import {createStripeWebhook} from './stripe-webhook.mjs';
+import {embeddedCheckout,existingSubscription,stripePrices,configuredPrices,selectedPrice,checkoutPlans,checkoutStatus} from './stripe-checkout.mjs';
 import {createPremiumLive} from './premium-live.mjs';
 import {isDeepStrictEqual} from 'node:util';
 import {librarySummary} from './simulator-replay.mjs';
@@ -22,13 +24,13 @@ export function createAccountMembership({env=process.env,pool,auth,origin,transa
  async function transaction(lock,action){if(transact)return transact(lock,action);const db=await pool.connect();try{await db.query('BEGIN');await db.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))',[lock]);const result=await action(db);await db.query('COMMIT');return result;}catch(e){await db.query('ROLLBACK');throw e;}finally{db.release();}}
  async function user(req){const session=await auth.api.getSession({headers:fromNodeHeaders(req.headers)});if(!session?.user?.emailVerified)return null;const profile=await one('SELECT stripe_customer FROM skyward_profiles WHERE user_id=$1',[session.user.id]);return {...session.user,customer:profile?.stripe_customer};}
  const liveBilling=env.SKYWARD_BILLING_MODE==='live';
- const key=env.STRIPE_SECRET_KEY||'',price=env.STRIPE_PRICE_ID||'',billing=key.startsWith(liveBilling?'sk_live_':'sk_test_')&&/^price_[A-Za-z0-9]+$/.test(price);
+ const key=env.STRIPE_SECRET_KEY||'',price=stripePrices(env).annual,billing=key.startsWith(liveBilling?'sk_live_':'sk_test_')&&/^price_[A-Za-z0-9]+$/.test(price);
  const limits={userRequests:integer(env.SKYWARD_MONTHLY_LOOKUPS,100),globalRequests:integer(env.SKYWARD_GLOBAL_LOOKUPS,1000),budgetMicros:integer(env.SKYWARD_BUDGET_MICROS,1000000),requestMicros:integer(env.SKYWARD_REQUEST_MICROS,1000)};
  async function stripe(path,params,idem){
   if(!billing)fail(503,'Checkout is not configured yet.');
   try{const response=await fetchImpl(`https://api.stripe.com/v1/${path}`,{method:params?'POST':'GET',headers:{Authorization:`Bearer ${key}`,'Stripe-Version':'2026-08-26.dahlia',...(params?{'Content-Type':'application/x-www-form-urlencoded'}:{}),...(idem?{'Idempotency-Key':idem}:{})},body:params?new URLSearchParams(params):undefined,signal:AbortSignal.timeout(10000),redirect:'error'});if(!response.ok)throw Error();return await response.json();}catch{fail(503,'Subscription service is unavailable. No premium access was granted.');}
  }
- async function paidEntitlement(u){if(!billing||!u.customer)return false;const q=new URLSearchParams({customer:u.customer,status:'active',limit:'100','expand[]':'data.latest_invoice'}),s=await stripe(`subscriptions?${q}`);return (s.data||[]).some(v=>v.livemode===liveBilling&&v.status==='active'&&customerId(v.customer)===u.customer&&v.latest_invoice?.status==='paid'&&v.latest_invoice.amount_paid>0&&customerId(v.latest_invoice.customer)===u.customer&&v.items?.data?.some(i=>i.price?.id===price&&i.current_period_end*1000>now()));}
+ async function paidEntitlement(u){if(!billing||!u.customer)return false;const q=new URLSearchParams({customer:u.customer,status:'active',limit:'100','expand[]':'data.latest_invoice'}),s=await stripe(`subscriptions?${q}`);return (s.data||[]).some(v=>v.livemode===liveBilling&&v.status==='active'&&customerId(v.customer)===u.customer&&v.latest_invoice?.status==='paid'&&v.latest_invoice.amount_paid>0&&customerId(v.latest_invoice.customer)===u.customer&&v.items?.data?.some(i=>configuredPrices(env).includes(i.price?.id)&&i.current_period_end*1000>now()));}
  async function entitlement(u){return !!(devPremium&&u)||await paidEntitlement(u);}
  async function usage(u){const month=new Date(now()).toISOString().slice(0,7),r=await one('SELECT requests,cost FROM skyward_usage WHERE user_id=$1 AND month=$2',[u.id,month]);return {requests:r?.requests??0,cost:Number(r?.cost??0),limit:limits.userRequests,month,mode:liveBilling?'live':'test',actualProviderSpend:liveBilling?null:0};}
  async function throttle(req){if(throttleRequest)return throttleRequest(req);const expiry=(Math.floor(now()/60000)+1)*60000,k=createHash('sha256').update(`${req.socket.remoteAddress}:${expiry}`).digest('hex');const r=await one('INSERT INTO skyward_rate_limits VALUES($1,1,$2) ON CONFLICT(key) DO UPDATE SET count=skyward_rate_limits.count+1 RETURNING count',[k,expiry]);await pool.query('DELETE FROM skyward_rate_limits WHERE expires<$1',[now()]);if(r.count>120)fail(429,'Too many attempts. Please try again shortly.');}
@@ -81,22 +83,30 @@ export function createAccountMembership({env=process.env,pool,auth,origin,transa
     });return {...result,usage:await usage(u)};
  }
  const premium=createPremiumTools({store:postgresPremiumStore(pool,transaction),observations,listJourneys:async id=>(await rows('SELECT j.body,c.body AS detail FROM skyward_journeys j LEFT JOIN skyward_checks c ON j.user_id=c.user_id AND j.key=c.key WHERE j.user_id=$1',[id])).map(r=>({...r.body,details:r.detail})),entitlement,env,now,userById:async id=>{const u=await one('SELECT id,email FROM "user" WHERE id=$1 AND "emailVerified"=true',[id]);if(!u)return null;return {...u,customer:(await one('SELECT stripe_customer FROM skyward_profiles WHERE user_id=$1',[id]))?.stripe_customer};},readJourney:async(id,key)=>{const r=await one('SELECT j.body,c.body AS detail FROM skyward_journeys j LEFT JOIN skyward_checks c ON j.user_id=c.user_id AND j.key=c.key WHERE j.user_id=$1 AND j.key=$2',[id,key]);return r?{...r.body,details:r.detail}:null;},lookup});
+ const billingWebhook=createStripeWebhook({env,store:postgresPremiumStore(pool,transaction),findUser:async customer=>{const row=await one('SELECT user_id FROM skyward_profiles WHERE stripe_customer=$1',[customer]);return row?{id:row.user_id}:null;},entitlement:paidEntitlement,live:liveBilling,now});
  async function handle(req,res,url){
   if(await premium.publicHandle(req,res,url))return true;
   if(url.pathname.startsWith('/api/auth/')){res.setHeader('Cache-Control','no-store');req.headers['x-skyward-client-ip']=req.socket.remoteAddress||'127.0.0.1';await authHandler(req,res);return true;}
   if(!/^\/api\/(account(?:\/|$)|billing(?:\/|$)|journeys(?:\/|$)|premium(?:\/|$))/.test(url.pathname))return false;
   const send=(status,value)=>{res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify(value));};
   try{
+   if(url.pathname==='/api/billing/webhook'){send(200,await billingWebhook(req));return true;}
    if(!['GET','POST'].includes(req.method))fail(405,'Method not allowed.');
    if(req.method==='POST'&&(req.headers.origin!==origin||!String(req.headers['content-type']||'').startsWith('application/json')))fail(403,'Use the account controls on this site.');
    await throttle(req);const u=await user(req),path=url.pathname;
    if(path==='/api/account'&&req.method==='GET'){send(200,{enabled:true,authProvider:'better-auth',billingReady:billing,liveDetailsReady:live.enabled,mode:liveBilling?'live':'test',user:u?{email:u.email,premium:await entitlement(u)}:null,usage:u?await usage(u):null});return true;}
    if(!u)fail(401,'Sign in with a verified email to continue.');
    const b=req.method==='POST'?await body(req,path):{};const extra=await premium.handle(path,req.method,u,b);if(extra){send(200,extra);return true;}const result=await library(path,req.method,u,url,b);if(result){send(200,result);return true;}
+   if(path==='/api/billing/plans'&&req.method==='GET'){send(200,{...await checkoutPlans(env,stripe,liveBilling),monthlyLookups:limits.userRequests});return true;}
+   if(path==='/api/billing/session'&&req.method==='GET'){send(200,await checkoutStatus(url.searchParams.get('session_id'),u,stripe,entitlement,liveBilling));return true;}
    if(path==='/api/billing/checkout'&&req.method==='POST'){
+    if(liveBilling&&!env.STRIPE_WEBHOOK_SECRET?.startsWith('whsec_'))fail(503,'Live billing notifications must be configured first.');
+    const plan=b.plan??'annual',chosenPrice=selectedPrice(env,plan),embedded=b.uiMode==='embedded';if(b.uiMode!==undefined&&!embedded)fail(400,'Invalid checkout mode.');await checkoutPlans(env,stripe,liveBilling);
     if(await entitlement(u))fail(409,'Premium is already active. Use Manage subscription.');
     if(!u.customer){const c=await stripe('customers',{email:u.email,'metadata[skyward_user]':u.id},`skyward-${liveBilling?'live':'test'}-customer-${u.id}`);if(c.livemode!==liveBilling||!/^cus_/.test(c.id))fail(503,'Invalid checkout configuration.');await pool.query('INSERT INTO skyward_profiles VALUES($1,$2) ON CONFLICT(user_id) DO UPDATE SET stripe_customer=excluded.stripe_customer',[u.id,c.id]);u.customer=c.id;}
-    const c=await stripe('checkout/sessions',{mode:'subscription',customer:u.customer,'line_items[0][price]':price,'line_items[0][quantity]':'1',success_url:origin+'/?account=return',cancel_url:origin+'/?account=cancel',client_reference_id:u.id},`skyward-${liveBilling?'live':'test'}-checkout-${u.id}-${Math.floor(now()/1800000)}`);
+    await existingSubscription(u,env,stripe);
+    if(embedded){send(200,await embeddedCheckout({env,live:liveBilling,user:u,origin,stripe,now}));return true;}
+    const c=await stripe('checkout/sessions',{mode:'subscription',customer:u.customer,'line_items[0][price]':chosenPrice,'line_items[0][quantity]':'1',success_url:origin+'/?account=return',cancel_url:origin+'/?account=cancel',client_reference_id:u.id},`skyward-${liveBilling?'live':'test'}-checkout-${u.id}-${Math.floor(now()/1800000)}`);
     if(c.livemode!==liveBilling||!String(c.url).startsWith('https://checkout.stripe.com/'))fail(503,'Invalid checkout configuration.');send(200,{url:c.url});return true;
    }
    if(path==='/api/billing/portal'&&req.method==='POST'){if(!u.customer)fail(409,'No subscription account exists yet.');const p=await stripe('billing_portal/sessions',{customer:u.customer,return_url:origin+'/?account=return'});if(!String(p.url).startsWith('https://billing.stripe.com/'))fail(503,'Subscription management is unavailable.');send(200,{url:p.url});return true;}

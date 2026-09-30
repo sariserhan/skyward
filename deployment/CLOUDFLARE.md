@@ -44,6 +44,8 @@ Nothing below was executed remotely during implementation.
 9. Run `npm run build:cloudflare` and `npm run assets:r2:plan`. Review total R2 usage and retained releases. A release is capped at 4 GiB locally; keep only current and previous supported releases within the 8 GiB storage budget. Upload explicitly with `SKYWARD_R2_UPLOAD_APPROVED=1 node scripts/upload-cloudflare-assets.mjs --upload`. This may take time; an interrupted upload can be rerun. Set `SKYWARD_ASSET_RELEASE` in Wrangler to the generated release only after verifying the upload.
 10. Run the checks below, then explicitly deploy with `npx wrangler deploy`. Custom-domain routes register the apex and www domain. Review Cloudflare's zone/DNS changes before publishing.
 
+See [annual embedded Stripe checkout and webhook setup](STRIPE.md) for the product, price ID, required keys, webhook events and test procedure.
+
 ## Optional services and cost controls
 
 Stripe and paid aviation remain in **test/demo mode** by default. Production payments, paid flight lookups, provider permissions and credentials require separate setup; free accounts cannot call the paid provider. Existing server-side entitlement and allowance checks remain enforced.
