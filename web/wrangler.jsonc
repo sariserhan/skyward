@@ -7,7 +7,7 @@
   "workers_dev": false,
   "preview_urls": false,
   "routes": [{"pattern":"skyvvard.com","custom_domain":true},{"pattern":"www.skyvvard.com","custom_domain":true}],
-  "assets": {"directory":".cloudflare/assets","binding":"ASSETS","run_worker_first":["/api/*","/watch/models/*","/watch","/watch/","/watch/index.html"],"not_found_handling":"none"},
+  "assets": {"directory":".cloudflare/assets","binding":"ASSETS","run_worker_first":["/api/*","/watch","/watch/","/watch/index.html"],"not_found_handling":"none"},
   "d1_databases": [{"binding":"DB","database_name":"skyward-accounts","database_id":"00000000-0000-0000-0000-000000000000","migrations_dir":"cloudflare/migrations"}],
   "r2_buckets": [{"binding":"MEDIA","bucket_name":"skyward-assets"}],
   "durable_objects": {"bindings":[{"name":"COORDINATOR","class_name":"SkywardCoordinator"}]},

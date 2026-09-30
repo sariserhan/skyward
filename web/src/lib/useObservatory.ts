@@ -1,3 +1,4 @@
+import {nextObservationLookup} from './observationPolling';
 import {useAccountWatches} from './useAccountWatches';
 import {qualityRows} from './positionQuality';
 import {retainMotion} from './motionHistory';
@@ -84,28 +85,30 @@ export function useObservatory(airport: AirportId, alertsEnabled = false) {
     if(!alertsEnabled||!watchedKey)return;
     const keys=watchedKey.split(',');let cursor=0,busy=false,alive=true;
     const controller=new AbortController();
-    const poll=async()=>{if(busy||document.hidden)return;busy=true;try{const data=await fetchFeed(`/api/search?kind=hex&q=${keys[cursor++%keys.length]}`,controller.signal);if(alive)data.aircraft=ingest(data.aircraft);}catch{/* Existing timestamps age; failures never create new fixes. */}finally{busy=false;}};
+    const poll=async()=>{if(busy||document.hidden)return;const hex=keys[cursor++%keys.length];if(nextObservationLookup(recent.current.get(hex),Date.now())>Date.now())return;busy=true;try{const data=await fetchFeed(`/api/search?kind=hex&q=${hex}`,controller.signal);if(alive)data.aircraft=ingest(data.aircraft);}catch{/* Existing timestamps age; failures never create new fixes. */}finally{busy=false;}};
     void poll();const timer=setInterval(poll,6000);document.addEventListener('visibilitychange',poll);
     return()=>{alive=false;controller.abort();clearInterval(timer);document.removeEventListener('visibilitychange',poll);};
   },[alertsEnabled,watchedKey,ingest]);
   const selectedHex = selected?.hex;
   useEffect(() => {
-    if (!selectedHex) return;
+    if (!selectedHex || selectedHex.startsWith('skyward-')) return;
     let alive = true, busy = false;let failures=0,nextAttempt=0;
     const controller = new AbortController();
     async function follow() {
       if (busy || document.hidden || Date.now()<nextAttempt) return;
-      busy = true;
+      const observed=nextObservationLookup(selectedRef.current??undefined,Date.now());
+      if(observed>Date.now()){nextAttempt=observed;setSelectedError('');return;}
+      busy = true;const startedAt=Date.now();
       try {
         const data = await fetchFeed(`/api/search?kind=hex&q=${selectedHex}`, controller.signal);
         if (!alive) return;
-        failures=0;nextAttempt=0;
+        failures=0;nextAttempt=startedAt+10000;
         if (data.aircraft.length) { data.aircraft=ingest(data.aircraft); setSelectedError(''); }
         else setSelectedError('No current observation. Showing the last known position.');
       } catch { nextAttempt=Date.now()+Math.min(60000,10000*2**Math.min(3,failures++));if (alive) setSelectedError('Tracking feed unavailable. Awaiting a fresh position; arrival unconfirmed.'); }
       finally { busy = false; }
     }
-    void follow(); const id = window.setInterval(follow, 10000);window.addEventListener('online',follow);document.addEventListener('visibilitychange',follow);
+    void follow(); const id = window.setInterval(follow, 1000);window.addEventListener('online',follow);document.addEventListener('visibilitychange',follow);
     return () => { alive = false; controller.abort(); clearInterval(id);window.removeEventListener('online',follow);document.removeEventListener('visibilitychange',follow); };
   }, [selectedHex, ingest]);
   const lookup = useCallback(async (kind: string, q: string) => {

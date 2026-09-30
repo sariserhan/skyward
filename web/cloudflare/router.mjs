@@ -24,7 +24,8 @@ export async function handle(request,env){
   if(request.body){const reader=request.body.getReader(),chunks=[];let size=0;while(true){const part=await reader.read();if(part.done)break;size+=part.value.length;if(size>65536){await reader.cancel();return Response.json({error:'Request too large'},{status:413});}chunks.push(part.value);}const body=new Uint8Array(size);let offset=0;for(const chunk of chunks){body.set(chunk,offset);offset+=chunk.length;}request=new Request(request,{body});}
   return coordinator(env).fetch(request);
  }
- if(path.startsWith('/watch/models/'))return r2Asset(request,env,'watch/models/'+path.slice('/watch/models/'.length));
+ // Public models are ordinary static assets; missing files must not trigger R2 reads.
+ if(path.startsWith('/watch/models/')){const response=await env.ASSETS.fetch(request);return response.status===404?error(404):response;}
  if(['/watch','/watch/','/watch/index.html','/index.html'].includes(path))return Response.redirect(url.origin+'/'+url.search,308);
  if(['/airport-simulation','/flight-simulator'].includes(path))return Response.redirect(url.origin+path+'/'+url.search,308);
  const page=publicPage(url,env);if(page){if(page.location)return new Response(null,{status:page.status,headers:{Location:page.location}});return new Response(request.method==='HEAD'?null:page.body,{status:page.status,headers:{'Content-Type':page.type,'Cache-Control':page.status===200?'public, max-age=300':'no-store'}});}

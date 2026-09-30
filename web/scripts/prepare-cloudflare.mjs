@@ -1,11 +1,11 @@
 import {readdir,readFile,writeFile,mkdir,rm,cp,stat} from 'node:fs/promises';
-import {resolve,relative,extname} from 'node:path';
+import {resolve,relative} from 'node:path';
 import {createHash} from 'node:crypto';
 const root=resolve(import.meta.dirname,'..'),dist=resolve(root,'dist'),out=resolve(root,'.cloudflare'),assets=resolve(out,'assets');
 await rm(assets,{recursive:true,force:true});await mkdir(resolve(assets,'watch'),{recursive:true});
-await writeFile(resolve(assets,'_headers'),'/watch/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n/watch/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n/offline-worker.js\n  Cache-Control: no-cache\n');
+await writeFile(resolve(assets,'_headers'),'/watch/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n/watch/models/*\n  Cache-Control: public, max-age=3600\n/watch/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n/offline-worker.js\n  Cache-Control: no-cache\n');
 const media=[];let staticCount=0;
-async function walk(dir,prefix){for(const entry of await readdir(dir,{withFileTypes:true})){const path=resolve(dir,entry.name),key=prefix+entry.name;if(entry.isDirectory())await walk(path,key+'/');else{const info=await stat(path);if(key.startsWith('watch/models/')||key.startsWith('airport-simulation/')){media.push({key,file:relative(root,path),bytes:info.size,sha256:createHash('sha256').update(await readFile(path)).digest('hex')});}else{if(info.size>25*1024*1024)throw Error(`Asset exceeds static hosting limit: ${key}`);await mkdir(resolve(assets,key,'..'),{recursive:true});await cp(path,resolve(assets,key));staticCount++;}}}}
+async function walk(dir,prefix){for(const entry of await readdir(dir,{withFileTypes:true})){const path=resolve(dir,entry.name),key=prefix+entry.name;if(entry.isDirectory())await walk(path,key+'/');else{const info=await stat(path);if(key.startsWith('airport-simulation/')){media.push({key,file:relative(root,path),bytes:info.size,sha256:createHash('sha256').update(await readFile(path)).digest('hex')});}else{if(info.size>25*1024*1024)throw Error(`Asset exceeds static hosting limit: ${key}`);await mkdir(resolve(assets,key,'..'),{recursive:true});await cp(path,resolve(assets,key));staticCount++;}}}}
 await walk(dist,'watch/');await cp(resolve(dist,'offline-worker.js'),resolve(assets,'offline-worker.js'));
 try{await stat(resolve(root,'../dist/web/index.html'));await walk(resolve(root,'../dist/web'),'airport-simulation/');}catch(e){if(e.code!=='ENOENT')throw e;console.log('Airport game export is absent; export Godot before enabling that simulator in production.');}
 if(staticCount>19000)throw Error('Static asset count exceeds the conservative free-plan budget');

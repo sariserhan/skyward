@@ -42,7 +42,9 @@ pages. Deleting rows does not imply an immediate reduction in allocated DB size.
 - D1: Better Auth users/sessions, subscription identifiers, bounded saved-flight
   metadata, settings, simulator progress, idempotency and quota records. No model
   binaries, audio, screenshots, raw provider payload archives or per-frame updates.
-- R2: deduplicated/versioned aircraft assets and explicitly bounded cloud recordings.
+- Static Assets: public aircraft models/textures, scripts and scenery files up to
+  the static-file size limit. Builds fail rather than silently moving models to a billed path.
+- R2: versioned private airport-game exports and explicitly bounded cloud recordings.
   Standard storage only. Recordings remain local/downloadable by default; cloud
   recording upload is disabled until storage and operation admission controls exist.
 - Browser: simulated traffic, motion interpolation, current flight trails and local
@@ -168,3 +170,35 @@ These boundaries apply now to the existing account implementations. They do not
 activate D1, migrate credentials or deploy Workers/R2. The global provider counters,
 D1 adapter/runtime, retention jobs and R2 admission controls above remain release
 requirements. Do not describe those provider-wide protections as implemented.
+
+
+## Request reduction implemented (2026-09-30)
+
+- All 3,936 current public model/texture files now use Workers Static Assets, with
+  their original URLs and identical bytes. No Worker execution, coordinator request
+  or R2 read is required to serve an existing model. One-hour browser caching keeps
+  stable model URLs updateable; hashed app bundles retain immutable caching.
+- Prepared static files increased from 1,641 to 5,577, below the build's 19,000-file
+  ceiling. Private R2 release content fell from 3,954 objects / approximately 921 MiB
+  to 18 objects / 98.9 MiB: 862,064,981 bytes removed per retained release. These are
+  local build measurements, not production request or billing measurements.
+- Selected-flight lookups reuse valid regional fixes within the existing ten-second
+  freshness window. A one-second local scheduler resumes lookup when the actual
+  source observation expires; this timer is not one network request per second.
+  Missing, rejected, future-dated and stale observations do not suppress lookups.
+  Watchlist polling also skips flights with fresh fixes. Synthetic aircraft do not
+  generate selected-flight provider lookups.
+- Existing hidden-tab pauses and API polling cadences remain. Rendering, animation,
+  model detail and camera coverage are unchanged. No account or paid response was
+  made publicly cacheable; private game files still require server-side access checks.
+
+Camera traffic still uses up to five area requests every successful 35-second cycle;
+selected-airport boards poll every 25 seconds. Selected-flight lookup can use up to
+360 requests/hour, less when regional observations satisfy freshness. Provider-side
+cache hits still consume Worker requests. Streaming region batching and cross-tab
+coordination are not implemented by this change.
+
+Before launch, measure Skyward plus Visitorping in the account dashboard. The current
+50,000 coordinator admissions/day setting excludes static files but is not a cap on
+all Worker requests, and rejected requests still count. Do not treat the older
+capacity targets in this document as implemented account-wide enforcement.

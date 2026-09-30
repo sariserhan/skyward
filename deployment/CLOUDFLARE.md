@@ -8,7 +8,7 @@ The product name remains **Skyward**. The canonical domain is **https://skyvvard
 - A Worker routes public HTML, SEO, API requests and authenticated simulators.
 - One SQLite-backed Durable Object coordinates provider queues, account transactions and usage checks. This intentionally starts as one bounded coordinator, not an untested horizontally scaled system. Password hashing happens here rather than in the front Worker; keep the secure Better Auth defaults.
 - D1 stores Better Auth users, sessions, verification and rate-limit records, billing identifiers, bounded saves, journeys and Premium metadata. It does **not** store live position streams, models, music, or full replay recordings.
-- R2 stores immutable releases of aircraft assets and the separate Godot airport game. Private game assets pass through the subscription check. The existing Aurowall library remains a separate integration; its credentials are not assumed to belong to Skyward's asset bucket.
+- Public aircraft models and textures use Workers Static Assets, bypassing Worker execution and R2 reads. R2 stores immutable releases of the separate Godot airport game. Private game assets pass through the subscription check. The existing Aurowall library remains a separate integration; its credentials are not assumed to belong to Skyward's asset bucket.
 - Better Auth with Resend handles account verification and password recovery. Five active sessions per account; daily bounded cleanup of expired sessions/tokens/rate limits and unverified accounts older than seven days.
 - Existing account/Premium handlers are shared with the Node deployment. D1 application writes use atomic `batch()` commits after validation. All app writes must stay behind the same coordinator: direct second writers would invalidate the serialization assumption.
 - Public contact page and email button target **contact@skyvvard.com**.
@@ -27,7 +27,7 @@ npm run dev:cloudflare
 
 Open `http://localhost:8787`. Copy `.dev.vars.example` to `.dev.vars` for local settings. Without Resend and auth secrets, the globe/public pages work and accounts clearly report unavailable. Supplying a real Resend key can send real verification mail; automated tests inject a fake sender. Do not use live secrets for automated testing.
 
-Model/game requests require R2 objects. The preparation step writes `.cloudflare/release.json` with the exact release, objects and hashes. Normal local Node development still serves bundled models directly and remains available with the existing start commands. `SKYWARD_ACCOUNTS=d1` is for the Worker, not `server/index.mjs`.
+Public model requests use bundled static files. Private airport-game requests require R2 objects. The preparation step writes `.cloudflare/release.json` with the exact release, objects and hashes. Normal local Node development still serves bundled models directly and remains available with the existing start commands. `SKYWARD_ACCOUNTS=d1` is for the Worker, not `server/index.mjs`.
 
 ## Provision when ready
 
@@ -60,7 +60,7 @@ The default cron is daily retention only. Before enabling automatic Premium moni
 
 - `npm test`, `npm run build:cloudflare`, `npm run db:migrate:d1:local`, `npm run check:cloudflare`.
 - Root and airport pages render, sitemap uses skyvvard.com, www redirects, unknown URLs return 404, and account/private pages have `noindex` and `no-store`.
-- Fetch a model, texture and large byte range from the uploaded R2 release; check browser model loading. Confirm unpaid clients cannot fetch game assets or paid flight data.
+- Fetch a model and texture from Static Assets without an R2 release configured; check browser model loading. Fetch a large private-game byte range from the uploaded R2 release with a paid session. Confirm unpaid clients cannot fetch game assets or paid flight data.
 - Verify a real Resend test account receives verification and reset mail, unverified sign-in is blocked, old sessions are revoked after reset, and contact mail reaches your inbox.
 - Verify account ownership, save conflicts, billing test checkout, route/weather/feed behavior and both simulators. Validate sustained request counts, D1 reads/writes, CPU and R2 operations on a staging deployment before opening public signups widely.
 - `/healthz` reports wiring status, **not** verified DNS, database migration state, email delivery or R2 object existence.
