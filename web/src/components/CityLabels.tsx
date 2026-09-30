@@ -1,6 +1,6 @@
 import {overlapsAircraft,type ScreenBox} from '../lib/labelPriority';
 import {publishNearbyFeatures} from '../lib/nearbyFeatures';
-import type {NearbyFeature} from '../lib/placeLabels';
+import {placeLabelZoom,type NearbyFeature} from '../lib/placeLabels';
 import {readFlightPreferences} from '../lib/flightPreferences';
 import {cityTiles} from '../lib/cityBuildings';
 import {sharedLiveMotion} from '../lib/liveMotion';
@@ -20,7 +20,7 @@ export function CityLabels({viewer,cities,enabled,large,flight=false,aircraftHex
    const picked=v.camera.pickEllipsoid(new C.Cartesian2(v.canvas.clientWidth*.5,v.canvas.clientHeight*.65),v.scene.globe.ellipsoid);
    const frame=aircraftHex?sharedLiveMotion.displayed(aircraftHex):null;
    const center=picked?C.Cartographic.fromCartesian(picked):frame?C.Cartographic.fromDegrees(frame.lon,frame.lat):v.camera.positionCartographic;
-   const tiles=cityTiles(C.Math.toDegrees(center.longitude),C.Math.toDegrees(center.latitude),'low',9),key=tiles.map(t=>t.key).join('|');desired=tiles.map(t=>t.key);
+   const tiles=cityTiles(C.Math.toDegrees(center.longitude),C.Math.toDegrees(center.latitude),'low',placeLabelZoom(v.camera.positionCartographic.height)),key=tiles.map(t=>t.key).join('|');desired=tiles.map(t=>t.key);
    if(key!==lastKey){lastKey=key;publishNearbyFeatures(desired.flatMap(k=>features.get(k)??[]));publish();}
    for(const tile of tiles)if(pending.size<4&&!cache.has(tile.key)&&!pending.has(tile.key)&&(failed.get(tile.key)??0)<Date.now()){pending.add(tile.key);worker.postMessage({tile,limit:150,places:true});}
   };
