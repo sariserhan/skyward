@@ -338,11 +338,19 @@ prevent repeated warnings. **Captain update** requests a fresh briefing.
 
 These are scripted, simulated voices, not a real aircraft's radio or cabin audio.
 No gate, landing clearance or arrival time is invented. Local English system
-voices are used without a paid service; if none is installed, a transcript is shown.
+voices are preferred without a paid service; browser English voices or the browser
+default are also supported. Browser voices may use an online speech service.
+A transcript remains available if speech cannot play.
 Enable voices with a click each time you enter a flight. Volume follows **Radio**
 and **Cabin** in Sound mix. Backgrounding or leaving the view stops its speech.
 The flight simulator also offers captain announcements alongside its existing
 simulated tower instructions.
+
+In the globe’s **Tower view**, enable **Tower radio** to hear simulated tower calls
+and pilot readbacks for nearby aircraft, or use **Test radio** to check playback.
+The landing/taxi/takeoff demonstration has phase-matched dialogue too. **Radio
+volume** shares the Sound mix setting; engine ambience softens during speech.
+Demonstration pauses, mute, hidden tabs and leaving the tower stop its radio.
 
 ### Atmosphere and Advanced handling
 
