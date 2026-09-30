@@ -13,8 +13,8 @@ export function capturePerformance(viewer:Cesium.Viewer,progress:(seconds:number
  try{if(PerformanceObserver.supportedEntryTypes.includes('long-animation-frame')){
   animationObserver=new PerformanceObserver(list=>{if(document.hidden)return;for(const entry of list.getEntries()){
    if(longAnimationFrames.length>=80)break;
-   const e=entry as PerformanceEntry&{blockingDuration?:number;scripts?:{duration:number;sourceURL?:string;sourceFunctionName?:string;forcedStyleAndLayoutDuration?:number}[]};
-   longAnimationFrames.push({atMs:e.startTime-captureStart,duration:e.duration,blockingDuration:e.blockingDuration,scripts:[...(e.scripts??[])].sort((a,b)=>b.duration-a.duration).slice(0,5).map(s=>({duration:s.duration,source:s.sourceURL?(()=>{try{return new URL(s.sourceURL,location.origin).pathname;}catch{return '';}})():'',function:s.sourceFunctionName,layoutMs:s.forcedStyleAndLayoutDuration}))});
+   const e=entry as PerformanceEntry&{blockingDuration?:number;scripts?:{duration:number;sourceURL?:string;sourceFunctionName?:string;forcedStyleAndLayoutDuration?:number;sourceCharPosition?:number;invoker?:string;invokerType?:string}[]};
+   longAnimationFrames.push({atMs:e.startTime-captureStart,duration:e.duration,blockingDuration:e.blockingDuration,scripts:[...(e.scripts??[])].sort((a,b)=>b.duration-a.duration).slice(0,5).map(s=>({duration:s.duration,source:s.sourceURL?(()=>{try{return new URL(s.sourceURL,location.origin).pathname;}catch{return '';}})():'',function:s.sourceFunctionName,sourceCharPosition:s.sourceCharPosition,invoker:s.invoker,invokerType:s.invokerType,layoutMs:s.forcedStyleAndLayoutDuration}))});
   }});animationObserver.observe({entryTypes:['long-animation-frame']});
  }}catch{/* Attribution is optional; ordinary long-task timing remains available. */}
  const pre=viewer.scene.preRender.addEventListener(()=>{start=performance.now();});

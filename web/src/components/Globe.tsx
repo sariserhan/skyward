@@ -456,10 +456,10 @@ export function Globe(p: Props) {
       }
       for (const [gateIndex,g] of airport.gates.entries()) added.push(v.entities.add({ id: `facility-${airport.id}-${buildingIndex+gateIndex}`, position: C.Cartesian3.fromDegrees(...g.position, 6), point: {pixelSize:4,color:C.Color.fromCssColorString('#8fdfc8'),disableDepthTestDistance:Number.POSITIVE_INFINITY,distanceDisplayCondition:new C.DistanceDisplayCondition(0,12000)}, label: { text: g.label, font: p.preferences.largeLabels?'15px sans-serif':'11px sans-serif', disableDepthTestDistance:Number.POSITIVE_INFINITY, pixelOffset:new C.Cartesian2(0,-12), style:C.LabelStyle.FILL_AND_OUTLINE, outlineColor:C.Color.fromCssColorString('#09141c'),outlineWidth:3, fillColor: C.Color.fromCssColorString('#afc6d0'), distanceDisplayCondition: new C.DistanceDisplayCondition(0, 3000) } }));
     }
-    // This small, fixed airport snapshot is built synchronously so airport details
-    // do not wait behind worldwide polygon jobs in Cesium's shared worker pool.
-    const surfaces = v.scene.primitives.add(new C.Primitive({ show:p.preferences.structures||p.camera.type==='tower'||flightOpen, geometryInstances: meshes, appearance: buildingAppearance(C,airports[0]?.lon??0,airports[0]?.lat??0), asynchronous: false }));
-    const taxiways = v.scene.primitives.add(new C.Primitive({ show:p.preferences.structures||p.camera.type==='tower'||flightOpen, geometryInstances: lines, appearance: new C.PolylineColorAppearance({ translucent: false }), asynchronous: false }));
+    // Airport polygons and taxiways can be large. Tessellate in Cesium workers
+    // rather than blocking camera animation when an airport snapshot arrives.
+    const surfaces = v.scene.primitives.add(new C.Primitive({ show:p.preferences.structures||p.camera.type==='tower'||flightOpen, geometryInstances: meshes, appearance: buildingAppearance(C,airports[0]?.lon??0,airports[0]?.lat??0), asynchronous: true }));
+    const taxiways = v.scene.primitives.add(new C.Primitive({ show:p.preferences.structures||p.camera.type==='tower'||flightOpen, geometryInstances: lines, appearance: new C.PolylineColorAppearance({ translucent: false }), asynchronous: true }));
     if(!terrainActive)added.forEach(e=>{e.show=p.preferences.labels;});
     v.scene.requestRender(); return () => { if (!v.isDestroyed()) { for (const e of added) v.entities.remove(e); v.scene.primitives.remove(surfaces); v.scene.primitives.remove(taxiways); } };
   }, [p.geometry,p.arrivalGeometry, ready, satellite, p.preferences.structures, p.preferences.labels,p.preferences.largeLabels,terrainActive,p.camera.type,flightOpen]);

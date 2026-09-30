@@ -12,6 +12,9 @@ def run(page):
  page.wait_for_function("__allPrimitives().some(p=>p.appearance?.material?.type==='SkywardBuildingFade'&&p.appearance.material.uniforms.visibility<1)",timeout=30000)
  page.wait_for_function("__viewer.dataSources._dataSources.some(s=>s.name==='mapped-airport-detail'&&s.entities.values.some(e=>e.id.startsWith('illustrative-bridge-')))")
  page.wait_for_function("__viewer.dataSources._dataSources.some(s=>s.entities.values.some(e=>e.id.startsWith('runway-surface-')))")
+ # Airport meshes must finish through Cesium's worker pipeline, without a
+ # synchronous tessellation on the animation thread.
+ page.wait_for_function("__allPrimitives().some(p=>p.appearance?.material?.type==='SkywardBuildingFade'&&p.allowPicking!==false&&p.ready&&p.asynchronous)",timeout=60000)
  page.wait_for_timeout(3000)
  assert page.evaluate("__allPrimitives().some(p=>p.appearance?.material?.type==='SkywardBuildingFade'&&p.appearance.material.uniforms.visibility===1)")
  # Tile coordinates must be uniforms: literal coordinates make every tile compile
