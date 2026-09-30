@@ -1,3 +1,4 @@
+import {createGlobalBasemap} from '../lib/globalBasemap';
 import {sceneryAhead} from '../lib/sceneryAhead';
 import {buildingAppearance} from '../lib/buildingAppearance';
 import {createModelWarmup} from '../lib/sceneWarmup';
@@ -323,14 +324,15 @@ export function Globe(p: Props) {
   useEffect(() => {
     const v=viewer.current; if(!ready || !v) return;
     const C=window.Cesium;
-    let alive=true, layer: Cesium.ImageryLayer | undefined, failures=0;
+    let alive=true, layer: Cesium.ImageryLayer | undefined, base:Cesium.ImageryLayer|undefined, failures=0;
     let removeError = () => {};
     setImageryReady(false);setImageryError('');
     if(p.preferences.basemap !== 'satellite') return;
+    base=v.imageryLayers.addImageryProvider(createGlobalBasemap(C,BASE),0);
     const fallback=()=>{
       if(!alive || v.isDestroyed())return;
       if(layer && v.imageryLayers.contains(layer))v.imageryLayers.remove(layer,true);
-      layer=undefined;setImageryReady(false);
+      layer=undefined;if(base&&v.imageryLayers.contains(base))v.imageryLayers.remove(base,true);base=undefined;setImageryReady(false);
       setImageryError('Satellite imagery unavailable. Showing the atlas.');
       if(atlas.current)atlas.current.show=!hasBaseImagery(v);
       v.scene.requestRender();
@@ -342,10 +344,11 @@ export function Globe(p: Props) {
       // Keep provider metadata attribution visible at every zoom level.
       if(provider.credit)provider.credit.showOnScreen=true;
       removeError=provider.errorEvent.addEventListener(()=>{if(++failures>=4)fallback();});
+      if(!base)base=v.imageryLayers.addImageryProvider(createGlobalBasemap(C,BASE),0);
       layer=v.imageryLayers.addImageryProvider(provider);
       setImageryError('');setImageryReady(true);v.scene.requestRender();
     }).catch(()=>{clearTimeout(timer);fallback();});
-    return()=>{alive=false;clearTimeout(timer);removeError();if(!v.isDestroyed()&&layer&&v.imageryLayers.contains(layer))v.imageryLayers.remove(layer,true);};
+    return()=>{alive=false;clearTimeout(timer);removeError();if(!v.isDestroyed()){if(layer&&v.imageryLayers.contains(layer))v.imageryLayers.remove(layer,true);if(base&&v.imageryLayers.contains(base))v.imageryLayers.remove(base,true);}};
   },[ready,p.preferences.basemap,imageryAttempt]);
   useEffect(()=>{
     const v=viewer.current;if(!v||!ready)return;

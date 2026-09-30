@@ -1,3 +1,4 @@
+import {createGlobalBasemap} from '../lib/globalBasemap';
 import {FlightVoices} from './FlightVoices';
 import {installTouchdownEffects} from '../lib/touchdownEffects';
 import {WaterSurface} from './WaterSurface';
@@ -38,6 +39,7 @@ function FlightScene({plan,geometry,state,camera,taxi,onViewer}:{onViewer:(v:Ces
   const timer=setInterval(()=>{if(!window.Cesium||!root.current||disposed)return;clearInterval(timer);try{
    const C=window.Cesium;viewer=new C.Viewer(root.current,{baseLayer:false,animation:false,timeline:false,baseLayerPicker:false,geocoder:false,homeButton:false,sceneModePicker:false,navigationHelpButton:false,fullscreenButton:false,selectionIndicator:false,infoBox:false,requestRenderMode:false});const v=viewer;onViewer(v);
    v.resolutionScale=Math.min(1,1.5/window.devicePixelRatio);v.scene.globe.baseColor=C.Color.fromCssColorString('#355b55');v.scene.globe.depthTestAgainstTerrain=false;if(plan.weather){v.scene.fog.enabled=true;v.scene.fog.density=.00001*40/plan.weather.visibility;v.scene.fog.minimumBrightness=.35;}v.scene.screenSpaceCameraController.enableInputs=false;
+   v.imageryLayers.addImageryProvider(createGlobalBasemap(C,import.meta.env.BASE_URL),0);
    v.imageryLayers.addImageryProvider(new C.UrlTemplateImageryProvider({url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',credit:'Source: Esri, Vantor, Earthstar Geographics, and the GIS User Community',maximumLevel:19}));
    v.cesiumWidget.creditDisplay.addStaticCredit(new C.Credit('Airports: © OpenStreetMap contributors / OurAirports',true));
    for(const airport of geometry){
