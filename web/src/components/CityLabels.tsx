@@ -1,3 +1,4 @@
+import {overlapsAircraft,type ScreenBox} from '../lib/labelPriority';
 import {publishNearbyFeatures} from '../lib/nearbyFeatures';
 import type {NearbyFeature} from '../lib/placeLabels';
 import {readFlightPreferences} from '../lib/flightPreferences';
@@ -32,11 +33,28 @@ export function CityLabels({viewer,cities,enabled,large,flight=false,aircraftHex
  const places=useMemo(()=>{const names=new Set<string>();return [...local,...cities].filter(c=>{const key=`${c.name.toLowerCase()}:${c.lon.toFixed(1)}:${c.lat.toFixed(1)}`;if(names.has(key))return false;names.add(key);return true;});},[cities,local]);
  useEffect(()=>{
   if(!viewer||!enabled||!places.length)return;const v=viewer,C=window.Cesium;
-  const entries=places.map((city,i)=>{const position=C.Cartesian3.fromDegrees(city.lon,city.lat,40);return {city,position,e:v.entities.add({id:`city-${i}`,show:false,position,label:{text:`• ${city.name}`,font:`${city.capital?'600':'400'} ${large?17:13}px sans-serif`,fillColor:C.Color.fromCssColorString('#fff2d2'),style:C.LabelStyle.FILL_AND_OUTLINE,outlineColor:C.Color.fromCssColorString('#15252c'),outlineWidth:4,heightReference:C.HeightReference.RELATIVE_TO_GROUND,disableDepthTestDistance:Number.POSITIVE_INFINITY,horizontalOrigin:C.HorizontalOrigin.LEFT,pixelOffset:new C.Cartesian2(5,0)}})};});
+  const entries=places.map((city,i)=>{const position=C.Cartesian3.fromDegrees(city.lon,city.lat,40);return {city,position,e:v.entities.add({id:`city-${i}`,show:false,position,label:{text:`• ${city.name}`,font:`${city.capital?'600':'400'} ${large?17:13}px sans-serif`,fillColor:C.Color.fromCssColorString('#fff2d2'),style:C.LabelStyle.FILL_AND_OUTLINE,outlineColor:C.Color.fromCssColorString('#15252c'),outlineWidth:4,heightReference:C.HeightReference.RELATIVE_TO_GROUND,disableDepthTestDistance:0,horizontalOrigin:C.HorizontalOrigin.LEFT,pixelOffset:new C.Cartesian2(5,0)}})};});
   let last=0;
   const update=()=>{
    const now=performance.now();if(now-last<250)return;last=now;
    const h=v.camera.positionCartographic.height;const maxRank=flight?10:h>7000000?2:h>2500000?4:h>800000?6:10;
+   // These are WebGL labels, not DOM layers: depth-test them and reserve
+   // screen space for each visible aircraft model or marker before placing text.
+   const aircraftBoxes:ScreenBox[]=[],modelBounds=new Map<string,Cesium.BoundingSphere>();
+   for(let i=0;i<v.scene.primitives.length;i++){const primitive=v.scene.primitives.get(i);if(primitive instanceof C.Model&&primitive.ready&&primitive.show&&primitive.id instanceof C.Entity)modelBounds.set(primitive.id.id,primitive.boundingSphere);}
+   for(const aircraft of v.entities.values){
+    if(!aircraft.isShowing||!(aircraft.id.startsWith('aircraft-')||aircraft.id==='flight-simulation')||!aircraft.position)continue;
+    const position=aircraft.position.getValue(v.clock.currentTime);if(!position)continue;
+    if(v.scene.mode===C.SceneMode.SCENE3D&&C.Cartesian3.dot(v.camera.directionWC,C.Cartesian3.subtract(position,v.camera.positionWC,new C.Cartesian3()))<=0)continue;
+    let center=position,radius=24;
+    const sphere=modelBounds.get(aircraft.id);
+    if(sphere&&C.Cartesian3.distance(v.camera.positionWC,sphere.center)>sphere.radius*1.1){
+     center=sphere.center;const pixels=v.camera.getPixelSize(sphere,v.canvas.clientWidth,v.canvas.clientHeight);
+     if(Number.isFinite(pixels)&&pixels>0)radius=Math.max(radius,sphere.radius/pixels+12);
+    }
+    const pt=C.SceneTransforms.worldToWindowCoordinates(v.scene,center);if(!pt||!Number.isFinite(radius)||!Number.isFinite(pt.x+pt.y))continue;
+    aircraftBoxes.push({x:pt.x-radius,y:pt.y-radius,width:radius*2,height:radius*2});
+   }
    const density=readFlightPreferences().labelDensity;const boxes:{x:number;y:number;w:number}[]=[];
    for(const e of v.entities.values){if(!e.show||!e.id.startsWith('atlas-country-')||!e.position||!e.label)continue;const position=e.position.getValue(v.clock.currentTime);if(!position)continue;const point=C.SceneTransforms.worldToWindowCoordinates(v.scene,position);if(point){const w=String(e.label.text?.getValue(v.clock.currentTime)??'').length*(large?8.5:6.5);boxes.push({x:point.x-w/2,y:point.y,w});}}
    for(const {city,position:base,e} of entries){
@@ -44,7 +62,7 @@ export function CityLabels({viewer,cities,enabled,large,flight=false,aircraftHex
     let visible=false;
     if(city.rank<=maxRank&&(v.scene.mode!==C.SceneMode.SCENE3D||(C.Cartesian3.dot(v.camera.directionWC,C.Cartesian3.subtract(position,v.camera.positionWC,new C.Cartesian3()))>0&&C.Cartesian3.dot(v.scene.globe.ellipsoid.geodeticSurfaceNormal(position),C.Cartesian3.subtract(v.camera.positionWC,position,new C.Cartesian3()))>0))){
      const pt=C.SceneTransforms.worldToWindowCoordinates(v.scene,position),w=city.name.length*(large?9:7)+18;
-     if(pt&&pt.x>=10&&pt.y>=12&&pt.x+w<v.canvas.clientWidth-10&&pt.y<v.canvas.clientHeight-35&&boxes.length<(flight?(density==='sparse'?8:density==='rich'?40:24):65)&&!boxes.some(b=>Math.abs(b.y-pt.y)<26&&pt.x<b.x+b.w+14&&pt.x+w+14>b.x)){visible=true;boxes.push({x:pt.x,y:pt.y,w});}
+     if(pt&&!overlapsAircraft({x:pt.x,y:pt.y-14,width:w+10,height:28},aircraftBoxes)&&pt.x>=10&&pt.y>=12&&pt.x+w<v.canvas.clientWidth-10&&pt.y<v.canvas.clientHeight-35&&boxes.length<(flight?(density==='sparse'?8:density==='rich'?40:24):65)&&!boxes.some(b=>Math.abs(b.y-pt.y)<26&&pt.x<b.x+b.w+14&&pt.x+w+14>b.x)){visible=true;boxes.push({x:pt.x,y:pt.y,w});}
     }
     e.show=visible;
    }
