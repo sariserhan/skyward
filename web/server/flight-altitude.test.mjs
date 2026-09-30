@@ -15,3 +15,8 @@ test('reported ground and airborne readings retain their own reference',()=>{
  assert.equal(flightAltitude({ground:false,altitude:null},null).altitude,null);
  assert.equal(flightAltitude({simulation:{},ground:false,altitude:800},{ground:true,altitude:1026,simulationElevationFt:1026}).elevation,1026);
 });
+test('climb instruments follow the rendered correction instead of showing a newer report',()=>{
+ const a={ground:false,altitude:1000},frame={ground:false,altitude:740,correcting:true};
+ assert.equal(flightAltitude(a,frame).altitude,740);assert.equal(flightAltitude(a,frame).label,'ft displayed');
+ assert.equal(flightAltitude({...a,ground:true},frame).onGround,false);
+});

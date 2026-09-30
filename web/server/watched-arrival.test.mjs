@@ -65,3 +65,10 @@ test('a landed watched arrival survives missing, stale and changed feed callsign
  assert.ok(parked);
  motion.stopArrival(a.hex);assert.equal(motion.sample(a,[],a.observedAt+1001000,false,route,airport).arrivalAnimation,undefined);
 });
+
+test('repeated Dulles climb updates do not keep restarting a long vertical correction',()=>{
+ const m=new LiveMotion(),start=100000,base={...a,callsign:'DEPART1',lat:38.95,lon:-77.46,altitude:313,ground:true,groundSpeed:140,heading:0,verticalRate:0,observedAt:start};
+ m.sample(base,[],start);let input=base,frame;
+ for(let ms=100;ms<=40000;ms+=100){if(ms%1000===0)input={...base,ground:false,altitude:1000+ms/1000*25,verticalRate:1500,observedAt:start+ms};frame=m.sample(input,[],start+ms);}
+ assert.equal(frame.ground,false);assert.ok(frame.altitude>input.altitude-100,`display remains too far below reported climb: ${frame.altitude}/${input.altitude}`);
+});
