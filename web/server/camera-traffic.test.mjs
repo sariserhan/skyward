@@ -64,3 +64,8 @@ test('neighboring overlapping viewports share a padded regional bucket without r
  const feed=new FeedClient(async()=>{calls++;await new Promise(r=>release=r);return {ok:true,json:async()=>({now:Date.now()/1000,ac:[{hex:'abcdef',lat:41,lon:29,seen_pos:2},{hex:'bbbbbb',lat:42.8,lon:29,seen_pos:2}]})};});
  const first=feed.cameraArea(41,29,100),second=feed.cameraArea(41.1,29.1,100);await new Promise(r=>setImmediate(r));assert.equal(calls,1);release();const results=await Promise.all([first,second]);assert.ok(results.every(r=>r.aircraft.length===1));assert.equal(calls,1);
 });
+
+test('feed transport is called without a client receiver for Workers compatibility',async()=>{
+ const client=new FeedClient(function(){assert.equal(this,undefined);return Promise.resolve(Response.json({now:Date.now(),ac:[]}));});
+ assert.deepEqual((await client.cameraArea(39,-77,50)).aircraft,[]);
+});

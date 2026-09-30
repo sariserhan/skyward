@@ -45,7 +45,7 @@ export function cameraAreaPath(lat,lon,radius){
 }
 
 export class FeedClient {
-  constructor(fetcher = fetch) { this.fetcher = fetcher; this.cooldowns = new Map(); this.failures = new Map(); this.errors = new Map(); this.cache = new Map(); this.pending = new Map(); this.tail = Promise.resolve(); this.nextAt = 0; this.stats = {started:0,failed:0,cacheHits:0,coalesced:0,suppressed:0,queueExpired:0,lastSuccessAt:null,lastPositionAt:null,totalMs:0}; }
+  constructor(fetcher = fetch) { this.fetcher = (...args) => fetcher(...args); this.cooldowns = new Map(); this.failures = new Map(); this.errors = new Map(); this.cache = new Map(); this.pending = new Map(); this.tail = Promise.resolve(); this.nextAt = 0; this.stats = {started:0,failed:0,cacheHits:0,coalesced:0,suppressed:0,queueExpired:0,lastSuccessAt:null,lastPositionAt:null,totalMs:0}; }
   checkCooldown(origin) {
     const until=this.cooldowns.get(origin)??0;
     if(until>Date.now()){const error=new Error('Flight feed is rate limited. Retrying after the requested pause.');error.retryAfter=Math.ceil((until-Date.now())/1000);throw error;}

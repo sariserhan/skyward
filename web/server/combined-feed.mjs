@@ -30,7 +30,7 @@ export class CombinedFeed {
  route(...args){return this.primary.route(...args);}
  area(id){if(!Object.hasOwn(AIRPORTS,id))throw Error('Unknown airport');return this.cameraArea(AIRPORTS[id].lat,AIRPORTS[id].lon,100);}
  async combine(method,args){
-  const results=await Promise.allSettled(this.providers.map(async p=>{try{const original=await p.client[method](...args);const data={...original,source:p.name,aircraft:original.aircraft.map(a=>({...a,positionSource:p.id}))};this.health.set(p.id,{available:true,lastSuccessAt:data.fetchedAt});return {id:p.id,data};}catch(e){this.health.set(p.id,{available:false,lastSuccessAt:this.health.get(p.id)?.lastSuccessAt??null});throw e;}}));
+  const results=await Promise.allSettled(this.providers.map(async p=>{try{const original=await p.client[method](...args);const data={...original,source:p.name,aircraft:original.aircraft.map(a=>({...a,positionSource:p.id}))};this.health.set(p.id,{available:true,lastSuccessAt:data.fetchedAt});return {id:p.id,data};}catch(e){this.health.set(p.id,{available:false,lastSuccessAt:this.health.get(p.id)?.lastSuccessAt??null,failure:typeof e.status==='number'?`UPSTREAM_${e.status}`:['Provider timestamp is not current','Invalid provider response','Illegal invocation'].includes(e.message)?e.message:e.name||'Error'});throw e;}}));
   const good=results.flatMap(r=>r.status==='fulfilled'?[r.value]:[]);
   if(!good.length)throw results.find(r=>r.status==='rejected').reason;
   return {...(this.providers.length===1?good[0].data:mergeFeeds(good)),partial:good.length<this.providers.length,failedSources:results.flatMap((r,i)=>r.status==='rejected'?[this.providers[i].id]:[])};
@@ -44,9 +44,11 @@ export function configuredFeed({env=process.env,fetchImpl=fetch}={}){
  const primary=new FeedClient(fetchImpl);
  if(!key||env.SKYWARD_FLYITALY_ENABLED==='0')return new CombinedFeed(primary);
  if(/[\r\n]/.test(key))throw Error('Invalid supplemental feed key.');
- const client=new FeedClient((input,options)=>{
+ const client=new FeedClient(async(input,options)=>{
   const path=flyItalyPath(new URL(input).pathname);
-  return fetchImpl('https://api.flyitalyadsb.com'+path,{...options,redirect:'error',headers:{...options.headers,'X-Api-Key':key}});
+  const response=await fetchImpl('https://api.flyitalyadsb.com'+path,{...options,redirect:'manual',headers:{...options.headers,'X-Api-Key':key}});
+  if(response.status>=300&&response.status<400)throw Object.assign(new Error('Supplemental feed redirect rejected'),{status:502});
+  return response;
  });
  return new CombinedFeed(primary,[{id:'flyitaly',name:'FlyItalyADSB',url:'https://flyitalyadsb.com/',license:'CC BY-SA 4.0; standard API limits',client}]);
 }

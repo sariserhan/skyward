@@ -1,3 +1,4 @@
+import {workerFetch} from './fetch.mjs';
 import {ACCOUNT_LINK_TTL_SECONDS} from '../server/email-template.mjs';
 import {betterAuth} from 'better-auth';
 import {randomUUID} from 'node:crypto';
@@ -6,7 +7,7 @@ export function d1AuthOptions(env,{sendEmail,waitUntil}={}){
  const origin=env.SKYWARD_PUBLIC_ORIGIN,site=new URL(origin);
  if(site.origin!==origin||site.protocol!=='https:'&&!['localhost','127.0.0.1'].includes(site.hostname))throw Error('Use a canonical HTTPS account origin');
  if(!env.BETTER_AUTH_SECRET||env.BETTER_AUTH_SECRET.length<32)throw Error('Set a strong BETTER_AUTH_SECRET');
- const deliver=sendEmail??resendSender(env),send=({user,url},subject)=>{
+ const deliver=sendEmail??resendSender(env,workerFetch),send=({user,url},subject)=>{
   const task=Promise.resolve().then(()=>deliver(accountEmail(user,url,subject,origin))).catch(()=>{console.error('Account email delivery failed.');});
   if(waitUntil){waitUntil(task);return;}return task;
  };

@@ -8,7 +8,7 @@
   "preview_urls": false,
   "routes": [{"pattern":"skyvvard.com","custom_domain":true},{"pattern":"www.skyvvard.com","custom_domain":true}],
   "assets": {"directory":".cloudflare/assets","binding":"ASSETS","run_worker_first":["/api/*","/watch","/watch/","/watch/index.html"],"not_found_handling":"none"},
-  "d1_databases": [{"binding":"DB","database_name":"skyward-accounts","database_id":"00000000-0000-0000-0000-000000000000","migrations_dir":"cloudflare/migrations"}],
+  "d1_databases": [{"binding":"DB","database_name":"skyward-accounts","database_id":"05af1103-a898-4deb-a44e-8255696bfc75","migrations_dir":"cloudflare/migrations"}],
   "r2_buckets": [{"binding":"MEDIA","bucket_name":"skyward-assets"}],
   "durable_objects": {"bindings":[{"name":"COORDINATOR","class_name":"SkywardCoordinator"}]},
   "migrations": [{"tag":"v1","new_sqlite_classes":["SkywardCoordinator"]}],
@@ -23,7 +23,7 @@
     "RESEND_FROM":"Skyward <contact@skyvvard.com>",
     "RESEND_REPLY_TO":"support@skyvvard.com",
     "SKYWARD_DYNAMIC_DAILY_LIMIT":"50000",
-    "SKYWARD_ASSET_RELEASE":""
+    "SKYWARD_ASSET_RELEASE":"31da478e9bdd383a"
   },
   "observability": {"enabled":false}
 }

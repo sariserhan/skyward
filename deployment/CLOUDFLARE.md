@@ -31,7 +31,7 @@ Public model requests use bundled static files. Private airport-game requests re
 
 ## Provision when ready
 
-Nothing below was executed remotely during implementation.
+Initial production provisioning was executed on 2026-09-30: D1 `skyward-accounts`, private Standard R2 `skyward-assets`, all three D1 migrations, and Worker secrets. The commands below also document the setup for future environments. Existing development/Neon accounts were not migrated.
 
 1. Add `skyvvard.com` to your Cloudflare account and finish DNS activation. Keep the account on Workers Free unless you explicitly decide otherwise. Disable automatic paid upgrades; inspect account-wide usage, not just this project.
 2. Create D1: `npx wrangler d1 create skyward-accounts`. Put the returned database ID in `wrangler.jsonc`. The all-zero ID is a deliberate placeholder, not a deployable production database.
@@ -84,3 +84,30 @@ Verification and password-reset mail share `server/email-template.mjs`: a fluid 
 Wrangler local secrets belong in web/.dev.vars. The Node start scripts load web/.env and web/.env.local; a key added only there is not automatically a deployed Worker secret. Configure RESEND_API_KEY and BETTER_AUTH_SECRET using Wrangler secrets for the deployed Worker; configure D1 and apply migrations before using accounts. Node test accounts intentionally do not send verification mail; use the Better Auth D1 Worker or the existing Neon backend for the real authentication flow.
 
 The public logo URL is https://skyvvard.com/watch/icon-192.png. Until the website is deployed, email clients may hide or fail to load it; the live-text Skyward name and all actions remain usable. Verify real delivery in target inboxes after deployment; browser previews cannot prove Gmail/Outlook delivery or rendering.
+
+
+## Deployment record — 2026-09-30
+
+- Public site: https://skyvvard.com; www redirects to the apex.
+- Worker version: `a1922aab-726d-4e61-aadf-1201ad80d524`.
+- D1: `skyward-accounts` (`05af1103-a898-4deb-a44e-8255696bfc75`), all three migrations applied.
+- Private R2 game release: `31da478e9bdd383a`; 18 objects, approximately 99 MiB.
+  Downloaded remote game HTML matched the local export. Public aircraft assets use Static Assets.
+- Better Auth and Resend secrets configured. Session/account endpoints respond;
+  real signup, inbox delivery and reset flow have not yet been verified end to end.
+- Billing remains test-mode and reports `billingReady: false` with the supplied
+  configuration. Checkout is not available. Do not describe payments as live or
+  verified; compatible test credentials and an end-to-end checkout test remain needed.
+  Paid aviation remains demo mode; no paid provider was activated.
+- Verified live HTTP responses: root/account/sitemap/model 200, unknown page 404,
+  unauthenticated private game and account library 401, account/session endpoints 200.
+  Dulles camera query returned four observed aircraft and airport weather returned KIAD.
+  ADSB.lol returned 429 from Cloudflare; supplemental FlyItaly observations succeeded.
+  Coverage is partial; retry delays are preserved rather than bypassed.
+- Workers rejects the Node fetch `redirect:error` setting. The deployment adapter
+  uses manual redirects and rejects redirect responses without forwarding credentials.
+  Feed transports also avoid binding the native fetch function to a client object.
+- Automated regression suite: 486 passed, one skipped. Browser smoke checks rendered
+  the globe without JavaScript runtime errors; these are not a full production load test.
+- No paid Cloudflare plan enabled, no test email sent and no payment charged.
+  Account-wide capacity alongside Visitorping still needs monitoring after launch.

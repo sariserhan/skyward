@@ -14,7 +14,7 @@ test('no key or disabled flag means no additional requests',async()=>{
  }
 });
 test('key stays in supplemental header, shared requests cache, key never appears in sources',async()=>{
- const urls=[];const f=configuredFeed({env:{SKYWARD_FLYITALY_API_KEY:'test-secret'},fetchImpl:async(u,o)=>{urls.push(u);assert.ok(!u.includes('test-secret'));if(u.includes('flyitaly')){assert.equal(o.headers['X-Api-Key'],'test-secret');assert.equal(o.redirect,'error');}else assert.equal(o.headers['X-Api-Key'],undefined);return {ok:true,json:async()=>({now:Date.now(),ac:[]})};}});
+ const urls=[];const f=configuredFeed({env:{SKYWARD_FLYITALY_API_KEY:'test-secret'},fetchImpl:async(u,o)=>{urls.push(u);assert.ok(!u.includes('test-secret'));if(u.includes('flyitaly')){assert.equal(o.headers['X-Api-Key'],'test-secret');assert.equal(o.redirect,'manual');}else assert.equal(o.headers['X-Api-Key'],undefined);return {ok:true,json:async()=>({now:Date.now(),ac:[]})};}});
  await Promise.all([f.cameraArea(40,33,25),f.cameraArea(40,33,25)]);assert.equal(urls.length,2);await f.cameraArea(40,33,25);assert.equal(urls.length,2);assert.ok(!JSON.stringify(f.sources).includes('test-secret'));
 });
 test('newest whole fix wins; older duplicates, impossible jumps and future timestamps do not',()=>{
@@ -34,4 +34,15 @@ test('429 cooldown prevents supplemental retries without stopping the base feed'
 test('malformed supplemental payload never becomes a successful empty live response',async()=>{
  const f=configuredFeed({env:{SKYWARD_FLYITALY_API_KEY:'test-secret'},fetchImpl:async u=>({ok:true,json:async()=>u.includes('flyitaly')?{error:'bad key'}:{now:Date.now(),ac:[]}})});
  const r=await f.cameraArea(40,33,25);assert.equal(r.partial,true);assert.deepEqual(r.failedSources,['flyitaly']);
+});
+
+test('supplemental redirects are rejected without forwarding the API key',async()=>{
+ let calls=0;
+ const f=configuredFeed({env:{SKYWARD_FLYITALY_API_KEY:'private-key'},fetchImpl:async(url,options)=>{
+  calls++;
+  if(url.includes('flyitaly')){assert.equal(options.redirect,'manual');return new Response(null,{status:302,headers:{Location:'https://example.invalid'}});}
+  return Response.json({now:Date.now(),ac:[]});
+ }});
+ const data=await f.cameraArea(39,-77,50);
+ assert.equal(calls,2);assert.equal(data.partial,true);assert.deepEqual(data.failedSources,['flyitaly']);
 });

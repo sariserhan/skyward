@@ -1,3 +1,4 @@
+import {workerFetch} from './fetch.mjs';
 import {DurableObject} from 'cloudflare:workers';
 import {configuredFeed} from '../server/combined-feed.mjs';
 import {AIRPORTS,cameraAreaPath,searchPath} from '../server/feed.mjs';
@@ -15,11 +16,11 @@ const valid=fn=>{try{return fn();}catch(e){throw Object.assign(e,{status:400});}
 const json=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store'}});
 export class SkywardCoordinator extends DurableObject{
  constructor(ctx,env){super(ctx,env);this.ctx=ctx;this.env=env;this.tail=Promise.resolve();this.rates=new Map();
-  this.feed=configuredFeed({env});this.weather=createLocalWeather();this.airportWeather=createAirportWeather();this.music=createAurowall({env});this.trips=createTripDiscovery(this.feed);
+  this.feed=configuredFeed({env,fetchImpl:workerFetch});this.weather=createLocalWeather({fetchImpl:workerFetch});this.airportWeather=createAirportWeather({fetchImpl:workerFetch});this.music=createAurowall({env});this.trips=createTripDiscovery(this.feed);
   this.ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS daily_budget(day TEXT PRIMARY KEY,requests INTEGER NOT NULL)');
   if(env.BETTER_AUTH_SECRET&&env.RESEND_API_KEY){
    this.auth=createD1Auth(env,{waitUntil:p=>ctx.waitUntil(p)});const {pool,transaction}=d1Pool(env.DB);
-   this.membership=createAccountMembership({env,pool,auth:this.auth,origin:env.SKYWARD_PUBLIC_ORIGIN,transact:transaction,throttleRequest:async()=>{},observations:()=>{const rows=new Map();for(const p of this.feed.providers)for(const item of p.client.cache.values())for(const a of item.value?.aircraft??[])if((a.observedAt??0)>(rows.get(a.hex)?.observedAt??0))rows.set(a.hex,a);return [...rows.values()];}});
+   this.membership=createAccountMembership({env,pool,fetchImpl:workerFetch,auth:this.auth,origin:env.SKYWARD_PUBLIC_ORIGIN,transact:transaction,throttleRequest:async()=>{},observations:()=>{const rows=new Map();for(const p of this.feed.providers)for(const item of p.client.cache.values())for(const a of item.value?.aircraft??[])if((a.observedAt??0)>(rows.get(a.hex)?.observedAt??0))rows.set(a.hex,a);return [...rows.values()];}});
   }
  }
  fetch(request){const run=this.tail.then(()=>this.route(request));this.tail=run.catch(()=>{});return run;}
@@ -53,6 +54,6 @@ export class SkywardCoordinator extends DurableObject{
    if(path==='/api/aurowall')return json(await this.music());
    if(path==='/api/trips')return json(url.searchParams.get('sample')==='1'?await tripResponse(url.searchParams):this.trips(tripQuery(url.searchParams)));
    return json({error:'Endpoint not found'},404);
-  }catch(e){return json({error:e.status?e.message:'This service is temporarily unavailable. Please retry.'},e.status||503);}
+  }catch(e){return json({error:e.status?e.message:'This service is temporarily unavailable. Please retry.',...(Number.isFinite(e.retryAfter)?{retryAfter:e.retryAfter}:{})},e.status||503);}
  }
 }
