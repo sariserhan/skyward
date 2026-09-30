@@ -1,17 +1,14 @@
 import {installSessionHealth} from './lib/sessionHealth';
 import './lib/installPrompt';
 import {lazy,Suspense} from 'react';
-import { createRoot } from 'react-dom/client';
-const App=lazy(()=>import('./App'));
-const AccountPage=lazy(()=>import('./components/AccountPage').then(m=>({default:m.AccountPage})));
+import {createRoot} from 'react-dom/client';
 import {loadGlobeEngine} from './lib/loadGlobeEngine';
-import { ErrorBoundary } from './components/ErrorBoundary';
+import {ErrorBoundary} from './components/ErrorBoundary';
+import {ErrorScreen,LoadingScreen} from './components/SystemState';
 import './styles.css';
-const FlightSimulator=lazy(()=>import('./components/FlightSimulator').then(m=>({default:m.FlightSimulator})));
+const App=lazy(async()=>{await loadGlobeEngine();return import('./App');});
+const AccountPage=lazy(()=>import('./components/AccountPage').then(m=>({default:m.AccountPage})));
+const FlightSimulator=lazy(async()=>{await loadGlobeEngine();const m=await import('./components/FlightSimulator');return {default:m.FlightSimulator};});
 installSessionHealth();
-async function start(){
- const account=location.pathname==='/account/';
- if(!account)await loadGlobeEngine();
- createRoot(document.getElementById('root')!).render(<ErrorBoundary><Suspense fallback={<main className="entry-loading" role="status">Loading {account?'your account':location.pathname.startsWith('/flight-simulator')?'flight simulator':'observatory'}…</main>}>{account?<AccountPage/>:location.pathname.startsWith('/flight-simulator')?<FlightSimulator/>:<App/>}</Suspense></ErrorBoundary>);
-}
-void start().catch(()=>{const message=document.getElementById('startup-message');if(message)message.textContent='The 3D engine could not load. Check your connection and reload.';});
+const path=location.pathname,account=path==='/account/'||path==='/account',simulator=path==='/flight-simulator/'||path==='/flight-simulator',globe=['/','/watch','/watch/','/watch/index.html','/index.html'].includes(path);
+createRoot(document.getElementById('root')!).render(<ErrorBoundary><Suspense fallback={<LoadingScreen label={account?'Loading your account…':simulator?'Loading flight simulator…':'Loading the globe and flight controls…'}/>}>{account?<AccountPage/>:simulator?<FlightSimulator/>:globe?<App/>:<ErrorScreen status={path==='/500'||path==='/500/'?500:404}/>}</Suspense></ErrorBoundary>);

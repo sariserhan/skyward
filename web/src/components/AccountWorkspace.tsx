@@ -1,3 +1,4 @@
+import {LoadingSkeleton} from './SystemState';
 import {lazy,Suspense} from 'react';
 const BoardingPasses=lazy(()=>import('./BoardingPasses').then(m=>({default:m.BoardingPasses})));
 import {AccountHome} from './AccountHome';
@@ -41,7 +42,7 @@ export function AccountWorkspace({account,openJourney}:{account:Account;openJour
  <nav className="account-tabs" aria-label="Account sections">{tabs.map(t=><button key={t} disabled={busy} aria-pressed={tab===t} onClick={()=>setTab(t)}>{t}{t==='Alerts'&&dashboard.alerts.some(a=>!a.read)?' •':''}</button>)}</nav>
  {message&&<p role="status" className="account-notice">{message}</p>}
  {kind&&kind!=='watchlist'&&!paid?<p className="account-lock">Premium includes {tab.toLowerCase()}. Sign in with an active test subscription to try it. No real payment is taken.</p>:<>
- {tab==='Boarding passes'&&<Suspense fallback={<p>Loading private trips…</p>}><BoardingPasses paid={paid} openJourney={openJourney}/></Suspense>}
+ {tab==='Boarding passes'&&<Suspense fallback={<LoadingSkeleton label="Loading your private trips…"/>}><BoardingPasses paid={paid} openJourney={openJourney}/></Suspense>}
  {tab==='Home'&&<AccountHome account={account} dashboard={dashboard} openJourney={openJourney} navigate={setTab}/>}
  {tab==='Premium tools'&&<PremiumWorkspace paid={paid}/>}
  {tab==='Travel'&&<><div className="account-section-heading"><h4>Your travel dashboard</h4><button disabled={busy} onClick={()=>void run(refresh,'Refreshed.')}>Refresh dashboard</button></div><label>Journeys<select value={range} onChange={e=>setRange(e.target.value)}><option value="upcoming">Today &amp; upcoming</option><option value="past">Past dates</option><option value="all">All saved journeys</option></select></label><p>Dates use UTC. Saved dates and routes are not booking confirmation. “Find aircraft” opens its current position, which may be a different flight.</p>

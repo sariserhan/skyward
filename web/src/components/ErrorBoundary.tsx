@@ -1,9 +1,14 @@
-import { Component, type ReactNode } from 'react';
-export class ErrorBoundary extends Component<{children: ReactNode}, {failed: boolean}> {
-  state = {failed: false};
-  static getDerivedStateFromError() { return {failed:true}; }
-  render() {
-    if(this.state.failed) return <main className="recovery-screen"><h1>Let’s reconnect to the sky.</h1><p>The observatory encountered an unexpected problem. Reload to start a fresh session; your saved aircraft stay on this device.</p><button className="primary-button" onClick={()=>location.reload()}>Reload observatory</button></main>;
-    return this.props.children;
-  }
+import {Component,type ReactNode} from 'react';
+import {ErrorScreen} from './SystemState';
+export class ErrorBoundary extends Component<{children:ReactNode},{failed:boolean}>{
+ state={failed:false};
+ static getDerivedStateFromError(){return {failed:true};}
+ // Resource failures are handled by their owning view. Only uncaught script errors
+ // and unhandled promises reach global recovery; normal API errors remain local.
+ private onError=(event:ErrorEvent)=>{if(event.error||event.message)this.fail();};
+ private onRejection=(event:PromiseRejectionEvent)=>{if(event.reason?.name!=='AbortError')this.fail();};
+ private fail=()=>{if(!this.state.failed)this.setState({failed:true});};
+ componentDidMount(){window.addEventListener('error',this.onError);window.addEventListener('unhandledrejection',this.onRejection);}
+ componentWillUnmount(){window.removeEventListener('error',this.onError);window.removeEventListener('unhandledrejection',this.onRejection);}
+ render(){return this.state.failed?<ErrorScreen/>:this.props.children;}
 }

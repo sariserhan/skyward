@@ -1,3 +1,4 @@
+import {LoadingSkeleton} from './SystemState';
 import {travelMetric} from '../lib/travelMetrics';
 import {PremiumPreview} from './PremiumPreview';
 import {lazy,Suspense,useRef,useState,useEffect} from 'react';
@@ -27,7 +28,7 @@ export function Upgrade({openJourney}:{openJourney:(hex:string)=>Promise<void>})
       </div>}
       {!accountOnly&&<PremiumPreview/>}<p className="upgrade-availability">Public subscriptions are coming soon. Checkout is disabled until configured, and defaults to test mode. Your account identifies the active checkout mode.</p>
       <p className="upgrade-privacy">Airline passenger manifests and actual onboard counts are unavailable. Travel together shows only display names and trip details travelers explicitly choose to publish.</p>
-      {open&&<Suspense fallback={<p role="status">Loading account…</p>}><MembershipPanel openJourney={async hex=>{await openJourney(hex);close();}}/></Suspense>}
+      {open&&<Suspense fallback={<LoadingSkeleton label="Loading your account…"/>}><MembershipPanel openJourney={async hex=>{await openJourney(hex);close();}}/></Suspense>}
       <button className="upgrade-return" onClick={close}>Keep exploring for free</button>
     </dialog>
   </>;

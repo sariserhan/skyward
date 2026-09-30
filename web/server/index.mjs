@@ -1,3 +1,4 @@
+import {sendHttpError} from './error-pages.mjs';
 import {createTravelMetrics} from './travel-metrics.mjs';
 import {createAurowall} from './aurowall.mjs';
 const aurowall=createAurowall();
@@ -110,7 +111,7 @@ export const server = http.createServer(async (req, res) => {
     if(isFlight){const access=await membership.simulatorAccess(req);if(!access.allowed){res.writeHead(access.status,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'private, no-store'});return res.end(simulatorPage(access).replaceAll('Airport simulator','Flight simulator').replaceAll('airport simulator','flight simulator'));}}
     const isWatch = url.pathname.startsWith('/watch/');
     const isGame = url.pathname.startsWith('/airport-simulation/');
-    if(!isAccount&&!isFlight&&!isWatch&&!isGame&&!['/','/offline-worker.js'].includes(url.pathname))return json(res,404,{error:'File not found'});
+    if(!isAccount&&!isFlight&&!isWatch&&!isGame&&!['/','/offline-worker.js'].includes(url.pathname))return sendHttpError(req,res,404,'File not found');
     if(isGame) {
       const access=await membership.simulatorAccess(req);
       const document=['/airport-simulation/','/airport-simulation/index.html'].includes(url.pathname);
@@ -124,9 +125,9 @@ export const server = http.createServer(async (req, res) => {
     const root = isGame ? gameRoot : webRoot;
     const path = decodeURIComponent(isFlight||isAccount?'':isWatch ? url.pathname.slice('/watch/'.length) : isGame ? url.pathname.slice('/airport-simulation/'.length) : url.pathname.slice(1));
     let file = resolve(root, path || 'index.html');
-    if (file !== root && !file.startsWith(root + sep)) return json(res, 403, { error: 'Forbidden' });
-    try { if ((await stat(file)).isDirectory()) file = resolve(file, 'index.html'); } catch { return json(res, 404, { error: 'File not found' }); }
-    let data = await readFile(file);
+    if (file !== root && !file.startsWith(root + sep)) return sendHttpError(req,res,403,'Forbidden');
+    try { if ((await stat(file)).isDirectory()) file = resolve(file, 'index.html'); } catch(error) { if(['ENOENT','ENOTDIR'].includes(error.code))return sendHttpError(req,res,404,'File not found');throw error; }
+    let data;try{data=await readFile(file);}catch(error){if(['ENOENT','ENOTDIR'].includes(error.code))return sendHttpError(req,res,404,'File not found');throw error;}
     if (/\.(js|css|json|geojson|svg|html|gltf)$/.test(file)) {
       res.setHeader('Vary','Accept-Encoding');
       if(data.length>=1024 && acceptsGzip(req.headers['accept-encoding'])) {
@@ -140,7 +141,7 @@ export const server = http.createServer(async (req, res) => {
     res.setHeader('Content-Length',data.length);
     res.writeHead(200, { 'Content-Type': MIME[extname(file)] ?? 'application/octet-stream', 'Cache-Control': isGame ? 'private, no-store' : extname(file) === '.html' ? 'no-store' : /[/\\]assets[/\\][^/\\]+-[A-Za-z0-9_-]+\.(js|css)$/.test(file) ? 'public, max-age=31536000, immutable' : 'public, max-age=300', 'X-Content-Type-Options': 'nosniff' });
     res.end(req.method === 'HEAD' ? undefined : data);
-  } catch { json(res, 500, { error: 'Unable to serve this request.' }); }
+  } catch { sendHttpError(req,res,500,'Unable to serve this request.'); }
 });
 let premiumTimer;
 server.on('listening',()=>{if(membership.premiumTick)premiumTimer=setInterval(()=>{void membership.premiumTick().catch(()=>console.error('Background account check failed.'));},60000).unref();});

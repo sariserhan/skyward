@@ -1,3 +1,4 @@
+import {errorPage} from './error-pages.mjs';
 import catalog from '../data/airport-catalog.json' with {type:'json'};
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const airports=Object.entries(catalog).sort((a,b)=>a[1].name.localeCompare(b[1].name));
@@ -8,11 +9,13 @@ function page(title,description,content,path,origin,noindex=false){
 }
 export function publicPage(url,env=process.env){
  const origin=publicOrigin(env.SKYWARD_PUBLIC_ORIGIN),path=url.pathname;
+ if(['/404','/404/'].includes(path))return errorPage(404);
+ if(['/500','/500/'].includes(path))return errorPage(500);
  if(path==='/robots.txt')return {status:200,type:'text/plain; charset=utf-8',body:`User-agent: *\nDisallow: /api/\nDisallow: /account/\nDisallow: /share/\nDisallow: /flight-simulator/\nDisallow: /airport-simulation/\n${origin?`Sitemap: ${origin}/sitemap.xml\n`:''}`};
  if(path==='/sitemap.xml')return origin?{status:200,type:'application/xml; charset=utf-8',body:`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${['/explore/','/airports/','/flights/','/premium/','/about/',...airports.map(([id])=>`/airports/${id}/`)].map(p=>`<url><loc>${escape(origin+p)}</loc></url>`).join('')}</urlset>`}:{status:503,type:'text/plain',body:'Set SKYWARD_PUBLIC_ORIGIN to enable the sitemap.'};
  if(['/airports','/explore','/about','/premium','/flights','/account'].includes(path))return {status:308,location:path+'/'+url.search};
  const airportMatch=path.match(/^\/airports\/([a-z0-9]{3,4})\/?$/i);
- if(airportMatch){const id=airportMatch[1].toUpperCase(),a=catalog[id];if(!a)return {status:404,type:'text/plain',body:'Airport not found.'};
+ if(airportMatch){const id=airportMatch[1].toUpperCase(),a=catalog[id];if(!a)return errorPage(404);
   if(path!==`/airports/${id}/`)return {status:308,location:`/airports/${id}/`};
   return page(`${a.name} (${id})`,`${a.city}, ${a.country}. Explore the airport and available aircraft observations in Skyward.`,`<p><a class="cta" href="/#airport=${id}">Explore ${id} on the globe</a></p><dl><dt>IATA / ICAO</dt><dd>${escape(a.iata)} / ${escape(a.icao)}</dd><dt>Location</dt><dd>${escape(a.city)}, ${escape(a.country)}</dd><dt>Coordinates</dt><dd>${a.lat.toFixed(4)}°, ${a.lon.toFixed(4)}°</dd></dl><h2>What you can explore</h2><p>Open the globe to see available runway geometry, aircraft observations and flight views. Terminal, gate and building detail varies by airport.</p><h2>Traffic coverage</h2><p>Aircraft appear only when our connected feeds receive their positions. An empty map does not mean there are no flights. This reference page does not show a live flight count or timetable.</p><p>Airport reference data: <a href="https://ourairports.com/airports/${escape(a.icao)}/">OurAirports</a>. <a href="/airports/">Browse other airports</a>.</p>`,path,origin);
  }

@@ -487,3 +487,21 @@ read at `GET /api/travel-metrics` with the same operator bearer token. They are
 activity totals, not unique-user conversion rates. No names, route/seat data,
 boarding contents, account IDs or durable analytics rows are collected. Request
 rate limiting uses bounded transient connection-address state, as other APIs do.
+
+### Loading and error recovery
+
+Unknown pages return a branded HTTP 404. `/404` and `/500` expose the generic
+error pages for inspection; server failures return HTTP 500. These pages are
+self-contained and work without JavaScript or app assets. API errors remain JSON.
+
+Startup, lazy-loaded views, account details, and shared trips use accessible
+loading skeletons that respect reduced motion. Uncaught application errors and
+unhandled promise failures show a global recovery screen with reload, globe,
+and account navigation. Reload does not clear saved browser settings. Expected
+request failures stay in their own panels; cancelled requests do not trigger
+global recovery. Entry-script download failures also provide a recovery message.
+
+After `npm --prefix web run build`, run
+`python web/tests/browser/system-states.py` with Python Playwright and Chromium
+installed to verify HTTP statuses, mobile layout, loading, and failure recovery
+on an isolated local server.

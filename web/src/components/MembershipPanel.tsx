@@ -1,3 +1,4 @@
+import {LoadingSkeleton} from './SystemState';
 import {lazy,Suspense} from 'react';
 const AccountWorkspace=lazy(()=>import('./AccountWorkspace').then(m=>({default:m.AccountWorkspace})));
 import {accountChanged} from '../lib/accountEvents';
@@ -15,9 +16,9 @@ export function MembershipPanel({openJourney}:{openJourney:(hex:string)=>Promise
   useEffect(()=>{let active=true;accountRequest<Account>('/api/account').then(a=>{if(active)setAccount(a);}).catch(e=>{if(active)setMessage(e.message);});return()=>{active=false;};},[]);
   async function perform(action:()=>Promise<void>) {if(busy)return;setBusy(true);setMessage('');try{await action();}catch(e){setMessage(e instanceof Error?e.message:'Please try again.');}finally{setBusy(false);}}
   async function billing(path:string) {const r=await accountRequest<{url:string}>(path,{});const url=new URL(r.url);if(url.protocol!=='https:'||!['checkout.stripe.com','billing.stripe.com'].includes(url.hostname))throw Error('Checkout unavailable.');window.location.assign(url.href);}
+  if(!account&&!message)return <LoadingSkeleton label="Loading your account…"/>;
   return <section className="membership-panel" aria-label="Your account">
     <h3>Your account &amp; journeys</h3>
-    {!account&&!message&&<p>Loading account…</p>}
     {!account&&message&&<button disabled={busy} onClick={()=>void perform(reload)}>Retry account connection</button>}
     {account&&!account.enabled&&<p>Account signup and subscriptions are coming soon. Free exploration is available now.</p>}
     {account?.enabled&&<><p className="account-test-note">{account.mode==='live'?'Live billing · confirm price and terms in checkout.':'Test environment · no real payments or live premium flight data.'}</p>
