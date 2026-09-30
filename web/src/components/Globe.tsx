@@ -527,20 +527,27 @@ export function Globe(p: Props) {
     return()=>{remove();clearInterval(timer);};
   },[ready,p.preferences.quality,p.preferences.batterySaver,p.preferences.autoQuality]);
   useEffect(()=>{
-    const v=viewer.current;if(!ready||!v)return;const C=window.Cesium;let lastLabels=0,lastSlowMotion=0,lastAnimation=0;
+    const v=viewer.current;if(!ready||!v)return;const C=window.Cesium;let lastLabels=0,lastSlowMotion=0,lastAnimation=0,orderedAt=-Infinity,orderedSelection:string|undefined;let orderedIds:string[]=[];
     const drawn=new Map<string,string>(),motion=sharedLiveMotion;
     const animate=()=>{
-      if(v.isDestroyed()||document.hidden||callbacks.current.obscured||callbacks.current.playback||lostRef.current)return;const s=callbacks.current;const tick=performance.now();if(s.camera.type!=='tower'&&tick-lastAnimation<(s.preferences.batterySaver?100:50))return;lastAnimation=tick;let changed=false;
+      if(v.isDestroyed()||document.hidden||callbacks.current.obscured||callbacks.current.playback||lostRef.current)return;const s=callbacks.current;const tick=performance.now();const markerTick=s.camera.type==='tower'||tick-lastAnimation>=(s.preferences.batterySaver?100:50);if(markerTick)lastAnimation=tick;let changed=false;
       if(s.preferences.batterySaver){const active=cameraMoving.current||flightOpen||s.aircraft.some(a=>a.observedAt!==null&&Date.now()-a.observedAt<(a.ground?8000:120000)&&(a.groundSpeed??0)>2);v.targetFrameRate=active?20:5;}
       if(!s.preferences.reducedMotion){
         const slowTick=Date.now()-lastSlowMotion>=1000;if(slowTick)lastSlowMotion=Date.now();
         let count=0;const limit=s.preferences.quality==='high'?240:s.preferences.quality==='low'?40:100;
-        const ordered=[...positions.current.entries()].sort((a,b)=>(Number(b[1].hex===s.selected?.hex)*2+Number(!!v.entities.getById(b[0])?.model))-(Number(a[1].hex===s.selected?.hex)*2+Number(!!v.entities.getById(a[0])?.model)));
-        for(const [id,a] of ordered){
+        // Reuse the priority order between feed/model changes instead of sorting every frame.
+        if(tick-orderedAt>=250||orderedIds.length!==positions.current.size||orderedSelection!==s.selected?.hex){
+          orderedIds=[...positions.current.keys()].sort((a,b)=>(Number(positions.current.get(b)?.hex===s.selected?.hex)*2+Number(!!v.entities.getById(b)?.model))-(Number(positions.current.get(a)?.hex===s.selected?.hex)*2+Number(!!v.entities.getById(a)?.model)));
+          orderedAt=tick;orderedSelection=s.selected?.hex;
+        }
+        for(const id of orderedIds){
+          const a=positions.current.get(id);if(!a)continue;
           const selected=a.hex===s.selected?.hex;
           if(a.targetKind!=='aircraft'||(selected&&(flightOpen||s.replayIndex!==null)))continue;
-          const e=v.entities.getById(id),current=e?.position?.getValue(v.clock.currentTime);
-          if(!e||!current)continue;
+          const e=v.entities.getById(id);
+          // Nearby 3D aircraft move at render cadence; distant map markers keep their cheaper cadence.
+          if(!e||(!markerTick&&!slowTick&&!selected&&!e.model))continue;
+          const current=e.position?.getValue(v.clock.currentTime);if(!current)continue;
           if(!slowTick&&!selected&&C.Cartesian3.distance(current,v.camera.positionWC)>Math.max(100000,v.camera.positionCartographic.height*3))continue;
           if(!slowTick&&!selected){const screen=C.SceneTransforms.worldToWindowCoordinates(v.scene,current);if(!screen||screen.x<0||screen.y<0||screen.x>v.canvas.clientWidth||screen.y>v.canvas.clientHeight)continue;}
           if(count++>=limit&&!slowTick)continue;
@@ -551,11 +558,11 @@ export function Globe(p: Props) {
           const clearance=String(e.model?.uri?.getValue(v.clock.currentTime)).includes('/models/sourced/')?sourcedGearClearance(a.aircraftType,8)-gearCompression(e):8;
           const key=`${fix.lon}/${fix.lat}/${displayAltitude}/${clearance}`;const desired=C.Cartesian3.fromDegrees(fix.lon,fix.lat,(Math.max(0,displayAltitude)+(fix.groundClearance??0))*.3048+clearance);if(drawn.get(id)===key&&C.Cartesian3.equalsEpsilon(current,desired,0,.01)&&!rotorRig(String(e.model?.uri?.getValue(v.clock.currentTime)??'')))continue;drawn.set(id,key);
           const pos=C.Cartesian3.fromDegrees(fix.lon,fix.lat,(Math.max(0,displayAltitude)+(fix.groundClearance??0))*.3048+clearance);
-          e.position=new C.ConstantPositionProperty(pos);
+          if(e.position instanceof C.ConstantPositionProperty)e.position.setValue(pos);else e.position=new C.ConstantPositionProperty(pos);
           const heading='heading' in fix?fix.heading:a.heading??0;
           const animation=aircraftAnimation.sample(e,{...fix,groundSpeed:fix.groundSpeed??a.groundSpeed??0},Date.now(),s.preferences.reducedMotion);
-          e.orientation=new C.ConstantProperty(C.Transforms.headingPitchRollQuaternion(pos,new C.HeadingPitchRoll(...aircraftModelAttitude(heading,fix.pitch??0,animation.bank))));if(e.model)applyAircraftRig(e,Date.now()/1000,fix.groundSpeed??a.groundSpeed??0,animation.gear,(fix.turnRate??0)*.1,animation.flaps,heading,fix.ground);
-          if(e.billboard)e.billboard.rotation=new C.ConstantProperty(-heading*Math.PI/180);changed=true;
+          const orientation=C.Transforms.headingPitchRollQuaternion(pos,new C.HeadingPitchRoll(...aircraftModelAttitude(heading,fix.pitch??0,animation.bank)));if(e.orientation instanceof C.ConstantProperty)e.orientation.setValue(orientation);else e.orientation=new C.ConstantProperty(orientation);if(e.model)applyAircraftRig(e,Date.now()/1000,fix.groundSpeed??a.groundSpeed??0,animation.gear,(fix.turnRate??0)*.1,animation.flaps,heading,fix.ground);
+          if(e.billboard){if(e.billboard.rotation instanceof C.ConstantProperty)e.billboard.rotation.setValue(-heading*Math.PI/180);else e.billboard.rotation=new C.ConstantProperty(-heading*Math.PI/180);}changed=true;
         }
       }
       if(Date.now()-lastLabels>500){

@@ -1,3 +1,4 @@
+import {aircraftNodeTransforms,setAircraftNode} from './aircraftNodeTransforms.ts';
 import fallbackFans from './fallbackFanRigs.json' with {type:'json'};
 import jetFans from './jetFanRigs.json' with {type:'json'};
 import rigs from './rotorRigs.json' with {type:'json'};
@@ -21,5 +22,5 @@ export function applyRotorRig(entity:Cesium.Entity,uri:string,speed:number,groun
   for(const node of group.nodes)transforms[node]=new C.TranslationRotationScale(translation,rotation);
  }
  for(const node of rig.hide)transforms[node]=new C.TranslationRotationScale(C.Cartesian3.ZERO,C.Quaternion.IDENTITY,C.Cartesian3.ZERO);
- const existing=entity.model.nodeTransformations?.getValue(C.JulianDate.now())??{};entity.model.nodeTransformations=new C.PropertyBag({...existing,...transforms});
+ const bag=aircraftNodeTransforms(entity.model,uri);for(const [name,value] of Object.entries(transforms))setAircraftNode(bag,name,value);
 }
