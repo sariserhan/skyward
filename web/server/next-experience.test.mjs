@@ -20,7 +20,7 @@ test('aircraft banks smoothly across heading wrap, respects reduced motion and c
  const animation=new AircraftAnimation(),key={};const base={heading:359,ground:false,groundSpeed:200,altitude:5000,turnRate:0};animation.sample(key,base,0);
  const turned=animation.sample(key,{...base,heading:1},1000);assert.ok(turned.bank>0&&turned.bank<25);
  assert.equal(animation.sample(key,base,2000,true).bank,0);
- const approach=animation.sample(key,{...base,landingPhase:'approach'},3000);assert.equal(approach.gear,1);assert.equal(approach.flaps,.7);
+ const approach=animation.sample(key,{...base,landingPhase:'approach'},3000);assert.equal(approach.gear,0);assert.equal(approach.flaps,.7);
  animation.sample(key,{...base,ground:true},4000);assert.equal(animation.sample(key,base,4100).gear,1);assert.equal(animation.sample(key,base,13000).gear,0);
 });
 test('snapshot history is bounded and uses an explicit privacy whitelist',()=>{

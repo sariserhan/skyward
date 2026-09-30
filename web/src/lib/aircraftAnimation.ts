@@ -9,7 +9,7 @@ export class AircraftAnimation {
   const bank=reduced?0:(old?.bank??0)+(bankTarget-(old?.bank??0))*(1-Math.exp(-dt*3));
   const lifted=old?.ground&&!frame.ground?now:old?.lifted??-Infinity;
   const approach=frame.landingPhase==='approach',recentTakeoff=!frame.ground&&now-lifted<8000;
-  const gear=frame.gear??(frame.ground||approach||recentTakeoff?1:0),flaps=approach?.7:recentTakeoff?.4:frame.ground&&(frame.groundSpeed??0)>50?.4:0;
+  const gear=frame.gear??(frame.ground||recentTakeoff?1:0),flaps=approach?.7:recentTakeoff?.4:frame.ground&&(frame.groundSpeed??0)>50?.4:0;
   this.states.set(key,{time:now,heading:frame.heading,bank,ground:frame.ground,lifted});return {bank,gear,flaps};
  }
 }

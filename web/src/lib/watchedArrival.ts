@@ -52,7 +52,7 @@ export class WatchedArrival {
     if(p.stage==='final'&&predictedLanding(seed,now,p.route,p.airport)){p.seed=seed;break;}
    }
   }
-  const f=p.seed?predictedLanding(p.seed,now,p.route,p.airport,true):{...p.pose,landingPhase:'approach' as const,estimated:true as const};
+  const f=p.seed?predictedLanding(p.seed,now,p.route,p.airport,true):{...p.pose,gear:0,landingPhase:'approach' as const,estimated:true as const};
   return f?{...f,time:p.sourceTime,age:Math.max(0,now-p.sourceTime),arrivalAnimation:true,arrivalElevationFt:p.airport.elevationFt,arrivalRejoin:!p.seed}:null;
  }
 }

@@ -106,7 +106,7 @@ test('multi-stop route can land at its aligned intermediate stop and deploy appr
  const original=structuredClone(multi),motion=new LiveMotion(),animation=new AircraftAnimation(),body={};let previous,phases=new Set();
  for(let seconds=0;seconds<=600;seconds++){
   const frame=motion.sample(a,[],a.observedAt+seconds*1000,false,multi,airport);assert.ok(frame.landingPhase);phases.add(frame.landingPhase);
-  assert.equal(animation.sample(body,frame,a.observedAt+seconds*1000).gear,1);
+  assert.equal(animation.sample(body,frame,a.observedAt+seconds*1000).gear,frame.gear);if(frame.ground)assert.equal(frame.gear,1);
   assert.ok(frame.lon<=.025*.85+1e-8,'Never fly beyond the runway');
   if(previous)assert.ok(trackDistance(previous,frame)<.05);previous=frame;
  }
@@ -115,4 +115,19 @@ test('multi-stop route can land at its aligned intermediate stop and deploy appr
  assert.equal(predictedLanding(a,160000,{...multi,status:'POSITION_MISMATCH'},airport),null);
  assert.equal(predictedLanding(a,160000,multi,{...airport,id:'UNLISTED'}),null);
  const fresh={...a,ground:true,groundSpeed:15,heading:180,observedAt:701000},observed=motion.sample(fresh,[],701000,false,multi,airport);assert.equal(observed.ground,true);assert.equal(observed.landingPhase,undefined);assert.equal(observed.estimated,false);assert.equal(observed.time,701000);
+});
+
+test('gear stays up on long or turning approaches and deploys on aligned final before touchdown',()=>{
+ for(const input of [a,{...a,lat:.02,heading:70}]){
+  const initial=predictedLanding(input,input.observedAt,route,airport);assert.ok(initial);assert.equal(initial.gear,0);
+  let deployed=false,touchdown=false;
+  for(let second=0;second<=500;second++){
+   const frame=predictedLanding(input,input.observedAt+second*1000,route,airport);assert.ok(frame);
+   if(frame.gear===1&&!frame.ground){deployed=true;assert.ok(frame.altitude-airport.elevationFt<=1800);assert.ok(Math.abs(((frame.heading-90+540)%360)-180)<=10);assert.ok(Math.abs(frame.lat*60)<=.15);}
+   if(frame.ground){assert.ok(deployed,'gear must extend before touchdown');assert.equal(frame.gear,1);touchdown=true;break;}
+  }
+  assert.ok(touchdown);
+ }
+ const highAirport={...airport,elevationFt:7000};
+ assert.equal(predictedLanding({...a,lon:-.04,altitude:8000},a.observedAt,route,highAirport).gear,1,'use height above airport, not sea level');
 });

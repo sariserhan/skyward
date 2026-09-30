@@ -56,7 +56,7 @@ export function predictedLanding(a:Aircraft,now:number,route:FlightRoute|null|un
  let arcs=approachArcs.get(airport);if(!arcs){arcs=new Map();approachArcs.set(airport,arcs);}let arc=arcs.get(key);
  if(!arc){arc=[0];let prior=p0;for(let i=1;i<=segments;i++){const p=curve(i/segments);arc.push(arc[i-1]+Math.hypot(p.x-prior.x,p.y-prior.y));prior=p;}arcs.set(key,arc);while(arcs.size>256)arcs.delete(arcs.keys().next().value!);}
  const pathLength=arc[segments],approachSeconds=pathLength/((a.groundSpeed!+touchdownSpeed)/2)*3600;
- const base={time:a.observedAt!,age:age*1000,estimated:true as const,predictionLimited:false,runway:id};
+ const base={time:a.observedAt!,age:age*1000,estimated:true as const,predictionLimited:false,runway:id,gear:1};
  if(age<approachSeconds){
   const elapsed=clamp(age/approachSeconds,0,1);
   const traveled=approachSeconds/3600*(a.groundSpeed!*elapsed+(touchdownSpeed-a.groundSpeed!)*elapsed*elapsed/2);
@@ -66,7 +66,12 @@ export function predictedLanding(a:Aircraft,now:number,route:FlightRoute|null|un
   const dx=3*u*u*(p1.x-p0.x)+6*u*t*(p2.x-p1.x)+3*t*t*(touch.x-p2.x),dy=3*u*u*(p1.y-p0.y)+6*u*t*(p2.y-p1.y)+3*t*t*(touch.y-p2.y);
   const slope=clamp((a.verticalRate??-700)/60*approachSeconds,-2*agl,0);
   const h=elapsed;const height=Math.max(0,(2*h*h*h-3*h*h+1)*agl+(h*h*h-2*h*h+h)*slope);
-  return {...base,...geo(p),altitude:airport.elevationFt!+height,ground:false,heading:(Math.atan2(dx,dy)/radians+360)%360,pitch:2+2*elapsed*elapsed*(3-2*elapsed),groundSpeed:a.groundSpeed!+(touchdownSpeed-a.groundSpeed!)*elapsed,landingPhase:'approach' as LandingPhase};
+  const aircraftHeading=(Math.atan2(dx,dy)/radians+360)%360;
+  const crossTrack=Math.abs((p.x-start.x)*(end.y-start.y)-(p.y-start.y)*(end.x-start.x))/length;
+  // Illustrative deployment on short, aligned final, not merely any approach phase.
+  // These are presentation limits, not measured gear state or an operating procedure.
+  const gear=height<=1800&&Math.hypot(touch.x-p.x,touch.y-p.y)<=4&&crossTrack<=.15&&Math.abs(wrap(aircraftHeading-heading))<=10&&a.groundSpeed!+(touchdownSpeed-a.groundSpeed!)*elapsed<=200?1:0;
+  return {...base,...geo(p),gear,altitude:airport.elevationFt!+height,ground:false,heading:aircraftHeading,pitch:2+2*elapsed*elapsed*(3-2*elapsed),groundSpeed:a.groundSpeed!+(touchdownSpeed-a.groundSpeed!)*elapsed,landingPhase:'approach' as LandingPhase};
  }
  const proposedTaxi=planTaxi(airport,geo(start),geo(end))??(completeArrival?arrivalParking(airport,geo(start),geo(end)):null);
  const touchAlong=((touch.x-start.x)*(end.x-start.x)+(touch.y-start.y)*(end.y-start.y))/length;

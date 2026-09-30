@@ -8,11 +8,11 @@ const airport=JSON.parse(readFileSync(new URL('../public/data/airports/NRT.json'
 const a={callsign:'KAL2129',hex:'71c711',aircraftType:'A21N',targetKind:'aircraft',ground:false,lat:35.711711,lon:140.445596,altitude:1825,groundSpeed:153.8,heading:329.1,verticalRate:-768,observedAt:1790647744044};
 const route={callsign:a.callsign,status:'UNVERIFIED',airports:[{iata:'PUS',icao:'RKPK',lat:35.179501,lon:128.938004},{iata:'NRT',icao:'RJAA',lat:35.764702,lon:140.386002}]};
 test('captured Narita final completes watched gear, landing, fallback taxi and parking despite late contradictory fixes',()=>{
- const motion=new LiveMotion(),stop=motion.watch(a.hex),animation=new AircraftAnimation(),body={},phases=new Set(),original=structuredClone(a);let previous,end;
+ const motion=new LiveMotion(),stop=motion.watch(a.hex),animation=new AircraftAnimation(),body={},phases=new Set(),original=structuredClone(a);let previous,end,gearBeforeTouchdown=false;
  for(let second=0;second<=900;second++){
   const now=a.observedAt+second*1000;
   const input=second>30?{...a,lat:a.lat+(second%2?.03:-.02),altitude:second%2?4000:125,ground:second%3===0,observedAt:now-60000}:a;
-  const frame=motion.sample(input,[],now,false,route,airport);assert.ok(frame.arrivalAnimation);phases.add(frame.landingPhase);assert.equal(animation.sample(body,frame,now).gear,1);
+  const frame=motion.sample(input,[],now,false,route,airport);assert.ok(frame.arrivalAnimation);phases.add(frame.landingPhase);const gear=animation.sample(body,frame,now).gear;assert.equal(gear,frame.gear);if(!frame.ground&&gear===1)gearBeforeTouchdown=true;if(frame.ground)assert.ok(gearBeforeTouchdown);
   if(previous){assert.ok(trackDistance(previous,frame)<.05);assert.ok(Math.abs(frame.altitude-previous.altitude)<35,`Vertical drop at ${second}`);if(previous.ground)assert.equal(frame.ground,true);}
   previous=frame;end=frame;
  }
@@ -38,4 +38,15 @@ test('watched base-leg arrivals intercept the runway smoothly before landing',()
  const m=new LiveMotion(),plane={...a,heading:240,altitude:2500};m.watch(plane.hex);let previous,parked=false;
  for(let second=0;second<1800;second++){const f=m.sample(plane,[],plane.observedAt+second*1000,false,route,airport);assert.equal(f.arrivalAnimation,true);if(previous){assert.ok(trackDistance(previous,f)<.06);assert.ok(Math.abs(f.altitude-previous.altitude)<40);}previous=f;if(f.landingPhase==='parked'){parked=true;break;}}
  assert.ok(parked);
+});
+
+test('watched rejoin does not inherit extended gear during its approach circuit',()=>{
+ const m=new LiveMotion(),late=a.observedAt+160000;m.sample(a,[],late,false,null,null);m.watch(a.hex);
+ let rejoined=false,landed=false;
+ for(let t=late;t<late+1800000;t+=1000){
+  const frame=m.sample(a,[],t,false,route,airport);
+  if(frame.arrivalRejoin){rejoined=true;assert.equal(frame.gear,0);}
+  if(frame.ground){assert.equal(frame.gear,1);landed=true;break;}
+ }
+ assert.ok(rejoined);assert.ok(landed);
 });
