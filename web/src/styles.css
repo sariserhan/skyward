@@ -423,3 +423,5 @@ body>.cesium-credit-lightbox-overlay .cesium-credit-lightbox-close{min-width:36p
 .statusbar.footer-toolbar>.footer-primary{display:flex!important}
 .statusbar.footer-toolbar>.footer-secondary:not([hidden]){display:block!important}
 @media(max-width:759px){.statusbar.footer-toolbar>.footer-primary{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+.brand-home{display:inline-flex;align-items:center;gap:17px;color:inherit;border-radius:4px}.brand-home img{flex-shrink:0}@media(max-width:1000px){.brand-home{gap:11px}}
