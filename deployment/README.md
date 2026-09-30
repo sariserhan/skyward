@@ -1,4 +1,10 @@
-# Production deployment
+# Deployment
+
+The intended launch target is [Cloudflare Workers, D1 and R2 on skyvvard.com](CLOUDFLARE.md). That guide covers the prepared Worker, Resend, local validation and required provisioning. Nothing is automatically deployed.
+
+The following Node/Neon deployment remains an alternative.
+
+# Node deployment alternative
 
 Skyward remains React/Vite with a persistent Node 24 service. Build once and serve
 `web/dist` through the Node server. Do not use Vite's development or preview server
@@ -80,6 +86,5 @@ examples must be smoke-tested on the deployment host before release.
 ## Cloudflare free-tier target
 
 The Cloudflare deployment target and bounded resource policy are defined in
-[FREE_TIER_DESIGN.md](FREE_TIER_DESIGN.md). This is a design, not a completed Workers/D1
-migration or an enforced zero-overage configuration. It includes capacity ceilings,
+[FREE_TIER_DESIGN.md](FREE_TIER_DESIGN.md). The prepared implementation is documented in [CLOUDFLARE.md](CLOUDFLARE.md); the free-tier document remains a capacity target, not an enforced zero-overage guarantee. It includes capacity ceilings,
 retention, R2 admission controls and required release tests.

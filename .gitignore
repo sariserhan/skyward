@@ -36,3 +36,10 @@ web/.local/
 
 # Reproducible raw facility snapshots (published assets and provenance are tracked)
 web/data/osm/v2/
+
+# Local Cloudflare state and secrets
+web/.wrangler/
+web/.cloudflare/
+.dev.vars
+.dev.vars.*
+!.dev.vars.example

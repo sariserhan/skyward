@@ -1,3 +1,4 @@
+import {SITE_ORIGIN} from './site.mjs';
 import {sendHttpError} from './error-pages.mjs';
 import {createTravelMetrics} from './travel-metrics.mjs';
 import {createAurowall} from './aurowall.mjs';
@@ -54,7 +55,7 @@ export const server = http.createServer(async (req, res) => {
       if(!authorizedMetrics(req.headers.authorization,process.env.SKYWARD_METRICS_TOKEN))return json(res,401,{error:'Unauthorized'});
       return json(res,200,{server:operations.snapshot(),feeds:feed.diagnostics});
     }
-    const published=publicPage(url);
+    const published=publicPage(url,{SKYWARD_PUBLIC_ORIGIN:SITE_ORIGIN,...process.env});
     if(published){if(published.location){res.writeHead(published.status,{Location:published.location,'Cache-Control':'no-store'});return res.end();}res.writeHead(published.status,{'Content-Type':published.type,'Cache-Control':published.status===200?'public, max-age=300':'no-store'});return res.end(req.method==='HEAD'?undefined:published.body);}
     if (url.pathname === '/healthz' || url.pathname === '/readyz') {
       try { await stat(resolve(webRoot, 'index.html')); return json(res, 200, { status: 'ok', service: 'skyward', upstream: 'not checked' }); }

@@ -1,3 +1,5 @@
+> **Launch target:** Skyward at **https://skyvvard.com**. Cloudflare Workers + D1 + R2 and Better Auth/Resend are prepared; nothing has been deployed or emailed. See [Cloudflare setup and release checklist](deployment/CLOUDFLARE.md). Contact: **contact@skyvvard.com**. The existing orbit mark is retained.
+
 # Skyward
 
 A browser flight observatory and flight simulator built with React, TypeScript,
@@ -58,7 +60,7 @@ not aircraft-feed coverage.
 - **Simulation:** flyable aircraft with Easy/Advanced controls, training,
   fuel, simulated radio guidance and landing/taxi practice. The separate Godot
   airport game is at `/airport-simulation/` when its web export is available.
-- **Accounts and Premium:** local test mode and a Neon PostgreSQL + Better Auth
+- **Accounts and Premium:** local test mode and a Cloudflare D1 or Neon PostgreSQL + Better Auth
   account path; Premium gates for simulators, recording, account libraries and
   configured paid flight details. Checkout defaults to test mode; the Neon backend supports explicit live billing configuration.
 
@@ -102,7 +104,7 @@ compatibility. See [browser testing](web/tests/browser/README.md).
   and rendering limitations.
 - [Deployment guide](deployment/README.md): the current persistent Node service
   and production setup. Deployment has not been performed; Cloudflare-specific
-  hosting, R2 and D1 are not implied by the current implementation.
+  hosting remains supported. The prepared [Cloudflare D1/R2/Workers target](deployment/CLOUDFLARE.md) is the intended launch path for **skyvvard.com**.
 - [Game spec](spec.md), [airport architecture](docs/architecture.md),
   [game status](docs/status.md), and [design decisions](docs/DECISIONS.md).
 

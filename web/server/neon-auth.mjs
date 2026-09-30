@@ -1,3 +1,4 @@
+import {resendSender,accountEmail} from './resend.mjs';
 import {Pool} from 'pg';
 import {betterAuth} from 'better-auth';
 import {randomUUID} from 'node:crypto';
@@ -30,10 +31,10 @@ function smtpSender(env){
  return message=>transport.sendMail({...message,from:env.SMTP_FROM});
 }
 export function createNeonAuth(pool,{env=process.env,sendEmail}={}){
- const config=neonConfig(env),deliver=sendEmail??smtpSender(env);
+ const config=neonConfig(env),deliver=sendEmail??(env.SKYWARD_EMAIL_PROVIDER==='resend'||env.RESEND_API_KEY?resendSender(env):smtpSender(env));
  // The Node server stays alive for delivery; keep account-enumeration timing out
  // of HTTP responses. Never log mail addresses, URLs or verification tokens.
- const send=(user,url,subject)=>{void Promise.resolve().then(()=>deliver({to:user.email,subject,text:`${subject}\n\n${url}\n\nIf you did not request this, you can ignore this email.`})).catch(()=>console.error('Account email delivery failed.'));};
+ const send=(user,url,subject)=>{void Promise.resolve().then(()=>deliver(accountEmail(user,url,subject,config.origin))).catch(()=>console.error('Account email delivery failed.'));};
  return betterAuth({
   appName:'Skyward',baseURL:config.origin,basePath:'/api/auth',secret:config.secret,database:pool,
   trustedOrigins:[config.origin],

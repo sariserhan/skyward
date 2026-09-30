@@ -22,7 +22,8 @@
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "6.1.1",
     "typescript": "7.0.2",
-    "vite": "8.3.1"
+    "vite": "8.3.1",
+    "wrangler": "^4.144.0"
   },
   "name": "skyward-observatory",
   "private": true,
@@ -72,6 +73,11 @@
     "test:devices": "npm run build && node scripts/device-release.mjs",
     "test:performance": "npm run build && node scripts/browser-tests.mjs --performance-capture",
     "import:facilities": "python3 scripts/import-airport-facilities.py",
-    "test:facilities": "python3 -m unittest discover -s scripts -p test_airport_facilities.py"
+    "test:facilities": "python3 -m unittest discover -s scripts -p test_airport_facilities.py",
+    "build:cloudflare": "npm run build && node scripts/prepare-cloudflare.mjs",
+    "dev:cloudflare": "wrangler dev --local",
+    "check:cloudflare": "wrangler deploy --dry-run --outdir .cloudflare/worker",
+    "db:migrate:d1:local": "wrangler d1 migrations apply skyward-accounts --local",
+    "assets:r2:plan": "node scripts/upload-cloudflare-assets.mjs"
   }
 }

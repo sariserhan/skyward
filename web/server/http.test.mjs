@@ -45,7 +45,7 @@ test('large startup assets negotiate gzip, respect q=0 and preserve HEAD metadat
 });
 
 test('homepage serves Skyward, legacy watch redirects, and the game has its own asset directory',async()=>{
- const home=await fetch(base+'/');assert.equal(home.status,200);assert.match(await home.text(),/Skyward · Flight observatory/);
+ const home=await fetch(base+'/');assert.equal(home.status,200);assert.match(await home.text(),/Skyward · 3D Flight Tracker/);
  for(const path of ['/watch','/watch/','/watch/index.html']){const r=await fetch(base+path+'?test=1',{redirect:'manual'});assert.equal(r.status,302);assert.equal(r.headers.get('location'),'/?test=1');}
  const redirect=await fetch(base+'/airport-simulation?test=1',{redirect:'manual'});assert.equal(redirect.headers.get('location'),'/airport-simulation/?test=1');
  const game=await fetch(base+'/airport-simulation/');assert.equal(game.status,401);assert.match(await game.text(),/included with Premium/);

@@ -1,8 +1,8 @@
 # Skyward: bounded Cloudflare free-tier design
 
-Status: architecture and implementation requirements, not deployed or enforced yet.
+Status: capacity targets. A locally testable Workers/D1/R2 target is now prepared; see [CLOUDFLARE.md](CLOUDFLARE.md). No remote deployment or zero-overage guarantee.
 Reviewed 2026-09-29. Target: Cloudflare Workers Free + D1 + R2 Standard + Better Auth.
-Neon remains the existing production database integration until a tested migration.
+D1 is the selected launch database; Neon remains an alternative. Migrating existing Neon users requires a separate tested data migration.
 
 ## Contract
 
