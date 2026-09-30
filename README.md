@@ -506,6 +506,17 @@ activity totals, not unique-user conversion rates. No names, route/seat data,
 boarding contents, account IDs or durable analytics rows are collected. Request
 rate limiting uses bounded transient connection-address state, as other APIs do.
 
+### Airport and flight URLs
+
+- `/airports/SFO/` opens the airport on the globe; the initial HTML contains catalog facts, canonical/social metadata and Airport structured data. Airport pages remain in the sitemap.
+- `/flights/JBU2117/` looks up the latest available observation for that tracking callsign. Selecting a real aircraft updates this URL without recreating the globe; Back/Forward restore selections. Camera movement adds no history entries. Flight-view mode is kept in the URL fragment, and Share view includes the camera pose.
+- `/flights/JBU2117/2026-09-30/` restricts lookup to that **UTC observation date**, not a verified departure date. Share view offers a date-specific link. Historical archives are not available: older dates display an unavailable message and a link to latest observations, never another day's aircraft.
+- Callsigns differ from ticket flight numbers and can be reused. Unverified flight lookup pages use `noindex,follow` and are excluded from the sitemap. Simulated aircraft have no public flight path. Aircraft without usable callsigns retain a hex fragment link.
+
+Cloudflare preparation generates all 1,152 airport entry documents into Static Assets. Flight entry HTML is composed by the existing Worker without calling a paid feed or writing to D1. Local Node serving uses the same document builder. No auth, billing or API access rules change. Unknown airports and invalid dates return HTTP 404.
+
+Verification: `web/server/page-routes.test.mjs` and `web/tests/browser/page-routes.py` (build first).
+
 ### Loading and error recovery
 
 The observatory’s error-notice and error-screen Reload buttons restore the selected real or simulated flight, flight camera, following state, and map position in the same tab. Recovery is independent of optional session resume; its one-use session snapshot expires after an hour and preserves original observation timestamps. Simulated flights retain their itinerary and clock. Browser regression: `web/tests/browser/error-recovery.py` (build first).

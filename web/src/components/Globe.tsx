@@ -633,7 +633,7 @@ export function Globe(p: Props) {
     const v = viewer.current; if (!v || !ready) return; const C = window.Cesium;
     v.trackedEntity = undefined; v.camera.lookAtTransform(C.Matrix4.IDENTITY);
     const duration = callbacks.current.preferences.reducedMotion ? 0 : 1.2;
-    if(firstRecovery.current){const pose=firstRecovery.current;firstRecovery.current=null;v.camera.setView({destination:C.Cartesian3.fromDegrees(pose.lon,pose.lat,pose.height),orientation:{heading:pose.heading,pitch:pose.pitch,roll:pose.roll}});if(p.following&&p.selected)v.trackedEntity=v.entities.getById(`aircraft-${p.selected.hex}`);return;}
+    if(firstRecovery.current||p.camera.pose){const pose=(firstRecovery.current??p.camera.pose)!;firstRecovery.current=null;v.camera.setView({destination:C.Cartesian3.fromDegrees(pose.lon,pose.lat,pose.height),orientation:{heading:pose.heading,pitch:pose.pitch,roll:pose.roll}});if(p.following&&p.selected)v.trackedEntity=v.entities.getById(`aircraft-${p.selected.hex}`);return;}
     if(p.camera.type==='tower'){return;} else if(p.camera.type==='overview'){
       const g=callbacks.current.geometry?.airports.find(a=>a.id===p.camera.airport);if(!g)return;
       const pts=airportPoints(g);const sphere=C.BoundingSphere.fromPoints((pts.length?pts:[[g.lon,g.lat]]).map(pt=>C.Cartesian3.fromDegrees(pt[0],pt[1])));sphere.radius=Math.max(1800,sphere.radius*1.25);

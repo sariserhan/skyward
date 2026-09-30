@@ -3,6 +3,7 @@ import {sendHttpError} from './error-pages.mjs';
 import {createTravelMetrics} from './travel-metrics.mjs';
 import {createAurowall} from './aurowall.mjs';
 const aurowall=createAurowall();
+import {observatoryDocument} from './observatory-document.mjs';
 import {publicPage} from './public-pages.mjs';
 import {createOperations,authorizedMetrics,clientAddress} from './operations.mjs';
 import {configuredFeed} from './combined-feed.mjs';
@@ -56,7 +57,7 @@ export const server = http.createServer(async (req, res) => {
       return json(res,200,{server:operations.snapshot(),feeds:feed.diagnostics});
     }
     const published=publicPage(url,{SKYWARD_PUBLIC_ORIGIN:SITE_ORIGIN,...process.env});
-    if(published){if(published.location){res.writeHead(published.status,{Location:published.location,'Cache-Control':'no-store'});return res.end();}res.writeHead(published.status,{'Content-Type':published.type,'Cache-Control':published.status===200?'public, max-age=300':'no-store'});return res.end(req.method==='HEAD'?undefined:published.body);}
+    if(published){if(published.location){res.writeHead(published.status,{Location:published.location,'Cache-Control':'no-store'});return res.end();}if(published.observatory)published.body=observatoryDocument(published,await readFile(resolve(webRoot,'index.html'),'utf8'));res.writeHead(published.status,{'Content-Type':published.type,'Cache-Control':published.status===200?'public, max-age=300':'no-store'});return res.end(req.method==='HEAD'?undefined:published.body);}
     if (url.pathname === '/healthz' || url.pathname === '/readyz') {
       try { await stat(resolve(webRoot, 'index.html')); return json(res, 200, { status: 'ok', service: 'skyward', upstream: 'not checked' }); }
       catch { return json(res, 503, { status: 'unavailable', error: 'Build assets missing' }); }

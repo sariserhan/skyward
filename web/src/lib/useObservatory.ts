@@ -113,7 +113,7 @@ export function useObservatory(airport: AirportId, alertsEnabled = false) {
     void follow(); const id = window.setInterval(follow, 1000);window.addEventListener('online',follow);document.addEventListener('visibilitychange',follow);
     return () => { alive = false; controller.abort(); clearInterval(id);window.removeEventListener('online',follow);document.removeEventListener('visibilitychange',follow); };
   }, [selectedHex, ingest]);
-  const lookup = useCallback(async (kind: string, q: string) => {
+  const lookup = useCallback(async (kind: string, q: string, accept?: (a:Aircraft)=>boolean) => {
     searchController.current?.abort(); const controller = new AbortController(); searchController.current = controller;
     setSearching(true); setSearchError('');
     try {
@@ -121,7 +121,8 @@ export function useObservatory(airport: AirportId, alertsEnabled = false) {
       if (controller.signal.aborted) return null;
       data.aircraft=ingest(data.aircraft);
       if (!data.aircraft.length) { setSearchError('No aircraft currently reported for that identifier. Try its ATC callsign, such as THY7.'); return null; }
-      select(data.aircraft[0]); return data.aircraft[0];
+      const match=data.aircraft.find(a=>!accept||accept(a));if(!match)return null;
+      select(match); return match;
     } catch (e) { if (!controller.signal.aborted) setSearchError(e instanceof Error ? e.message : 'Lookup unavailable.'); return null; }
     finally { if (!controller.signal.aborted) setSearching(false); }
   }, [ingest, select]);
