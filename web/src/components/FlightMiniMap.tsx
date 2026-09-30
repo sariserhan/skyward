@@ -10,6 +10,23 @@ import {coloredTrail} from '../lib/positionQuality';
 import type {City} from '../lib/cities';
 type World={features:{geometry:{type:string;coordinates:number[][][]|number[][][][]}}[]};
 let cached:World|null=null;
+// Compile immutable geography once instead of projecting every vertex each update.
+const outlineCache=new WeakMap<World,{path:Path2D;minX:number;maxX:number;minY:number;maxY:number}[]>();
+function outlines(world:World){
+ const cached=outlineCache.get(world);if(cached)return cached;
+ const result:{path:Path2D;minX:number;maxX:number;minY:number;maxY:number}[]=[];
+ for(const feature of world.features){
+  const polygons=feature.geometry.type==='Polygon'?[feature.geometry.coordinates as number[][][]]:feature.geometry.type==='MultiPolygon'?feature.geometry.coordinates as number[][][][]:[];
+  for(const rings of polygons){
+   const path=new Path2D();let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+   const anchor=((rings[0]?.[0]?.[0]??0)+180)/360;
+   for(const ring of rings){let last=anchor;ring.forEach(([lon,lat],i)=>{let x=(lon+180)/360;while(x-last>.5)x-=1;while(x-last<-.5)x+=1;last=x;const y=mercatorY(lat);minX=Math.min(minX,x);maxX=Math.max(maxX,x);minY=Math.min(minY,y);maxY=Math.max(maxY,y);if(i===0)path.moveTo(x,y);else path.lineTo(x,y);});path.closePath();}
+   result.push({path,minX,maxX,minY,maxY});
+  }
+ }
+ outlineCache.set(world,result);return result;
+}
+
 export function FlightMiniMap({aircraft:reported,cities,route,trail=[],routeView=false,followDisplayed=false,positionLabel=followDisplayed?'Displayed aircraft position':'Reported position'}:{aircraft:Aircraft;cities:City[];route:FlightRoute|null;trail?:TrailPoint[];routeView?:boolean;followDisplayed?:boolean;positionLabel?:string}){
  const [tileStatus,setTileStatus]=useState('Loading detailed map…');
  const [displayed,setDisplayed]=useState<{hex:string;lat:number;lon:number;heading:number}|null>(null);
@@ -30,12 +47,20 @@ export function FlightMiniMap({aircraft:reported,cities,route,trail=[],routeView
   let disposed=false,paintFrame=0;const tiles=miniMapTiles(cx,cy,span,W,H).map(t=>({...t,base:mapTile(t.z,t.x,t.y),labels:mapTile(t.z,t.x,t.y,true)}));
   const draw=()=>{if(disposed)return;
   ctx.fillStyle='#0a2335';ctx.fillRect(0,0,W,H);
-  const x=(lon:number)=>W/2+(((lon-cx+540)%360)-180)*scale,y=(lat:number)=>H/2+(mercatorY(lat)-mercatorY(cy))*worldPixels;
+  const centerY=mercatorY(cy);const x=(lon:number)=>W/2+(((lon-cx+540)%360)-180)*scale,y=(lat:number)=>H/2+(mercatorY(lat)-centerY)*worldPixels;
   ctx.strokeStyle='#254554';ctx.lineWidth=1;
   for(let lat=-90;lat<=90;lat+=wide?30:5){ctx.beginPath();ctx.moveTo(0,y(lat));ctx.lineTo(W,y(lat));ctx.stroke();}
   for(let lon=-180;lon<180;lon+=wide?30:5){ctx.beginPath();ctx.moveTo(x(lon),0);ctx.lineTo(x(lon),H);ctx.stroke();}
-  if(world)for(const f of world.features){const polygons=f.geometry.type==='Polygon'?[f.geometry.coordinates as number[][][]]:f.geometry.type==='MultiPolygon'?f.geometry.coordinates as number[][][][]:[];
-   for(const rings of polygons)for(const shift of [-360,0,360]){ctx.beginPath();for(const ring of rings){let last:number|undefined;ring.forEach(([lon,lat],i)=>{let dx=((lon-cx+540)%360)-180;if(last!==undefined){while(dx-last>180)dx-=360;while(dx-last< -180)dx+=360;}last=dx;const px=W/2+(dx+shift)*scale,py=y(lat);if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);});ctx.closePath();}ctx.fillStyle='#365953';ctx.fill('evenodd');ctx.strokeStyle='#66867e';ctx.stroke();}
+  // Opaque imagery already covers these outlines; retain them for missing tiles.
+  if(world&&!tiles.every(t=>t.base.image)){
+   const centerX=(cx+180)/360,centerY=mercatorY(cy),halfX=W/(2*worldPixels),halfY=H/(2*worldPixels);
+   ctx.save();ctx.fillStyle='#365953';ctx.strokeStyle='#66867e';ctx.lineWidth=1/worldPixels;
+   for(const outline of outlines(world))for(const shift of [-1,0,1]){
+    if(outline.maxX+shift<centerX-halfX||outline.minX+shift>centerX+halfX||outline.maxY<centerY-halfY||outline.minY>centerY+halfY)continue;
+    ctx.setTransform(worldPixels,0,0,worldPixels,W/2+(shift-centerX)*worldPixels,H/2-centerY*worldPixels);
+    ctx.fill(outline.path,'evenodd');ctx.stroke(outline.path);
+   }
+   ctx.restore();
   }
   for(const t of tiles){if(t.base.image)ctx.drawImage(t.base.image,t.left,t.top,t.size+.5,t.size+.5);if(t.labels.image)ctx.drawImage(t.labels.image,t.left,t.top,t.size+.5,t.size+.5);}
   ctx.fillStyle='rgba(4,15,24,.12)';ctx.fillRect(0,0,W,H);

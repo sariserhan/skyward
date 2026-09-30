@@ -28,7 +28,7 @@ export function TowerRadio({observations,demo,suspended}:{observations:Aircraft[
    if(!('speechSynthesis' in window)){setNotice('Speech unavailable in this browser. Transcript only.');const line=queue.shift()!;setCaption(`${line.speaker==='Tower'?'Tower':'Pilot'}: ${line.text}`);last=now;return;}
    const synth=window.speechSynthesis;if(synth.speaking||synth.pending)return;if(synth.paused)synth.resume();
    const line=queue.shift()!,u=new SpeechSynthesisUtterance(line.text);let preferred='';try{preferred=localStorage.getItem('skyward.voice.v1')??'';}catch{}
-   const voice=announcementVoice(synth.getVoices(),preferred);if(voice)u.voice=voice;u.lang=voice?.lang??'en-US';u.volume=readAudioMix().radio*.8;u.rate=line.speaker==='Tower'?1.04:.95;u.pitch=line.speaker==='Tower'?1:.9;
+   const voice=announcementVoice(synth.getVoices(),preferred);if(!voice){last=now;setCaption(`${line.speaker}: ${line.text}`);setNotice('No supported voice available. Enable Google, Tessa, Fred, Ralph or Karen. Transcript only.');return;}u.voice=voice;u.lang=voice?.lang??'en-US';u.volume=readAudioMix().radio*.8;u.rate=line.speaker==='Tower'?1.04:.95;u.pitch=line.speaker==='Tower'?1:.9;
    owned=u;started=now;setCaption(`${line.speaker==='Tower'?'Tower':'Pilot'}: ${line.text}`);setNotice('Starting radio speech…');
    const finish=()=>{if(owned!==u)return false;owned=null;release?.();release=null;last=Date.now();return true;};
    u.onstart=()=>{if(owned===u){release=acquireSpeechFocus();setNotice(`Speaking · ${line.speaker==='Tower'?'Tower':'Pilot'}`);}};
