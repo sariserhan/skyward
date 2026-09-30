@@ -1,3 +1,4 @@
+import {reprojectTerrainTile} from './terrainProjection.ts';
 import {flattenAirportTile} from './airportTerrain.ts';
 import {qualityEvent} from './qualityEvents.ts';
 import type * as Cesium from 'cesium';
@@ -36,10 +37,24 @@ export function createOpenTerrain(failed:()=>void, updated:()=>void) {
       if(z===0)return new Float32Array(65*65);throw error;}).finally(()=>{active--;pending.delete(key);if(!disposed)updated();});
     pending.set(key,job);return job;
   };
-  const provider=new C.CustomHeightmapTerrainProvider({width:65,height:65,tilingScheme:new C.WebMercatorTilingScheme(),callback:load,
+  // Geographic geometry reaches ±90°. Mercator terrain leaves both polar caps open.
+  const geographic=new Map<string,Promise<Float32Array>>();let projecting=0;
+  const globeTile=(x:number,y:number,z:number)=>{
+    const key=`${z}/${x}/${y}`;
+    if(disposed)return undefined;
+    if(geographic.has(key))return geographic.get(key);
+    if(projecting>=2)return undefined;
+    projecting++;
+    const job=reprojectTerrainTile(x,y,z,async(sx,sy,sz)=>{
+      const tile=load(sx,sy,sz);if(!tile)throw new Error('Terrain request deferred');return tile;
+    }).catch(error=>{geographic.delete(key);throw error;}).finally(()=>{projecting--;});
+    geographic.set(key,job);if(geographic.size>128)geographic.delete(geographic.keys().next().value!);
+    return job;
+  };
+  const provider=new C.CustomHeightmapTerrainProvider({width:65,height:65,tilingScheme:new C.GeographicTilingScheme(),callback:globeTile,
     credit:new C.Credit(`<a href="${(import.meta.env?.BASE_URL??'/')}terrain-attribution.txt" target="_blank">Open terrain: Mapzen · USGS · NOAA · other contributors</a>`,true)});
   provider.requestTileGeometry=(x,y,level)=>{
-    const heights=load(x,y,level);if(!heights)return undefined;
+    const heights=globeTile(x,y,level);if(!heights)return undefined;
     return heights.then(buffer=>new C.HeightmapTerrainData({buffer,width:65,height:65,childTileMask:level>=14?0:15}));
   };
   const retries=new Map<string,number>();
@@ -52,5 +67,5 @@ export function createOpenTerrain(failed:()=>void, updated:()=>void) {
     if(active>2||disposed||!Number.isFinite(lon)||!Number.isFinite(lat))return;
     const scheme=new C.WebMercatorTilingScheme(),point=C.Cartographic.fromDegrees(lon,Math.max(-85,Math.min(85,lat)));
     for(const z of [9,11]){const tile=scheme.positionToTileXY(point,z);if(tile)void load(tile.x,tile.y,z,true)?.catch(()=>{});}
-  },dispose:()=>{disposed=true;controller.abort();removeError();cache.clear();retries.clear();}};
+  },dispose:()=>{disposed=true;controller.abort();removeError();cache.clear();geographic.clear();retries.clear();}};
 }
