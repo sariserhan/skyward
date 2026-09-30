@@ -1,3 +1,5 @@
+import {ACCOUNT_LINK_TTL_SECONDS} from './email-template.mjs';
+import {SUPPORT_EMAIL} from './site.mjs';
 import {resendSender,accountEmail} from './resend.mjs';
 import {Pool} from 'pg';
 import {betterAuth} from 'better-auth';
@@ -28,7 +30,7 @@ function smtpSender(env){
  const port=Number(env.SMTP_PORT||587);
  if(!Number.isInteger(port)||port<1||port>65535)throw Error('Invalid SMTP_PORT.');
  const transport=nodemailer.createTransport({host:env.SMTP_HOST,port,secure:port===465,requireTLS:port!==465,auth:env.SMTP_USER?{user:env.SMTP_USER,pass:env.SMTP_PASSWORD}:undefined,tls:{rejectUnauthorized:true},connectionTimeout:10000,socketTimeout:20000});
- return message=>transport.sendMail({...message,from:env.SMTP_FROM});
+ return message=>transport.sendMail({...message,from:env.SMTP_FROM,replyTo:env.RESEND_REPLY_TO||SUPPORT_EMAIL});
 }
 export function createNeonAuth(pool,{env=process.env,sendEmail}={}){
  const config=neonConfig(env),deliver=sendEmail??(env.SKYWARD_EMAIL_PROVIDER==='resend'||env.RESEND_API_KEY?resendSender(env):smtpSender(env));
@@ -39,8 +41,8 @@ export function createNeonAuth(pool,{env=process.env,sendEmail}={}){
   appName:'Skyward',baseURL:config.origin,basePath:'/api/auth',secret:config.secret,database:pool,
   trustedOrigins:[config.origin],
   advanced:{ipAddress:{ipAddressHeaders:['x-skyward-client-ip']},cookiePrefix:'skyward-auth',useSecureCookies:config.origin.startsWith('https:'),database:{generateId:()=>randomUUID()}},
-  emailAndPassword:{enabled:true,minPasswordLength:12,maxPasswordLength:128,requireEmailVerification:true,revokeSessionsOnPasswordReset:true,sendResetPassword:({user,url})=>send(user,url,'Reset your Skyward password')},
-  emailVerification:{sendOnSignUp:true,sendOnSignIn:true,autoSignInAfterVerification:false,sendVerificationEmail:({user,url})=>send(user,url,'Verify your Skyward email')},
+  emailAndPassword:{enabled:true,minPasswordLength:12,maxPasswordLength:128,requireEmailVerification:true,revokeSessionsOnPasswordReset:true,resetPasswordTokenExpiresIn:ACCOUNT_LINK_TTL_SECONDS,sendResetPassword:({user,url})=>send(user,url,'Reset your Skyward password')},
+  emailVerification:{expiresIn:ACCOUNT_LINK_TTL_SECONDS,sendOnSignUp:true,sendOnSignIn:true,autoSignInAfterVerification:false,sendVerificationEmail:({user,url})=>send(user,url,'Verify your Skyward email')},
   session:{expiresIn:7*86400,updateAge:86400,cookieCache:{enabled:false}},
   rateLimit:{enabled:true,storage:'database',window:60,max:60},
   logger:{level:'error',log:level=>{if(level==='error')console.error('Authentication request failed.');}}

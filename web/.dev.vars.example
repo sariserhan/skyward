@@ -4,7 +4,7 @@ BETTER_AUTH_SECRET=
 RESEND_API_KEY=
 # Real email is sent when a real key is supplied; use a verified sending domain.
 RESEND_FROM=Skyward <contact@skyvvard.com>
-RESEND_REPLY_TO=contact@skyvvard.com
+RESEND_REPLY_TO=support@skyvvard.com
 # Optional existing provider/audio keys stay server-side.
 # SKYWARD_FLYITALY_API_KEY=
 # R2_ACCOUNT_ID=
