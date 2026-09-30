@@ -6,6 +6,17 @@
  if(setup&&toggle)toggle.onclick=()=>{setup.hidden=!setup.hidden;toggle.setAttribute('aria-expanded',String(!setup.hidden));toggle.textContent=setup.hidden?'Show setup':'Hide setup';};
  const buttons=['cloud-save','cloud-load','cloud-start','cloud-export'];
  function enabled(){for(const id of buttons)byId(id).disabled=!ready||busy;}
+ // Use a styled, non-blocking modal; browser-native confirmation freezes the game thread.
+ function confirmAction({title,message,accept,focusTarget}){return new Promise(resolve=>{
+  const previous=focusTarget||document.activeElement,dialog=document.createElement('dialog');
+  dialog.className='skyward-confirm';dialog.setAttribute('aria-labelledby','skyward-confirm-title');dialog.setAttribute('aria-describedby','skyward-confirm-description');
+  dialog.innerHTML='<form method="dialog"><span class="skyward-confirm-brand">SKYWARD</span><h2 id="skyward-confirm-title"></h2><p id="skyward-confirm-description"></p><div class="skyward-confirm-actions"><button value="cancel" autofocus>Keep current game</button><button value="confirm" class="skyward-confirm-accept"></button></div></form>';
+  dialog.querySelector('h2').textContent=title;dialog.querySelector('p').textContent=message;dialog.querySelector('[value="confirm"]').textContent=accept;
+  dialog.addEventListener('cancel',event=>{event.preventDefault();dialog.close('cancel');});
+  dialog.addEventListener('click',event=>{const r=dialog.getBoundingClientRect();if(event.target===dialog&&(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom))dialog.close('cancel');});
+  dialog.addEventListener('close',()=>{const accepted=dialog.returnValue==='confirm';dialog.remove();resolve(accepted);requestAnimationFrame(()=>{if(previous instanceof HTMLElement&&previous.isConnected)previous.focus();});},{once:true});
+  document.body.append(dialog);dialog.showModal();dialog.querySelector('[value="cancel"]').focus();
+ });}
  async function api(body,key){
   const response=await fetch('/api/account/library'+(body?'':'?kind=simulator'+(key?'&key='+encodeURIComponent(key):'')),{method:body?'POST':'GET',credentials:'same-origin',headers:body?{'Content-Type':'application/json'}:undefined,body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(15000)});
   const data=await response.json();if(!response.ok)throw Error(data.error||'Cloud save unavailable.');return data;
@@ -27,6 +38,6 @@
  });
  byId('cloud-export').onclick=()=>void run(async()=>{const value=await command('snapshot'),url=URL.createObjectURL(new Blob([JSON.stringify(value)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='skyward-career.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);status.textContent='Full backup exported to this device.';});
  byId('cloud-save').onclick=()=>void run(async()=>{const snapshot=await command('snapshot'),c=snapshot.career;if(!c)throw Error('Start a career before saving progress.');const value={kind:'career-progress',version:1,career_id:c.career_id,airport_name:c.airport_name,day:c.day,cash_cents:c.cash_cents,phase:c.phase,mode:c.mode,difficulty:c.difficulty};const key=current?.key||crypto.randomUUID();const saved=await api({kind:'simulator',key,revision:current?.revision??0,value});current={key,revision:saved.revision};await refresh();status.textContent='Progress summary saved to your account. Export a backup to resume the full game elsewhere.';});
- byId('cloud-load').onclick=()=>{if(confirm('Replace the current game with this cloud save? Unsaved progress will be lost.'))void run(()=>load(slots.value));};
- byId('cloud-start').onclick=()=>{if(confirm('Start this scenario? Export a full backup first to preserve the current game.'))void run(async()=>{status.textContent='Opening '+byId('cloud-scenario').selectedOptions[0].textContent+'…';await command('scenario',byId('cloud-scenario').value);current=null;slots.value='';status.textContent='Scenario started. Save a progress summary to your account or export a full backup.';});};
+ byId('cloud-load').onclick=()=>void run(async()=>{const key=slots.value;if(!key){status.textContent='Choose a cloud save first.';slots.focus();return;}if(await confirmAction({title:'Load this saved game?',focusTarget:byId('cloud-load'),message:'This replaces your current game. Unsaved progress will be lost. Export a full backup first if you want to keep it.',accept:'Load saved game'}))await load(key);});
+ byId('cloud-start').onclick=()=>void run(async()=>{const scenario=byId('cloud-scenario'),value=scenario.value,name=scenario.selectedOptions[0].textContent;if(!await confirmAction({title:'Start a new scenario?',focusTarget:byId('cloud-start'),message:'Start '+name+' and replace your current game? Export a full backup first to keep your progress.',accept:'Start scenario'}))return;status.textContent='Opening '+name+'…';await command('scenario',value);current=null;slots.value='';status.textContent='Scenario started. Save a progress summary to your account or export a full backup.';});
 })();
