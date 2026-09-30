@@ -1,3 +1,4 @@
+import {createTravelMetrics} from './travel-metrics.mjs';
 import {createAurowall} from './aurowall.mjs';
 const aurowall=createAurowall();
 import {publicPage} from './public-pages.mjs';
@@ -32,7 +33,7 @@ const tripDiscovery=createTripDiscovery(feed);
 const airportWeather=createAirportWeather();
 const localWeather=createLocalWeather();
 const rates = new Map();
-const operations=createOperations();
+const operations=createOperations(),travelMetrics=createTravelMetrics();
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'application/javascript', '.mjs': 'application/javascript', '.css': 'text/css', '.txt': 'text/plain; charset=utf-8', '.json': 'application/json', '.geojson': 'application/geo+json', '.png': 'image/png', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.wasm': 'application/wasm', '.gltf': 'model/gltf+json', '.glb': 'model/gltf-binary', '.woff2': 'font/woff2' };
 function json(res, code, value) { res.writeHead(code, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(value)); }
 export const server = http.createServer(async (req, res) => {
@@ -44,6 +45,7 @@ export const server = http.createServer(async (req, res) => {
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   try {
     const memberUrl = new URL(req.url, 'http://localhost');
+    if(await travelMetrics.handle(req,res,memberUrl)) return;
     if(await membership.handle(req,res,memberUrl)) return;
     if (!['GET', 'HEAD'].includes(req.method)) return json(res, 405, { error: 'Method not allowed' });
     const url = new URL(req.url, 'http://localhost');

@@ -1,0 +1,6 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {createServer} from 'node:http';import {createTravelMetrics} from './travel-metrics.mjs';
+test('Conversion metrics store allowlisted counters only, reject added personal fields and protect reads',async t=>{
+ const token='test-only-metrics-token-1234567890',metrics=createTravelMetrics({env:{SKYWARD_METRICS_TOKEN:token}}),server=createServer((req,res)=>void metrics.handle(req,res,new URL(req.url,'http://localhost')));await new Promise(r=>server.listen(0,'127.0.0.1',r));t.after(()=>new Promise(r=>server.close(r)));const url=`http://127.0.0.1:${server.address().port}/api/travel-metrics`,headers={Origin:'http://localhost:8000','Content-Type':'application/json'};
+ assert.equal((await fetch(url,{method:'POST',headers,body:JSON.stringify({event:'trip_saved',name:'PRIVATE'})})).status,400);assert.equal((await fetch(url,{method:'POST',headers,body:JSON.stringify({event:'trip_saved'})})).status,200);assert.equal((await fetch(url)).status,401);
+ const data=await(await fetch(url,{headers:{Authorization:'Bearer '+token}})).json();assert.equal(Object.values(data.days)[0].trip_saved,1);assert.ok(!JSON.stringify(data).includes('PRIVATE'));assert.match(data.scope,/resets on restart/);
+});

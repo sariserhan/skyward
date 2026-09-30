@@ -7,5 +7,14 @@
   "sha256": "9387cdb38df5bd664da823f8ccb69fdd9b33a1888f5b7cca09c34a3cd9ff59f9",
   "matched": 1080,
   "catalog": 1152,
-  "match": "Exact ICAO and within 20 km; unknown zones omitted. Historical reference; offsets and DST from browser IANA database."
+  "match": "Exact ICAO and within 20 km; unknown zones omitted. Historical reference; offsets and DST from browser IANA database.",
+  "manualSupplements": [
+    {
+      "airport": "IST",
+      "zone": "Europe/Istanbul",
+      "source": "https://data.iana.org/time-zones/tzdb/zone1970.tab",
+      "checked": "2026-09-30",
+      "reason": "IANA TR zone; current Istanbul airport missing from historical OpenFlights match."
+    }
+  ]
 }

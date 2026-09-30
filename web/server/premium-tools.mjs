@@ -12,7 +12,7 @@ export function validSubscription(value){
  return {endpoint:url.href,keys:{p256dh:value.keys.p256dh,auth:value.keys.auth}};
 }
 export function createPremiumTools({store,entitlement,userById,readJourney,lookup,listJourneys,observations,env=process.env,now=Date.now,sendPush=webpush.sendNotification}){
- const travelers=createTravelers({store,entitlement,userById,readJourney,observations,now});
+ const travelers=createTravelers({store,entitlement,userById,readJourney,observations,now,env});
  const vapid=env.SKYWARD_VAPID_PUBLIC_KEY&&env.SKYWARD_VAPID_PRIVATE_KEY&&env.SKYWARD_VAPID_SUBJECT?{subject:env.SKYWARD_VAPID_SUBJECT,publicKey:env.SKYWARD_VAPID_PUBLIC_KEY,privateKey:env.SKYWARD_VAPID_PRIVATE_KEY}:null;
  const month=()=>new Date(now()).toISOString().slice(0,7),monthlyLimit=30;
  async function eligible(id){const u=await userById(id);return u&&await entitlement(u)?u:null;}

@@ -424,7 +424,7 @@ static. Regenerate metadata with `python3 web/scripts/prepare-jet-fan-rigs.py`.
 
 **Travel together** (`/travelers/`) lists voluntary, self-reported traveler posts.
 Premium members can publish from **Account → Boarding passes → Share my journey**
-after linking a tracking journey. A separate public alias, flight/route/date and
+after saving a trip with its confirmed tracking callsign. A separate public alias, flight/route/date and
 chosen approximate window position are shared for 1 or 24 hours (three active
 posts per account). Exact seat numbers, barcode files, account emails and booking
 references remain private. Sharing can be withdrawn even after Premium expires;
@@ -438,3 +438,52 @@ verified boarding status or airline passenger manifest. Directory reads use
 bounded existing account storage and cached traffic; public viewing never invokes
 the paid details API. Premium marketing includes a direct **Start with my trip**
 entry point at `/account/?trips=1`.
+
+Travel sharing now includes the following:
+
+- **One-save setup:** a reviewed trip with a confirmed tracking callsign creates
+  and links its tracking journey during Save. Ticket numbers are never silently
+  treated as ICAO callsigns. Trips without a callsign still save privately.
+- **Visibility:** Private (authenticated owner window), Anyone with the invitation
+  link (unlisted), or Public directory. All modes expire and can be removed.
+  An invitation is a bearer link: anyone it is forwarded to can view it.
+- **Seat preview:** choose side and approximate cabin position visually. An
+  explicitly confirmed [British Airways A320neo representative seat map](https://www.britishairways.com/content/information/seating/seat-maps)
+  supports window columns A/F, rows 1–30. Its position buckets remain approximate;
+  no tail-specific seat layout or actual seat camera is claimed. Other aircraft
+  use the manual preview and available official cabin references.
+- **Arrival companion:** straight-line route progress only for a matching nearby
+  route observation, destination local time, cached station weather, and available
+  server-verified arrival details no older than 15 minutes. Public guests never
+  trigger paid flight-detail calls. Notification permission is requested only by
+  the user; arrival notifications require the page to remain open and active.
+- **Recaps:** consecutive observed ground/air transitions near the relevant
+  airport and fresh reported arrivals are distinguished. Long gaps never imply
+  takeoff or landing. Users can download scenery/sunset images they mark in the
+  simulated view and export a JSON recap. At most 24 recap events stay in the
+  current browser tab session; images are downloaded, not uploaded.
+- **Reactions:** waves/hearts have cooldowns, bounded in-memory history, traveler
+  mute and per-guest-browser blocking. A 24-hour HttpOnly guest cookie identifies
+  the browser for interaction controls. Clearing cookies can evade a browser
+  block; this is not verified-person blocking. Reaction/milestone memory resets
+  on server restart. Owner controls can stop interactions after downgrading.
+- **Directory:** filter by callsign, route or UTC date; hide/restore trips locally;
+  report privacy, impersonation, inappropriate content or spam. Reports contain
+  reason counts only, expire with the post, and do not automatically remove posts.
+
+Operator moderation uses `GET /api/travelers/moderation`, protected by the
+existing `SKYWARD_METRICS_TOKEN` bearer token. `POST` with `{"key":"<post-id>",
+"action":"hide"}` hides a reported post; `"dismiss"` clears its reports. Keep
+that token server-side and use an operator client; it is never sent to browser UI.
+Configure it before opening public traveler posting to external users so reports
+can be reviewed. Normal users can always hide trips locally and withdraw their
+own sharing.
+
+Anonymous travel-funnel events (`premium_view`, `trip_start`, `trip_saved`,
+`sharing_created`, `guest_watch`) contain only the event name. The browser emits
+at most one of each per page session and honors Do Not Track. Aggregate daily
+counts are bounded to 30 days **in process memory**, reset on restart, and can be
+read at `GET /api/travel-metrics` with the same operator bearer token. They are
+activity totals, not unique-user conversion rates. No names, route/seat data,
+boarding contents, account IDs or durable analytics rows are collected. Request
+rate limiting uses bounded transient connection-address state, as other APIs do.
