@@ -27,7 +27,7 @@ export function AirLabsDetails() {
     <p>Preview schedules, gates and arrival estimates using a separate example flight. No paid lookup or automatic refresh.</p>
     <button className="quiet-button" disabled={loading} onClick={load}>{loading ? 'Loading preview…' : result ? 'Reload preview' : 'Load sample details'}</button>
     {error && <p role="alert">{error}</p>}
-    {result && <div aria-live="polite"><p>{result.mode === 'demo' ? 'Synthetic example DEMO101. Not data for your selected aircraft.' : 'Premium flight details are coming soon. No live lookup was made.'}</p>{result.mode === 'demo' && result.flight && <>
+    {result && <div aria-live="polite"><p>{result.mode === 'demo' ? 'Synthetic example DEMO101. Not data for your selected aircraft.' : 'Live flight details are unavailable. No live lookup was made.'}</p>{result.mode === 'demo' && result.flight && <>
       <strong>{result.flight.callsign} · synthetic example</strong>
       <div className="airlabs-endpoints">{(['departure', 'arrival'] as const).map(side => {const p = result.flight![side]; return <div key={side}>
         <h4>{side === 'departure' ? 'Departure' : 'Arrival'} · {p.airport ?? 'Unknown'}</h4>

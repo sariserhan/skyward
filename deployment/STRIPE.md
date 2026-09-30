@@ -81,3 +81,88 @@ no development Premium bypass, and an example.invalid test account:
   subscription test is not a claim that browser Checkout completed.
 
 Production configuration and deployment were not changed by these local tests.
+
+
+## Launch checkpoint — September 30, 2026
+
+The production public-route check passes for home, account, terms, privacy, contact,
+missing-page 404, and unauthenticated Premium/simulator denial. At this checkpoint
+`/api/account` reports `mode: live`, `billingReady: false`, and
+`liveDetailsReady: false`. Do not describe this as a completed payment launch.
+
+Read-only Stripe checks found the live USD 59.99/year price
+`price_1ULGXnRksGpoxxAiGXOwVtT7` and an enabled webhook at
+`https://skyvvard.com/api/billing/webhook`, version `2026-08-26.dahlia`.
+The live webhook was missing `invoice.payment_action_required` (it contained
+`invoice.payment_attempt_required`, a different event). After explicit approval,
+the missing event was added while preserving existing events. Both live and test
+Customer Portals are now configured and verified: cancellation at period end,
+payment-method updates, invoice history, return URL
+`https://skyvvard.com/account/`, and the site's Terms/Privacy links. The default
+portal and all required webhook events were read back successfully in both modes.
+No charge or subscription was created. The test read-only Stripe preflight now
+passes; this is configuration verification, not payment or webhook delivery proof.
+
+The user supplied `AIRLABS_API_KEY` in `web/.env.local`. Two controlled real
+API requests succeeded (HTTP 200): AAL6 flight details returned schedule and gate
+fields; IAD schedules returned 50 partial records. The callsign-only result is
+explicitly an unverified flight instance, not proof of a watched-aircraft match.
+The Worker inventory still does not contain the key. Automatic approval review
+requires explicit approval to upload this credential into the production Worker;
+that approval is pending. Aviation mode remains `demo` until the production setup
+is authorized. Actual provider quotas/costs still need to match the configured
+service budget. This integration does not add observed positions to the globe.
+Free and Premium share observed map coverage.
+
+### Repeatable checks
+
+From `web/`:
+
+```sh
+npm run check:launch
+npm run check:stripe
+# Read-only live check, using securely supplied live environment values:
+node scripts/check-stripe.mjs --live
+npm test
+npm run build:cloudflare
+npm run check:cloudflare
+```
+
+`check:launch` makes public read-only requests, exits nonzero when required
+readiness checks fail, and makes no paid lookup, signup, email or checkout request.
+`check:stripe` is read-only and now checks the annual price, registered webhook
+and event coverage, and Customer Portal configuration. A configured signing
+secret does not prove that its signature matches delivered events. Keep local
+keys in test mode; do not commit secrets.
+
+Validated locally: paid/unpaid subscription summaries and cancellation dates;
+matching checkout keys and required live webhook configuration; D1 signup,
+verification, password reset and old-session invalidation with a captured test
+outbox; signed webhook reconciliation; user/global/accounting-budget exhaustion;
+shared cached lookups; denial of paid cached results to free users; paywall live,
+test and unavailable UI states; responsive account layouts and recovery errors.
+These fixture tests do not establish actual inbox delivery or successful browser
+payment completion. A designated test inbox is still needed; real email delivery,
+browser checkout completion and Stripe-to-deployment webhook delivery remain
+unverified. No real payment was created.
+
+### Limits and observability
+
+Live lookups use a shared five-minute cache with concurrent-request deduplication.
+Authorization runs before cache access. Each upstream attempt reserves allowance
+before the request; failures are not automatically retried/refunded. Defaults are
+100 requests/user/month, 1,000 service requests/month, and a separately configured
+accounting budget. `SKYWARD_REQUEST_MICROS` must reflect the purchased provider plan:
+this internal estimate is not the provider's invoice or proof of a dollar spend cap.
+The actual provider's plan/quota still needs checking before live activation.
+
+Error reports use fixed codes only, with no exception messages, stack traces,
+flight identifiers, boarding passes or passenger names. Each browser reports each
+code at most once per page session and respects Do Not Track. Counts are bounded
+in server memory (30 daily buckets) and reset on restart/eviction; no D1/R2 rows are
+added for error events. The first occurrence of each error code/day is written to
+console for live Worker tail inspection. Workers historical observability remains
+disabled; this is lightweight operational visibility, not retained crash analytics.
+Protected totals are available at `GET /api/travel-metrics` with
+`Authorization: Bearer <SKYWARD_METRICS_TOKEN>` after configuring a secret token
+of at least 24 characters. Public reads stay denied. Do not put the token in a URL.

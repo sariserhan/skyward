@@ -1,3 +1,4 @@
+import {retainMapCredit,osmCredit} from '../lib/mapCredits';
 import {createGlobalBasemap} from '../lib/globalBasemap';
 import {sceneryAhead} from '../lib/sceneryAhead';
 import {buildingAppearance} from '../lib/buildingAppearance';
@@ -134,9 +135,7 @@ export function Globe(p: Props) {
   const rendered = useRef(new Map<string,string>());
   useEffect(()=>{
     const v=viewer.current;if(!ready||!v||v.isDestroyed()||(!p.geometry&&!p.arrivalGeometry))return;
-    const credit=new window.Cesium.Credit('<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap contributors</a>',true);
-    v.creditDisplay.addStaticCredit(credit);v.scene.requestRender();
-    return()=>{if(!v.isDestroyed()){v.creditDisplay.removeStaticCredit(credit);v.scene.requestRender();}};
+    return retainMapCredit(window.Cesium,v,osmCredit);
   },[ready,p.geometry,p.arrivalGeometry]);
 
   useEffect(()=>{const v=viewer.current;if(!ready||!v)return;let timer:ReturnType<typeof setTimeout>;

@@ -551,3 +551,10 @@ Fallback aircraft also have family-specific sweep, tail proportions and engine m
 The aircraft gallery now offers **Front / Side / Rear / Underside**, control-surface and gear previews, and **Close inspection** resolution. Only the selected preview loads. In the live globe, tiny background models stay as icons, with a pixel-size hysteresis band to avoid loading/unloading churn; the actively selected aircraft remains prioritized.
 
 To inspect the fallback fleet after a build, run `python web/tests/browser/model_gallery.py` in the existing Python Playwright environment. It captures five representative families at four fixed angles, exercises the actual flap transform, and checks a mobile viewport. `MODEL_GALLERY_ALL=1` captures every fallback family. Screenshots go to a temporary directory or `SKYWARD_QA_ARTIFACTS`, never into the app bundle. For repeatable visual regression comparisons, use `SKYWARD_MODEL_BASELINES=/path/to/approved-images`; create or explicitly refresh those references with `UPDATE_MODEL_BASELINES=1`. Review changes before accepting them. Keep browser, device scale and renderer consistent for pixel comparisons; the test tolerates small antialiasing differences.
+
+
+Production launch checks: run `npm --prefix web run check:launch` for public route
+and configuration readiness. See [the billing launch checkpoint](deployment/STRIPE.md#launch-checkpoint--september-30-2026)
+for verified behavior, outstanding Stripe/email/aviation setup, API limits and
+privacy-preserving reliability counters. Premium currently shares the free map's
+observed aircraft coverage; live billing does not activate paid aviation data.

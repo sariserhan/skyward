@@ -39,7 +39,7 @@ const operations=createOperations(),travelMetrics=createTravelMetrics();
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'application/javascript', '.mjs': 'application/javascript', '.css': 'text/css', '.txt': 'text/plain; charset=utf-8', '.json': 'application/json', '.geojson': 'application/geo+json', '.png': 'image/png', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.wasm': 'application/wasm', '.gltf': 'model/gltf+json', '.glb': 'model/gltf-binary', '.woff2': 'font/woff2' };
 function json(res, code, value) { res.writeHead(code, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(value)); }
 export const server = http.createServer(async (req, res) => {
-  operations.observe(res);
+  operations.observe(res);res.once('finish',()=>{if(res.statusCode>=500)travelMetrics.record('server_request_error');});
   if(process.env.SKYWARD_ACCESS_LOG==='1'){const start=Date.now();res.once('finish',()=>console.log(`${req.method} ${(req.url?.startsWith('/share/')||req.url?.startsWith('/api/watch-room/'))?'/private-link/[redacted]':req.url?.split('?')[0]} ${res.statusCode} ${Date.now()-start}ms`));}
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');

@@ -1,3 +1,4 @@
+import type {Account} from '../lib/membership';
 import {LoadingSkeleton} from './SystemState';
 import {travelMetric} from '../lib/travelMetrics';
 import {PremiumPreview} from './PremiumPreview';
@@ -6,6 +7,7 @@ const MembershipPanel=lazy(()=>import('./MembershipPanel').then(m=>({default:m.M
 import {Sparkles, X} from 'lucide-react';
 
 export function Upgrade({openJourney}:{openJourney:(hex:string)=>Promise<void>}) {
+  const [account,setAccount]=useState<Account|null>(null);
   const [open,setOpen]=useState(false);
   const [accountOnly,setAccountOnly]=useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
@@ -17,7 +19,7 @@ export function Upgrade({openJourney}:{openJourney:(hex:string)=>Promise<void>})
     <button ref={trigger} className="upgrade-trigger" aria-haspopup="dialog" onClick={() => show()}><Sparkles size={14}/>Upgrade</button>
     <button className="account-trigger quiet-button" onClick={()=>show(true)} aria-haspopup="dialog">Account &amp; journeys</button>
     <dialog ref={dialog} className="upgrade-dialog" aria-labelledby="upgrade-title" aria-describedby="upgrade-description" onClose={() => {setOpen(false);trigger.current?.focus();}} onClick={e => {if(e.target === e.currentTarget) close();}}>
-      <div className="upgrade-heading"><span>SKYWARD PREMIUM · COMING SOON</span><button className="icon-button" aria-label="Close upgrade details" onClick={close}><X size={20}/></button></div>
+      <div className="upgrade-heading"><span>SKYWARD PREMIUM{account?.billingReady?(account.mode==='test'?' · TEST CHECKOUT':''):account?' · CHECKOUT UNAVAILABLE':''}</span><button className="icon-button" aria-label="Close upgrade details" onClick={close}><X size={20}/></button></div>
       <h2 id="upgrade-title">{accountOnly?'Your Skyward':'Your flight. Their window to the world.'}</h2>
       <p id="upgrade-description">Scan your boarding pass or add your flight and seat. Keep a personal travel companion—and choose to bring others along.</p>
       {!accountOnly&&<section className="premium-travel-story" aria-label="Bring someone along"><span>YOUR JOURNEY, SHARED YOUR WAY</span><h3>“Watch from Jane’s window.”</h3><p>Let friends follow your route and explore a simulated window view while your flight is being tracked.</p><div className="premium-travel-steps"><article><strong>01 · Add your trip</strong><p>Scan a boarding pass, import a photo or PDF, or type your flight and seat.</p></article><article><strong>02 · Make it yours</strong><p>Keep your trip private. Pick a public nickname and approximate window position only if you want to share.</p></article><article><strong>03 · Bring them along</strong><p>Publish an expiring journey in Travel together. Anyone can watch a matching aircraft without signing in.</p></article></div><div className="membership-actions"><a className="primary-button" href="/account/?trips=1">Start with my trip</a><a href="/travelers/">Explore Travel together →</a></div><small>Illustrative window scenery, not a live seat camera. Trips are self-reported; aircraft coverage varies.</small></section>}
@@ -26,9 +28,9 @@ export function Upgrade({openJourney}:{openJourney:(hex:string)=>Promise<void>})
         <section><h3>Free</h3><p>Your current experience</p><ul><li>Interactive globe and aircraft tracking</li><li>3D flight views</li><li>Existing free-feed observations</li><li>Device-only watchlist</li></ul></section>
         <section className="upgrade-premium"><h3>Premium</h3><p>Everything in Free, plus Premium tools:</p><ul><li>Scan a boarding pass or add yourself to your own trip</li><li>Private windows, invitation-only links, or public journey cards</li><li>Arrival companion with destination time, weather and available estimates</li><li>Waves, hearts, guest controls and downloadable journey recaps</li><li>Let friends explore your chosen simulated window view</li><li>My next flight home, guided setup and family flights</li><li>Private boarding-pass scanner: camera, photo and PDF</li><li>Manual trips with name or display name, flight and seat</li><li>Calendar import and export for saved journeys</li><li>Personalized feed near favourite airports and aircraft types</li><li>Usage dashboard with allowances and reset dates</li><li>Scheduled departure and arrival times when connected</li><li>Gate and terminal details</li><li>Updated arrival estimates and flight status</li><li>Flight-change inbox after verified checks</li><li>Session recording, trimmed replay and side/bird camera sequences</li><li>Titled portrait and landscape video export on your device</li><li>Flight passport, route globe and annual recap</li><li>Private watch-together rooms and spotter alerts</li><li>Watchlist and saved journey syncing across devices</li><li>Saved viewing setups across devices</li><li>Personal flight logbook and shareable cards</li><li>Airport simulator and synced progress summaries</li><li>Flyable aircraft with Easy and Advanced controls</li><li>Trip timelines, spotting journal and airport dashboards</li><li>Expiring flight links and background monitoring tools</li></ul><small>On-demand flight details with usage limits. Availability varies by flight.</small></section>
       </div>}
-      {!accountOnly&&<PremiumPreview/>}<p className="upgrade-availability">Public subscriptions are coming soon. Checkout is disabled until configured, and defaults to test mode. Your account identifies the active checkout mode.</p>
+      {!accountOnly&&<PremiumPreview liveDetailsReady={account?.liveDetailsReady}/>}<p className="upgrade-availability">{!account?'Checking subscription availability…':!account.enabled||!account.billingReady?'Checkout is currently unavailable. You can keep exploring for free.':account.mode==='test'?'Test checkout only. No real payments are taken.':'Annual membership. Review the price in checkout; manage or cancel renewal from your account.'} {!account?.liveDetailsReady&&'Live flight-detail lookups are not available yet. Free and Premium share the same map coverage.'}</p>
       <p className="upgrade-privacy">Airline passenger manifests and actual onboard counts are unavailable. Travel together shows only display names and trip details travelers explicitly choose to publish.</p>
-      {open&&<Suspense fallback={<LoadingSkeleton label="Loading your account…"/>}><MembershipPanel openJourney={async hex=>{await openJourney(hex);close();}}/></Suspense>}
+      {open&&<Suspense fallback={<LoadingSkeleton label="Loading your account…"/>}><MembershipPanel onAccount={setAccount} openJourney={async hex=>{await openJourney(hex);close();}}/></Suspense>}
       <button className="upgrade-return" onClick={close}>Keep exploring for free</button>
     </dialog>
   </>;

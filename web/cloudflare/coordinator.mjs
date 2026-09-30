@@ -1,3 +1,4 @@
+import {createTravelMetrics} from '../server/travel-metrics.mjs';
 import {workerFetch} from './fetch.mjs';
 import {DurableObject} from 'cloudflare:workers';
 import {configuredFeed} from '../server/combined-feed.mjs';
@@ -15,7 +16,7 @@ import {nodeHandler} from './node-handler.mjs';
 const valid=fn=>{try{return fn();}catch(e){throw Object.assign(e,{status:400});}};
 const json=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store'}});
 export class SkywardCoordinator extends DurableObject{
- constructor(ctx,env){super(ctx,env);this.ctx=ctx;this.env=env;this.tail=Promise.resolve();this.rates=new Map();
+ constructor(ctx,env){super(ctx,env);this.ctx=ctx;this.env=env;this.tail=Promise.resolve();this.rates=new Map();this.metrics=createTravelMetrics({env});
   this.feed=configuredFeed({env,fetchImpl:workerFetch});this.weather=createLocalWeather({fetchImpl:workerFetch});this.airportWeather=createAirportWeather({fetchImpl:workerFetch});this.music=createAurowall({env});this.trips=createTripDiscovery(this.feed);
   this.ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS daily_budget(day TEXT PRIMARY KEY,requests INTEGER NOT NULL)');
   if(env.BETTER_AUTH_SECRET&&env.RESEND_API_KEY){
@@ -36,10 +37,10 @@ export class SkywardCoordinator extends DurableObject{
    }
    if(path==='/internal/access'){const response=await nodeHandler(request,async(req,res)=>{const access=await this.membership?.simulatorAccess(req)??{allowed:false,status:401};res.writeHead(200,{'Content-Type':'application/json'});res.end(JSON.stringify(access));return true;});return response;}
    const ip=request.headers.get('cf-connecting-ip')||'local',now=Date.now(),old=this.rates.get(ip),rate=old&&now-old.at<60000?old:{at:now,count:0};rate.count++;this.rates.set(ip,rate);if(this.rates.size>1000)this.rates.delete(this.rates.keys().next().value);if(rate.count>120)return json({error:'Please wait before refreshing.'},429);
+   if(path==='/api/travel-metrics')return nodeHandler(request,(req,res,u)=>this.metrics.handle(req,res,u));
    if(path.startsWith('/api/auth/'))return this.auth?this.auth.handler(request):json({error:'Account email is not configured yet.'},503);
-   if(this.membership){const r=await nodeHandler(request,(req,res,u)=>this.membership.handle(req,res,u));if(r)return r;}
+   if(this.membership){const r=await nodeHandler(request,(req,res,u)=>this.membership.handle(req,res,u));if(r){if(r.status>=500)this.metrics.record('server_request_error');return r;}}
    if(path==='/api/account')return json({enabled:false,authProvider:'better-auth',mode:'test',user:null,billingReady:false,liveDetailsReady:false});
-   if(path==='/api/travel-metrics')return request.method==='POST'?json({ok:true}):json({error:'Metrics are not publicly available'},403);
    if(!['GET','HEAD'].includes(request.method))return json({error:'Method not allowed'},405);
    if(path==='/api/area'){const values=['lat','lon','radius'].map(k=>url.searchParams.has(k)&&url.searchParams.get(k).trim()?Number(url.searchParams.get(k)):NaN);valid(()=>cameraAreaPath(...values));return json(await this.feed.cameraArea(...values));}
    if(path==='/api/aircraft'){const id=url.searchParams.get('airport');if(!Object.hasOwn(AIRPORTS,id))return json({error:'Choose an airport'},400);return json(await this.feed.area(id));}
@@ -54,6 +55,6 @@ export class SkywardCoordinator extends DurableObject{
    if(path==='/api/aurowall')return json(await this.music());
    if(path==='/api/trips')return json(url.searchParams.get('sample')==='1'?await tripResponse(url.searchParams):this.trips(tripQuery(url.searchParams)));
    return json({error:'Endpoint not found'},404);
-  }catch(e){return json({error:e.status?e.message:'This service is temporarily unavailable. Please retry.',...(Number.isFinite(e.retryAfter)?{retryAfter:e.retryAfter}:{})},e.status||503);}
+  }catch(e){if(!e.status||e.status>=500)this.metrics.record('server_request_error');return json({error:e.status?e.message:'This service is temporarily unavailable. Please retry.',...(Number.isFinite(e.retryAfter)?{retryAfter:e.retryAfter}:{})},e.status||503);}
  }
 }

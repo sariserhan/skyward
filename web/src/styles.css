@@ -427,3 +427,7 @@ body>.cesium-credit-lightbox-overlay .cesium-credit-lightbox-close{min-width:36p
 .brand-home{display:inline-flex;align-items:center;gap:17px;color:inherit;border-radius:4px}.brand-home img{flex-shrink:0}@media(max-width:1000px){.brand-home{gap:11px}}
 
 @media(min-width:760px) and (max-width:1100px){.footer-toolbar .footer-primary{gap:3px}.footer-toolbar .footer-primary>:is(button,a){font-size:10px;padding:8px 6px}}
+
+/* Attribution belongs to the existing footer, with no separate bar. */
+.statusbar.footer-toolbar>.map-attribution{display:block!important;min-height:0;padding:3px 0 0;margin:0;border:0;background:transparent;line-height:1.35}
+.subscription-summary{padding:12px;border:1px solid var(--line);border-radius:8px;margin:12px 0}.subscription-summary p+p{margin-top:6px}

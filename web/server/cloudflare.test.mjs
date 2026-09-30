@@ -61,3 +61,22 @@ test('D1 paid library writes round-trip, preserve ownership and delete cleanly',
  r=await request('/api/account/library',{kind:'watchlist',key:'abcdef',remove:true});assert.equal(r.status,200,await r.clone().text());assert.equal((await request('/api/account/library?kind=watchlist&key=abcdef')).status,404);
  }finally{db.close();}
 });
+
+test('D1 paid lookup budgets reject user, service and spending exhaustion before provider calls',async()=>{
+ for(const limit of [{SKYWARD_MONTHLY_LOOKUPS:'1'},{SKYWARD_GLOBAL_LOOKUPS:'1'},{SKYWARD_BUDGET_MICROS:'1000'}]){
+  const {db,binding}=localD1(),{pool,transaction}=d1Pool(binding);let paid=true,calls=0;
+  const env={NODE_ENV:'production',SKYWARD_ACCOUNTS:'d1',SKYWARD_BILLING_MODE:'live',SKYWARD_AIRLABS_MODE:'live',AIRLABS_API_KEY:'fixture',STRIPE_SECRET_KEY:'sk_live_fixture',STRIPE_PUBLISHABLE_KEY:'pk_live_fixture',STRIPE_PRICE_ANNUAL_ID:'price_year',STRIPE_WEBHOOK_SECRET:'whsec_fixture',...limit};
+  db.prepare('INSERT INTO user VALUES(?,?,?,?,?,?,?)').run('budget-user','Member','budget@example.invalid',1,null,'2026-01-01','2026-01-01');db.prepare('INSERT INTO skyward_profiles VALUES(?,?)').run('budget-user','cus_budget');
+  const membership=createAccountMembership({env,pool,transact:transaction,origin,throttleRequest:async()=>{},auth:{api:{getSession:async()=>({user:{id:'budget-user',email:'budget@example.invalid',emailVerified:true}})}},fetchImpl:async url=>{
+   if(String(url).startsWith('https://api.stripe.com/'))return Response.json({data:paid?[{livemode:true,status:'active',customer:'cus_budget',latest_invoice:{customer:'cus_budget',status:'paid',amount_paid:5999},items:{data:[{price:{id:'price_year'},current_period_end:Math.floor(Date.now()/1000)+3600}]}}]:[]});
+   calls++;return Response.json({response:[]});
+  }});
+  const call=airport=>nodeHandler(new Request(origin+'/api/premium/schedules',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json'},body:JSON.stringify({airport,direction:'departures'})}),(req,res,url)=>membership.handle(req,res,url));
+  try{
+   assert.equal((await call('IAD')).status,200);assert.equal(calls,1);
+   assert.equal((await call('IAD')).status,200);assert.equal(calls,1,'same query is cached');
+   assert.equal((await call('IST')).status,429);assert.equal(calls,1,'exhausted budget makes no upstream request');
+   paid=false;assert.equal((await call('IAD')).status,403,'free accounts cannot access the paid cache');assert.equal(calls,1);
+  }finally{db.close();}
+ }
+});

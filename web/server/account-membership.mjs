@@ -1,3 +1,4 @@
+import {billingConfigured,subscriptionSummary} from './billing-status.mjs';
 import {createStripeWebhook} from './stripe-webhook.mjs';
 import {embeddedCheckout,existingSubscription,stripePrices,configuredPrices,selectedPrice,checkoutPlans,checkoutStatus} from './stripe-checkout.mjs';
 import {createPremiumLive} from './premium-live.mjs';
@@ -32,7 +33,7 @@ export function createAccountMembership({env=process.env,pool,auth,origin,transa
  }
  async function paidEntitlement(u){if(!billing||!u.customer)return false;const q=new URLSearchParams({customer:u.customer,status:'active',limit:'100','expand[]':'data.latest_invoice'}),s=await stripe(`subscriptions?${q}`);return (s.data||[]).some(v=>v.livemode===liveBilling&&v.status==='active'&&customerId(v.customer)===u.customer&&v.latest_invoice?.status==='paid'&&v.latest_invoice.amount_paid>0&&customerId(v.latest_invoice.customer)===u.customer&&v.items?.data?.some(i=>configuredPrices(env).includes(i.price?.id)&&i.current_period_end*1000>now()));}
  async function entitlement(u){return !!(devPremium&&u)||await paidEntitlement(u);}
- async function usage(u){const month=new Date(now()).toISOString().slice(0,7),r=await one('SELECT requests,cost FROM skyward_usage WHERE user_id=$1 AND month=$2',[u.id,month]);return {requests:r?.requests??0,cost:Number(r?.cost??0),limit:limits.userRequests,month,mode:liveBilling?'live':'test',actualProviderSpend:liveBilling?null:0};}
+ async function usage(u){const month=new Date(now()).toISOString().slice(0,7),r=await one('SELECT requests,cost FROM skyward_usage WHERE user_id=$1 AND month=$2',[u.id,month]);return {requests:r?.requests??0,cost:Number(r?.cost??0),limit:limits.userRequests,month,mode:liveBilling?'live':'test',remaining:Math.max(0,limits.userRequests-(r?.requests??0)),resetAt:Date.UTC(Number(month.slice(0,4)),Number(month.slice(5,7)),1),actualProviderSpend:liveBilling?null:0};}
  async function throttle(req){if(throttleRequest)return throttleRequest(req);const expiry=(Math.floor(now()/60000)+1)*60000,k=createHash('sha256').update(`${req.socket.remoteAddress}:${expiry}`).digest('hex');const r=await one('INSERT INTO skyward_rate_limits VALUES($1,1,$2) ON CONFLICT(key) DO UPDATE SET count=skyward_rate_limits.count+1 RETURNING count',[k,expiry]);await pool.query('DELETE FROM skyward_rate_limits WHERE expires<$1',[now()]);if(r.count>120)fail(429,'Too many attempts. Please try again shortly.');}
  async function body(req,path){const chunks=[];let bytes=0;for await(const c of req){bytes+=c.length;if(bytes>(path==='/api/account/library'?64*1024:8192))fail(413,'Request too large.');chunks.push(c);}try{const b=JSON.parse(Buffer.concat(chunks).toString()||'{}');if(!b||typeof b!=='object'||Array.isArray(b))throw Error();return b;}catch{fail(400,'Invalid request.');}}
  async function library(path,method,u,url,b){
@@ -94,7 +95,11 @@ export function createAccountMembership({env=process.env,pool,auth,origin,transa
    if(!['GET','POST'].includes(req.method))fail(405,'Method not allowed.');
    if(req.method==='POST'&&(req.headers.origin!==origin||!String(req.headers['content-type']||'').startsWith('application/json')))fail(403,'Use the account controls on this site.');
    await throttle(req);const u=await user(req),path=url.pathname;
-   if(path==='/api/account'&&req.method==='GET'){send(200,{enabled:true,authProvider:'better-auth',billingReady:billing,liveDetailsReady:live.enabled,mode:liveBilling?'live':'test',user:u?{email:u.email,premium:await entitlement(u)}:null,usage:u?await usage(u):null});return true;}
+   if(path==='/api/account'&&req.method==='GET'){
+    let subscription=null;
+    if(u){subscription=subscriptionSummary([],env,u.customer,now());if(billing&&u.customer){try{const result=await stripe('subscriptions?'+new URLSearchParams({customer:u.customer,status:'all',limit:'100','expand[]':'data.latest_invoice'}));subscription=subscriptionSummary(result.data,env,u.customer,now());}catch{subscription={status:'unavailable',premium:false,periodEndsAt:null,cancelAtPeriodEnd:false,canManage:true};}}}
+    send(200,{enabled:true,authProvider:'better-auth',billingReady:billingConfigured(env),liveDetailsReady:live.enabled,mode:liveBilling?'live':'test',subscription,user:u?{email:u.email,premium:!!devPremium||!!subscription?.premium}:null,usage:u?await usage(u):null});return true;
+   }
    if(!u)fail(401,'Sign in with a verified email to continue.');
    const b=req.method==='POST'?await body(req,path):{};const extra=await premium.handle(path,req.method,u,b);if(extra){send(200,extra);return true;}const result=await library(path,req.method,u,url,b);if(result){send(200,result);return true;}
    if(path==='/api/billing/plans'&&req.method==='GET'){send(200,{...await checkoutPlans(env,stripe,liveBilling),monthlyLookups:limits.userRequests});return true;}

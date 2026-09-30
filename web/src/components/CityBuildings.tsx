@@ -1,3 +1,4 @@
+import {retainMapCredit,osmCredit} from '../lib/mapCredits';
 import {tagRenderLayer} from '../lib/renderLayers';
 import {readRenderStats} from '../lib/renderDiagnostics';
 import {buildingAppearance} from '../lib/buildingAppearance';
@@ -18,8 +19,7 @@ export function CityBuildings({viewer:v,enabled,quality,terrain,airports,airport
   const fades=new Map<Cesium.Primitive,number>(),retiring=new Map<string,{start:number;opacity:number}>();
   const cache=new Map<string,CityBuilding[]>(),pending=new Set<string>(),failed=new Map<string,number>(),meshes=new Map<string,Cesium.Primitive>(),replacements=new Map<string,Cesium.Primitive>();
   let previous:{lon:number;lat:number;time:number}|null=null;let desired:CityTile[]=[],disposed=false,lastUpdate=0,terrainTimer:ReturnType<typeof setTimeout>|undefined;
-  const credit=new C.Credit('<a href="https://openmaptiles.org/">© OpenMapTiles</a> · <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>',true);
-  v.creditDisplay.addStaticCredit(credit);
+  const releaseOSM=retainMapCredit(C,v,osmCredit),releaseTiles=retainMapCredit(C,v,'<a href="https://openmaptiles.org/">© OpenMapTiles</a>');
   const exclusions=airportStructures?airports.flatMap(a=>a.surfaces.filter(s=>s.kind!=='apron').map(s=>({minX:Math.min(...s.points.map(p=>p[0])),maxX:Math.max(...s.points.map(p=>p[0])),minY:Math.min(...s.points.map(p=>p[1])),maxY:Math.max(...s.points.map(p=>p[1]))}))):[];
   function clear(){for(const mesh of [...meshes.values(),...replacements.values()])v!.scene.primitives.remove(mesh);meshes.clear();replacements.clear();fades.clear();retiring.clear();}
   function draw(key:string,buildings:CityBuilding[],replace=false){
@@ -86,7 +86,7 @@ export function CityBuildings({viewer:v,enabled,quality,terrain,airports,airport
    for(const [key,fade] of retiring){const mesh=meshes.get(key);if(!mesh){retiring.delete(key);continue;}const amount=Math.max(0,1-(performance.now()-fade.start)/1200);mesh.appearance.material!.uniforms.visibility=fade.opacity*amount;if(!amount){v.scene.primitives.remove(mesh);meshes.delete(key);retiring.delete(key);}v.scene.requestRender();}
    for(const [key,mesh] of replacements){if(!mesh.ready)continue;const old=meshes.get(key);if(old){fades.delete(old);v.scene.primitives.remove(old);}meshes.set(key,mesh);replacements.delete(key);v.scene.requestRender();}});
   update();
-  return()=>{disposed=true;clearInterval(timer);clearTimeout(terrainTimer);remove();terrainRemove();swap();worker.terminate();if(!v.isDestroyed()){clear();v.creditDisplay.removeStaticCredit(credit);v.scene.requestRender();}};
+  return()=>{disposed=true;clearInterval(timer);clearTimeout(terrainTimer);remove();terrainRemove();swap();worker.terminate();if(!v.isDestroyed()){clear();releaseOSM();releaseTiles();v.scene.requestRender();}};
  },[v,enabled,quality,terrain,airports,airportStructures]);
  return enabled&&statusHost?createPortal(<small className="city-buildings-status" role="status">{status}</small>,statusHost):null;
 }

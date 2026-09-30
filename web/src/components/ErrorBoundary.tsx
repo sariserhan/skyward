@@ -1,7 +1,9 @@
+import {renderFailure} from '../lib/sessionHealth';
 import {Component,type ReactNode} from 'react';
 import {ErrorScreen} from './SystemState';
 export class ErrorBoundary extends Component<{children:ReactNode},{failed:boolean;backgroundError:boolean}>{
  state={failed:false,backgroundError:false};
+ componentDidCatch(){renderFailure();}
  static getDerivedStateFromError(){return {failed:true};}
  // Event handlers and background tasks can fail without invalidating React's
  // rendered tree. Keep the globe mounted so its own recovery can finish.
