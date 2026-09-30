@@ -107,11 +107,11 @@ The user supplied `AIRLABS_API_KEY` in `web/.env.local`. Two controlled real
 API requests succeeded (HTTP 200): AAL6 flight details returned schedule and gate
 fields; IAD schedules returned 50 partial records. The callsign-only result is
 explicitly an unverified flight instance, not proof of a watched-aircraft match.
-The Worker inventory still does not contain the key. Automatic approval review
-requires explicit approval to upload this credential into the production Worker;
-that approval is pending. Aviation mode remains `demo` until the production setup
-is authorized. Actual provider quotas/costs still need to match the configured
-service budget. This integration does not add observed positions to the globe.
+After explicit user approval, `AIRLABS_API_KEY` was installed and its presence
+verified in the production skyward Worker secret inventory. Wrangler now selects
+`SKYWARD_AIRLABS_MODE=live`; deploying this configuration enables the service for
+verified paid users. No key was printed or committed. Actual provider quotas/costs
+still need to match the configured service budget. This integration does not add observed positions to the globe.
 Free and Premium share observed map coverage.
 
 ### Repeatable checks
