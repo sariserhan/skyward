@@ -433,3 +433,67 @@ body>.cesium-credit-lightbox-overlay .cesium-credit-lightbox-close{min-width:36p
 /* Attribution belongs to the existing footer, with no separate bar. */
 .statusbar.footer-toolbar>.map-attribution{display:block!important;min-height:0;padding:6px 0 0;margin:5px 0 0;border:0;border-top:1px solid #35515e;background:transparent;line-height:1.35}
 .subscription-summary{padding:12px;border:1px solid var(--line);border-radius:8px;margin:12px 0}.subscription-summary p+p{margin-top:6px}
+
+/* Phone observatory: the globe owns the screen; tools open only on demand. */
+.app-shell.phone-layout{min-height:0;height:100dvh;overflow:hidden}
+.phone-layout .topbar{height:56px;padding:0 12px;gap:8px}
+.phone-layout .brand{gap:0}.phone-layout .brand-home{gap:7px}.phone-layout .brand-name{font-size:15px;letter-spacing:2px}
+.phone-layout .brand-home img{width:28px;height:28px}
+.phone-layout .brand-description,.phone-layout .mobile-menu,.phone-layout .header-status,.phone-layout .topbar nav>button:first-child{display:none}
+.phone-layout .topbar nav{gap:6px;margin-left:auto;align-items:center}
+.phone-layout .topbar nav button{min-height:44px;padding:8px;font-size:12px}
+.phone-layout .topbar .music-launcher{font-size:0;width:44px}.phone-layout .topbar nav .music-launcher>span{display:inline;font-size:20px}
+.phone-layout .workspace{overflow:hidden}
+.phone-layout .sidebar-shell{position:absolute;inset:0 auto 0 0;width:min(340px,90vw);transform:none;z-index:20;box-shadow:none;visibility:hidden;pointer-events:none}
+.phone-layout .sidebar-shell.open{visibility:visible;pointer-events:auto;box-shadow:10px 0 30px #0008}
+.phone-layout .sidebar-backdrop{z-index:19!important}
+.phone-layout .mobile-close{display:flex;width:44px;height:44px;top:8px;right:8px}
+.phone-layout .sidebar-title{padding-right:40px}.phone-layout .aircraft-row{min-height:44px}
+.phone-layout .map-primary-controls{top:10px;right:10px;max-width:none;flex-wrap:nowrap;z-index:12}
+.phone-layout .map-primary-controls>button{display:none}
+.phone-layout .map-primary-controls>.unified-map-tools>summary{min-height:44px;padding:0 14px;font-size:12px}
+.phone-layout .map-tools-content{width:min(340px,calc(100vw - 20px));max-height:calc(100dvh - 190px);overscroll-behavior:contain}
+.phone-layout .map-tools-content button,.phone-layout .map-tools-content summary{min-height:44px}
+.phone-layout .map-title,.phone-layout .map-stage:has(.flight-experience) .map-title{top:10px;left:10px;max-width:calc(100% - 125px);padding:8px;background:#0b202ad9;border-radius:8px}
+.phone-layout .map-title h1{font-size:15px}.phone-layout .map-title p,.phone-layout .camera-state{display:none}
+.phone-layout.world-view .map-title,.phone-layout.world-view .empty-inspector,.phone-layout.world-view .camera-traffic-status,.phone-layout.world-view .map-readout,.phone-layout.world-view .atlas-key{display:none}
+.phone-layout.world-view .globe{bottom:0!important}
+.phone-layout .camera-traffic-status{top:68px;left:10px;right:auto;max-width:calc(100% - 20px);font-size:10px}
+.phone-layout .camera-traffic-status:not([open]) .coverage-counts{display:none}
+.phone-layout .statusbar.footer-toolbar{padding:4px 8px max(4px,env(safe-area-inset-bottom));height:auto;min-height:0;overflow:visible}
+.phone-layout .statusbar.footer-toolbar>.footer-primary{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+.phone-layout .footer-toolbar .footer-primary>:is(button,a){width:100%;min-width:0;min-height:46px;margin:0;padding:6px 4px;font-size:12px;white-space:nowrap}
+.phone-layout .footer-toolbar .footer-primary>.mobile-flights{display:inline-flex}
+.phone-layout .footer-toolbar .footer-secondary{max-height:calc(100dvh - 145px);right:8px;width:calc(100vw - 16px);z-index:30}
+.phone-layout .footer-extra-grid button,.phone-layout .footer-extra-grid a{min-height:44px;white-space:normal}
+.phone-layout .map-attribution{max-height:23px;white-space:nowrap;overflow-x:auto;font-size:8px;scrollbar-width:none}
+.phone-layout .map-attribution *{white-space:nowrap}
+.phone-layout input,.phone-layout select{font-size:16px}
+.phone-layout button,.phone-layout summary,.phone-layout a{touch-action:manipulation}
+.phone-layout .globe canvas{touch-action:none}
+.phone-layout .inspector{max-height:40%;overflow:auto;overscroll-behavior:contain}
+.phone-layout .flight-experience{max-height:45%;overscroll-behavior:contain}
+.phone-layout .flight-experience button{min-height:44px}
+
+.phone-camera-select{display:none}
+.phone-layout .map-title-heading{flex-wrap:wrap}
+.phone-layout .phone-camera-select{display:flex;align-items:center;gap:12px;margin:4px 0 10px}
+.phone-layout .phone-camera-select select{flex:1;min-width:0;min-height:44px;padding:8px;background:#102633;color:#edf4f6;border:1px solid #527481;border-radius:6px}
+.phone-layout .camera-view-buttons{display:none}
+.phone-layout [aria-label="Saved flight camera"],.phone-layout .flight-compact .flight-distance{display:none}
+.phone-layout .flight-experience .flight-group-title{display:none}
+
+.phone-layout .camera-traffic-status{display:none!important}
+
+.phone-layout .header-status{display:flex;gap:0}
+.phone-layout .header-status time{display:none}
+.phone-layout .header-status .connection-status{font-size:0;gap:0}
+.phone-layout .header-status .status-dot{width:7px;height:7px}
+.phone-layout .flight-experience>.floating-panel-controls{display:none}
+.phone-layout .flight-experience.panel-minimized>.floating-panel-controls{display:flex}
+.phone-layout .flight-experience>.sheet-handle{font-size:0;min-height:24px;height:24px;padding:7px;top:0}
+.phone-layout .flight-experience>.sheet-handle>span{height:4px}
+.phone-layout .flight-upgrade-banner{padding:7px 9px;margin:6px 0}
+.phone-layout .flight-upgrade-banner>button,.phone-layout .observed-flight-upgrade span:last-child{display:none}
+.phone-layout .flight-compact .flight-voices{display:none}
+.phone-layout .flight-experience header{min-height:44px;margin-bottom:5px}

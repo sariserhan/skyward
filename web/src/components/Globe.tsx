@@ -1,3 +1,4 @@
+import {globeAltitude} from '../lib/globeFraming';
 import {updateGraphics} from '../lib/updateGraphics';
 import {FollowFlightPath} from './FollowFlightPath';
 import {retainMapCredit,osmCredit} from '../lib/mapCredits';
@@ -116,6 +117,16 @@ export function Globe(p: Props) {
   useEffect(()=>{const abort=new AbortController();fetch(`${BASE}data/cities.json`,{signal:abort.signal}).then(r=>{if(!r.ok)throw new Error('Cities unavailable');return r.json();}).then(data=>setCities(data.cities)).catch(()=>{});return()=>abort.abort();},[]);
   const [ready, setReady] = useState(false);
   useEffect(()=>{const v=viewer.current;if(!ready||!v)return;return installRenderDiagnostics(v);},[ready]); const [error, setError] = useState('');
+  useEffect(()=>{
+    const v=viewer.current;if(!ready||!v)return;const C=window.Cesium;
+    let width=v.canvas.clientWidth,height=v.canvas.clientHeight;
+    const resize=new ResizeObserver(()=>{
+      const w=v.canvas.clientWidth,h=v.canvas.clientHeight;if(w===width&&h===height)return;width=w;height=h;
+      if(v.isDestroyed()||callbacks.current.camera.type!=='world'||v.camera.positionCartographic.height<800000)return;
+      const position=v.camera.positionCartographic;v.camera.cancelFlight();
+      v.camera.setView({destination:C.Cartesian3.fromRadians(position.longitude,position.latitude,globeAltitude(w,h)),orientation:{heading:0,pitch:-Math.PI/2,roll:0}});v.scene.requestRender();
+    });resize.observe(v.canvas);return()=>resize.disconnect();
+  },[ready]);
   useEffect(()=>{const v=viewer.current;if(!ready||!v)return;const initial=callbacks.current;
     return installArrivalSpin(window.Cesium,v,initial.camera.type==='world'&&(initial.camera.spin===true||(initial.camera.serial===0&&!initial.recoveryPose))&&!initial.preferences.reducedMotion,()=>{const p=callbacks.current;return {stop:p.preferences.reducedMotion||p.mode!=='3D'||p.camera.serial!==initial.camera.serial||p.command.serial!==initial.command.serial||p.zoomSignal!==initial.zoomSignal||!!p.selected||!!p.playback||p.following,paused:p.obscured};});
   },[ready,p.camera.serial]);
@@ -178,12 +189,14 @@ export function Globe(p: Props) {
       controller.tiltEventTypes = [C.CameraEventType.RIGHT_DRAG, C.CameraEventType.MIDDLE_DRAG, {eventType: C.CameraEventType.LEFT_DRAG, modifier: C.KeyboardEventModifier.CTRL}, C.CameraEventType.PINCH];
       // A pinch changes distance only; use the explicit tilt control on touch screens.
       controller.tiltEventTypes = [C.CameraEventType.RIGHT_DRAG, C.CameraEventType.MIDDLE_DRAG, {eventType:C.CameraEventType.LEFT_DRAG,modifier:C.KeyboardEventModifier.CTRL}];
-      controller.inertiaSpin = .65; controller.inertiaZoom = .55; controller.inertiaTranslate=.65;
-      controller.maximumMovementRatio=.06;
+      const touch=matchMedia('(pointer:coarse)').matches;
+      controller.inertiaSpin = touch?.35:.65; controller.inertiaZoom = touch?0:.55; controller.inertiaTranslate=touch?.35:.65;
+      controller.zoomFactor=touch?2:5;
+      controller.maximumMovementRatio=touch?.04:.06;
       controller.minimumZoomDistance = 50;
-      v.scene.screenSpaceCameraController.maximumZoomDistance = 35000000;
+      v.scene.screenSpaceCameraController.maximumZoomDistance = 65000000;
       v.scene.screenSpaceCameraController.enableCollisionDetection = true;
-      v.camera.setView({ destination: C.Cartesian3.fromDegrees(-25, 27, 12000000) });
+      v.camera.setView({ destination: C.Cartesian3.fromDegrees(-25, 27, globeAltitude(v.canvas.clientWidth,v.canvas.clientHeight)) });
       // Keep public-domain source details in the native, keyboard-accessible credit dialog.
       v.creditDisplay.addStaticCredit(new C.Credit('<a href="https://www.naturalearthdata.com/about/terms-of-use/" target="_blank" rel="noreferrer">Geography and city labels: Natural Earth · public domain</a>', false));
       v.creditDisplay.addStaticCredit(new C.Credit('<a href="https://ourairports.com/data/" target="_blank" rel="noreferrer">Airport directory and runways: OurAirports · public domain</a>', false));
@@ -628,7 +641,7 @@ export function Globe(p: Props) {
       const lon=Math.atan2(-sun.y,-sun.x)*180/Math.PI,lat=Math.asin(-sun.z)*180/Math.PI;
       v.camera.flyTo({destination:C.Cartesian3.fromDegrees(lon,lat,14000000),orientation:{heading:0,pitch:-Math.PI/2,roll:0},duration});
     } else if (p.camera.type === 'world') {
-      v.camera.flyTo({ destination: C.Cartesian3.fromDegrees(-25, 27, 12000000), orientation: { heading: 0, pitch: -Math.PI / 2, roll: 0 }, duration });
+      v.camera.flyTo({ destination: C.Cartesian3.fromDegrees(-25, 27, globeAltitude(v.canvas.clientWidth,v.canvas.clientHeight)), orientation: { heading: 0, pitch: -Math.PI / 2, roll: 0 }, duration });
     } else {
       const aircraft = selectedRef.current;
       const airport = p.camera.airport ? AIRPORTS[p.camera.airport] : null;

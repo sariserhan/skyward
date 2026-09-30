@@ -6,7 +6,7 @@ import {lazy,Suspense,useRef,useState,useEffect} from 'react';
 const MembershipPanel=lazy(()=>import('./MembershipPanel').then(m=>({default:m.MembershipPanel})));
 import {Sparkles, X} from 'lucide-react';
 
-export function Upgrade({openJourney}:{openJourney:(hex:string)=>Promise<void>}) {
+export function Upgrade({openJourney,hideAccountButton=false}:{hideAccountButton?:boolean;openJourney:(hex:string)=>Promise<void>}) {
   const [account,setAccount]=useState<Account|null>(null);
   const [open,setOpen]=useState(false);
   const [accountOnly,setAccountOnly]=useState(false);
@@ -18,7 +18,7 @@ export function Upgrade({openJourney}:{openJourney:(hex:string)=>Promise<void>})
   useEffect(()=>{const account=()=>show(true),upgrade=()=>show(false);window.addEventListener('skyward-account',account);window.addEventListener('skyward-upgrade',upgrade);if(new URLSearchParams(location.search).has('account')){show(new URLSearchParams(location.search).get('account')!=='upgrade');const url=new URL(location.href);url.searchParams.delete('account');history.replaceState(null,'',url);}return()=>{window.removeEventListener('skyward-account',account);window.removeEventListener('skyward-upgrade',upgrade);};},[]);
   return <>
     <button ref={trigger} className="upgrade-trigger" aria-haspopup="dialog" onClick={() => show()}><Sparkles size={14}/>Upgrade</button>
-    <button className="account-trigger quiet-button" onClick={()=>show(true)} aria-haspopup="dialog">Account &amp; journeys</button>
+    {!hideAccountButton&&<button className="account-trigger quiet-button" onClick={()=>show(true)} aria-haspopup="dialog">Account &amp; journeys</button>}
     <dialog ref={dialog} className={`upgrade-dialog${accountOnly?'':' upgrade-dialog-expanded'}`} aria-labelledby="upgrade-title" aria-describedby="upgrade-description" onClose={() => {setOpen(false);const target=returnFocus.current?.isConnected?returnFocus.current:trigger.current;target?.focus();}} onClick={e => {if(e.target === e.currentTarget) close();}}>
       <div className="upgrade-heading"><span>SKYWARD PREMIUM{account?.billingReady?(account.mode==='test'?' · TEST CHECKOUT':''):account?' · CHECKOUT UNAVAILABLE':''}</span><button className="icon-button" aria-label="Close upgrade details" onClick={close}><X size={20}/></button></div>
       <h2 id="upgrade-title">{accountOnly?'Your Skyward':'Your flight. Their window to the world.'}</h2>
