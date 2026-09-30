@@ -494,10 +494,10 @@ export function Globe(p: Props) {
     if(flightOpen||p.playback)return;
     for (const {points:segment,color} of coloredTrail(p.replayIndex === null ? p.trail : p.trail.slice(0, p.replayIndex + 1))) {
       if (segment.length < 2) continue;
-      added.push(v.entities.add({ polyline: { positions: C.Cartesian3.fromDegreesArrayHeights(segment.flatMap(pt => [pt.lon, pt.lat, Math.max(0, pt.altitude) * .3048 + 8])), width: 2.5, material: C.Color.fromCssColorString(color) } }));
+      added.push(v.entities.add({ polyline: { positions: C.Cartesian3.fromDegreesArrayHeights(segment.flatMap(pt => [pt.lon, pt.lat, Math.max(0, pt.altitude) * .3048 + 8])), width: p.following?4:2.5, material: p.following?new C.PolylineOutlineMaterialProperty({color:C.Color.fromCssColorString('#8fdfc8'),outlineColor:C.Color.fromCssColorString('#0b202c'),outlineWidth:1}):C.Color.fromCssColorString(color) } }));
     }
     v.scene.requestRender(); return () => { if (!v.isDestroyed()) for (const e of added) v.entities.remove(e); };
-  }, [p.trail, p.replayIndex, ready,flightOpen,!!p.playback]);
+  }, [p.trail, p.replayIndex, ready,flightOpen,!!p.playback,p.following]);
   useEffect(()=>{
     const v=viewer.current,f=p.camera.facility;if(!v||!ready||p.camera.type!=='facility'||!f)return;
     const C=window.Cesium,added:Cesium.Entity[]=[];
