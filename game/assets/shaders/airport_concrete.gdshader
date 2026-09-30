@@ -11,11 +11,11 @@ void fragment() {
  vec2 edge=min(fract(p/6.0),1.0-fract(p/6.0))*6.0;
  float aa=max(length(fwidth(p)),0.015);
  float joint=(1.0-smoothstep(0.015,0.015+aa,min(edge.x,edge.y)))*min(1.0,0.06/aa);
- float variation=(hash(cell)-0.5)*0.035;
+ float variation=(hash(cell)-0.5)*0.032;
  float mottling=(noise(p*.7)-.5)*.045+(noise(p*3.0)-.5)*.024;
  float grain=(noise(p*38.0)-.5)*.075/(1.0+aa*25.0);
  float damp=smoothstep(.35,.78,noise(p*.13))*wetness;
- ALBEDO=(vec3(.43,.44,.42)+variation+mottling+grain-joint*.13)*(1.0-damp*.28);
+ ALBEDO=(vec3(.36,.365,.35)+variation+mottling+grain-joint*.13)*(1.0-damp*.28);
  ROUGHNESS=mix(.88+grain,.35,damp);
  AO=1.0-joint*.18;
  // Microscopic aggregate relief fades out with distance to avoid crawling pixels.

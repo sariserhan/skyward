@@ -21,11 +21,15 @@ var elevation := 0.9
 var distance := 3000.0
 var camera_mode := "Orbit"
 var concourse_position := Vector3.ZERO
+var apron_focus := Vector3(INF,INF,INF)
+var apron_camera := Vector3.ZERO
 var dragging := false
 var panning := false
 var camera_target := Vector3.ZERO
 var apron_material: ShaderMaterial
 var building_material: ShaderMaterial
+var glazing_material: ShaderMaterial
+var asphalt_material: ShaderMaterial
 var night := false
 var manual: CheckButton
 var status: Label
@@ -53,7 +57,7 @@ func _ready() -> void:
 	custom_minimum_size = Vector2(600, 290)
 	var tools := HFlowContainer.new()
 	add_child(tools)
-	for mode in ["Orbit", "Concourse", "Tower", "Follow", "Top"]:
+	for mode in ["Orbit", "Concourse", "Apron", "Tower", "Follow", "Top"]:
 		var button := Button.new()
 		button.text = mode
 		button.pressed.connect(func():
@@ -175,6 +179,7 @@ func _ready() -> void:
 	desk_button.text = "Tower desk"
 	desk_button.pressed.connect(func(): desk.hide() if desk.visible else desk.open())
 	tools.add_child(desk_button)
+	for control in tools.get_children(): control.add_theme_font_size_override("font_size",14)
 	_lighting()
 
 func apply_weather() -> void:
@@ -220,7 +225,7 @@ func _box(parent: Node3D, at: Vector3, dimensions: Vector3, color: Color) -> Mes
 	var mesh := BoxMesh.new()
 	mesh.size = dimensions
 	node.mesh = mesh
-	node.material_override = _material(color)
+	node.material_override = glazing_material if color == Color("365765") and glazing_material != null else _material(color)
 	if dimensions.y<.6 and dimensions.x>5:
 		var key:=color.to_html()
 		if not pavement_cache.has(key):
@@ -236,10 +241,16 @@ func _box(parent: Node3D, at: Vector3, dimensions: Vector3, color: Color) -> Mes
 	parent.add_child(node)
 	return node
 
-func _line(a: Vector3, b: Vector3, width: float, color: Color, height := 0.15) -> void:
-	if a.distance_to(b) < 0.01: return
+func _line(a: Vector3, b: Vector3, width: float, color: Color, height := 0.15) -> MeshInstance3D:
+	if a.distance_to(b) < 0.01: return null
 	var node := _box(world, (a + b) * 0.5, Vector3(width, height, a.distance_to(b)), color)
 	node.look_at_from_position(node.position, b + Vector3.UP * 0.001)
+	if color == Color("393f40") or color == Color("343b40"):
+		if asphalt_material == null:
+			asphalt_material=ShaderMaterial.new()
+			asphalt_material.shader=load("res://assets/shaders/airport_asphalt.gdshader")
+		node.material_override=asphalt_material
+	return node
 
 func _point(id: String, height := 0.0) -> Vector3:
 	var p := sim.airside.node_position(id)
@@ -251,7 +262,9 @@ func _label(text: String, at: Vector3, parent: Node3D = null) -> Label3D:
 	label.position = at
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	label.font_size = 26
-	label.pixel_size = 0.35
+	label.pixel_size = 0.12
+	label.visibility_range_end = 1800
+	label.fixed_size = false
 	label.no_depth_test = false
 	label.outline_size = 4
 	(world if parent == null else parent).add_child(label)
@@ -303,9 +316,14 @@ func _build_world() -> void:
 	for child in world.get_children():
 		if child not in [camera, sun] and not child is WorldEnvironment: child.queue_free()
 	models.clear()
+	AirportAircraftMaterials.finishes.clear()
 	bridges.clear()
 	arrival_starts.clear()
 	bound_sim = sim
+	apron_focus=Vector3(INF,INF,INF)
+	if glazing_material == null:
+		glazing_material=ShaderMaterial.new()
+		glazing_material.shader=load("res://assets/shaders/airport_glass.gdshader")
 	clearance.setup(sim.airside.config)
 	desk.gate_choice.clear(); desk.runway_choice.clear(); desk.strips.order.clear()
 	desk.via.clear(); desk.radar.route.clear(); desk.route_flight=""
@@ -443,8 +461,8 @@ func _add_lights(points: Array[Vector3], color: Color) -> void:
 	var multi := MultiMesh.new()
 	multi.transform_format = MultiMesh.TRANSFORM_3D
 	var mesh := SphereMesh.new()
-	mesh.radius = 0.45
-	mesh.height = 0.9
+	mesh.radius = 0.11
+	mesh.height = 0.22
 	mesh.radial_segments = 6
 	mesh.rings = 3
 	mesh.material = _material(color,true).duplicate()
@@ -452,7 +470,10 @@ func _add_lights(points: Array[Vector3], color: Color) -> void:
 	mesh.material.emission_enabled = night
 	multi.mesh = mesh
 	multi.instance_count = points.size()
-	for i in points.size(): multi.set_instance_transform(i,Transform3D(Basis.IDENTITY,points[i]))
+	for i in points.size():
+		var at:=points[i]
+		at.y=.4
+		multi.set_instance_transform(i,Transform3D(Basis.IDENTITY,at))
 	var node := MultiMeshInstance3D.new()
 	node.multimesh = multi
 	node.set_meta("lamp_color",color)
@@ -488,6 +509,7 @@ func _aircraft(f: AirportFlight) -> Node3D:
 	var body := Node3D.new()
 	world.add_child(body)
 	var plane: Node3D = scenes[name].instantiate()
+	AirportAircraftMaterials.apply(plane)
 	body.add_child(plane)
 	var bounds := _bounds(plane,plane)
 	var length := 63.0 if type == "787" else 44.5 if type == "A321" else 35.0 if type == "A220" else 39.5
@@ -653,9 +675,10 @@ func _process(delta: float) -> void:
 	var target := center
 	if camera_mode in ["Follow","Tower"] and models.has(selected_id) and models[selected_id].visible: target = models[selected_id].position
 	var desired: Vector3
-	if camera_mode == "Concourse": target = concourse_position
+	if camera_mode in ["Concourse","Apron"]: target = concourse_position+Vector3.UP*3
 	match camera_mode:
 		"Concourse": desired = concourse_position+Vector3(145,65,165)
+		"Apron": desired=_apron_camera_position()
 		"Tower": desired = tower_position if tower_position != Vector3.ZERO else center+Vector3(radius*.12,85,radius*.18)
 		"Follow": desired = target+Vector3(60,24,70)
 		"Top": desired = center+Vector3(0,distance,.1)
@@ -667,7 +690,7 @@ func _process(delta: float) -> void:
 	for child in world.get_children():
 		if child is Label3D:
 			child.visible = labels
-			child.pixel_size = clampf(camera.global_position.distance_to(child.global_position)*.0008,.03,2.0)
+			child.pixel_size = clampf(camera.global_position.distance_to(child.global_position)*.00025,.025,.25)
 	detail_scene.update(delta)
 	refresh += delta
 	if refresh>.3:
@@ -741,6 +764,18 @@ func _free_camera() -> void:
 	yaw = atan2(offset.x,offset.z)
 	elevation = clampf(asin(clampf(offset.y/distance,-1,1)),.1,1.5)
 	camera_mode = "Orbit"
+
+func _apron_camera_position() -> Vector3:
+	# Only resolve mapped walls when changing stands, not on every rendered frame.
+	if apron_focus != concourse_position:
+		apron_focus=concourse_position
+		var anchor:=_terminal_anchor(concourse_position)
+		var away: Vector3=(concourse_position-Vector3(anchor.x,0,anchor.z)).normalized()
+		var side:=Vector3(-away.z,0,away.x)
+		var desired:=concourse_position+away*70+side*38+Vector3.UP*7
+		var placement:=clearance.safe_position(desired,1.5)
+		apron_camera=placement.position if placement.ok else concourse_position+Vector3.UP*350
+	return apron_camera
 
 func _terminal_anchor(at: Vector3) -> Vector3:
 	var nearest := at+Vector3(21,0,10)

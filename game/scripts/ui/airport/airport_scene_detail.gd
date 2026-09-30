@@ -57,7 +57,7 @@ func setup(owner_view: Airport3D) -> void:
 		var at:=view._point(id,.4)
 		for gap in [-1.5,1.5]: view._line(at+Vector3(-12,0,gap),at+Vector3(12,0,gap),.45,Color("eac44f"),.05)
 	for child in view.world.get_children():
-		if child is MeshInstance3D and child.mesh is BoxMesh and child.mesh.size.y<.6:
+		if child is MeshInstance3D and child.mesh is BoxMesh and child.mesh.size.y<.6 and child.material_override is StandardMaterial3D:
 			puddle_materials.append(child.material_override)
 	rain=CPUParticles3D.new(); rain.amount=500; rain.lifetime=1.2; rain.emission_shape=CPUParticles3D.EMISSION_SHAPE_BOX; rain.emission_box_extents=Vector3(45,20,45)
 	rain.direction=Vector3(.2,-1,.1); rain.spread=4; rain.initial_velocity_min=28; rain.initial_velocity_max=38; rain.gravity=Vector3(0,-9,0)
@@ -73,12 +73,18 @@ func apply_weather() -> void:
 	view.environment.fog_light_color=Color("293d4b") if view.night else Color("a1adb2")
 	view.environment.fog_density=.00008 if float(w.visibility)>2 else .00035
 	if view.apron_material != null: view.apron_material.set_shader_parameter("wetness", 1.0 if w.wet else 0.0)
+	if view.asphalt_material != null: view.asphalt_material.set_shader_parameter("wetness",1.0 if w.wet else 0.0)
+	if view.glazing_material != null: view.glazing_material.set_shader_parameter("night",1.0 if view.night else 0.0)
 	for material in puddle_materials: material.roughness=.32 if w.wet else .82
 	var glazing := view._material(Color("365765"))
 	glazing.roughness=.22; glazing.metallic=.25
 	glazing.emission_enabled=view.night
 	glazing.emission=Color("b8c4b7")
 	glazing.emission_energy_multiplier=.3
+	var fixture:=view._material(Color("cfdbcc"))
+	fixture.emission_enabled=view.night
+	fixture.emission=Color("fff0d3")
+	fixture.emission_energy_multiplier=1.4
 	for light in floodlights: light.visible=view.night
 	if rain!=null: rain.emitting=w.wet
 
@@ -251,11 +257,15 @@ func _mapped_terminals() -> void:
 			var length := a.distance_to(b)
 			if length < 2: continue
 			# Broad glazing and roof coping track every concourse bend.
-			view._line(a,b,.5,Color("365765"),height*.35)
+			var glass:=view._line(a,b,.56,Color("365765"),height*.35)
+			glass.material_override=view.glazing_material
+			# Continuous sill, sunshade and inset facade bands give the wall real depth.
+			view._line(a-Vector3.UP*(height*.18),b-Vector3.UP*(height*.18),.9,Color("626f72"),.25)
+			view._line(a+Vector3.UP*(height*.19),b+Vector3.UP*(height*.19),1.8,Color("aab4b3"),.18)
 			view._line(Vector3(a.x,height+.2,a.z),Vector3(b.x,height+.2,b.z),.8,Color("8d9696"),.4)
 			for bay in range(1,mini(60,int(length/6))):
 				var at := a.lerp(b,float(bay)/float(mini(60,int(length/6))))
-				decorations.append(view._box(view.world,at,Vector3(.45,height*.4,.45),Color("98a4a7")))
+				view._box(view.world,at,Vector3(.25,height*.4,.25),Color("69787d"))
 
 ## Generic service equipment is kept within the mapped roof footprint.
 func _roof_equipment(points: Array, height: float) -> void:

@@ -209,7 +209,23 @@ Terminal roofs have weathered panel materials and bounded illustrative service
 equipment. Non-repeating landscape shading replaces the tiled grass texture.
 Apron masts provide a budget of six actual nighttime floodlights; window bands gain
 subtle nighttime illumination. These additions are generic scenery, not surveyed
-architectural details. The lower Concourse camera emphasizes terminal scale.
+architectural details. The lower Concourse camera emphasizes terminal scale. **Apron** provides a
+stand-relative ground-level camera for inspecting aircraft and turnaround services.
+Terminal and bridge glazing now shares a material with window mullions, varied
+interior shading and warm night lighting; terminal sills and sunshades add physical
+depth. Asphalt has a separate aggregate/repair material and wet-weather response.
+Concrete detail is filtered with distance, and airport lights use smaller lenses.
+Imported aircraft retain their textures with shared paint/metal finish variants
+and anisotropic filtering.
+Static facade ribs join the existing scenery batches; real apron illumination
+remains capped at six lights. These materials run in the browser Compatibility
+renderer and require no new service or paid asset.
+
+`tools/ui_tests.sh tests/iad_visual_review.gd` captures matching IAD concourse,
+apron daylight, rain and night scenes under `/tmp/iad-*.png`, checking the ground
+camera and material transitions. Use `SKYWARD_AIRPORT_QA_SCENARIO=res://configs/airports/dulles.json tools/ui_tests.sh tests/airport_ground_scene_smoke.gd` to check turnaround actors
+and building clearance. Screenshot tests use software rendering here; they do not
+establish a customer-device FPS guarantee.
 Building footprints come from OSM, with tagged heights/levels where available and
 fallback heights otherwise. Facades are illustrative: these are not photogrammetry
 or detailed architectural models. Other globe airports are not yet playable controller scenarios.
