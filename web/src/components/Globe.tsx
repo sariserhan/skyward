@@ -62,7 +62,7 @@ import {qualityEvent} from '../lib/qualityEvents';
 import { createOpenTerrain } from '../lib/openTerrain';
 import { addTerrainAirport } from '../lib/terrainAirport';
 import { fleetUri,fallbackFleetUri,sourcedModel } from '../lib/flightPresentation';
-import {cameraArea,areaKey,type CameraArea} from '../lib/cameraTraffic';
+import {cameraArea,flightTrafficArea,areaKey,type CameraArea} from '../lib/cameraTraffic';
 import {AtlasLayer} from './AtlasLayer';
 import {CityLabels} from './CityLabels';
 import type {City} from '../lib/cities';
@@ -310,12 +310,20 @@ export function Globe(p: Props) {
   },[ready,mapAttempt]);
   useEffect(()=>{const v=viewer.current;if(!v||!ready)return;const update=()=>{if(v.isDestroyed())return;v.useDefaultRenderLoop=!p.obscured&&!document.hidden&&!contextLost;if(v.useDefaultRenderLoop){v.resize();v.scene.requestRender();}};update();document.addEventListener('visibilitychange',update);return()=>document.removeEventListener('visibilitychange',update);},[ready,p.obscured,contextLost]);
   useEffect(()=>{
-    const v=viewer.current;if(!v||!ready)return;const C=window.Cesium;let last='';
+    const v=viewer.current;if(!v||!ready)return;const C=window.Cesium;let last='';let flightArea:CameraArea|null=null;
     const publish=()=>{
       if(v.isDestroyed()||document.hidden)return;
       // Suppress global arrival-spin requests, but keep local traffic updating
       // even during a long pan or when Cesium misses a moveEnd event.
       if(cameraMoving.current&&!callbacks.current.following&&v.camera.positionCartographic.height>800000)return;
+      const selected=callbacks.current.selected;
+      if(flightOpenRef.current&&selected){
+        const fix=sharedLiveMotion.displayed(selected.hex)??selected;
+        if(fix.lat!=null&&fix.lon!=null){
+          flightArea=flightTrafficArea({lat:fix.lat,lon:fix.lon},flightArea);
+          const key=areaKey(flightArea);if(key!==last){last=key;callbacks.current.onTrafficArea(flightArea);}return;
+        }
+      }else flightArea=null;
       const canvas=v.canvas,points:{lat:number;lon:number}[]=[];let center:{lat:number;lon:number}|null=null;
       for(const [x,y] of [[.5,.5],[.04,.04],[.96,.04],[.96,.96],[.04,.96],[.5,.04],[.96,.5],[.5,.96],[.04,.5]]){
         const p=v.camera.pickEllipsoid(new C.Cartesian2(canvas.clientWidth*x,canvas.clientHeight*y),v.scene.globe.ellipsoid);if(!p)continue;

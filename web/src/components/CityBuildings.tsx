@@ -18,18 +18,26 @@ export function CityBuildings({viewer:v,enabled,quality,terrain,airports,airport
   try{worker=new Worker(new URL('../workers/cityBuildings.worker.ts',import.meta.url),{type:'module'});}catch{setStatus('3D city buildings are unavailable in this browser.');return;}
   const fades=new Map<Cesium.Primitive,number>(),retiring=new Map<string,{start:number;opacity:number}>();
   const cache=new Map<string,CityBuilding[]>(),pending=new Set<string>(),failed=new Map<string,number>(),meshes=new Map<string,Cesium.Primitive>(),replacements=new Map<string,Cesium.Primitive>();
+  const elevations=new Map<string,number[]>();
   let previous:{lon:number;lat:number;time:number}|null=null;let desired:CityTile[]=[],disposed=false,lastUpdate=0,terrainTimer:ReturnType<typeof setTimeout>|undefined;
   const releaseOSM=retainMapCredit(C,v,osmCredit),releaseTiles=retainMapCredit(C,v,'<a href="https://openmaptiles.org/">© OpenMapTiles</a>');
   const exclusions=airportStructures?airports.flatMap(a=>a.surfaces.filter(s=>s.kind!=='apron').map(s=>({minX:Math.min(...s.points.map(p=>p[0])),maxX:Math.max(...s.points.map(p=>p[0])),minY:Math.min(...s.points.map(p=>p[1])),maxY:Math.max(...s.points.map(p=>p[1]))}))):[];
-  function clear(){for(const mesh of [...meshes.values(),...replacements.values()])v!.scene.primitives.remove(mesh);meshes.clear();replacements.clear();fades.clear();retiring.clear();}
+  function clear(){for(const mesh of [...meshes.values(),...replacements.values()])v!.scene.primitives.remove(mesh);meshes.clear();replacements.clear();elevations.clear();fades.clear();retiring.clear();}
   function draw(key:string,buildings:CityBuilding[],replace=false){
    if(disposed||v!.isDestroyed()||replacements.has(key)||(!replace&&meshes.has(key)))return;
+   // Tile-load notifications include imagery and unchanged terrain. Reuse the mesh
+   // unless actual building elevations changed, avoiding repeated geometry/GPU uploads.
+   const bases=buildings.map(b=>{const ring=b.rings[0];if(!terrain||!ring?.length)return 0;
+    return surfaceHeight(v!.scene.globe.getHeight(C.Cartographic.fromDegrees(ring.reduce((s,p)=>s+p[0],0)/ring.length,ring.reduce((s,p)=>s+p[1],0)/ring.length)));});
+   const prior=elevations.get(key);
+   if(replace&&prior&&prior.length===bases.length&&bases.every((height,i)=>Math.abs(height-prior[i])<.5))return;
+   elevations.set(key,bases);
    const instances:Cesium.GeometryInstance[]=[];
    for(const [index,b] of buildings.entries()){
     const ring=b.rings[0];if(!ring?.length)continue;
     const lon=ring.reduce((s,p)=>s+p[0],0)/ring.length,lat=ring.reduce((s,p)=>s+p[1],0)/ring.length;
     if(exclusions.some(e=>lon>=e.minX&&lon<=e.maxX&&lat>=e.minY&&lat<=e.maxY))continue;
-    const base=terrain?surfaceHeight(v!.scene.globe.getHeight(C.Cartographic.fromDegrees(lon,lat))):0;
+    const base=bases[index];
     const hierarchy=new C.PolygonHierarchy(C.Cartesian3.fromDegreesArray(ring.flat()),b.rings.slice(1).map(hole=>new C.PolygonHierarchy(C.Cartesian3.fromDegreesArray(hole.flat()))));
     instances.push(new C.GeometryInstance({id:`city-building-${key}-${index}`,geometry:new C.PolygonGeometry({polygonHierarchy:hierarchy,height:base+b.base,extrudedHeight:base+b.height,vertexFormat:C.PerInstanceColorAppearance.VERTEX_FORMAT}),attributes:{color:C.ColorGeometryInstanceAttribute.fromColor(C.Color.fromCssColorString(b.height>80?'#acb9c0':b.height>25?'#b5b9b7':'#c1bcb0'))}}));
    }
@@ -83,7 +91,7 @@ export function CityBuildings({viewer:v,enabled,quality,terrain,airports,airport
   // Keep the existing mesh visible while an elevation-adjusted replacement builds.
   const swap=v.scene.postRender.addEventListener(()=>{
    for(const [mesh,start] of fades){if(!mesh.ready)continue;const began=start||performance.now();fades.set(mesh,began);mesh.appearance.material!.uniforms.visibility=Math.min(1,(performance.now()-began)/1200);if(performance.now()-began>=1200)fades.delete(mesh);v.scene.requestRender();}
-   for(const [key,fade] of retiring){const mesh=meshes.get(key);if(!mesh){retiring.delete(key);continue;}const amount=Math.max(0,1-(performance.now()-fade.start)/1200);mesh.appearance.material!.uniforms.visibility=fade.opacity*amount;if(!amount){v.scene.primitives.remove(mesh);meshes.delete(key);retiring.delete(key);}v.scene.requestRender();}
+   for(const [key,fade] of retiring){const mesh=meshes.get(key);if(!mesh){retiring.delete(key);continue;}const amount=Math.max(0,1-(performance.now()-fade.start)/1200);mesh.appearance.material!.uniforms.visibility=fade.opacity*amount;if(!amount){v.scene.primitives.remove(mesh);meshes.delete(key);elevations.delete(key);retiring.delete(key);}v.scene.requestRender();}
    for(const [key,mesh] of replacements){if(!mesh.ready)continue;const old=meshes.get(key);if(old){fades.delete(old);v.scene.primitives.remove(old);}meshes.set(key,mesh);replacements.delete(key);v.scene.requestRender();}});
   update();
   return()=>{disposed=true;clearInterval(timer);clearTimeout(terrainTimer);remove();terrainRemove();swap();worker.terminate();if(!v.isDestroyed()){clear();releaseOSM();releaseTiles();v.scene.requestRender();}};

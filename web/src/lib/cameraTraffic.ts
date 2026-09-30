@@ -52,3 +52,10 @@ export function retainedViewportRows(rows:Aircraft[],known:Aircraft[],area:Camer
  for(const a of known){if(a.observedAt===null||now-a.observedAt>120000||a.observedAt>now+1000||!inCameraArea(a,area))continue;const old=latest.get(a.hex);if(!old||(old.observedAt??0)<a.observedAt)latest.set(a.hex,a);}
  return [...latest.values()].filter(a=>inCameraArea(a,area));
 }
+
+/** A watched flight owns its coverage window; camera orbit must not restart polling. */
+export function flightTrafficArea(position:{lat:number;lon:number},previous:CameraArea|null):CameraArea|null{
+ if(!Number.isFinite(position.lat)||!Number.isFinite(position.lon)||Math.abs(position.lat)>90)return previous;
+ if(previous&&distanceNm(previous.lat,previous.lon,position.lat,position.lon)<20)return previous;
+ const area=cameraArea(position,[]);return area?{...area,radius:50,regions:[{lat:area.lat,lon:area.lon,radius:50}]}:previous;
+}
