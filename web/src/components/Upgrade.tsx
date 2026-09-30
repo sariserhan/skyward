@@ -12,13 +12,14 @@ export function Upgrade({openJourney}:{openJourney:(hex:string)=>Promise<void>})
   const [accountOnly,setAccountOnly]=useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
+  const returnFocus=useRef<HTMLElement|null>(null);
   const close = () => dialog.current?.close();
-  const show=(account=false)=>{if(!account)travelMetric('premium_view');setAccountOnly(account);setOpen(true);dialog.current?.showModal();};
+  const show=(account=false)=>{returnFocus.current=document.activeElement instanceof HTMLElement?document.activeElement:null;if(!account)travelMetric('premium_view');setAccountOnly(account);setOpen(true);dialog.current?.showModal();};
   useEffect(()=>{const account=()=>show(true),upgrade=()=>show(false);window.addEventListener('skyward-account',account);window.addEventListener('skyward-upgrade',upgrade);if(new URLSearchParams(location.search).has('account')){show(new URLSearchParams(location.search).get('account')!=='upgrade');const url=new URL(location.href);url.searchParams.delete('account');history.replaceState(null,'',url);}return()=>{window.removeEventListener('skyward-account',account);window.removeEventListener('skyward-upgrade',upgrade);};},[]);
   return <>
     <button ref={trigger} className="upgrade-trigger" aria-haspopup="dialog" onClick={() => show()}><Sparkles size={14}/>Upgrade</button>
     <button className="account-trigger quiet-button" onClick={()=>show(true)} aria-haspopup="dialog">Account &amp; journeys</button>
-    <dialog ref={dialog} className={`upgrade-dialog${accountOnly?'':' upgrade-dialog-expanded'}`} aria-labelledby="upgrade-title" aria-describedby="upgrade-description" onClose={() => {setOpen(false);trigger.current?.focus();}} onClick={e => {if(e.target === e.currentTarget) close();}}>
+    <dialog ref={dialog} className={`upgrade-dialog${accountOnly?'':' upgrade-dialog-expanded'}`} aria-labelledby="upgrade-title" aria-describedby="upgrade-description" onClose={() => {setOpen(false);const target=returnFocus.current?.isConnected?returnFocus.current:trigger.current;target?.focus();}} onClick={e => {if(e.target === e.currentTarget) close();}}>
       <div className="upgrade-heading"><span>SKYWARD PREMIUM{account?.billingReady?(account.mode==='test'?' · TEST CHECKOUT':''):account?' · CHECKOUT UNAVAILABLE':''}</span><button className="icon-button" aria-label="Close upgrade details" onClick={close}><X size={20}/></button></div>
       <h2 id="upgrade-title">{accountOnly?'Your Skyward':'Your flight. Their window to the world.'}</h2>
       <p id="upgrade-description">Scan your boarding pass or add your flight and seat. Keep a personal travel companion—and choose to bring others along.</p>
