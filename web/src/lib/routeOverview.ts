@@ -9,8 +9,16 @@ export function routeOverview(route:FlightRoute|null,a:Aircraft,trail:TrailPoint
  return {origin,destination,total,from,remaining,observed,gaps,fraction:from+remaining>0?from/(from+remaining):0};
 }
 export function routeArc(a:{lon:number;lat:number},b:{lon:number;lat:number},steps=64){
- const rad=Math.PI/180,vector=(p:{lon:number;lat:number})=>[Math.cos(p.lat*rad)*Math.cos(p.lon*rad),Math.cos(p.lat*rad)*Math.sin(p.lon*rad),Math.sin(p.lat*rad)];const x=vector(a),y=vector(b),angle=Math.acos(Math.max(-1,Math.min(1,x.reduce((sum,v,i)=>sum+v*y[i],0))));
- return Array.from({length:steps+1},(_,i)=>{const f=i/steps;if(Math.abs(Math.sin(angle))<1e-8){const dl=((b.lon-a.lon+540)%360)-180;return {lon:((a.lon+dl*f+540)%360)-180,lat:a.lat+(b.lat-a.lat)*f};}const u=Math.sin((1-f)*angle)/Math.sin(angle),v=Math.sin(f*angle)/Math.sin(angle),p=x.map((n,j)=>u*n+v*y[j]);return {lon:Math.atan2(p[1],p[0])/rad,lat:Math.atan2(p[2],Math.hypot(p[0],p[1]))/rad};});
+ const rad=Math.PI/180,vector=(p:{lon:number;lat:number})=>[Math.cos(p.lat*rad)*Math.cos(p.lon*rad),Math.cos(p.lat*rad)*Math.sin(p.lon*rad),Math.sin(p.lat*rad)];
+ const x=vector(a),y=vector(b),angle=Math.acos(Math.max(-1,Math.min(1,x[0]*y[0]+x[1]*y[1]+x[2]*y[2]))),sinAngle=Math.sin(angle),linear=Math.abs(sinAngle)<1e-8,dl=((b.lon-a.lon+540)%360)-180;
+ const points=new Array<{lon:number;lat:number}>(steps+1);
+ for(let i=0;i<=steps;i++){
+  const f=i/steps;
+  if(linear){points[i]={lon:((a.lon+dl*f+540)%360)-180,lat:a.lat+(b.lat-a.lat)*f};continue;}
+  const u=Math.sin((1-f)*angle)/sinAngle,v=Math.sin(f*angle)/sinAngle,px=u*x[0]+v*y[0],py=u*x[1]+v*y[1],pz=u*x[2]+v*y[2];
+  points[i]={lon:Math.atan2(py,px)/rad,lat:Math.atan2(pz,Math.hypot(px,py))/rad};
+ }
+ return points;
 }
 
 /** Project onto the fixed planned arc; lateral deviations never redraw that arc. */

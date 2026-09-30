@@ -9,16 +9,17 @@ export function useFlightRoute(aircraft: Aircraft | null) {
   const canLookup = !aircraft?.simulation && aircraft?.targetKind!=='vehicle' && aircraft?.targetKind!=='fixed' && !!aircraft?.callsign && aircraft.lat !== null && aircraft.lon !== null && aircraft.observedAt !== null;
   useEffect(() => {
     if (!canLookup) { setState({key, data: null, loading: false, error: aircraft?.targetKind==='vehicle'||aircraft?.targetKind==='fixed'?'Routes are not applicable to reported surface vehicles or fixed objects.':'Origin and destination require a reported callsign and position.'}); return; }
-    const controller = new AbortController(); let busy = false;
+    const controller = new AbortController(); let busy = false, nextAttempt = 0;
     async function load() {
       const a = latest.current;
-      if (!a?.callsign || a.lat === null || a.lon === null || a.observedAt === null || busy || document.hidden) return;
-      busy = true; setState(previous=>({key,data:previous.key===key?previous.data:null,error:'',loading:true}));
+      if (!a?.callsign || a.lat === null || a.lon === null || a.observedAt === null || busy || document.hidden || Date.now() < nextAttempt) return;
+      const attemptedAt = Date.now();
+      busy = true; nextAttempt = attemptedAt + 30000; setState(previous=>({key,data:previous.key===key?previous.data:null,error:'',loading:true}));
       try {
         const response = await fetch(`/api/route?callsign=${encodeURIComponent(a.callsign)}&lat=${a.lat}&lon=${a.lon}`, { signal: AbortSignal.any([controller.signal, AbortSignal.timeout(25000)]) });
         if (!response.ok) throw new Error('Route lookup unavailable. Live aircraft positions are unaffected.');
         const data: FlightRoute = await response.json();
-        if (!controller.signal.aborted) {rememberSearchRoute(a,data);setState({key, data, error: '', loading: false});}
+        if (!controller.signal.aborted) {nextAttempt = attemptedAt + 300000;rememberSearchRoute(a,data);setState({key, data, error: '', loading: false});}
       } catch (e) { if (!controller.signal.aborted) setState(previous=>({key,data:previous.key===key?previous.data:null,error:e instanceof Error?e.message:'Route unavailable',loading:false})); }
       finally { busy = false; }
     }
