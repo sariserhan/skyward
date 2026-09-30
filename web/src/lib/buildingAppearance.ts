@@ -6,21 +6,18 @@ export function buildingAppearance(C:typeof Cesium,lon:number,lat:number){
  const anchor=C.Cartesian3.fromDegrees(lon,lat),encoded=splitPosition(C,anchor);
  const frame=C.Transforms.eastNorthUpToFixedFrame(anchor);
  const axis=(i:number)=>new C.Cartesian3(frame[i*4],frame[i*4+1],frame[i*4+2]);
- const vector=(p:Cesium.Cartesian3)=>`vec3(${p.x.toFixed(9)},${p.y.toFixed(9)},${p.z.toFixed(9)})`;
  const appearance=new C.PerInstanceColorAppearance({closed:true,translucent:false,flat:false,vertexShaderSource:`
  in vec3 position3DHigh;in vec3 position3DLow;in vec3 normal;in vec4 color;in float batchId;
- out vec3 v_positionEC;out vec3 v_normalEC;out vec4 v_color;out vec3 v_facade;out vec3 v_upEC;out vec3 v_wall;
+ out vec3 v_positionEC;out vec3 v_normalEC;out vec4 v_color;
  void main(){
   vec4 p=czm_computePosition();v_positionEC=(czm_modelViewRelativeToEye*p).xyz;v_normalEC=czm_normal*normal;v_color=color;
-  vec3 local=(position3DHigh-${vector(encoded.high)})+(position3DLow-${vector(encoded.low)});
-  v_facade=vec3(dot(local,${vector(axis(0))}),dot(local,${vector(axis(1))}),dot(local,${vector(axis(2))}));
-  v_wall=vec3(dot(normal,${vector(axis(0))}),dot(normal,${vector(axis(1))}),dot(normal,${vector(axis(2))}));
-  v_upEC=czm_viewRotation*${vector(axis(2))};gl_Position=czm_modelViewProjectionRelativeToEye*p;
+  gl_Position=czm_modelViewProjectionRelativeToEye*p;
  }`,fragmentShaderSource:`
- in vec3 v_positionEC;in vec3 v_normalEC;in vec4 v_color;in vec3 v_facade;in vec3 v_upEC;in vec3 v_wall;
+ in vec3 v_positionEC;in vec3 v_normalEC;in vec4 v_color;
  void main(){
   float dissolve=fract(sin(dot(floor(gl_FragCoord.xy),vec2(12.9898,78.233)))*43758.5453);
   if(dissolve>buildingVisibility())discard;
+  vec3 v_facade=buildingCoordinates(v_positionEC),v_wall=buildingNormal(v_normalEC),v_upEC=buildingUp();
   vec3 normal=normalize(v_normalEC);float wall=1.0-smoothstep(.35,.7,abs(v_wall.z));
   vec2 uv=vec2(abs(v_wall.x)>abs(v_wall.y)?v_facade.y:v_facade.x,v_facade.z)/vec2(3.2,3.8);
   vec2 cell=fract(uv),edge=max(fwidth(uv),vec2(.015));
@@ -36,7 +33,15 @@ export function buildingAppearance(C:typeof Cesium,lon:number,lat:number){
   material.emission=vec3(.72,.49,.24)*pane*occupied*night*.45;material.alpha=1.0;
   out_FragColor=czm_phong(normalize(-v_positionEC),material,czm_lightDirectionEC);
  }`});
- appearance.material=new C.Material({fabric:{type:'SkywardBuildingFade',uniforms:{visibility:1},source:'float buildingVisibility(){return visibility;} czm_material czm_getMaterial(czm_materialInput i){return czm_getDefaultMaterial(i);}'},translucent:false});
+ appearance.material=new C.Material({fabric:{type:'SkywardBuildingFade',uniforms:{visibility:1,anchorHigh:encoded.high,anchorLow:encoded.low,east:axis(0),north:axis(1),up:axis(2)},source:`
+ float buildingVisibility(){return visibility;}
+ vec3 buildingCoordinates(vec3 positionEC){
+  vec3 local=(czm_encodedCameraPositionMCHigh-anchorHigh)+(czm_encodedCameraPositionMCLow-anchorLow)+czm_inverseViewRotation*positionEC;
+  return vec3(dot(local,east),dot(local,north),dot(local,up));
+ }
+ vec3 buildingNormal(vec3 normalEC){vec3 n=czm_inverseViewRotation*normalEC;return vec3(dot(n,east),dot(n,north),dot(n,up));}
+ vec3 buildingUp(){return czm_viewRotation*up;}
+ czm_material czm_getMaterial(czm_materialInput i){return czm_getDefaultMaterial(i);}`},translucent:false});
  return appearance;
 }
 

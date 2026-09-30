@@ -13,6 +13,11 @@ def run(page):
  page.wait_for_function("__viewer.dataSources._dataSources.some(s=>s.entities.values.some(e=>e.id.startsWith('runway-surface-')))")
  page.wait_for_timeout(3000)
  assert page.evaluate("__viewer.scene.primitives._primitives.some(p=>p.appearance?.material?.type==='SkywardBuildingFade'&&p.appearance.material.uniforms.visibility===1)")
+ # Tile coordinates must be uniforms: literal coordinates make every tile compile
+ # a new program and caused repeated 200–400 ms stalls in flight orbit.
+ page.wait_for_function("__viewer.scene.primitives._primitives.filter(p=>p.appearance?.material?.type==='SkywardBuildingFade'&&p.allowPicking===false).length>=2")
+ shaders=page.evaluate("(()=>{const rows=__viewer.scene.primitives._primitives.filter(p=>p.appearance?.material?.type==='SkywardBuildingFade'&&p.allowPicking===false);return new Set(rows.map(p=>p.appearance.vertexShaderSource+p.appearance.fragmentShaderSource+p.appearance.material.shaderSource)).size;})()")
+ assert shaders==1,shaders
  page.screenshot(path=str(f.ARTIFACTS/'scenery-detail.jpg'),type='jpeg',quality=75)
  page.evaluate("__viewer.camera.setView({destination:Cesium.Cartesian3.fromDegrees(-77.2,39.05,1400),orientation:{heading:0,pitch:-1.2,roll:0}});__viewer.scene.requestRender()")
  page.wait_for_timeout(4000)
