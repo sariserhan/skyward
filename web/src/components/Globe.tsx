@@ -6,7 +6,7 @@ import {installTouchdownEffects} from '../lib/touchdownEffects';
 import {readCabinAudio} from '../lib/cabinAudio';
 import {WaterSurface} from './WaterSurface';
 import {CityBuildings} from './CityBuildings';
-import {airportBuildingHeight} from '../lib/airportBuildings';
+import {airportBuildingHeight,airportPolygonHierarchy} from '../lib/airportBuildings';
 import {WeatherLayer} from './WeatherLayer';
 import {aircraftModelAttitude} from '../lib/aircraftAttitude';
 import {loadGeography} from '../lib/geographyLoader';
@@ -417,7 +417,7 @@ export function Globe(p: Props) {
         const coords = surface.points.flat();
         if (coords.length < 6) continue;
         if(surface.kind === 'apron' && satellite)continue;
-        meshes.push(new C.GeometryInstance({ id: surface.kind === 'apron' ? `airport-${airport.id}` : `facility-${airport.id}-${buildingIndex++}`, geometry: new C.PolygonGeometry({ polygonHierarchy: new C.PolygonHierarchy(C.Cartesian3.fromDegreesArray(coords)), height: surface.kind === 'apron' ? .3 : 1, extrudedHeight: airportBuildingHeight(surface), vertexFormat: C.PerInstanceColorAppearance.VERTEX_FORMAT }), attributes: colorAttribute(surface.kind === 'apron' ? '#243d49' : surface.kind === 'terminal' ? (satellite ? '#b4b7b1' : '#799da5') : (satellite ? '#8d9699' : '#455e6b')) }));
+        meshes.push(new C.GeometryInstance({ id: surface.kind === 'apron' ? `airport-${airport.id}` : `facility-${airport.id}-${buildingIndex++}`, geometry: new C.PolygonGeometry({ polygonHierarchy: airportPolygonHierarchy(C,surface), height: surface.kind === 'apron' ? .3 : 1, extrudedHeight: airportBuildingHeight(surface), vertexFormat: C.PerInstanceColorAppearance.VERTEX_FORMAT }), attributes: colorAttribute(surface.kind === 'apron' ? '#243d49' : surface.kind === 'terminal' ? (satellite ? '#b4b7b1' : '#799da5') : (satellite ? '#8d9699' : '#455e6b')) }));
       }
       for (const path of airport.paths) if (path.points.length >= 2) lines.push(new C.GeometryInstance({ geometry: new C.PolylineGeometry({ positions: C.Cartesian3.fromDegreesArrayHeights(path.points.flatMap(pt => [...pt, 1])), width: satellite ? 1 : path.kind === 'parking_position' ? 1 : 3, vertexFormat: C.PolylineColorAppearance.VERTEX_FORMAT }), attributes: colorAttribute(path.kind === 'parking_position' ? '#aa9b62' : '#607478') }));
       for (const [runwayIndex, r] of airport.runways.entries()) {

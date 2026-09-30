@@ -32,7 +32,7 @@
     "prepare:assets": "node scripts/copy-cesium.mjs",
     "predev": "npm run prepare:assets",
     "dev": "vite --host 0.0.0.0",
-    "build": "npm run prepare:assets && node scripts/prepare-coverage.mjs && tsc -b && vite build",
+    "build": "npm run prepare:assets && node scripts/prepare-coverage.mjs && node scripts/prepare-airport-assets.mjs && tsc -b && vite build",
     "start": "node --env-file-if-exists=.env --env-file-if-exists=.env.local server/index.mjs",
     "test": "node --test server/*.test.mjs",
     "prepare:fleet": "python3 scripts/make-aircraft.py",
@@ -70,6 +70,8 @@
     "test:account-recovery": "npm run build && node scripts/browser-tests.mjs --account-recovery",
     "test:scenery": "npm run build && node scripts/browser-tests.mjs --scenery",
     "test:devices": "npm run build && node scripts/device-release.mjs",
-    "test:performance": "npm run build && node scripts/browser-tests.mjs --performance-capture"
+    "test:performance": "npm run build && node scripts/browser-tests.mjs --performance-capture",
+    "import:facilities": "python3 scripts/import-airport-facilities.py",
+    "test:facilities": "python3 -m unittest discover -s scripts -p test_airport_facilities.py"
   }
 }

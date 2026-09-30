@@ -505,3 +505,12 @@ After `npm --prefix web run build`, run
 `python web/tests/browser/system-states.py` with Python Playwright and Chromium
 installed to verify HTTP statuses, mobile layout, loading, and failure recovery
 on an isolated local server.
+
+### Expanded airport facilities
+
+The resumable facility importer covers the airport directory, supports complex
+terminal footprints and courtyards, and preserves existing maps on failed or
+suspicious imports. Facility buttons enable automatically when data is available.
+See [import, validation, and static/R2 delivery instructions](web/scripts/AIRPORT_FACILITIES.md).
+The build produces a checksummed airport asset manifest without uploading or
+writing geometry to the account database. Source coverage remains partial.

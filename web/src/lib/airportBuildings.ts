@@ -1,3 +1,4 @@
+import type * as Cesium from 'cesium';
 import type {AirportGeometry,FacilityTarget} from '../types';
 /** Footprint extrusions, not surveyed architecture. Zero-height aprons stay flat. */
 export function airportBuildingHeight(surface:{kind:string;height:number}):number|undefined {
@@ -14,4 +15,9 @@ export function airport3DTarget(airport:AirportGeometry):FacilityTarget {
   const minY=ys.length?Math.min(...ys):airport.lat,maxY=ys.length?Math.max(...ys):airport.lat;
   const extent=Math.hypot((maxX-minX)*Math.cos(airport.lat*Math.PI/180),maxY-minY)*111320;
   return {airport:airport.id,kind:'airport3d',label:'3D airport',lon:((airport.lon+(minX+maxX)/2+540)%360)-180,lat:(minY+maxY)/2,range:points.length?Math.max(1600,Math.min(14000,extent*1.6)):7000};
+}
+
+/** Preserve courtyard voids in both terrain and flat-earth building rendering. */
+export function airportPolygonHierarchy(C:typeof Cesium,surface:AirportGeometry['surfaces'][number]){
+ return new C.PolygonHierarchy(C.Cartesian3.fromDegreesArray(surface.points.flat()),(surface.holes??[]).map(ring=>new C.PolygonHierarchy(C.Cartesian3.fromDegreesArray(ring.flat()))));
 }

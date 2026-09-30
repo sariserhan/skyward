@@ -2,7 +2,7 @@ import {FlightVoices} from './FlightVoices';
 import {installTouchdownEffects} from '../lib/touchdownEffects';
 import {WaterSurface} from './WaterSurface';
 import {Windshield} from './Windshield';
-import {airportBuildingHeight} from '../lib/airportBuildings';
+import {airportBuildingHeight,airportPolygonHierarchy} from '../lib/airportBuildings';
 import {installRunwayLights} from '../lib/installRunwayLights';
 import {SimulatorAirportPicker} from './SimulatorAirportPicker';
 import {createWeatherMotion,weatherRoughness} from '../lib/weatherMotion';
@@ -41,7 +41,7 @@ function FlightScene({plan,geometry,state,camera,taxi,onViewer}:{onViewer:(v:Ces
    v.imageryLayers.addImageryProvider(new C.UrlTemplateImageryProvider({url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',credit:'Source: Esri, Vantor, Earthstar Geographics, and the GIS User Community',maximumLevel:19}));
    v.cesiumWidget.creditDisplay.addStaticCredit(new C.Credit('Airports: © OpenStreetMap contributors / OurAirports',true));
    for(const airport of geometry){
-    for(const surface of airport.surfaces)if(surface.points.length>2)v.entities.add({polygon:{hierarchy:C.Cartesian3.fromDegreesArray(surface.points.flat()),height:0,extrudedHeight:airportBuildingHeight(surface),material:C.Color.fromCssColorString(surface.kind==='apron'?'#394448':surface.kind==='terminal'?'#b4b7b1':'#8d9699')}});
+    for(const surface of airport.surfaces)if(surface.points.length>2)v.entities.add({polygon:{hierarchy:airportPolygonHierarchy(C,surface),height:0,extrudedHeight:airportBuildingHeight(surface),material:C.Color.fromCssColorString(surface.kind==='apron'?'#394448':surface.kind==='terminal'?'#b4b7b1':'#8d9699')}});
     for(const path of airport.paths??[])if(['taxiway','taxilane','parking_position'].includes(path.kind)&&path.points.length>1)v.entities.add({corridor:{positions:C.Cartesian3.fromDegreesArray(path.points.flat()),width:path.kind==='parking_position'?8:18,height:.1,material:C.Color.fromCssColorString('#4b5559')}});
     for(const r of airport.runways){v.entities.add({corridor:{positions:C.Cartesian3.fromDegreesArray([...r.a,...r.b]),width:r.width,height:.2,material:C.Color.fromCssColorString('#343e43')}});for(const mark of runwayMarkings(r))v.entities.add({polyline:{positions:C.Cartesian3.fromDegreesArrayHeights(mark.flatMap(p=>[...p,.5])),width:2,material:C.Color.WHITE}});}
    }

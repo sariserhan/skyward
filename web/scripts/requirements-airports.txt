@@ -1,0 +1,2 @@
+# Offline import/validation only; not shipped to browsers or application servers.
+shapely==2.1.2

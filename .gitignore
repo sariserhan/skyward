@@ -33,3 +33,6 @@ web/*.tsbuildinfo
 
 # Local membership database
 web/.local/
+
+# Reproducible raw facility snapshots (published assets and provenance are tracked)
+web/data/osm/v2/

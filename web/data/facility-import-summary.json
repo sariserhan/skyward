@@ -1,0 +1,13 @@
+{
+  "finishedAt":"2026-09-30T02:56:34.635460+00:00",
+  "requested":1152,
+  "requests":0,
+  "downloadBytes":0,
+  "stopped":null,
+  "outcomes":{
+    "imported":87,
+    "unavailable":36,
+    "not_attempted":1028,
+    "review_required":1
+  }
+}

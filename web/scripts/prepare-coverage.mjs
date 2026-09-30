@@ -1,9 +1,10 @@
 import {readFile,writeFile} from 'node:fs/promises';
 import catalog from '../data/airport-catalog.json' with {type:'json'};
+const imports=JSON.parse(await readFile(new URL('../data/facility-import-status.json',import.meta.url)));
 const rows=[];
 for(const [id,a] of Object.entries(catalog)){
  const g=JSON.parse(await readFile(new URL(`../public/data/airports/${id}.json`,import.meta.url)));
- rows.push({id,name:a.name,city:a.city,country:a.country,icao:a.icao,runways:g.runways.length,terminals:g.surfaces.filter(s=>s.kind==='terminal').length,buildings:g.surfaces.filter(s=>s.kind!=='apron').length,gates:g.gates.length,coverage:g.coverage,directoryDate:a.retrievedAt,facilityDate:g.osm?.retrievedAt??(['IAD','IST'].includes(id)?'2026-09-26':null),source:g.source,sourceUrl:a.sourceUrl,omittedComplexFeatures:g.osm?.omittedComplexFeatures??null});
+ rows.push({id,name:a.name,city:a.city,country:a.country,icao:a.icao,runways:g.runways.length,terminals:g.surfaces.filter(s=>s.kind==='terminal').length,buildings:g.surfaces.filter(s=>s.kind!=='apron').length,gates:g.gates.length,coverage:g.coverage,facilityImport:{status:imports[id]?.status??'not_attempted',checkedAt:imports[id]?.recordedAt??null,matching:imports[id]?.matching??null},paths:g.paths.length,courtyards:g.surfaces.reduce((n,s)=>n+(s.holes?.length??0),0),directoryDate:a.retrievedAt,facilityDate:g.osm?.retrievedAt??(['IAD','IST'].includes(id)?'2026-09-26':null),source:g.source,sourceUrl:a.sourceUrl,omittedComplexFeatures:g.osm?.omittedComplexFeatures??null});
 }
 await writeFile(new URL('../public/data/coverage.json',import.meta.url),JSON.stringify(rows));
 console.log(`Prepared coverage metadata for ${rows.length} airports`);

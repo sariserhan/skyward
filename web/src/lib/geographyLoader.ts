@@ -23,7 +23,10 @@ export function loadGeography(url:string,signal:AbortSignal){
  });
 }
 export function loadAirportGeometry(url:string,id:string,signal:AbortSignal){
- return loadMapAsset(url,signal,(data:unknown):data is AirportGeometry=>{
+ // Optional public static/R2 custom-domain prefix; never a credential or runtime API.
+ const base=import.meta.env?.VITE_AIRPORT_ASSET_BASE_URL;
+ const assetUrl=base?`${base.replace(/\/$/,'')}/${encodeURIComponent(id)}.json`:url;
+ return loadMapAsset(assetUrl,signal,(data:unknown):data is AirportGeometry=>{
   const d=data as Partial<AirportGeometry>|null;
   return !!d&&d.id===id&&Number.isFinite(d.lat)&&Number.isFinite(d.lon)&&
    ['runways','surfaces','paths','gates'].every(key=>Array.isArray(d[key as keyof AirportGeometry]));
