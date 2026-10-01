@@ -1,3 +1,4 @@
+import {trackingFlightCode} from '../shared/flight-identifiers.mjs';
 import {targetKind} from './target-kind.mjs';
 import { routePath, normalizeRoute } from './routes.mjs';
 // No credentials, subscriptions, or paid endpoints. Provider queries are shared,
@@ -31,7 +32,7 @@ export function normalizePayload(raw, fetchedAt = Date.now()) {
   return { source: 'ADSB.lol', fetchedAt, sourceAt: sourceNow, aircraft: raw.ac.map(a => normalizeAircraft(a, sourceNow)).filter(Boolean) };
 }
 export function searchPath(kind, input) {
-  const query = String(input ?? '').trim().toUpperCase();
+  const query = kind==='callsign'?trackingFlightCode(input):String(input ?? '').trim().toUpperCase();
   if (kind === 'hex' && /^[A-F\d]{6}$/.test(query)) return `/v2/hex/${query}`;
   if (kind === 'callsign' && /^[A-Z\d]{2,10}$/.test(query)) return `/v2/callsign/${query}`;
   if (kind === 'registration' && /^[A-Z\d-]{2,12}$/.test(query)) return `/v2/reg/${query}`;

@@ -1,3 +1,4 @@
+import {flightDisplayCode,passengerFlightAlias} from '../../shared/flight-identifiers.mjs';
 import {LiveCollections} from './LiveCollections';
 import {SavedFlights} from './SavedFlights';
 import {coverageMessage} from '../lib/coverageMessage';
@@ -19,11 +20,11 @@ export function Sidebar(p: Props) {
   const airportResults=useMemo(()=>searchAirports(airportQuery),[airportQuery]);
   const [query, setQuery] = useState(''); const [kind, setKind] = useState('callsign');
   useEffect(()=>setQuery(''),[p.airport]);
-  const rows = useMemo(() => p.aircraft.filter(a => (!query || `${a.callsign} ${a.registration} ${a.hex}`.toLowerCase().includes(query.trim().toLowerCase()))).sort((a, b) => (b.observedAt ?? 0) - (a.observedAt ?? 0) || a.callsign.localeCompare(b.callsign)), [p.aircraft, query]);
+  const rows = useMemo(() => p.aircraft.filter(a => (!query || `${a.callsign} ${passengerFlightAlias(a.callsign)??''} ${a.registration} ${a.hex}`.toLowerCase().includes(query.trim().toLowerCase()))).sort((a, b) => (b.observedAt ?? 0) - (a.observedAt ?? 0) || a.callsign.localeCompare(b.callsign)), [p.aircraft, query]);
   const previousResults=useMemo(()=>{
     const source=query.trim()?p.receivedAircraft:p.recentlyViewed;
     const q=query.trim().toLowerCase();
-    return source.filter(a=>!a.simulation&&!rows.some(row=>row.hex===a.hex)&&(!q||`${a.callsign} ${a.registration} ${a.hex}`.toLowerCase().includes(q))).slice(0,q?10:5);
+    return source.filter(a=>!a.simulation&&!rows.some(row=>row.hex===a.hex)&&(!q||`${a.callsign} ${passengerFlightAlias(a.callsign)??''} ${a.registration} ${a.hex}`.toLowerCase().includes(q))).slice(0,q?10:5);
   },[query,p.receivedAircraft,p.recentlyViewed,rows]);
   return <aside className="sidebar" aria-label="Aircraft browser">
     <div className="sidebar-title"><h2>{p.watching ? 'Your watchlist' : 'Airspace'}</h2><Radio size={18} className="muted"/></div>
@@ -38,11 +39,11 @@ export function Sidebar(p: Props) {
       <button className="icon-button airport-focus" aria-label={`View ${p.airport} airport`} onClick={()=>p.focusAirport(p.airport)}><Crosshair size={17}/></button>
     </div></div>
     <form className="search-form" onSubmit={async e => { e.preventDefault(); if (query.trim()) await p.lookup(kind, query); }}>
-      <label className="search-field"><Search size={17}/><input maxLength={12} aria-label="Search aircraft" placeholder="Callsign or registration" value={query} onChange={e => setQuery(e.target.value)} autoComplete="off" spellCheck={false}/>{query && <button type="button" className="search-go" aria-label="Clear aircraft search" onClick={()=>setQuery('')}><X size={15}/></button>}{query && <button type="submit" className="search-go" aria-label="Look up aircraft globally" disabled={p.searching}><ArrowRight size={17}/></button>}</label>
-      {query && <div className="search-options"><select aria-label="Identifier type" value={kind} onChange={e => setKind(e.target.value)}><option value="callsign">ATC callsign</option><option value="registration">Registration</option><option value="hex">ICAO hex</option></select><button type="submit" disabled={p.searching}>{p.searching ? 'Looking up…' : 'Find flight worldwide'}</button></div>}
+      <label className="search-field"><Search size={17}/><input maxLength={12} aria-label="Search aircraft" placeholder="Flight number or registration" value={query} onChange={e => setQuery(e.target.value)} autoComplete="off" spellCheck={false}/>{query && <button type="button" className="search-go" aria-label="Clear aircraft search" onClick={()=>setQuery('')}><X size={15}/></button>}{query && <button type="submit" className="search-go" aria-label="Look up aircraft globally" disabled={p.searching}><ArrowRight size={17}/></button>}</label>
+      {query && <div className="search-options"><select aria-label="Identifier type" value={kind} onChange={e => setKind(e.target.value)}><option value="callsign">Flight number / tracking code</option><option value="registration">Registration</option><option value="hex">ICAO hex</option></select><button type="submit" disabled={p.searching}>{p.searching ? 'Looking up…' : 'Find flight worldwide'}</button></div>}
     </form>
 
-    <p className="flight-search-help">Enter a callsign (e.g. UAL613) and press Enter to search worldwide. No previous viewing needed.</p>
+    <p className="flight-search-help">Enter a flight number (e.g. UA613 or UAL613) and press Enter to search worldwide. No previous viewing needed.</p>
     {p.searchError && <p className="inline-message" role="status">{p.searchError}</p>}
     {!p.watching&&<TrafficFilters value={p.filters} change={p.setFilters} aircraft={p.allAircraft} airport={p.airport}/>}
     {!p.watching&&<label className="traffic-select">Traffic on map & list<select aria-label="Traffic altitude filter" value={p.trafficFilter} onChange={e=>p.setTrafficFilter(e.target.value as TrafficFilter)}><option value="all">All targets</option><option value="aircraft">Classified aircraft</option><option value="vehicles">Surface vehicles</option><option value="fixed">Fixed objects / transmitters</option><option value="unknown">Unclassified targets</option><option value="ground">On ground</option><option value="airborne">Airborne</option><option value="low">Below 10,000 ft</option><option value="high">10,000 ft and above</option></select></label>}
@@ -50,9 +51,9 @@ export function Sidebar(p: Props) {
     <div className="aircraft-scroll">
     {!p.watching&&previousResults.length>0&&<section className="recent-aircraft" aria-label="Previously viewed or received aircraft"><h3>{query.trim()?'Previously received · outside this list':'Recently viewed'}</h3><p className="muted">Reopen an observation; tracking checks for a newer position.</p>{previousResults.map(a=><button className="airport-main" key={a.hex} onClick={()=>p.select(a)} aria-label={`Reopen ${a.callsign||a.registration||a.hex}`}><Plane size={16}/><span><strong>{a.callsign||a.registration||a.hex.toUpperCase()}</strong><small>{a.registration||a.hex} · {a.aircraftType||'Aircraft'}</small><small>Last observation: {a.observedAt?new Date(a.observedAt).toLocaleString():'time unknown'} · {duration(ageSeconds(a,p.now))}</small></span></button>)}</section>}
       {p.watching ? <div className="watch-list">{p.watches.length ? <SavedFlights watches={p.watches} observations={p.allAircraft} lookup={p.lookup}/> : <div className="empty-list"><Star size={26}/><h3>Keep a flight in sight.</h3><p>Select an aircraft and tap the star to save it here. Premium syncs your watchlist across devices. Free watches stay in this browser.</p></div>}</div> : <>
-        <div className="aircraft-table-head"><span>Callsign</span><span>Type</span><span>Alt · ft</span><span>GS · kt</span></div>
+        <div className="aircraft-table-head"><span>Flight</span><span>Type</span><span>Alt · ft</span><span>GS · kt</span></div>
         {p.loading && !rows.length ? <div className="empty-list"><span className="loading-ring"/><p>Listening to the airspace…</p></div> : rows.length ? rows.map(a => <button key={a.hex} className={`aircraft-row ${p.selected?.hex === a.hex ? 'active' : ''} ${a.simulation?'synthetic-row':ageSeconds(a, p.now) > 120 ? 'stale' : ''}`} onClick={() => p.select(a)} title={`${kindLabel(a)} · ${a.registration || a.hex} · ${a.simulation?'Skyward · Simulated':duration(ageSeconds(a, p.now))}`} aria-label={`View ${a.callsign || a.registration || a.hex}`}>
-          <span className="callsign"><Plane size={14}/>{a.callsign || a.registration || a.hex.toUpperCase()}</span><span>{a.targetKind==='vehicle'?'VEH':a.targetKind==='fixed'?'FIX':a.aircraftType || '—'}</span><span>{a.ground ? 'GND' : a.altitude?.toLocaleString() ?? '—'}</span><span>{a.groundSpeed === null ? '—' : Math.round(a.groundSpeed)}</span>
+          <span className="callsign"><Plane size={14}/>{flightDisplayCode(a.callsign) || a.registration || a.hex.toUpperCase()}</span><span>{a.targetKind==='vehicle'?'VEH':a.targetKind==='fixed'?'FIX':a.aircraftType || '—'}</span><span>{a.ground ? 'GND' : a.altitude?.toLocaleString() ?? '—'}</span><span>{a.groundSpeed === null ? '—' : Math.round(a.groundSpeed)}</span>
         </button>) : <div className="empty-list"><Radio size={26}/><h3>{coverageMessage(p.allAircraft,rows.length,p.now,p.loading,p.error,!!query||p.aircraft.length<p.allAircraft.length,navigator.onLine).title}</h3><p>{coverageMessage(p.allAircraft,rows.length,p.now,p.loading,p.error,!!query||p.aircraft.length<p.allAircraft.length,navigator.onLine).detail}</p><button className="text-button" onClick={p.refresh}><RefreshCw size={14}/> Refresh observations</button></div>}
       </>}
     </div>

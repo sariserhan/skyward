@@ -1,3 +1,4 @@
+import {trackingFlightCode} from '../../shared/flight-identifiers.mjs';
 import {withSpecialAircraftType} from './specialAircraftVisuals';
 import {providerRetryAt} from './trafficRetry';
 import {nextObservationLookup} from './observationPolling';
@@ -27,7 +28,9 @@ export function useObservatory(airport: AirportId, alertsEnabled = false) {
   const {watches,toggleWatch,watchSyncError}=useAccountWatches();
   const [trail, setTrail] = useState<TrailPoint[]>([]);
   const [searching, setSearching] = useState(false);
-  const [searchError, setSearchError] = useState('');
+  const [searchError, updateSearchError] = useState('');
+  const searchErrorRef=useRef('');
+  const setSearchError=useCallback((value:string)=>{searchErrorRef.current=value;updateSearchError(value);},[]);
   const [observations,setObservations]=useState<Aircraft[]>([]);
   // Session-only history: keep explicitly viewed aircraft beyond viewport/cache eviction.
   const [recentlyViewed,setRecentlyViewed]=useState<Aircraft[]>([]);
@@ -121,10 +124,13 @@ export function useObservatory(airport: AirportId, alertsEnabled = false) {
     searchController.current?.abort(); const controller = new AbortController(); searchController.current = controller;
     setSearching(true); setSearchError('');
     try {
-      const data = await fetchFeed(`/api/search?kind=${encodeURIComponent(kind)}&q=${encodeURIComponent(q.trim().toUpperCase().replace(/\s+/g,''))}`, controller.signal);
+      const query=kind==='callsign'?trackingFlightCode(q):q.trim().toUpperCase().replace(/\s+/g,'');
+      const data = await fetchFeed(`/api/search?kind=${encodeURIComponent(kind)}&q=${encodeURIComponent(query)}`, controller.signal);
       if (controller.signal.aborted) return null;
-      data.aircraft=ingest(data.aircraft);
-      if (!data.aircraft.length) { setSearchError('No current observation found worldwide for this identifier. The flight may not be airborne or may be outside feed coverage. Check the tracking callsign (for example UAL613) and try again.'); return null; }
+      data.aircraft=data.aircraft.filter(a=>kind!=='callsign'||a.callsign.trim().toUpperCase()===query);
+      if(new Set(data.aircraft.map(a=>a.hex)).size>1){setSearchError('More than one aircraft matches this flight number. Check the aircraft registration and route before opening it.');return null;}
+      data.aircraft=ingest(data.aircraft).filter(a=>kind!=='callsign'||a.callsign.trim().toUpperCase()===query);
+      if (!data.aircraft.length) { setSearchError('No current observation found worldwide for this identifier. The flight may not be airborne or may be outside feed coverage. Check the operating flight number on your ticket; codeshares and changed tracking callsigns may require the operating airline’s code.'); return null; }
       const match=data.aircraft.find(a=>!accept||accept(a));if(!match)return null;
       select(match); return match;
     } catch (e) { if (!controller.signal.aborted) setSearchError(e instanceof Error ? e.message : 'Lookup unavailable.'); return null; }
@@ -132,5 +138,5 @@ export function useObservatory(airport: AirportId, alertsEnabled = false) {
   }, [ingest, select]);
   useEffect(() => () => searchController.current?.abort(), []);
   const clearSelected = useCallback(() => { searchController.current?.abort(); setSearching(false); setSearchError(''); selectedRef.current = null; setSelected(null); setSelectedError(''); setTrail([]); }, []);
-  return { watchSyncError, ingest, activity, histories:histories.current,motionHistories:motionHistories.current, recentlyViewed, observations, aircraft, selected, select, clearSelected, error, loading, updatedAt, selectedError, watches, toggleWatch, lookup, searching, searchError, trail, refresh: () => refreshRef.current() };
+  return { watchSyncError, ingest, activity, histories:histories.current,motionHistories:motionHistories.current, recentlyViewed, observations, aircraft, selected, select, clearSelected, error, loading, updatedAt, selectedError, watches, toggleWatch, lookup, searching, searchError, searchErrorRef, trail, refresh: () => refreshRef.current() };
 }

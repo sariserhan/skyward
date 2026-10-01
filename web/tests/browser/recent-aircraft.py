@@ -31,7 +31,7 @@ def run(page):
  page.get_by_role('link',name='Skyward globe',exact=True).click()
  page.locator('.search-trigger').click()
  search.get_by_role('textbox',name='Search airports, flights and controls').fill('UAL613')
- retained=search.get_by_role('button',name='Flight · UAL613',exact=False)
+ retained=search.get_by_role('button',name='Flight · UA613 · UAL613',exact=False)
  expect(retained).to_contain_text('Last observation')
  retained.click()
  expect(page.get_by_role('region',name='Aircraft details')).to_contain_text('UAL613')

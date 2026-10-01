@@ -1,3 +1,4 @@
+import {passengerFlightAlias} from '../../shared/flight-identifiers.mjs';
 import type {Aircraft,FlightRoute} from '../types.ts';
 import {airlineNames,aircraftNames} from './aircraft.ts';
 export interface SearchFields {text:string;airline:string;type:string;registration:string;origin:string;destination:string;}
@@ -16,7 +17,7 @@ export function searchRoute(a:Aircraft,now=Date.now()){
 export function matchesFlightSearch(a:Aircraft,f:SearchFields,route=searchRoute(a)){
  const operator=`${a.callsign.slice(0,3)} ${airlineNames[a.callsign.slice(0,3)]??''}`,type=`${a.aircraftType} ${aircraftNames[a.aircraftType]??''}`;
  const places=route?.airports.map(p=>`${p.iata} ${p.icao} ${p.name} ${p.city}`)??[];
- const all=normalize(`${a.hex} ${a.callsign} ${a.registration} ${operator} ${type} ${places.join(' ')}`);
+ const all=normalize(`${a.hex} ${passengerFlightAlias(a.callsign)??''} ${a.callsign} ${a.registration} ${operator} ${type} ${places.join(' ')}`);
  return normalize(f.text).split(/\s+/).filter(Boolean).every(t=>all.includes(t))&&normalize(operator).includes(normalize(f.airline))&&normalize(type).includes(normalize(f.type))&&normalize(a.registration).includes(normalize(f.registration))&&normalize(places[0]??'').includes(normalize(f.origin??''))&&normalize(places[1]??'').includes(normalize(f.destination??''));
 }
 export function recentSearches(raw:unknown):SearchFields[]{
