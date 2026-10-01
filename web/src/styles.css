@@ -510,3 +510,6 @@ body>.cesium-credit-lightbox-overlay .cesium-credit-lightbox-close{min-width:36p
 /* Avoid a stale sticky-header compositing surface over the mobile WebGL view.
    The sheet handle and panel controls already provide the persistent controls. */
 .phone-layout .flight-experience header{position:static}
+
+/* Featured collections stay visible above the globe on every screen size. */
+.collection-navigation{display:flex;justify-content:center;gap:24px;flex-shrink:0;background:#0b1922;border-bottom:1px solid var(--line);padding:0 12px}.collection-navigation a{display:inline-flex;align-items:center;min-height:44px;color:var(--mint);font-size:13px}.collection-navigation a:hover{text-decoration:underline;text-underline-offset:4px}
