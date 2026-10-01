@@ -12,7 +12,7 @@ export function liveCollections(c:Catalog, observations:Aircraft[], now:number){
   if(!prior||(row.observedAt??0)>(prior.observedAt??0))active.set(hex,row);
  }
  return c.aircraft.flatMap(a=>{
-  if(a.retired||a.mergedInto)return [];
+  if(a.status==='UNVERIFIED'||a.status==='HISTORICAL'||a.retired||a.mergedInto)return [];
   const matched=matchAirframeObservation(c,a,[...active.values()],now);
   const row=matched&&active.get(matched.hex);
   if(!row)return [];
@@ -21,5 +21,5 @@ export function liveCollections(c:Catalog, observations:Aircraft[], now:number){
  });
 }
 
-function liveAssociations(c:Catalog,id:string,day:string){return c.entities.filter(e=>!e.archived&&e.entityType!=='PERSON'&&e.entityType!=='HISTORIC'&&c.associations.some(s=>s.aircraftId===id&&s.entityId===e.id&&s.reviewed&&!s.archived&&s.confidence!=='LOW'&&s.associationType!=='FORMERLY_ASSOCIATED'&&(!s.validFrom||s.validFrom<=day)&&(!s.validTo||day<s.validTo)));}
-export function liveCandidates(c:Catalog,now=Date.now(),entityId=''){const day=new Date(now).toISOString().slice(0,10);return c.aircraft.filter(a=>!a.retired&&!a.mergedInto&&identityAt(a,'registrations',day)&&liveAssociations(c,a.id,day).some(e=>!entityId||(entityId==='sports'?e.entityType==='SPORTS_TEAM':e.id===entityId))).slice(0,10);}
+function liveAssociations(c:Catalog,id:string,day:string){return c.entities.filter(e=>!e.archived&&e.entityType!=='PERSON'&&e.entityType!=='HISTORIC'&&c.associations.some(s=>s.aircraftId===id&&s.entityId===e.id&&s.reviewed&&s.status!=='UNVERIFIED'&&s.status!=='HISTORICAL'&&!['HISTORIC_ASSOCIATION','REPORTED_CHARTER'].includes(s.associationType)&&!s.archived&&s.confidence!=='LOW'&&s.associationType!=='FORMERLY_ASSOCIATED'&&(!s.validFrom||s.validFrom<=day)&&(!s.validTo||day<s.validTo)));}
+export function liveCandidates(c:Catalog,now=Date.now(),entityId=''){const day=new Date(now).toISOString().slice(0,10);return c.aircraft.filter(a=>a.status!=='UNVERIFIED'&&a.status!=='HISTORICAL'&&!a.retired&&!a.mergedInto&&identityAt(a,'registrations',day)&&liveAssociations(c,a.id,day).some(e=>!entityId||(entityId==='sports'?e.entityType==='SPORTS_TEAM':e.id===entityId))).slice(0,10);}

@@ -13,3 +13,8 @@ export function reviewIdentities(c:Catalog):IdentityIssue[]{
  }
  return result;
 }
+
+/** Review dates are editorial signals, never automatic deletions. */
+export function associationReviewQueue(c:Catalog,now=Date.now()){
+ return c.associations.map(a=>{const date=a.lastVerifiedAt??a.verifiedAt;const ageDays=Math.floor((now-Date.parse(date))/86400000);return {id:a.id,aircraftId:a.aircraftId,entityId:a.entityId,lastVerifiedAt:date,ageDays,reason:a.status==='UNVERIFIED'||!a.reviewed?'Unverified association':ageDays>=90?'90-day review due':ageDays<0?'Future verification date':''};}).filter(a=>a.reason).sort((a,b)=>b.ageDays-a.ageDays);
+}

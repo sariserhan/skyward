@@ -34,7 +34,8 @@
           "verifiedAt": "2026-09-30",
           "confidence": "HIGH"
         }
-      ]
+      ],
+      "status": "HISTORICAL"
     },
     {
       "id": "nasa-sca-911",
@@ -69,7 +70,8 @@
           "verifiedAt": "2026-09-30",
           "confidence": "HIGH"
         }
-      ]
+      ],
+      "status": "HISTORICAL"
     },
     {
       "id": "noaa-orion-42",
@@ -97,7 +99,8 @@
           "verifiedAt": "2026-09-30",
           "confidence": "HIGH"
         }
-      ]
+      ],
+      "status": "VERIFIED"
     },
     {
       "id": "noaa-orion-43",
@@ -125,7 +128,8 @@
           "verifiedAt": "2026-09-30",
           "confidence": "HIGH"
         }
-      ]
+      ],
+      "status": "VERIFIED"
     },
     {
       "id": "noaa-gulfstream-49",
@@ -154,7 +158,8 @@
           "confidence": "HIGH"
         }
       ],
-      "operator": "NOAA"
+      "operator": "NOAA",
+      "status": "VERIFIED"
     },
     {
       "id": "nasa-sofia-747",
@@ -188,7 +193,8 @@
           "verifiedAt": "2026-10-01",
           "confidence": "HIGH"
         }
-      ]
+      ],
+      "status": "HISTORICAL"
     },
     {
       "id": "boeing-767-25193",
@@ -239,7 +245,8 @@
       ],
       "serialNumber": "25193",
       "serialSeries": "767",
-      "yearBuilt": 1991
+      "yearBuilt": 1991,
+      "status": "VERIFIED"
     },
     {
       "id": "boeing-767-25194",
@@ -290,7 +297,8 @@
       ],
       "serialNumber": "25194",
       "serialSeries": "767",
-      "yearBuilt": 1991
+      "yearBuilt": 1991,
+      "status": "VERIFIED"
     },
     {
       "id": "alaska-kraken-933",
@@ -341,7 +349,8 @@
       ],
       "serialNumber": "44098",
       "serialSeries": "737",
-      "yearBuilt": 2022
+      "yearBuilt": 2022,
+      "status": "VERIFIED"
     },
     {
       "id": "alaska-giants-855",
@@ -367,7 +376,8 @@
           "verifiedAt": "2026-10-01",
           "confidence": "HIGH"
         }
-      ]
+      ],
+      "status": "VERIFIED"
     },
     {
       "id": "boeing-za004",
@@ -394,7 +404,8 @@
           "confidence": "HIGH"
         }
       ],
-      "retired": true
+      "retired": true,
+      "status": "HISTORICAL"
     },
     {
       "id": "icelandair-hekla-aurora",
@@ -427,7 +438,8 @@
           "confidence": "HIGH"
         }
       ],
-      "retired": true
+      "retired": true,
+      "status": "HISTORICAL"
     },
     {
       "id": "orbis-md10-46800",
@@ -472,7 +484,8 @@
       ],
       "serialNumber": "46800",
       "serialSeries": "DC-10",
-      "yearBuilt": 1973
+      "yearBuilt": 1973,
+      "status": "VERIFIED"
     },
     {
       "id": "flying-bulls-dc6",
@@ -508,7 +521,8 @@
           "confidence": "HIGH"
         }
       ],
-      "yearBuilt": 1958
+      "yearBuilt": 1958,
+      "status": "VERIFIED"
     },
     {
       "id": "flying-bulls-p38",
@@ -534,7 +548,8 @@
           "verifiedAt": "2026-10-01",
           "confidence": "HIGH"
         }
-      ]
+      ],
+      "status": "VERIFIED"
     },
     {
       "id": "noaa-twin-otter-46",
@@ -562,7 +577,8 @@
           "verifiedAt": "2026-10-01",
           "confidence": "HIGH"
         }
-      ]
+      ],
+      "status": "VERIFIED"
     },
     {
       "id": "noaa-twin-otter-48",
@@ -590,7 +606,8 @@
           "verifiedAt": "2026-10-01",
           "confidence": "HIGH"
         }
-      ]
+      ],
+      "status": "VERIFIED"
     },
     {
       "id": "noaa-twin-otter-56",
@@ -636,7 +653,8 @@
         }
       ],
       "serialNumber": "788",
-      "yearBuilt": 1982
+      "yearBuilt": 1982,
+      "status": "VERIFIED"
     },
     {
       "id": "noaa-twin-otter-57",
@@ -664,7 +682,8 @@
           "verifiedAt": "2026-10-01",
           "confidence": "HIGH"
         }
-      ]
+      ],
+      "status": "VERIFIED"
     },
     {
       "id": "alaska-seattle-world-cup-985",
@@ -693,7 +712,8 @@
           "verifiedAt": "2026-10-01",
           "confidence": "HIGH"
         }
-      ]
+      ],
+      "status": "VERIFIED"
     },
     {
       "id": "jetblue-746",
@@ -740,7 +760,8 @@
           "verifiedAt": "2026-10-01",
           "confidence": "MEDIUM"
         }
-      ]
+      ],
+      "status": "VERIFIED"
     },
     {
       "id": "jetblue-595",
@@ -787,7 +808,8 @@
           "verifiedAt": "2026-10-01",
           "confidence": "MEDIUM"
         }
-      ]
+      ],
+      "status": "VERIFIED"
     },
     {
       "id": "jetblue-632",
@@ -834,7 +856,8 @@
           "verifiedAt": "2026-10-01",
           "confidence": "MEDIUM"
         }
-      ]
+      ],
+      "status": "VERIFIED"
     },
     {
       "id": "jetblue-633",
@@ -881,7 +904,8 @@
           "verifiedAt": "2026-10-01",
           "confidence": "MEDIUM"
         }
-      ]
+      ],
+      "status": "VERIFIED"
     },
     {
       "id": "jetblue-605",
@@ -928,7 +952,8 @@
           "verifiedAt": "2026-10-01",
           "confidence": "MEDIUM"
         }
-      ]
+      ],
+      "status": "VERIFIED"
     }
   ],
   "entities": [
@@ -1050,7 +1075,9 @@
       "associationType": "FORMERLY_ASSOCIATED",
       "validFrom": null,
       "validTo": null,
-      "reviewed": true
+      "reviewed": true,
+      "status": "HISTORICAL",
+      "lastVerifiedAt": "2026-09-30"
     },
     {
       "sourceUrl": "https://www.nasa.gov/centers-and-facilities/armstrong/nasa-armstrong-fact-sheet-shuttle-carrier-aircraft/",
@@ -1063,7 +1090,9 @@
       "associationType": "FORMERLY_ASSOCIATED",
       "validFrom": null,
       "validTo": null,
-      "reviewed": true
+      "reviewed": true,
+      "status": "HISTORICAL",
+      "lastVerifiedAt": "2026-09-30"
     },
     {
       "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/lockheed-wp-3d-orion",
@@ -1076,7 +1105,9 @@
       "associationType": "OPERATOR",
       "validFrom": null,
       "validTo": null,
-      "reviewed": true
+      "reviewed": true,
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-09-30"
     },
     {
       "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/lockheed-wp-3d-orion",
@@ -1089,7 +1120,9 @@
       "associationType": "OPERATOR",
       "validFrom": null,
       "validTo": null,
-      "reviewed": true
+      "reviewed": true,
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-09-30"
     },
     {
       "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/gulfstream-iv-sp",
@@ -1102,7 +1135,9 @@
       "associationType": "OPERATOR",
       "validFrom": null,
       "validTo": null,
-      "reviewed": true
+      "reviewed": true,
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01"
     },
     {
       "sourceUrl": "https://www.nasa.gov/solar-system/nasas-retired-sofia-aircraft-finds-new-home-at-arizona-museum/",
@@ -1115,7 +1150,9 @@
       "associationType": "FORMERLY_ASSOCIATED",
       "validFrom": null,
       "validTo": null,
-      "reviewed": true
+      "reviewed": true,
+      "status": "HISTORICAL",
+      "lastVerifiedAt": "2026-10-01"
     },
     {
       "sourceUrl": "https://www.planespotters.net/photos/reg/N36NE?sort=aircraft",
@@ -1129,7 +1166,9 @@
       "validFrom": null,
       "validTo": null,
       "reviewed": true,
-      "context": "Photographic identification documents the Patriots association. The team separately describes team transport and goodwill missions. Current charter operator and occupants are not inferred."
+      "context": "Photographic identification documents the Patriots association. The team separately describes team transport and goodwill missions. Current charter operator and occupants are not inferred.",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01"
     },
     {
       "sourceUrl": "https://www.planespotters.net/photo/1398124/n225ne-new-england-patriots-boeing-767-323er",
@@ -1143,7 +1182,9 @@
       "validFrom": null,
       "validTo": null,
       "reviewed": true,
-      "context": "Photographic identification documents the Patriots association. The team separately describes team transport and goodwill missions. Current charter operator and occupants are not inferred."
+      "context": "Photographic identification documents the Patriots association. The team separately describes team transport and goodwill missions. Current charter operator and occupants are not inferred.",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01"
     },
     {
       "sourceUrl": "https://news.alaskaair.com/community/alaska-airlines-seattle-kraken-aircraft-2024/",
@@ -1157,7 +1198,9 @@
       "validFrom": null,
       "validTo": null,
       "reviewed": true,
-      "context": "Alaska announced this Kraken-themed airline aircraft in October 2024. This documents a livery partnership, not team ownership or passengers."
+      "context": "Alaska announced this Kraken-themed airline aircraft in October 2024. This documents a livery partnership, not team ownership or passengers.",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01"
     },
     {
       "sourceUrl": "https://news.alaskaair.com/community/alaska-airlines-seattle-kraken-aircraft-2024/",
@@ -1171,7 +1214,9 @@
       "validFrom": null,
       "validTo": null,
       "reviewed": true,
-      "context": "Alaska identified N933AK in its October 2024 unveiling. The source documents its operation at that time; current service and livery are not independently confirmed."
+      "context": "Alaska identified N933AK in its October 2024 unveiling. The source documents its operation at that time; current service and livery are not independently confirmed.",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01"
     },
     {
       "sourceUrl": "https://news.alaskaair.com/newsroom/san-francisco-giants-and-alaska-airlines-newest-livery-shows-up-in-a-giant-way/",
@@ -1185,7 +1230,9 @@
       "validFrom": null,
       "validTo": null,
       "reviewed": true,
-      "context": "The September 2021 announcement identified N855VA and planned the livery through 2022. Current paint, operator and registration are unconfirmed."
+      "context": "The September 2021 announcement identified N855VA and planned the livery through 2022. Current paint, operator and registration are unconfirmed.",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01"
     },
     {
       "sourceUrl": "https://news.alaskaair.com/newsroom/san-francisco-giants-and-alaska-airlines-newest-livery-shows-up-in-a-giant-way/",
@@ -1199,7 +1246,9 @@
       "validFrom": null,
       "validTo": null,
       "reviewed": true,
-      "context": "Historical 2021 airline livery announcement; not a claim of current operator or ownership."
+      "context": "Historical 2021 airline livery announcement; not a claim of current operator or ownership.",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01"
     },
     {
       "sourceUrl": "https://www.boeing.com/features/2026/02/last-787-8-test-airplane-bows-out-after-years-of-breakthroughs",
@@ -1213,7 +1262,9 @@
       "validFrom": null,
       "validTo": null,
       "reviewed": true,
-      "context": "Boeing identifies ZA004 as N7874 and documents its final flight on February 11, 2026. This is a retired test aircraft."
+      "context": "Boeing identifies ZA004 as N7874 and documents its final flight on February 11, 2026. This is a retired test aircraft.",
+      "status": "HISTORICAL",
+      "lastVerifiedAt": "2026-10-01"
     },
     {
       "sourceUrl": "https://www.icelandair.com/is-is/um-okkur/flugflotinn/hekla-aurora/",
@@ -1227,7 +1278,9 @@
       "validFrom": null,
       "validTo": null,
       "reviewed": true,
-      "context": "Hekla Aurora, identified as TF-FIU in the airline media kit, was taken out of service in October 2025."
+      "context": "Hekla Aurora, identified as TF-FIU in the airline media kit, was taken out of service in October 2025.",
+      "status": "HISTORICAL",
+      "lastVerifiedAt": "2026-10-01"
     },
     {
       "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=330AU",
@@ -1241,7 +1294,9 @@
       "validFrom": null,
       "validTo": null,
       "reviewed": true,
-      "context": "The FAA identifies Project Orbis International as the registered organization. Orbis documents its MD-10 Flying Eye Hospital program."
+      "context": "The FAA identifies Project Orbis International as the registered organization. Orbis documents its MD-10 Flying Eye Hospital program.",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01"
     },
     {
       "sourceUrl": "https://www.flyingbulls.at/en/fleet/douglas-dc-6b",
@@ -1255,7 +1310,9 @@
       "validFrom": null,
       "validTo": null,
       "reviewed": true,
-      "context": "The official collection profile identifies OE-LDM, formerly N996DM, and its 1958 construction. This historic aircraft is not marked retired."
+      "context": "The official collection profile identifies OE-LDM, formerly N996DM, and its 1958 construction. This historic aircraft is not marked retired.",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01"
     },
     {
       "sourceUrl": "https://www.flyingbulls.at/en/stories/unique-beauty",
@@ -1269,7 +1326,9 @@
       "validFrom": null,
       "validTo": null,
       "reviewed": true,
-      "context": "The collection identifies its P-38 Lightning as N25Y. This is a heritage display aircraft, not a personal-transport association."
+      "context": "The collection identifies its P-38 Lightning as N25Y. This is a heritage display aircraft, not a personal-transport association.",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01"
     },
     {
       "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/de-havilland-dhc-6-300-twin-otter",
@@ -1283,7 +1342,9 @@
       "validFrom": null,
       "validTo": null,
       "reviewed": true,
-      "context": "NOAA identifies this registration in its Twin Otter research fleet. A research mission does not imply a point-to-point passenger destination."
+      "context": "NOAA identifies this registration in its Twin Otter research fleet. A research mission does not imply a point-to-point passenger destination.",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01"
     },
     {
       "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/de-havilland-dhc-6-300-twin-otter",
@@ -1297,7 +1358,9 @@
       "validFrom": null,
       "validTo": null,
       "reviewed": true,
-      "context": "NOAA identifies this registration in its Twin Otter research fleet. A research mission does not imply a point-to-point passenger destination."
+      "context": "NOAA identifies this registration in its Twin Otter research fleet. A research mission does not imply a point-to-point passenger destination.",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01"
     },
     {
       "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/de-havilland-dhc-6-300-twin-otter",
@@ -1311,7 +1374,9 @@
       "validFrom": null,
       "validTo": null,
       "reviewed": true,
-      "context": "NOAA identifies this registration in its Twin Otter research fleet. A research mission does not imply a point-to-point passenger destination."
+      "context": "NOAA identifies this registration in its Twin Otter research fleet. A research mission does not imply a point-to-point passenger destination.",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01"
     },
     {
       "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/de-havilland-dhc-6-300-twin-otter",
@@ -1325,7 +1390,9 @@
       "validFrom": null,
       "validTo": null,
       "reviewed": true,
-      "context": "NOAA identifies this registration in its Twin Otter research fleet. A research mission does not imply a point-to-point passenger destination."
+      "context": "NOAA identifies this registration in its Twin Otter research fleet. A research mission does not imply a point-to-point passenger destination.",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01"
     },
     {
       "sourceUrl": "https://news.alaskaair.com/company/seattle-fifa-world-cup-2026-local-organizing-committee-livery/",
@@ -1339,7 +1406,9 @@
       "validFrom": "2026-06-10",
       "validTo": null,
       "reviewed": true,
-      "context": "Alaska identifies this 737-9 MAX in its June 2026 Seattle World Cup promotion. This is a scheduled airline aircraft with commemorative branding, not a team charter; current paint scheme is unconfirmed."
+      "context": "Alaska identifies this 737-9 MAX in its June 2026 Seattle World Cup promotion. This is a scheduled airline aircraft with commemorative branding, not a team charter; current paint scheme is unconfirmed.",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01"
     },
     {
       "sourceUrl": "https://planecaptures.com/collection/jetblue-airways-special-colors",
@@ -1353,7 +1422,9 @@
       "validFrom": null,
       "validTo": null,
       "reviewed": true,
-      "context": "Photographic catalog identifies N746JB with New York Jets branding. FAA verifies the airframe identity separately. This relationship is a livery association, not team ownership or evidence of a team journey; current paint scheme is unconfirmed."
+      "context": "Photographic catalog identifies N746JB with New York Jets branding. FAA verifies the airframe identity separately. This relationship is a livery association, not team ownership or evidence of a team journey; current paint scheme is unconfirmed.",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01"
     },
     {
       "sourceUrl": "https://planecaptures.com/collection/jetblue-airways-special-colors",
@@ -1367,7 +1438,9 @@
       "validFrom": null,
       "validTo": null,
       "reviewed": true,
-      "context": "Photographic catalog identifies N595JB with Boston Celtics branding. FAA verifies the airframe identity separately. This relationship is a livery association, not team ownership or evidence of a team journey; current paint scheme is unconfirmed."
+      "context": "Photographic catalog identifies N595JB with Boston Celtics branding. FAA verifies the airframe identity separately. This relationship is a livery association, not team ownership or evidence of a team journey; current paint scheme is unconfirmed.",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01"
     },
     {
       "sourceUrl": "https://planecaptures.com/collection/jetblue-airways-special-colors",
@@ -1381,7 +1454,9 @@
       "validFrom": null,
       "validTo": null,
       "reviewed": true,
-      "context": "Photographic catalog identifies N632JB with Boston Bruins branding. FAA verifies the airframe identity separately. This relationship is a livery association, not team ownership or evidence of a team journey; current paint scheme is unconfirmed."
+      "context": "Photographic catalog identifies N632JB with Boston Bruins branding. FAA verifies the airframe identity separately. This relationship is a livery association, not team ownership or evidence of a team journey; current paint scheme is unconfirmed.",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01"
     },
     {
       "sourceUrl": "https://planecaptures.com/collection/jetblue-airways-special-colors",
@@ -1395,7 +1470,9 @@
       "validFrom": null,
       "validTo": null,
       "reviewed": true,
-      "context": "Photographic catalog identifies N633JB with Brooklyn Nets branding. FAA verifies the airframe identity separately. This relationship is a livery association, not team ownership or evidence of a team journey; current paint scheme is unconfirmed."
+      "context": "Photographic catalog identifies N633JB with Brooklyn Nets branding. FAA verifies the airframe identity separately. This relationship is a livery association, not team ownership or evidence of a team journey; current paint scheme is unconfirmed.",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01"
     },
     {
       "sourceUrl": "https://planecaptures.com/collection/jetblue-airways-special-colors",
@@ -1409,7 +1486,9 @@
       "validFrom": null,
       "validTo": null,
       "reviewed": true,
-      "context": "Photographic catalog identifies N605JB with Boston Red Sox branding. FAA verifies the airframe identity separately. This relationship is a livery association, not team ownership or evidence of a team journey; current paint scheme is unconfirmed."
+      "context": "Photographic catalog identifies N605JB with Boston Red Sox branding. FAA verifies the airframe identity separately. This relationship is a livery association, not team ownership or evidence of a team journey; current paint scheme is unconfirmed.",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01"
     }
   ]
 }

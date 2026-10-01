@@ -1,0 +1,152 @@
+{
+  "version": 1,
+  "aircraft": [
+    {
+      "id": "boeing-767-25193",
+      "manufacturer": "Boeing",
+      "model": "767-323",
+      "category": "Sports-associated aircraft",
+      "registrations": [
+        {
+          "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=36NE",
+          "sourceName": "FAA aircraft registry: N36NE",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "N36NE",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [
+        {
+          "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=36NE",
+          "sourceName": "FAA aircraft registry: N36NE",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "a40b24",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "sources": [
+        {
+          "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=36NE",
+          "sourceName": "FAA aircraft registry: N36NE",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        },
+        {
+          "sourceUrl": "https://www.patriots.com/video/do-your-life-patriots-team-plane",
+          "sourceName": "New England Patriots: team plane and goodwill missions",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        },
+        {
+          "sourceUrl": "https://www.planespotters.net/photos/reg/N36NE?sort=aircraft",
+          "sourceName": "Planespotters photographic aircraft identification: N36NE",
+          "verifiedAt": "2026-10-01",
+          "confidence": "MEDIUM"
+        }
+      ],
+      "serialNumber": "25193",
+      "serialSeries": "767",
+      "yearBuilt": 1991,
+      "status": "VERIFIED"
+    },
+    {
+      "id": "boeing-767-25194",
+      "manufacturer": "Boeing",
+      "model": "767-323",
+      "category": "Sports-associated aircraft",
+      "registrations": [
+        {
+          "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=225NE",
+          "sourceName": "FAA aircraft registry: N225NE",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "N225NE",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [
+        {
+          "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=225NE",
+          "sourceName": "FAA aircraft registry: N225NE",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "a1f4c5",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "sources": [
+        {
+          "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=225NE",
+          "sourceName": "FAA aircraft registry: N225NE",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        },
+        {
+          "sourceUrl": "https://www.patriots.com/video/do-your-life-patriots-team-plane",
+          "sourceName": "New England Patriots: team plane and goodwill missions",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        },
+        {
+          "sourceUrl": "https://www.planespotters.net/photo/1398124/n225ne-new-england-patriots-boeing-767-323er",
+          "sourceName": "Planespotters photographic aircraft identification: N225NE",
+          "verifiedAt": "2026-10-01",
+          "confidence": "MEDIUM"
+        }
+      ],
+      "serialNumber": "25194",
+      "serialSeries": "767",
+      "yearBuilt": 1991,
+      "status": "VERIFIED"
+    }
+  ],
+  "entities": [
+    {
+      "id": "new-england-patriots",
+      "slug": "new-england-patriots",
+      "displayName": "New England Patriots",
+      "entityType": "SPORTS_TEAM",
+      "description": "Two Boeing 767 aircraft publicly associated with the team. These aircraft also serve other missions; an observation does not identify the passengers."
+    }
+  ],
+  "associations": [
+    {
+      "sourceUrl": "https://www.planespotters.net/photos/reg/N36NE?sort=aircraft",
+      "sourceName": "Planespotters photographic aircraft identification: N36NE",
+      "verifiedAt": "2026-10-01",
+      "confidence": "MEDIUM",
+      "id": "boeing-767-25193-new-england-patriots",
+      "aircraftId": "boeing-767-25193",
+      "entityId": "new-england-patriots",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Photographic identification documents the Patriots association. The team separately describes team transport and goodwill missions. Current charter operator and occupants are not inferred.",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01"
+    },
+    {
+      "sourceUrl": "https://www.planespotters.net/photo/1398124/n225ne-new-england-patriots-boeing-767-323er",
+      "sourceName": "Planespotters photographic aircraft identification: N225NE",
+      "verifiedAt": "2026-10-01",
+      "confidence": "MEDIUM",
+      "id": "boeing-767-25194-new-england-patriots",
+      "aircraftId": "boeing-767-25194",
+      "entityId": "new-england-patriots",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Photographic identification documents the Patriots association. The team separately describes team transport and goodwill missions. Current charter operator and occupants are not inferred.",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01"
+    }
+  ]
+}

@@ -605,3 +605,12 @@ City-building streaming admits up to 48 buildings / roughly 2,000 footprint vert
 Aircraft identity and following V1 adds `/aircraft/`, `/notable-aircraft/`, and `/following/` (also under More tools). The small curated catalog is served as static assets; follows persist locally and can be explicitly synced to a Premium account. Profiles check tracking observations on request, with an optional ten-check visible-page monitoring session for followed aircraft. No added continuous tracking, paid lookups, R2 objects or background notifications. The local review workbench at `/admin/notable-aircraft/` includes guided forms, source review, conflict/duplicate suggestions and audited repository publication. Profiles also support bounded local history imports and opt-in in-page activity alerts. Run `npm --prefix web run check:free-budget` for a read-only account usage check (Billing Read permission required; partial access fails honestly). See [aircraft identity, publication and resource limits](docs/notable-aircraft.md). Shared Cloudflare free allowances still depend on traffic from all projects in the account.
 
 The **Notable aircraft directory** at `/notable-aircraft/` now includes 15 aircraft across 10 sourced sports, business, public-service and heritage collections. Search/filter collections and follow aircraft directly; open a collection to see source evidence and the difference between team transport, commemorative livery and historical association. Categories and searches are shareable URL parameters. Directory browsing remains static and makes no tracking requests. See [curation decisions and limits](docs/notable-aircraft.md#curated-directory-2026-10-01).
+
+The notable-aircraft addendum now includes explicit verification states, an
+additive seed-to-review-draft importer, a 90-day association review queue and
+`/methodology/`. See [spec2 acceptance](docs/spec2-acceptance.md) for the requirement
+mapping and remaining limitations, and [provider usage review](docs/data-provider-compliance.md)
+for current source terms and unresolved account-specific permissions. Run
+`npm --prefix web run catalog:seed -- data/notable-aircraft.seed.json /tmp/catalog-draft.json`
+from the repository root, or use `node web/scripts/seed-airframes.mjs web/data/notable-aircraft.seed.json /tmp/catalog-draft.json`.
+Seed generation does not publish or change the source catalog.

@@ -4,7 +4,7 @@ export type ObservationSnapshot={row:AirframeObservation|null;source:string;chec
 const KEY='skyward.airframe-observations.v1',TTL=30*60000,MAX=10;
 /** Original observations only; never projected coordinates or a simulated landing. */
 export function matchAirframeObservation(c:Catalog,a:Airframe,input:unknown,now=Date.now()):AirframeObservation|null{
- if(!Array.isArray(input)||a.retired)return null;
+ if(!Array.isArray(input)||a.retired||a.status==='HISTORICAL'||a.status==='UNVERIFIED')return null;
  const rows:AirframeObservation[]=[];
  for(const r of input.slice(0,5000)){
   if(!r||r.simulation||!Number.isFinite(r.observedAt)||r.observedAt<=0||r.observedAt>now+30000||now-r.observedAt>TTL||!Number.isFinite(r.lat)||Math.abs(r.lat)>90||!Number.isFinite(r.lon)||Math.abs(r.lon)>180||typeof r.hex!=='string'||!/^[a-f0-9]{6}$/.test(r.hex))continue;

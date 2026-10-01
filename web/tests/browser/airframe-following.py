@@ -62,6 +62,8 @@ def run(page):
  page.get_by_label('Permanent record ID').fill('test-association')
  page.get_by_label('Aircraft',exact=True).select_option('nasa-sca-905')
  page.get_by_label('Entity',exact=True).select_option('test-organization')
+ assert page.get_by_label('Verification status',exact=True).input_value()=='UNVERIFIED'
+ page.get_by_label('Verification status',exact=True).select_option('VERIFIED')
  page.get_by_label('Source name',exact=True).fill('Fixture source')
  page.get_by_label('Source URL',exact=True).fill('https://example.org/evidence')
  page.get_by_label('Confidence',exact=True).select_option('HIGH')
@@ -83,6 +85,7 @@ def run(page):
  # Active-airframe observation fixture: passive browsing makes no paid or free feed request.
  catalog=json.loads((f.ROOT/'public/data/airframes.json').read_text())
  catalog['aircraft'][0]['retired']=False
+ catalog['aircraft'][0]['status']='VERIFIED'
  page.route('**/watch/data/airframes.json',lambda r:r.fulfill(json=catalog))
  lookup=[]
  def observation(r):
