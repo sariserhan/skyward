@@ -29,6 +29,8 @@ export function useObservatory(airport: AirportId, alertsEnabled = false) {
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState('');
   const [observations,setObservations]=useState<Aircraft[]>([]);
+  // Session-only history: keep explicitly viewed aircraft beyond viewport/cache eviction.
+  const [recentlyViewed,setRecentlyViewed]=useState<Aircraft[]>([]);
   const accepted=useRef(new Map<string,Aircraft>());
   const recent=useRef(new Map<string,Aircraft>());
   const motionHistories=useRef(new Map<string,TrailPoint[]>());
@@ -58,9 +60,10 @@ export function useObservatory(airport: AirportId, alertsEnabled = false) {
       }
     }
     setObservations([...recent.current.values()]);
+    setRecentlyViewed(previous=>{let changed=false;const next=previous.map(old=>{const fresh=recent.current.get(old.hex);if(fresh&&(fresh.observedAt??0)>(old.observedAt??0)){changed=true;return fresh;}return old;});return changed?next:previous;});
     return rows;
   }, []);
-  const select = useCallback((a: Aircraft) => { a=qualityRows([withSpecialAircraftType(a)],accepted.current)[0]; if((histories.current.get(a.hex)?.length??0)<(motionHistories.current.get(a.hex)?.length??0)){histories.current.set(a.hex,[...motionHistories.current.get(a.hex)!]);if(histories.current.size>250){const oldest=[...histories.current.keys()].find(hex=>hex!==a.hex);if(oldest)histories.current.delete(oldest);}} selectedRef.current = a; setSelected(a); setSelectedError(''); setTrail(histories.current.get(a.hex) ?? []); }, []);
+  const select = useCallback((a: Aircraft) => { a=qualityRows([withSpecialAircraftType(a)],accepted.current)[0]; if((histories.current.get(a.hex)?.length??0)<(motionHistories.current.get(a.hex)?.length??0)){histories.current.set(a.hex,[...motionHistories.current.get(a.hex)!]);if(histories.current.size>250){const oldest=[...histories.current.keys()].find(hex=>hex!==a.hex);if(oldest)histories.current.delete(oldest);}} setRecentlyViewed(previous=>[a,...previous.filter(old=>old.hex!==a.hex)].slice(0,20)); selectedRef.current = a; setSelected(a); setSelectedError(''); setTrail(histories.current.get(a.hex) ?? []); }, []);
   useEffect(() => {
     let alive = true, inFlight = false, nextAttempt = 0, cooldown = 0, failures = 0;
     const controller = new AbortController();
@@ -129,5 +132,5 @@ export function useObservatory(airport: AirportId, alertsEnabled = false) {
   }, [ingest, select]);
   useEffect(() => () => searchController.current?.abort(), []);
   const clearSelected = useCallback(() => { searchController.current?.abort(); setSearching(false); setSearchError(''); selectedRef.current = null; setSelected(null); setSelectedError(''); setTrail([]); }, []);
-  return { watchSyncError, ingest, activity, histories:histories.current,motionHistories:motionHistories.current, observations, aircraft, selected, select, clearSelected, error, loading, updatedAt, selectedError, watches, toggleWatch, lookup, searching, searchError, trail, refresh: () => refreshRef.current() };
+  return { watchSyncError, ingest, activity, histories:histories.current,motionHistories:motionHistories.current, recentlyViewed, observations, aircraft, selected, select, clearSelected, error, loading, updatedAt, selectedError, watches, toggleWatch, lookup, searching, searchError, trail, refresh: () => refreshRef.current() };
 }
