@@ -17,7 +17,7 @@ def run(page):
  assert menu.is_visible()
  assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
  page.screenshot(path=str(f.ARTIFACTS/'live-collections-mobile.png'))
- menu.get_by_role('link',name='Browse the reference directory').click()
+ menu.get_by_role('link',name='Explore live collections').click()
  page.get_by_role('heading',name='Notable aircraft',exact=True).wait_for()
  assert not errors,errors
  print('PASS desktop/mobile live menu, hidden inactive entries, reference navigation, no script errors',flush=True)

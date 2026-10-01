@@ -10,6 +10,7 @@ def run(page):
  page.goto(f.URL+'/notable-aircraft/')
  page.get_by_role('heading',name='Notable aircraft',exact=True).wait_for()
  assert 'Notable aircraft' in page.title()
+ page.get_by_role('button',name='Aircraft & history',exact=True).click()
  assert page.get_by_role('article').count()==10
  page.get_by_role('button',name='Sports (3)',exact=True).click()
  assert page.get_by_role('article').count()==3

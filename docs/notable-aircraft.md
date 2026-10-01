@@ -145,3 +145,11 @@ registration observations are hidden. This is area-scoped discovery, not a
 worldwide active-fleet search. Selecting a result opens the existing aircraft
 viewer; no follow action is required. The separate reference directory retains
 historical aircraft and evidence, and is explicitly labeled as reference material.
+
+The directory now defaults to **Watch live**, with **Aircraft & history** separate.
+An explicit **Find airborne aircraft** action checks at most ten currently verified
+organizational aircraft sequentially through the existing free search endpoint.
+No checks run on page load or in the background. A one-minute session cooldown
+survives tab changes and reloads when session storage is available; requests abort
+on leaving and stop on errors. Only matched, recent airborne observations produce
+Watch live links. Results expire after two minutes and make no passenger claim.

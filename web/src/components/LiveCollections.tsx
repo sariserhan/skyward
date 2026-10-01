@@ -16,7 +16,7 @@ export function LiveCollections({aircraft,now,select}:{aircraft:Aircraft[];now:n
    {rows.map(({aircraft:a,names})=><button key={a.hex} onClick={()=>select(a)} aria-label={`Watch ${a.callsign||a.registration} live`}><strong>{names}</strong><span>{a.callsign||a.registration} · Watch live →</span></button>)}
    {!rows.length&&<p role="status">{failed?'Aircraft collections could not load.':!catalog?'Loading collections…':'No matching airborne aircraft detected in the loaded map area.'}</p>}
    <small>Recent observations only. Coverage varies; aircraft associations do not identify passengers.</small>
-   <a href="/notable-aircraft/">Browse the reference directory →</a>
+   <a href="/notable-aircraft/">Explore live collections →</a>
   </div>
  </details>;
 }
