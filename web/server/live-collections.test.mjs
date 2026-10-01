@@ -22,3 +22,13 @@ test('registration-only fleet entries require an unambiguous matching observatio
  assert.equal(liveCollections(conflict,[reg],now).length,0);
  assert.equal(liveCollections(c,[{...reg,observedAt:now-121000}],now).length,0);
 });
+test('sports discovery includes verified team liveries with accurate model and relationship labels',async()=>{
+ const {liveCandidates}=await import('../src/lib/liveCollections.ts');
+ const sports=liveCandidates(c,now,'sports');
+ for(const [registration,hex] of [['N746JB','aa099e'],['N595JB','a7b0c4'],['N632JB','a845f4'],['N633JB','a849ab'],['N605JB','a7da9c']]){
+  assert.ok(sports.some(a=>a.registrations.some(r=>r.value===registration)));
+  const result=liveCollections(c,[{...row,hex,registration}],now);
+  assert.equal(result.length,1);assert.equal(result[0].relationship,'Team-branded airline aircraft');
+ }
+ assert.ok(sports.length<=10);assert.ok(!sports.some(a=>a.operator==='NOAA'));
+});

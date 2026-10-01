@@ -694,6 +694,241 @@
           "confidence": "HIGH"
         }
       ]
+    },
+    {
+      "id": "jetblue-746",
+      "manufacturer": "Airbus",
+      "model": "A320-232",
+      "serialNumber": "3622",
+      "yearBuilt": 2008,
+      "operator": "JetBlue Airways",
+      "category": "Team-branded airline aircraft",
+      "variant": "New York Jets livery association",
+      "registrations": [
+        {
+          "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=746JB",
+          "sourceName": "FAA N746JB aircraft registration",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "N746JB",
+          "country": "US",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [
+        {
+          "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=746JB",
+          "sourceName": "FAA N746JB aircraft registration",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "aa099e",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "sources": [
+        {
+          "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=746JB",
+          "sourceName": "FAA N746JB aircraft registration",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        },
+        {
+          "sourceUrl": "https://planecaptures.com/collection/jetblue-airways-special-colors",
+          "sourceName": "PlaneCaptures JetBlue special-livery photographic catalog",
+          "verifiedAt": "2026-10-01",
+          "confidence": "MEDIUM"
+        }
+      ]
+    },
+    {
+      "id": "jetblue-595",
+      "manufacturer": "Airbus",
+      "model": "A320-232",
+      "serialNumber": "2286",
+      "yearBuilt": 2004,
+      "operator": "JetBlue Airways",
+      "category": "Team-branded airline aircraft",
+      "variant": "Boston Celtics livery association",
+      "registrations": [
+        {
+          "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=595JB",
+          "sourceName": "FAA N595JB aircraft registration",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "N595JB",
+          "country": "US",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [
+        {
+          "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=595JB",
+          "sourceName": "FAA N595JB aircraft registration",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "a7b0c4",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "sources": [
+        {
+          "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=595JB",
+          "sourceName": "FAA N595JB aircraft registration",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        },
+        {
+          "sourceUrl": "https://planecaptures.com/collection/jetblue-airways-special-colors",
+          "sourceName": "PlaneCaptures JetBlue special-livery photographic catalog",
+          "verifiedAt": "2026-10-01",
+          "confidence": "MEDIUM"
+        }
+      ]
+    },
+    {
+      "id": "jetblue-632",
+      "manufacturer": "Airbus",
+      "model": "A320-232",
+      "serialNumber": "2647",
+      "yearBuilt": 2006,
+      "operator": "JetBlue Airways",
+      "category": "Team-branded airline aircraft",
+      "variant": "Boston Bruins livery association",
+      "registrations": [
+        {
+          "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=632JB",
+          "sourceName": "FAA N632JB aircraft registration",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "N632JB",
+          "country": "US",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [
+        {
+          "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=632JB",
+          "sourceName": "FAA N632JB aircraft registration",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "a845f4",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "sources": [
+        {
+          "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=632JB",
+          "sourceName": "FAA N632JB aircraft registration",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        },
+        {
+          "sourceUrl": "https://planecaptures.com/collection/jetblue-airways-special-colors",
+          "sourceName": "PlaneCaptures JetBlue special-livery photographic catalog",
+          "verifiedAt": "2026-10-01",
+          "confidence": "MEDIUM"
+        }
+      ]
+    },
+    {
+      "id": "jetblue-633",
+      "manufacturer": "Airbus",
+      "model": "A320-232",
+      "serialNumber": "2671",
+      "yearBuilt": 2006,
+      "operator": "JetBlue Airways",
+      "category": "Team-branded airline aircraft",
+      "variant": "Brooklyn Nets livery association",
+      "registrations": [
+        {
+          "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=633JB",
+          "sourceName": "FAA N633JB aircraft registration",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "N633JB",
+          "country": "US",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [
+        {
+          "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=633JB",
+          "sourceName": "FAA N633JB aircraft registration",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "a849ab",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "sources": [
+        {
+          "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=633JB",
+          "sourceName": "FAA N633JB aircraft registration",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        },
+        {
+          "sourceUrl": "https://planecaptures.com/collection/jetblue-airways-special-colors",
+          "sourceName": "PlaneCaptures JetBlue special-livery photographic catalog",
+          "verifiedAt": "2026-10-01",
+          "confidence": "MEDIUM"
+        }
+      ]
+    },
+    {
+      "id": "jetblue-605",
+      "manufacturer": "Airbus",
+      "model": "A320-232",
+      "serialNumber": "2368",
+      "yearBuilt": 2005,
+      "operator": "JetBlue Airways",
+      "category": "Team-branded airline aircraft",
+      "variant": "Boston Red Sox livery association",
+      "registrations": [
+        {
+          "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=605JB",
+          "sourceName": "FAA N605JB aircraft registration",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "N605JB",
+          "country": "US",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [
+        {
+          "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=605JB",
+          "sourceName": "FAA N605JB aircraft registration",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "a7da9c",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "sources": [
+        {
+          "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=605JB",
+          "sourceName": "FAA N605JB aircraft registration",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        },
+        {
+          "sourceUrl": "https://planecaptures.com/collection/jetblue-airways-special-colors",
+          "sourceName": "PlaneCaptures JetBlue special-livery photographic catalog",
+          "verifiedAt": "2026-10-01",
+          "confidence": "MEDIUM"
+        }
+      ]
     }
   ],
   "entities": [
@@ -766,6 +1001,41 @@
       "displayName": "The Flying Bulls",
       "entityType": "COMPANY",
       "description": "A public display and heritage aircraft collection. These entries describe the aircraft collection, not private individuals or their travel."
+    },
+    {
+      "id": "new-york-jets",
+      "slug": "new-york-jets",
+      "displayName": "New York Jets",
+      "entityType": "SPORTS_TEAM",
+      "description": "New York Jets branding documented on a JetBlue Airbus A320. This is a regular airline aircraft, not a confirmed team charter. Current paint scheme and passengers are unknown."
+    },
+    {
+      "id": "boston-celtics",
+      "slug": "boston-celtics",
+      "displayName": "Boston Celtics",
+      "entityType": "SPORTS_TEAM",
+      "description": "Boston Celtics branding documented on a JetBlue Airbus A320. This is a regular airline aircraft, not a confirmed team charter. Current paint scheme and passengers are unknown."
+    },
+    {
+      "id": "boston-bruins",
+      "slug": "boston-bruins",
+      "displayName": "Boston Bruins",
+      "entityType": "SPORTS_TEAM",
+      "description": "Boston Bruins branding documented on a JetBlue Airbus A320. This is a regular airline aircraft, not a confirmed team charter. Current paint scheme and passengers are unknown."
+    },
+    {
+      "id": "brooklyn-nets",
+      "slug": "brooklyn-nets",
+      "displayName": "Brooklyn Nets",
+      "entityType": "SPORTS_TEAM",
+      "description": "Brooklyn Nets branding documented on a JetBlue Airbus A320. This is a regular airline aircraft, not a confirmed team charter. Current paint scheme and passengers are unknown."
+    },
+    {
+      "id": "boston-red-sox",
+      "slug": "boston-red-sox",
+      "displayName": "Boston Red Sox",
+      "entityType": "SPORTS_TEAM",
+      "description": "Boston Red Sox branding documented on a JetBlue Airbus A320. This is a regular airline aircraft, not a confirmed team charter. Current paint scheme and passengers are unknown."
     }
   ],
   "associations": [
@@ -1070,6 +1340,76 @@
       "validTo": null,
       "reviewed": true,
       "context": "Alaska identifies this 737-9 MAX in its June 2026 Seattle World Cup promotion. This is a scheduled airline aircraft with commemorative branding, not a team charter; current paint scheme is unconfirmed."
+    },
+    {
+      "sourceUrl": "https://planecaptures.com/collection/jetblue-airways-special-colors",
+      "sourceName": "PlaneCaptures JetBlue special-livery photographic catalog",
+      "verifiedAt": "2026-10-01",
+      "confidence": "MEDIUM",
+      "id": "jetblue-746-new-york-jets",
+      "aircraftId": "jetblue-746",
+      "entityId": "new-york-jets",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Photographic catalog identifies N746JB with New York Jets branding. FAA verifies the airframe identity separately. This relationship is a livery association, not team ownership or evidence of a team journey; current paint scheme is unconfirmed."
+    },
+    {
+      "sourceUrl": "https://planecaptures.com/collection/jetblue-airways-special-colors",
+      "sourceName": "PlaneCaptures JetBlue special-livery photographic catalog",
+      "verifiedAt": "2026-10-01",
+      "confidence": "MEDIUM",
+      "id": "jetblue-595-boston-celtics",
+      "aircraftId": "jetblue-595",
+      "entityId": "boston-celtics",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Photographic catalog identifies N595JB with Boston Celtics branding. FAA verifies the airframe identity separately. This relationship is a livery association, not team ownership or evidence of a team journey; current paint scheme is unconfirmed."
+    },
+    {
+      "sourceUrl": "https://planecaptures.com/collection/jetblue-airways-special-colors",
+      "sourceName": "PlaneCaptures JetBlue special-livery photographic catalog",
+      "verifiedAt": "2026-10-01",
+      "confidence": "MEDIUM",
+      "id": "jetblue-632-boston-bruins",
+      "aircraftId": "jetblue-632",
+      "entityId": "boston-bruins",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Photographic catalog identifies N632JB with Boston Bruins branding. FAA verifies the airframe identity separately. This relationship is a livery association, not team ownership or evidence of a team journey; current paint scheme is unconfirmed."
+    },
+    {
+      "sourceUrl": "https://planecaptures.com/collection/jetblue-airways-special-colors",
+      "sourceName": "PlaneCaptures JetBlue special-livery photographic catalog",
+      "verifiedAt": "2026-10-01",
+      "confidence": "MEDIUM",
+      "id": "jetblue-633-brooklyn-nets",
+      "aircraftId": "jetblue-633",
+      "entityId": "brooklyn-nets",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Photographic catalog identifies N633JB with Brooklyn Nets branding. FAA verifies the airframe identity separately. This relationship is a livery association, not team ownership or evidence of a team journey; current paint scheme is unconfirmed."
+    },
+    {
+      "sourceUrl": "https://planecaptures.com/collection/jetblue-airways-special-colors",
+      "sourceName": "PlaneCaptures JetBlue special-livery photographic catalog",
+      "verifiedAt": "2026-10-01",
+      "confidence": "MEDIUM",
+      "id": "jetblue-605-boston-red-sox",
+      "aircraftId": "jetblue-605",
+      "entityId": "boston-red-sox",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Photographic catalog identifies N605JB with Boston Red Sox branding. FAA verifies the airframe identity separately. This relationship is a livery association, not team ownership or evidence of a team journey; current paint scheme is unconfirmed."
     }
   ]
 }

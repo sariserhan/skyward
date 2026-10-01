@@ -171,3 +171,33 @@ match an established ICAO address when present, have no conflicting catalog iden
 and contain only one observed address for that registration. Stale, ground and
 ambiguous results are excluded. Cards show the verified model and destination
 unknown; the existing flight viewer obtains route data separately if available.
+
+### Sports expansion (2026-10-01)
+
+The catalog contains 25 airframes and 15 collections, including eight sports
+collections. Five JetBlue A320-232 airframes were added:
+
+| Team branding | Registration | FAA serial | ICAO |
+| --- | --- | --- | --- |
+| New York Jets | N746JB | 3622 | aa099e |
+| Boston Celtics | N595JB | 2286 | a7b0c4 |
+| Boston Bruins | N632JB | 2647 | a845f4 |
+| Brooklyn Nets | N633JB | 2671 | a849ab |
+| Boston Red Sox | N605JB | 2368 | a7da9c |
+
+FAA inquiry records establish aircraft identity. The PlaneCaptures photographic
+catalog establishes the livery relationship at medium confidence; the source
+links are retained on each profile. These are team-branded airline aircraft,
+not evidence of team ownership, a current team charter, passengers, or an unchanged
+paint scheme. This distinction appears directly on live cards and sidebar entries.
+
+The **Sports teams** live selector checks eligible sports aircraft together within
+the existing ten-request cap and shared session cooldown. Existing Patriots and
+Kraken aircraft remain eligible; the historical Giants association does not gain
+live eligibility from these changes. Ground, stale, ambiguous and simulated rows
+remain excluded. There is no paid API, automatic polling or database write added.
+
+This is a curated sports-aircraft directory, **not all sports-team flights**.
+Sponsorship alone cannot establish a registration or a specific charter. Teams
+without verified aircraft evidence remain absent. Rotating charters and temporary
+paint schemes require additional dated evidence rather than inferred tail numbers.

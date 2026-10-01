@@ -32,13 +32,13 @@ export default function LiveDirectory({c}:{c:Catalog}){
   <p className="airframe-eyebrow">Team jets. Iconic fleets. A window into the skies.</p>
   <h2>Catch them in flight.</h2>
   <p>Discover airborne aircraft associated with teams, airlines and organizations. Choose an aircraft and watch its journey on the globe.</p>
-  <label>Choose a collection<select value={collection} disabled={busy} onChange={e=>{setCollection(e.target.value);setRows([]);setMessage('');}}><option value="">All collections · up to 10 aircraft</option>{c.entities.filter(e=>liveCandidates(c,now,e.id).length>0).map(e=><option key={e.id} value={e.id}>{e.displayName}</option>)}</select></label>
+  <label>Choose a collection<select value={collection} disabled={busy} onChange={e=>{setCollection(e.target.value);setRows([]);setMessage('');}}><option value="">All collections · up to 10 aircraft</option><option value="sports">Sports teams · up to 10 aircraft</option>{c.entities.filter(e=>liveCandidates(c,now,e.id).length>0).map(e=><option key={e.id} value={e.id}>{e.displayName}</option>)}</select></label>
   <button onClick={check} disabled={busy||now<next}>{busy?'Checking aircraft…':now<next?'Check available shortly':'Find airborne aircraft'}</button>
   <p><small>Up to 10 checks per request. No automatic background polling.</small></p>
   {message&&<p role="status">{message}</p>}
   {!active.length&&!busy&&<p>{message?'No recent airborne matches to show.':'Check for active aircraft to begin. Only recent airborne observations appear here.'}</p>}
-  <div className="airframe-grid">{active.map(({aircraft:a,names})=><article className="airframe-card" key={a.hex}>
-   <p className="airframe-eyebrow">Airborne · recently observed</p><h3>{names}</h3><p>{a.registration} · {a.aircraftType}</p><p>Destination unknown · open flight view for available route information.</p>
+  <div className="airframe-grid">{active.map(({aircraft:a,names,relationship})=><article className="airframe-card" key={a.hex}>
+   <p className="airframe-eyebrow">Airborne · recently observed</p><h3>{names}</h3><p>{relationship}</p><p>{a.registration} · {a.aircraftType}</p><p>Destination unknown · open flight view for available route information.</p>
    <a href={`/#aircraft=${encodeURIComponent(a.hex)}&scene=flight&view=side`}>Watch live →</a>
    <p><small>Position observed {new Date(a.observedAt!).toLocaleTimeString()} · Passengers unknown</small></p>
   </article>)}</div>
