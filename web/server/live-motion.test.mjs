@@ -51,3 +51,23 @@ test('approaches without runway context continue moving; fresh ground fixes win'
  assert.notEqual(liveFrame(approach,[],160000).lon,liveFrame(approach,[],900000).lon);
  assert.deepEqual(approach,{...a,callsign:'TEST1',altitude:1500,verticalRate:-700,groundSpeed:160});
 });
+
+test('large upward and downward altitude corrections stay shallow at approach speed',()=>{
+ for(const sign of [-1,1]){
+  const motion=new LiveMotion(),initial={...a,altitude:10000,groundSpeed:140};
+  const before=motion.sample(initial,[],100000);
+  const fix={...initial,altitude:10000+sign*5000,observedAt:100001};
+  let previous=motion.sample(fix,[],100001);
+  assert.equal(previous.altitude,before.altitude);
+  for(let elapsed=1000;elapsed<=180000;elapsed+=1000){
+   const frame=motion.sample(fix,[],100001+elapsed);
+   const distanceFeet=trackDistance(previous,frame)*6076.12;
+   const change=Math.abs(frame.altitude-previous.altitude);
+   assert.ok(change<=(sign>0?45.01:30.01),'correction rate stays bounded');
+   assert.ok(change<=distanceFeet*Math.tan((sign>0?10:6)*Math.PI/180)+.01,'correction follows forward motion');
+   assert.ok(sign*(frame.altitude-previous.altitude)>=0);
+   previous=frame;
+  }
+  assert.equal(fix.altitude,10000+sign*5000,'reported altitude is untouched');
+ }
+});
