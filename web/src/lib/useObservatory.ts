@@ -121,10 +121,10 @@ export function useObservatory(airport: AirportId, alertsEnabled = false) {
     searchController.current?.abort(); const controller = new AbortController(); searchController.current = controller;
     setSearching(true); setSearchError('');
     try {
-      const data = await fetchFeed(`/api/search?kind=${encodeURIComponent(kind)}&q=${encodeURIComponent(q.trim().toUpperCase())}`, controller.signal);
+      const data = await fetchFeed(`/api/search?kind=${encodeURIComponent(kind)}&q=${encodeURIComponent(q.trim().toUpperCase().replace(/\s+/g,''))}`, controller.signal);
       if (controller.signal.aborted) return null;
       data.aircraft=ingest(data.aircraft);
-      if (!data.aircraft.length) { setSearchError('No aircraft currently reported for that identifier. Try its ATC callsign, such as THY7.'); return null; }
+      if (!data.aircraft.length) { setSearchError('No current observation found worldwide for this identifier. The flight may not be airborne or may be outside feed coverage. Check the tracking callsign (for example UAL613) and try again.'); return null; }
       const match=data.aircraft.find(a=>!accept||accept(a));if(!match)return null;
       select(match); return match;
     } catch (e) { if (!controller.signal.aborted) setSearchError(e instanceof Error ? e.message : 'Lookup unavailable.'); return null; }

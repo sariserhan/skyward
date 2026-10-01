@@ -31,8 +31,9 @@ def run(page):
  page.get_by_role('link',name='Skyward globe',exact=True).click()
  page.locator('.search-trigger').click()
  search.get_by_role('textbox',name='Search airports, flights and controls').fill('UAL613')
- expect(search.locator('.search-active').first).to_contain_text('Last observation')
- search.locator('.search-active').first.click()
+ retained=search.get_by_role('button',name='Flight · UAL613',exact=False)
+ expect(retained).to_contain_text('Last observation')
+ retained.click()
  expect(page.get_by_role('region',name='Aircraft details')).to_contain_text('UAL613')
  page.screenshot(path=str(f.ARTIFACTS/'recent-aircraft.png'))
  assert not errors,errors
