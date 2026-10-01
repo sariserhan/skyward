@@ -17,7 +17,7 @@ const fail=(status,message)=>{throw Object.assign(Error(message),{status});};
 const customerId=v=>typeof v==='string'?v:v?.id;
 const integer=(v,fallback)=>{const n=Number(v??fallback);if(!Number.isSafeInteger(n)||n<1)throw Error('Invalid premium limit');return n;};
 
-export function createAccountMembership({env=process.env,pool,auth,origin,transact,throttleRequest,fetchImpl=fetch,now=Date.now,observations=()=>[]}={}) {
+export function createAccountMembership({env=process.env,pool,auth,origin,transact,throttleRequest,fetchImpl=fetch,now=Date.now,observations=()=>[],airlabsPermissions}={}) {
  const devPremium=developmentPremium(env);
  const authHandler=toNodeHandler(auth);
  const rows=async(sql,args=[],db=pool)=>(await db.query(sql,args)).rows;
@@ -71,7 +71,7 @@ export function createAccountMembership({env=process.env,pool,auth,origin,transa
  if((own?.requests??0)>=limits.userRequests||Number(total.requests)>=limits.globalRequests||Number(total.cost)+limits.requestMicros>limits.budgetMicros)fail(429,'Flight-detail allowance reached. No lookup was made.');
  await db.query('INSERT INTO skyward_usage VALUES($1,$2,1,$3) ON CONFLICT(user_id,month) DO UPDATE SET requests=skyward_usage.requests+1,cost=skyward_usage.cost+excluded.cost',[u.id,month,limits.requestMicros]);
  });}
- const live=createPremiumLive({env,paid:async u=>liveBilling&&await paidEntitlement(u),reserve:reserveLive,fetchImpl,now});
+ const live=createPremiumLive({env,paid:async u=>liveBilling&&await paidEntitlement(u),reserve:reserveLive,fetchImpl,now,permissions:airlabsPermissions});
  async function lookup(u,journeyKey){
     if(!await entitlement(u))fail(403,'An active paid subscription is required.');
     if(env.SKYWARD_AIRLABS_MODE==='live'){const row=await one('SELECT body FROM skyward_journeys WHERE user_id=$1 AND key=$2',[u.id,String(journeyKey||'')]);if(!row)fail(404,'Save this journey first.');const result=await live.flight(u,row.body);await recordVerifiedCheck(u.id,row.body.key,result);return {...result,usage:await usage(u)};}

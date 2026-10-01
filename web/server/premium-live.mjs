@@ -1,7 +1,8 @@
+import {airlabsPermissions,airlabsUsageAllowed} from './airlabs-permissions.mjs';
 import {fetchAirLabsFlight,fetchAirLabsSchedules} from './airlabs.mjs';
 // A real subscription check is deliberately separate from development/test entitlement.
-export function createPremiumLive({env,paid,reserve,fetchImpl=fetch,now=Date.now}){
- const enabled=env.SKYWARD_AIRLABS_MODE==='live'&&env.SKYWARD_BILLING_MODE==='live'&&!!env.AIRLABS_API_KEY;
+export function createPremiumLive({env,paid,reserve,fetchImpl=fetch,now=Date.now,permissions=airlabsPermissions}){
+ const enabled=env.SKYWARD_AIRLABS_MODE==='live'&&env.SKYWARD_BILLING_MODE==='live'&&!!env.AIRLABS_API_KEY&&airlabsUsageAllowed(permissions);
  const cache=new Map(),pending=new Map();
  async function request(u,key,load){
   if(!enabled)throw Object.assign(Error('Live flight details are not enabled. No paid request was made.'),{status:503});

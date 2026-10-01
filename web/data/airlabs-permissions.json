@@ -1,0 +1,16 @@
+{
+  "provider": "AirLabs",
+  "planName": null,
+  "reviewedAt": null,
+  "evidence": [],
+  "permissions": {
+    "publicDisplay": "UNRESOLVED",
+    "commercialUse": "UNRESOLVED",
+    "caching": "UNRESOLVED",
+    "historicalRetention": "UNRESOLVED",
+    "derivedData": "UNRESOLVED",
+    "attribution": "UNRESOLVED",
+    "privateAircraftCoverage": "UNRESOLVED",
+    "registrationIcaoLookup": "UNRESOLVED"
+  }
+}

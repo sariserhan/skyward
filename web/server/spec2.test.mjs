@@ -42,7 +42,7 @@ test('seeds must explicitly state verification and association review date',()=>
 
 test('historical airframes and expired associations are separate from current collections',async()=>{
  const {entityAircraftGroups}=await import('../src/lib/notableDirectory.ts');
- const c=structuredClone(source),id=seed.entities[0].id;
+ const c=structuredClone(source),id='new-england-patriots';
  assert.equal(entityAircraftGroups(c,id).current.length,2);
  const association=c.associations.find(s=>s.entityId===id);association.validTo='2020-01-01';
  const groups=entityAircraftGroups(c,id);

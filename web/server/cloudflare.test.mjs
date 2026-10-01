@@ -1,3 +1,4 @@
+import {verifiedAirLabs} from './fixtures/airlabs-permissions.mjs';
 import {createHmac} from 'node:crypto';
 import test from 'node:test';import assert from 'node:assert/strict';import {DatabaseSync} from 'node:sqlite';import {readFileSync} from 'node:fs';
 import {d1Pool,d1Statement} from '../cloudflare/d1-pool.mjs';import {createD1Auth} from '../cloudflare/auth.mjs';import {createAccountMembership} from './account-membership.mjs';import {nodeHandler} from '../cloudflare/node-handler.mjs';import {handle} from '../cloudflare/router.mjs';import {resendSender} from './resend.mjs';import {publicPage} from './public-pages.mjs';
@@ -72,7 +73,7 @@ test('D1 paid lookup budgets reject user, service and spending exhaustion before
   const {db,binding}=localD1(),{pool,transaction}=d1Pool(binding);let paid=true,calls=0;
   const env={NODE_ENV:'production',SKYWARD_ACCOUNTS:'d1',SKYWARD_BILLING_MODE:'live',SKYWARD_AIRLABS_MODE:'live',AIRLABS_API_KEY:'fixture',STRIPE_SECRET_KEY:'sk_live_fixture',STRIPE_PUBLISHABLE_KEY:'pk_live_fixture',STRIPE_PRICE_ANNUAL_ID:'price_year',STRIPE_WEBHOOK_SECRET:'whsec_fixture',...limit};
   db.prepare('INSERT INTO user VALUES(?,?,?,?,?,?,?)').run('budget-user','Member','budget@example.invalid',1,null,'2026-01-01','2026-01-01');db.prepare('INSERT INTO skyward_profiles VALUES(?,?)').run('budget-user','cus_budget');
-  const membership=createAccountMembership({env,pool,transact:transaction,origin,throttleRequest:async()=>{},auth:{api:{getSession:async()=>({user:{id:'budget-user',email:'budget@example.invalid',emailVerified:true}})}},fetchImpl:async url=>{
+  const membership=createAccountMembership({airlabsPermissions:verifiedAirLabs,env,pool,transact:transaction,origin,throttleRequest:async()=>{},auth:{api:{getSession:async()=>({user:{id:'budget-user',email:'budget@example.invalid',emailVerified:true}})}},fetchImpl:async url=>{
    if(String(url).startsWith('https://api.stripe.com/'))return Response.json({data:paid?[{livemode:true,status:'active',customer:'cus_budget',latest_invoice:{customer:'cus_budget',status:'paid',amount_paid:5999},items:{data:[{price:{id:'price_year'},current_period_end:Math.floor(Date.now()/1000)+3600}]}}]:[]});
    calls++;return Response.json({response:[]});
   }});

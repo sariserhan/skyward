@@ -1,0 +1,2 @@
+// Test fixture only. Not evidence about the production AirLabs account.
+export const verifiedAirLabs={planName:'Test fixture',reviewedAt:'2026-10-01',evidence:['https://example.invalid/test-contract'],permissions:Object.fromEntries(['publicDisplay','commercialUse','caching','historicalRetention','derivedData','attribution','privateAircraftCoverage','registrationIcaoLookup'].map(k=>[k,'VERIFIED']))};

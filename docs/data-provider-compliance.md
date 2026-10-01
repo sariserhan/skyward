@@ -29,3 +29,50 @@ actual plan. Do not scrape tracking websites to obtain telemetry.
   provider-specific restrictions mean data-compliance acceptance is **PARTIAL**.
 - Free-tier budgets are operational limits, not licenses. This change adds no
   paid requests, scheduled Workers, DB writes, raw-data export or source signup.
+
+## AirLabs account review — PARTIAL (2026-10-01)
+
+Inspected tracked configuration, adapter code, deployment configuration and local
+configuration variable names. `web/.env.local` contains AIRLABS_API_KEY; no plan
+name or contract was found. No key value was printed, no account/API lookup was
+made and no credential was requested. Mode `live` in wrangler is configuration,
+not proof of account permissions. Current adapters use `/flight` and `/schedules`,
+not the `/flights` live-position endpoint.
+
+| Question | Finding | Unresolved account evidence |
+| --- | --- | --- |
+| 1. Public display of API-derived live positions | PARTIAL: documented technical capability, no account grant located. | Permission to display positions on skyvvard.com, including public/free vs subscriber audiences and restrictions. |
+| 2. Commercial use | PARTIAL: developer/product use cases are documented. | Actual plan permits this paid product and its intended use. |
+| 3. Caching | PARTIAL: provider publishes caching guidance. | Permitted cache duration, shared-user cache, edge/server/browser storage and deletion requirements. Current details cache is five minutes. |
+| 4. Historical retention | PARTIAL: no account retention terms located. | Permission and limits for saved journey checks, activity history, backups and user exports. |
+| 5. Redistribution / derived data | PARTIAL: no account grant located. | Downstream display, derived tracks, user sharing/export and any bulk/API redistribution limits. We do not add a raw-data API. |
+| 6. Attribution | PARTIAL: exact plan obligations not located. | Required wording, logos, links and placement, or explicit absence of such obligations. |
+| 7. Private / non-airline aircraft coverage | PARTIAL: do not assume universal coverage from live-position marketing. | Plan coverage, exclusions/suppression and permitted handling of private/non-airline aircraft; no guarantee of every aircraft. |
+| 8. Registration / ICAO lookup | PARTIAL: official documentation demonstrates `/flights?reg_number=…` and `/flights?hex=…`. | Entitlement to those endpoint filters/fields and applicable limits on this account. Technical availability is not licensing approval. |
+
+Primary evidence reviewed:
+- https://airlabs.co/docs/flights — live aircraft-position API.
+- https://airlabs.co/how-to-track-a-flight — registration/hex lookup examples.
+- https://airlabs.co/docs/flight — the existing scheduled-flight detail adapter.
+- https://airlabs.co/serverless-flight-api-proxy — caching implementation guidance,
+  not an account-specific retention grant.
+- https://airlabs.co/terms-of-service — general terms, not a recorded plan contract.
+
+### Deployment and runtime gate
+
+`web/data/airlabs-permissions.json` records unresolved permissions, with no secrets.
+`airlabsUsageAllowed` requires plan name, dated review, evidence links and VERIFIED
+permissions for display, commercial use, caching, retention, derived data and
+attribution. A review must confirm both permission and implementation of any
+conditions before marking VERIFIED. It is not enough to set an environment flag.
+The current JSON blocks live details/schedules before payment checks, cache reads,
+quota reservations or network calls. Account `liveDetailsReady` becomes false.
+The operator's live-check CLI is gated too; demo data remains available.
+A future position adapter must additionally use `airlabsPositionUsageAllowed` for
+private-aircraft coverage and registration/ICAO entitlements. No position adapter
+or new provider was deployed here. Provider-independent catalog, follows and
+existing non-AirLabs observations continue operating.
+
+This commit does not change the running production deployment. After deployment,
+existing AirLabs details and schedule calls remain unavailable until this review
+is completed. No request was sent to AirLabs to test or infer rights.

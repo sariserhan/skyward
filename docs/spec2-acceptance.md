@@ -8,7 +8,7 @@ lookups, or new database storage were performed.
 | Area | Result | Evidence / remaining work |
 | --- | --- | --- |
 | Seed import mechanism | PASS | `airframeSeed.ts`, CLI and spec2 tests: idempotent additive imports, stable IDs, conflicting records and duplicate serial/identifiers rejected; publication remains a separately reviewed existing command. |
-| Entire supplied 26-row seed list | PARTIAL | Two Patriots records are present and included in the seed; importing them is a no-op. The other 24 rows are named-person live-tracking seeds and were not imported. Citation placeholders in the attachment are not source URLs. No placeholder or unsupported identity is marked verified. |
+| Entire supplied 26-row seed list | PARTIAL | The organizational seed now includes all 25 existing reviewed aircraft, 15 collections and 27 associations; imports are a no-op against the current catalog, including both Patriots records. The other 24 rows are named-person live-tracking seeds and were not imported. Citation placeholders in the attachment are not source URLs. No placeholder or unsupported identity is marked verified. |
 | Public UI | PARTIAL | Existing directory, organization profiles, aircraft profiles, aircraft follows and source disclaimers work. Added methodology, verification/history labels, association types, review due labels and category filters. No personal live-tracking pages were implemented. Recent observed tracks retain up to 60 positions checked on the page, with original timestamps and no extra fetches or database writes. Current and historical aircraft are separated in collections. No personal live-tracking pages are provided. |
 | Data compliance | PARTIAL | Provider inventory and source links are in `data-provider-compliance.md`. Public credits and privacy-field exclusion are implemented. AirLabs account-specific rights, production provider contact/restrictions remain unverified. No claim of full production compliance. |
 | Identity and following | PASS | Existing permanent aircraft IDs, registration timelines, conflict detection, merges and follows retained. Charter callsigns are validated in a separate editorial dataset and never converted into aircraft identities. |
@@ -19,8 +19,8 @@ lookups, or new database storage were performed.
 remain. Methodology distinguishes telemetry from occupants and animation. No new
 provider or privacy-address discovery interface was added.
 
-6, 16: `web/data/notable-aircraft.seed.json` contains the two source-backed Patriots
-airframes. `catalog:seed` generates a new review draft without publishing or
+6, 16: `web/data/notable-aircraft.seed.json` contains the 25 source-backed organizational
+airframes, including both Patriots aircraft. `catalog:seed` generates a new review draft without publishing or
 mutating the catalog. Existing `catalog:import` writes an audited publication
 change after review. Explicit VERIFIED/HISTORICAL/UNVERIFIED states are validated;
 unverified aircraft and associations are excluded from the public projection. Seed imports now require explicit status on every aircraft and association and lastVerifiedAt on every association.
@@ -56,7 +56,7 @@ follows and optional Premium sync. Tracking infrastructure was not rewritten.
 
 ## Reproducible validation
 
-Executed locally: build passed; 579 tests passed, 1 skipped, 0 failed. All three
+Executed locally: build passed; 582 tests passed, 1 skipped, 0 failed. All three
 browser checks below passed, including mobile overflow, verification selection,
 local follows, historical lookup restrictions and methodology navigation.
 Cloudflare static packaging passed; no assets were uploaded.
@@ -76,3 +76,13 @@ profile → observation → recent track, mobile layout and zero automatic track
 Remaining external information: AirLabs plan/public-display agreement, production provider
 contact status and any account-specific restrictions. The excluded personal tracking
 seeds are not a pending implementation promise.
+
+## Updated boundary implementation
+
+Personal context has a separate editorial schema and local validation/export UI,
+with explicit source/confidence/current-history fields and no live identity join.
+The dataset remains empty until usable source-backed context is provided.
+AirLabs account permissions are PARTIAL with all eight requested questions
+documented in data-provider-compliance.md. Runtime calls and the live-check CLI
+fail closed pending reviewed evidence; no key value or account query was exposed.
+The catalog and existing non-AirLabs aircraft following remain independent.

@@ -13,6 +13,9 @@ def run(page):
  page.screenshot(path=str(f.ARTIFACTS/'methodology-mobile.png'))
  page.goto(f.URL+'/admin/notable-aircraft/')
  page.get_by_role('heading',name='Aircraft review workbench',exact=True).wait_for()
+ page.get_by_text('Contextual association dataset',exact=True).click()
+ page.get_by_role('button',name='Validate context',exact=True).click()
+ page.get_by_text('0 contextual associations validated.',exact=False).wait_for()
  c=json.loads((f.ROOT/'data/airframe-catalog.json').read_text())
  c['associations'][0]['lastVerifiedAt']='2020-01-01'
  page.get_by_label('Import source catalog').set_input_files({'name':'review.json','mimeType':'application/json','buffer':json.dumps(c).encode()})

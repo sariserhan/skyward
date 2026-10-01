@@ -201,3 +201,20 @@ This is a curated sports-aircraft directory, **not all sports-team flights**.
 Sponsorship alone cannot establish a registration or a specific charter. Teams
 without verified aircraft evidence remain absent. Rotating charters and temporary
 paint schemes require additional dated evidence rather than inferred tail numbers.
+
+## Separate contextual associations
+
+`web/data/aircraft-context-associations.json` is a separate editorial dataset,
+validated during catalog builds, never copied to public assets or joined into
+live discovery, follows or activity alerts. It requires explicit current/historical/
+unknown relationship, verification status, confidence, source and review date.
+The local workbench can validate and export a context draft without uploading it.
+Operational identifiers, coordinates, contact fields and occupant assertions are
+not schema fields. Public historical context can be reviewed separately; this
+change does not create a person-to-live-aircraft navigation path.
+
+The dataset is empty: the supplied named-person seed references contain citation
+placeholders rather than usable source URLs. They were not promoted into verified
+records. Do not invent provenance to fill the dataset. The organizational seed
+now mirrors the 25 existing reviewed aircraft, 15 entities and 27 associations;
+this is an idempotent reviewed seed, not a claim of 25 newly discovered aircraft.

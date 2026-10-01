@@ -1,3 +1,4 @@
+import {verifiedAirLabs} from './fixtures/airlabs-permissions.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
@@ -14,7 +15,7 @@ test('Dated status accepts landed aircraft without a fresh position, rejects oth
  assert.equal(normalizeFlight({response:row},{...expected,hex:'123456'},now).flight,null);assert.equal(normalizeFlight({response:row},{...expected,to:'LHR'},now).status,'ROUTE_MISMATCH');
 });
 test('Live requests require explicit configuration and independently verified payment before budget or network',async()=>{
- let calls=0,reservations=0;const deps={env:{},paid:async()=>true,reserve:async()=>reservations++,fetchImpl:async()=>{calls++;return {ok:true,json:async()=>({response:row})};},now:()=>now},j={callsign:'AAL6',hex:'',date:'2026-09-30'};
+ let calls=0,reservations=0;const deps={permissions:verifiedAirLabs,env:{},paid:async()=>true,reserve:async()=>reservations++,fetchImpl:async()=>{calls++;return {ok:true,json:async()=>({response:row})};},now:()=>now},j={callsign:'AAL6',hex:'',date:'2026-09-30'};
  await assert.rejects(createPremiumLive(deps).flight({},j),e=>e.status===503);
  const env={SKYWARD_BILLING_MODE:'live',SKYWARD_AIRLABS_MODE:'live',AIRLABS_API_KEY:'secret'};
  await assert.rejects(createPremiumLive({...deps,env,paid:async()=>false}).flight({},j),e=>e.status===403);
@@ -26,7 +27,7 @@ test('Live requests require explicit configuration and independently verified pa
 });
 test('Budget rejection never calls provider; provider failure has no retry or refund',async()=>{
  const env={SKYWARD_BILLING_MODE:'live',SKYWARD_AIRLABS_MODE:'live',AIRLABS_API_KEY:'secret'};let calls=0,reserved=0;
- const deps={env,paid:async()=>true,reserve:async()=>{throw Error('budget');},fetchImpl:async()=>{calls++;throw Error('secret');}},j={callsign:'AAL6',date:'2026-09-30'};
+ const deps={permissions:verifiedAirLabs,env,paid:async()=>true,reserve:async()=>{throw Error('budget');},fetchImpl:async()=>{calls++;throw Error('secret');}},j={callsign:'AAL6',date:'2026-09-30'};
  await assert.rejects(createPremiumLive(deps).flight({},j),/budget/);assert.equal(calls,0);
  await assert.rejects(createPremiumLive({...deps,reserve:async()=>reserved++}).flight({},j),/No automatic retry/);assert.equal(calls,1);assert.equal(reserved,1);
 });
