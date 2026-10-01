@@ -954,6 +954,2722 @@
         }
       ],
       "status": "VERIFIED"
+    },
+    {
+      "id": "fleet-20261001-001",
+      "manufacturer": "Airbus",
+      "model": "A350-900",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LWA",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-002",
+      "manufacturer": "Airbus",
+      "model": "A350-900",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LWB",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-003",
+      "manufacturer": "Airbus",
+      "model": "A350-900",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LWC",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-004",
+      "manufacturer": "Airbus",
+      "model": "A350-900",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LWD",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-005",
+      "manufacturer": "Airbus",
+      "model": "A350-900",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LWE",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-006",
+      "manufacturer": "Airbus",
+      "model": "A350-900",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LWF",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-007",
+      "manufacturer": "Airbus",
+      "model": "A350-900",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LWG",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-008",
+      "manufacturer": "Airbus",
+      "model": "A350-900",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LWH",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-009",
+      "manufacturer": "Airbus",
+      "model": "A350-900",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LWI",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-010",
+      "manufacturer": "Airbus",
+      "model": "A350-900",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LWK",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-011",
+      "manufacturer": "Airbus",
+      "model": "A350-900",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LWL",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-012",
+      "manufacturer": "Airbus",
+      "model": "A350-900",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LWM",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-013",
+      "manufacturer": "Airbus",
+      "model": "A350-900",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LWN",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-014",
+      "manufacturer": "Airbus",
+      "model": "A350-900",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LWO",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-015",
+      "manufacturer": "Airbus",
+      "model": "A350-900",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LWP",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-016",
+      "manufacturer": "Airbus",
+      "model": "A350-900",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LWR",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-017",
+      "manufacturer": "Airbus",
+      "model": "A350-900",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LWS",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-018",
+      "manufacturer": "Airbus",
+      "model": "A350-900",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LWT",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-019",
+      "manufacturer": "Airbus",
+      "model": "A330-300",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LTM",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-020",
+      "manufacturer": "Airbus",
+      "model": "A330-300",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LTO",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-021",
+      "manufacturer": "Airbus",
+      "model": "A330-300",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LTP",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-022",
+      "manufacturer": "Airbus",
+      "model": "A330-300",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LTS",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-023",
+      "manufacturer": "Airbus",
+      "model": "A330-300",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LTT",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-024",
+      "manufacturer": "Airbus",
+      "model": "A321",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LZE",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-025",
+      "manufacturer": "Airbus",
+      "model": "A321",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LZF",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-026",
+      "manufacturer": "Airbus",
+      "model": "A321",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LZG",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-027",
+      "manufacturer": "Airbus",
+      "model": "A321",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LZH",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-028",
+      "manufacturer": "Airbus",
+      "model": "A321",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LZK",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-029",
+      "manufacturer": "Airbus",
+      "model": "A321",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LZL",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-030",
+      "manufacturer": "Airbus",
+      "model": "A321",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LZM",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-031",
+      "manufacturer": "Airbus",
+      "model": "A321",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LZN",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-032",
+      "manufacturer": "Airbus",
+      "model": "A321",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LZO",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-033",
+      "manufacturer": "Airbus",
+      "model": "A321",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LZP",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-034",
+      "manufacturer": "Airbus",
+      "model": "A321",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LZR",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-035",
+      "manufacturer": "Airbus",
+      "model": "A321",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LZS",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-036",
+      "manufacturer": "Airbus",
+      "model": "A321",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LZT",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-037",
+      "manufacturer": "Airbus",
+      "model": "A321",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LZU",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-038",
+      "manufacturer": "Airbus",
+      "model": "A320",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LXA",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-039",
+      "manufacturer": "Airbus",
+      "model": "A320",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LXB",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-040",
+      "manufacturer": "Airbus",
+      "model": "A320",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LXC",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-041",
+      "manufacturer": "Airbus",
+      "model": "A320",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LXD",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-042",
+      "manufacturer": "Airbus",
+      "model": "A320",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LXF",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-043",
+      "manufacturer": "Airbus",
+      "model": "A320",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LXH",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-044",
+      "manufacturer": "Airbus",
+      "model": "A320",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LXI",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-045",
+      "manufacturer": "Airbus",
+      "model": "A320",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LXK",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-046",
+      "manufacturer": "Airbus",
+      "model": "A320",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LXL",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-047",
+      "manufacturer": "Airbus",
+      "model": "A320",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LXM",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-048",
+      "manufacturer": "Airbus",
+      "model": "A319",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LVC",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-049",
+      "manufacturer": "Airbus",
+      "model": "A319",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LVD",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-050",
+      "manufacturer": "Airbus",
+      "model": "A319",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LVH",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-051",
+      "manufacturer": "Airbus",
+      "model": "A319",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LVI",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-052",
+      "manufacturer": "Airbus",
+      "model": "A319",
+      "operator": "Finnair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LVL",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-053",
+      "manufacturer": "Embraer",
+      "model": "E190",
+      "operator": "Norra (Finnair services)",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LKE",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-054",
+      "manufacturer": "Embraer",
+      "model": "E190",
+      "operator": "Norra (Finnair services)",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LKF",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-055",
+      "manufacturer": "Embraer",
+      "model": "E190",
+      "operator": "Norra (Finnair services)",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LKG",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-056",
+      "manufacturer": "Embraer",
+      "model": "E190",
+      "operator": "Norra (Finnair services)",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LKH",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-057",
+      "manufacturer": "Embraer",
+      "model": "E190",
+      "operator": "Norra (Finnair services)",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LKI",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-058",
+      "manufacturer": "Embraer",
+      "model": "E190",
+      "operator": "Norra (Finnair services)",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LKK",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-059",
+      "manufacturer": "Embraer",
+      "model": "E190",
+      "operator": "Norra (Finnair services)",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LKL",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-060",
+      "manufacturer": "Embraer",
+      "model": "E190",
+      "operator": "Norra (Finnair services)",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LKM",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-061",
+      "manufacturer": "Embraer",
+      "model": "E190",
+      "operator": "Norra (Finnair services)",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LKN",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-062",
+      "manufacturer": "Embraer",
+      "model": "E190",
+      "operator": "Norra (Finnair services)",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LKO",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-063",
+      "manufacturer": "Embraer",
+      "model": "E190",
+      "operator": "Norra (Finnair services)",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LKP",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-064",
+      "manufacturer": "Embraer",
+      "model": "E190",
+      "operator": "Norra (Finnair services)",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-LKR",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-065",
+      "manufacturer": "ATR",
+      "model": "72-500",
+      "operator": "Norra (Finnair services)",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-ATE",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-066",
+      "manufacturer": "ATR",
+      "model": "72-500",
+      "operator": "Norra (Finnair services)",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-ATF",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-067",
+      "manufacturer": "ATR",
+      "model": "72-500",
+      "operator": "Norra (Finnair services)",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-ATG",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-068",
+      "manufacturer": "ATR",
+      "model": "72-500",
+      "operator": "Norra (Finnair services)",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-ATH",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-069",
+      "manufacturer": "ATR",
+      "model": "72-500",
+      "operator": "Norra (Finnair services)",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-ATI",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-070",
+      "manufacturer": "ATR",
+      "model": "72-500",
+      "operator": "Norra (Finnair services)",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-ATJ",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-071",
+      "manufacturer": "ATR",
+      "model": "72-500",
+      "operator": "Norra (Finnair services)",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-ATK",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-072",
+      "manufacturer": "ATR",
+      "model": "72-500",
+      "operator": "Norra (Finnair services)",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-ATL",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-073",
+      "manufacturer": "ATR",
+      "model": "72-500",
+      "operator": "Norra (Finnair services)",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-ATM",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-074",
+      "manufacturer": "ATR",
+      "model": "72-500",
+      "operator": "Norra (Finnair services)",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-ATN",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-075",
+      "manufacturer": "ATR",
+      "model": "72-500",
+      "operator": "Norra (Finnair services)",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-ATO",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-076",
+      "manufacturer": "ATR",
+      "model": "72-500",
+      "operator": "Norra (Finnair services)",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "OH-ATP",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+          "sourceName": "Finnair official fleet: registration lists by aircraft type",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-077",
+      "manufacturer": "Boeing",
+      "model": "737 MAX 8",
+      "operator": "Icelandair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "TF-ICV",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-078",
+      "manufacturer": "Boeing",
+      "model": "737 MAX 8",
+      "operator": "Icelandair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "TF-ICM",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-079",
+      "manufacturer": "Boeing",
+      "model": "737 MAX 8",
+      "operator": "Icelandair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "TF-ICO",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-080",
+      "manufacturer": "Boeing",
+      "model": "737 MAX 8",
+      "operator": "Icelandair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "TF-ICU",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-081",
+      "manufacturer": "Boeing",
+      "model": "737 MAX 8",
+      "operator": "Icelandair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "TF-ICF",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-082",
+      "manufacturer": "Boeing",
+      "model": "737 MAX 8",
+      "operator": "Icelandair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "TF-ICR",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-083",
+      "manufacturer": "Boeing",
+      "model": "737 MAX 8",
+      "operator": "Icelandair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "TF-ICS",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-084",
+      "manufacturer": "Boeing",
+      "model": "737 MAX 8",
+      "operator": "Icelandair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "TF-ICH",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-085",
+      "manufacturer": "Boeing",
+      "model": "737 MAX 8",
+      "operator": "Icelandair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "TF-ICG",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-086",
+      "manufacturer": "Boeing",
+      "model": "737 MAX 8",
+      "operator": "Icelandair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "TF-ICE",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-087",
+      "manufacturer": "Boeing",
+      "model": "737 MAX 8",
+      "operator": "Icelandair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "TF-ICJ",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-088",
+      "manufacturer": "Boeing",
+      "model": "737 MAX 8",
+      "operator": "Icelandair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "TF-ICP",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-089",
+      "manufacturer": "Boeing",
+      "model": "737 MAX 8",
+      "operator": "Icelandair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "TF-ICY",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-090",
+      "manufacturer": "Boeing",
+      "model": "737 MAX 8",
+      "operator": "Icelandair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "TF-ICN",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-091",
+      "manufacturer": "Boeing",
+      "model": "737 MAX 8",
+      "operator": "Icelandair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "TF-ICL",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-092",
+      "manufacturer": "Boeing",
+      "model": "737 MAX 8",
+      "operator": "Icelandair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "TF-ICI",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-093",
+      "manufacturer": "Boeing",
+      "model": "737 MAX 8",
+      "operator": "Icelandair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "TF-ICT",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-094",
+      "manufacturer": "Boeing",
+      "model": "737 MAX 9",
+      "operator": "Icelandair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "TF-ICD",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-095",
+      "manufacturer": "Boeing",
+      "model": "737 MAX 9",
+      "operator": "Icelandair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "TF-ICA",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-096",
+      "manufacturer": "Boeing",
+      "model": "737 MAX 9",
+      "operator": "Icelandair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "TF-ICC",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "fleet-20261001-097",
+      "manufacturer": "Boeing",
+      "model": "737 MAX 9",
+      "operator": "Icelandair",
+      "category": "Airline fleet",
+      "status": "VERIFIED",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "TF-ICB",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+          "sourceName": "Icelandair official Boeing 737 MAX fleet",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
     }
   ],
   "entities": [
@@ -1061,6 +3777,13 @@
       "displayName": "Boston Red Sox",
       "entityType": "SPORTS_TEAM",
       "description": "Boston Red Sox branding documented on a JetBlue Airbus A320. This is a regular airline aircraft, not a confirmed team charter. Current paint scheme and passengers are unknown."
+    },
+    {
+      "id": "finnair",
+      "slug": "finnair",
+      "displayName": "Finnair",
+      "entityType": "COMPANY",
+      "description": "Aircraft listed in Finnair\u2019s published fleet, including regional aircraft operated by Norra. Availability and observations vary."
     }
   ],
   "associations": [
@@ -1489,6 +4212,1558 @@
       "context": "Photographic catalog identifies N605JB with Boston Red Sox branding. FAA verifies the airframe identity separately. This relationship is a livery association, not team ownership or evidence of a team journey; current paint scheme is unconfirmed.",
       "status": "VERIFIED",
       "lastVerifiedAt": "2026-10-01"
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-001-operator",
+      "aircraftId": "fleet-20261001-001",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-002-operator",
+      "aircraftId": "fleet-20261001-002",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-003-operator",
+      "aircraftId": "fleet-20261001-003",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-004-operator",
+      "aircraftId": "fleet-20261001-004",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-005-operator",
+      "aircraftId": "fleet-20261001-005",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-006-operator",
+      "aircraftId": "fleet-20261001-006",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-007-operator",
+      "aircraftId": "fleet-20261001-007",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-008-operator",
+      "aircraftId": "fleet-20261001-008",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-009-operator",
+      "aircraftId": "fleet-20261001-009",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-010-operator",
+      "aircraftId": "fleet-20261001-010",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-011-operator",
+      "aircraftId": "fleet-20261001-011",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-012-operator",
+      "aircraftId": "fleet-20261001-012",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-013-operator",
+      "aircraftId": "fleet-20261001-013",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-014-operator",
+      "aircraftId": "fleet-20261001-014",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-015-operator",
+      "aircraftId": "fleet-20261001-015",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-016-operator",
+      "aircraftId": "fleet-20261001-016",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-017-operator",
+      "aircraftId": "fleet-20261001-017",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-018-operator",
+      "aircraftId": "fleet-20261001-018",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-019-operator",
+      "aircraftId": "fleet-20261001-019",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-020-operator",
+      "aircraftId": "fleet-20261001-020",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-021-operator",
+      "aircraftId": "fleet-20261001-021",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-022-operator",
+      "aircraftId": "fleet-20261001-022",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-023-operator",
+      "aircraftId": "fleet-20261001-023",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-024-operator",
+      "aircraftId": "fleet-20261001-024",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-025-operator",
+      "aircraftId": "fleet-20261001-025",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-026-operator",
+      "aircraftId": "fleet-20261001-026",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-027-operator",
+      "aircraftId": "fleet-20261001-027",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-028-operator",
+      "aircraftId": "fleet-20261001-028",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-029-operator",
+      "aircraftId": "fleet-20261001-029",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-030-operator",
+      "aircraftId": "fleet-20261001-030",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-031-operator",
+      "aircraftId": "fleet-20261001-031",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-032-operator",
+      "aircraftId": "fleet-20261001-032",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-033-operator",
+      "aircraftId": "fleet-20261001-033",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-034-operator",
+      "aircraftId": "fleet-20261001-034",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-035-operator",
+      "aircraftId": "fleet-20261001-035",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-036-operator",
+      "aircraftId": "fleet-20261001-036",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-037-operator",
+      "aircraftId": "fleet-20261001-037",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-038-operator",
+      "aircraftId": "fleet-20261001-038",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-039-operator",
+      "aircraftId": "fleet-20261001-039",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-040-operator",
+      "aircraftId": "fleet-20261001-040",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-041-operator",
+      "aircraftId": "fleet-20261001-041",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-042-operator",
+      "aircraftId": "fleet-20261001-042",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-043-operator",
+      "aircraftId": "fleet-20261001-043",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-044-operator",
+      "aircraftId": "fleet-20261001-044",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-045-operator",
+      "aircraftId": "fleet-20261001-045",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-046-operator",
+      "aircraftId": "fleet-20261001-046",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-047-operator",
+      "aircraftId": "fleet-20261001-047",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-048-operator",
+      "aircraftId": "fleet-20261001-048",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-049-operator",
+      "aircraftId": "fleet-20261001-049",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-050-operator",
+      "aircraftId": "fleet-20261001-050",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-051-operator",
+      "aircraftId": "fleet-20261001-051",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-052-operator",
+      "aircraftId": "fleet-20261001-052",
+      "entityId": "finnair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-053-operator",
+      "aircraftId": "fleet-20261001-053",
+      "entityId": "finnair",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operated by Norra for Finnair; not a claim of Finnair ownership."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-054-operator",
+      "aircraftId": "fleet-20261001-054",
+      "entityId": "finnair",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operated by Norra for Finnair; not a claim of Finnair ownership."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-055-operator",
+      "aircraftId": "fleet-20261001-055",
+      "entityId": "finnair",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operated by Norra for Finnair; not a claim of Finnair ownership."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-056-operator",
+      "aircraftId": "fleet-20261001-056",
+      "entityId": "finnair",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operated by Norra for Finnair; not a claim of Finnair ownership."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-057-operator",
+      "aircraftId": "fleet-20261001-057",
+      "entityId": "finnair",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operated by Norra for Finnair; not a claim of Finnair ownership."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-058-operator",
+      "aircraftId": "fleet-20261001-058",
+      "entityId": "finnair",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operated by Norra for Finnair; not a claim of Finnair ownership."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-059-operator",
+      "aircraftId": "fleet-20261001-059",
+      "entityId": "finnair",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operated by Norra for Finnair; not a claim of Finnair ownership."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-060-operator",
+      "aircraftId": "fleet-20261001-060",
+      "entityId": "finnair",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operated by Norra for Finnair; not a claim of Finnair ownership."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-061-operator",
+      "aircraftId": "fleet-20261001-061",
+      "entityId": "finnair",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operated by Norra for Finnair; not a claim of Finnair ownership."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-062-operator",
+      "aircraftId": "fleet-20261001-062",
+      "entityId": "finnair",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operated by Norra for Finnair; not a claim of Finnair ownership."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-063-operator",
+      "aircraftId": "fleet-20261001-063",
+      "entityId": "finnair",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operated by Norra for Finnair; not a claim of Finnair ownership."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-064-operator",
+      "aircraftId": "fleet-20261001-064",
+      "entityId": "finnair",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operated by Norra for Finnair; not a claim of Finnair ownership."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-065-operator",
+      "aircraftId": "fleet-20261001-065",
+      "entityId": "finnair",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operated by Norra for Finnair; not a claim of Finnair ownership."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-066-operator",
+      "aircraftId": "fleet-20261001-066",
+      "entityId": "finnair",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operated by Norra for Finnair; not a claim of Finnair ownership."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-067-operator",
+      "aircraftId": "fleet-20261001-067",
+      "entityId": "finnair",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operated by Norra for Finnair; not a claim of Finnair ownership."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-068-operator",
+      "aircraftId": "fleet-20261001-068",
+      "entityId": "finnair",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operated by Norra for Finnair; not a claim of Finnair ownership."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-069-operator",
+      "aircraftId": "fleet-20261001-069",
+      "entityId": "finnair",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operated by Norra for Finnair; not a claim of Finnair ownership."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-070-operator",
+      "aircraftId": "fleet-20261001-070",
+      "entityId": "finnair",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operated by Norra for Finnair; not a claim of Finnair ownership."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-071-operator",
+      "aircraftId": "fleet-20261001-071",
+      "entityId": "finnair",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operated by Norra for Finnair; not a claim of Finnair ownership."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-072-operator",
+      "aircraftId": "fleet-20261001-072",
+      "entityId": "finnair",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operated by Norra for Finnair; not a claim of Finnair ownership."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-073-operator",
+      "aircraftId": "fleet-20261001-073",
+      "entityId": "finnair",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operated by Norra for Finnair; not a claim of Finnair ownership."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-074-operator",
+      "aircraftId": "fleet-20261001-074",
+      "entityId": "finnair",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operated by Norra for Finnair; not a claim of Finnair ownership."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-075-operator",
+      "aircraftId": "fleet-20261001-075",
+      "entityId": "finnair",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operated by Norra for Finnair; not a claim of Finnair ownership."
+    },
+    {
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet",
+      "sourceName": "Finnair official fleet: registration lists by aircraft type",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-076-operator",
+      "aircraftId": "fleet-20261001-076",
+      "entityId": "finnair",
+      "associationType": "PUBLICLY_ASSOCIATED",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operated by Norra for Finnair; not a claim of Finnair ownership."
+    },
+    {
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+      "sourceName": "Icelandair official Boeing 737 MAX fleet",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-077-operator",
+      "aircraftId": "fleet-20261001-077",
+      "entityId": "icelandair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+      "sourceName": "Icelandair official Boeing 737 MAX fleet",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-078-operator",
+      "aircraftId": "fleet-20261001-078",
+      "entityId": "icelandair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+      "sourceName": "Icelandair official Boeing 737 MAX fleet",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-079-operator",
+      "aircraftId": "fleet-20261001-079",
+      "entityId": "icelandair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+      "sourceName": "Icelandair official Boeing 737 MAX fleet",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-080-operator",
+      "aircraftId": "fleet-20261001-080",
+      "entityId": "icelandair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+      "sourceName": "Icelandair official Boeing 737 MAX fleet",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-081-operator",
+      "aircraftId": "fleet-20261001-081",
+      "entityId": "icelandair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+      "sourceName": "Icelandair official Boeing 737 MAX fleet",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-082-operator",
+      "aircraftId": "fleet-20261001-082",
+      "entityId": "icelandair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+      "sourceName": "Icelandair official Boeing 737 MAX fleet",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-083-operator",
+      "aircraftId": "fleet-20261001-083",
+      "entityId": "icelandair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+      "sourceName": "Icelandair official Boeing 737 MAX fleet",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-084-operator",
+      "aircraftId": "fleet-20261001-084",
+      "entityId": "icelandair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+      "sourceName": "Icelandair official Boeing 737 MAX fleet",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-085-operator",
+      "aircraftId": "fleet-20261001-085",
+      "entityId": "icelandair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+      "sourceName": "Icelandair official Boeing 737 MAX fleet",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-086-operator",
+      "aircraftId": "fleet-20261001-086",
+      "entityId": "icelandair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+      "sourceName": "Icelandair official Boeing 737 MAX fleet",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-087-operator",
+      "aircraftId": "fleet-20261001-087",
+      "entityId": "icelandair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+      "sourceName": "Icelandair official Boeing 737 MAX fleet",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-088-operator",
+      "aircraftId": "fleet-20261001-088",
+      "entityId": "icelandair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+      "sourceName": "Icelandair official Boeing 737 MAX fleet",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-089-operator",
+      "aircraftId": "fleet-20261001-089",
+      "entityId": "icelandair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+      "sourceName": "Icelandair official Boeing 737 MAX fleet",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-090-operator",
+      "aircraftId": "fleet-20261001-090",
+      "entityId": "icelandair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+      "sourceName": "Icelandair official Boeing 737 MAX fleet",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-091-operator",
+      "aircraftId": "fleet-20261001-091",
+      "entityId": "icelandair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+      "sourceName": "Icelandair official Boeing 737 MAX fleet",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-092-operator",
+      "aircraftId": "fleet-20261001-092",
+      "entityId": "icelandair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+      "sourceName": "Icelandair official Boeing 737 MAX fleet",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-093-operator",
+      "aircraftId": "fleet-20261001-093",
+      "entityId": "icelandair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+      "sourceName": "Icelandair official Boeing 737 MAX fleet",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-094-operator",
+      "aircraftId": "fleet-20261001-094",
+      "entityId": "icelandair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+      "sourceName": "Icelandair official Boeing 737 MAX fleet",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-095-operator",
+      "aircraftId": "fleet-20261001-095",
+      "entityId": "icelandair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+      "sourceName": "Icelandair official Boeing 737 MAX fleet",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-096-operator",
+      "aircraftId": "fleet-20261001-096",
+      "entityId": "icelandair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
+    },
+    {
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/",
+      "sourceName": "Icelandair official Boeing 737 MAX fleet",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "fleet-20261001-097-operator",
+      "aircraftId": "fleet-20261001-097",
+      "entityId": "icelandair",
+      "associationType": "OPERATOR",
+      "status": "VERIFIED",
+      "lastVerifiedAt": "2026-10-01",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "Listed in the operator\u2019s published fleet on the review date. Operator association, not a claim of legal ownership, present position or passengers."
     }
   ]
 }

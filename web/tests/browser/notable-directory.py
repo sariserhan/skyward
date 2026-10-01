@@ -11,7 +11,7 @@ def run(page):
  page.get_by_role('heading',name='Notable aircraft',exact=True).wait_for()
  assert 'Notable aircraft' in page.title()
  page.get_by_role('button',name='Aircraft & history',exact=True).click()
- assert page.get_by_role('article').count()==15
+ assert page.get_by_role('article').count()==16
  page.get_by_role('button',name='Sports (8)',exact=True).click()
  assert page.get_by_role('article').count()==8
  page.get_by_role('button',name='Follow N36NE',exact=True).click()
@@ -27,11 +27,11 @@ def run(page):
  assert page.get_by_role('link',name='N36NE',exact=True).count()==2
  page.goto(f.URL+'/notable-aircraft/?category=Business+%26+aviation')
  page.get_by_role('heading',name='Notable aircraft',exact=True).wait_for()
- assert page.get_by_role('article').count()==4
+ assert page.get_by_role('article').count()==5
  page.get_by_label('Search the directory').fill('not-a-real-collection')
  page.get_by_role('heading',name='No matching collections').wait_for()
  page.get_by_role('button',name='Clear filters').click()
- assert page.get_by_role('article').count()==15
+ assert page.get_by_role('article').count()==16
  page.set_viewport_size({'width':1440,'height':1000})
  page.screenshot(path=str(f.ARTIFACTS/'notable-directory-desktop.png'))
  page.set_viewport_size({'width':390,'height':844})

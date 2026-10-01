@@ -1,0 +1,685 @@
+{
+  "reviewedAt": "2026-10-01",
+  "reviewer": "Codex source review (not independent human audit)",
+  "records": [
+    {
+      "aircraftId": "fleet-20261001-001",
+      "registration": "OH-LWA",
+      "model": "A350-900",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-002",
+      "registration": "OH-LWB",
+      "model": "A350-900",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-003",
+      "registration": "OH-LWC",
+      "model": "A350-900",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-004",
+      "registration": "OH-LWD",
+      "model": "A350-900",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-005",
+      "registration": "OH-LWE",
+      "model": "A350-900",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-006",
+      "registration": "OH-LWF",
+      "model": "A350-900",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-007",
+      "registration": "OH-LWG",
+      "model": "A350-900",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-008",
+      "registration": "OH-LWH",
+      "model": "A350-900",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-009",
+      "registration": "OH-LWI",
+      "model": "A350-900",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-010",
+      "registration": "OH-LWK",
+      "model": "A350-900",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-011",
+      "registration": "OH-LWL",
+      "model": "A350-900",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-012",
+      "registration": "OH-LWM",
+      "model": "A350-900",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-013",
+      "registration": "OH-LWN",
+      "model": "A350-900",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-014",
+      "registration": "OH-LWO",
+      "model": "A350-900",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-015",
+      "registration": "OH-LWP",
+      "model": "A350-900",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-016",
+      "registration": "OH-LWR",
+      "model": "A350-900",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-017",
+      "registration": "OH-LWS",
+      "model": "A350-900",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-018",
+      "registration": "OH-LWT",
+      "model": "A350-900",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-019",
+      "registration": "OH-LTM",
+      "model": "A330-300",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-020",
+      "registration": "OH-LTO",
+      "model": "A330-300",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-021",
+      "registration": "OH-LTP",
+      "model": "A330-300",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-022",
+      "registration": "OH-LTS",
+      "model": "A330-300",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-023",
+      "registration": "OH-LTT",
+      "model": "A330-300",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-024",
+      "registration": "OH-LZE",
+      "model": "A321",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-025",
+      "registration": "OH-LZF",
+      "model": "A321",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-026",
+      "registration": "OH-LZG",
+      "model": "A321",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-027",
+      "registration": "OH-LZH",
+      "model": "A321",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-028",
+      "registration": "OH-LZK",
+      "model": "A321",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-029",
+      "registration": "OH-LZL",
+      "model": "A321",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-030",
+      "registration": "OH-LZM",
+      "model": "A321",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-031",
+      "registration": "OH-LZN",
+      "model": "A321",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-032",
+      "registration": "OH-LZO",
+      "model": "A321",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-033",
+      "registration": "OH-LZP",
+      "model": "A321",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-034",
+      "registration": "OH-LZR",
+      "model": "A321",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-035",
+      "registration": "OH-LZS",
+      "model": "A321",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-036",
+      "registration": "OH-LZT",
+      "model": "A321",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-037",
+      "registration": "OH-LZU",
+      "model": "A321",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-038",
+      "registration": "OH-LXA",
+      "model": "A320",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-039",
+      "registration": "OH-LXB",
+      "model": "A320",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-040",
+      "registration": "OH-LXC",
+      "model": "A320",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-041",
+      "registration": "OH-LXD",
+      "model": "A320",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-042",
+      "registration": "OH-LXF",
+      "model": "A320",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-043",
+      "registration": "OH-LXH",
+      "model": "A320",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-044",
+      "registration": "OH-LXI",
+      "model": "A320",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-045",
+      "registration": "OH-LXK",
+      "model": "A320",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-046",
+      "registration": "OH-LXL",
+      "model": "A320",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-047",
+      "registration": "OH-LXM",
+      "model": "A320",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-048",
+      "registration": "OH-LVC",
+      "model": "A319",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-049",
+      "registration": "OH-LVD",
+      "model": "A319",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-050",
+      "registration": "OH-LVH",
+      "model": "A319",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-051",
+      "registration": "OH-LVI",
+      "model": "A319",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-052",
+      "registration": "OH-LVL",
+      "model": "A319",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-053",
+      "registration": "OH-LKE",
+      "model": "E190",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-054",
+      "registration": "OH-LKF",
+      "model": "E190",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-055",
+      "registration": "OH-LKG",
+      "model": "E190",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-056",
+      "registration": "OH-LKH",
+      "model": "E190",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-057",
+      "registration": "OH-LKI",
+      "model": "E190",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-058",
+      "registration": "OH-LKK",
+      "model": "E190",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-059",
+      "registration": "OH-LKL",
+      "model": "E190",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-060",
+      "registration": "OH-LKM",
+      "model": "E190",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-061",
+      "registration": "OH-LKN",
+      "model": "E190",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-062",
+      "registration": "OH-LKO",
+      "model": "E190",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-063",
+      "registration": "OH-LKP",
+      "model": "E190",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-064",
+      "registration": "OH-LKR",
+      "model": "E190",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-065",
+      "registration": "OH-ATE",
+      "model": "72-500",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-066",
+      "registration": "OH-ATF",
+      "model": "72-500",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-067",
+      "registration": "OH-ATG",
+      "model": "72-500",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-068",
+      "registration": "OH-ATH",
+      "model": "72-500",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-069",
+      "registration": "OH-ATI",
+      "model": "72-500",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-070",
+      "registration": "OH-ATJ",
+      "model": "72-500",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-071",
+      "registration": "OH-ATK",
+      "model": "72-500",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-072",
+      "registration": "OH-ATL",
+      "model": "72-500",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-073",
+      "registration": "OH-ATM",
+      "model": "72-500",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-074",
+      "registration": "OH-ATN",
+      "model": "72-500",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-075",
+      "registration": "OH-ATO",
+      "model": "72-500",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-076",
+      "registration": "OH-ATP",
+      "model": "72-500",
+      "entityId": "finnair",
+      "sourceUrl": "https://www.finnair.com/en/flight-information/finnair-fleet"
+    },
+    {
+      "aircraftId": "fleet-20261001-077",
+      "registration": "TF-ICV",
+      "model": "737 MAX 8",
+      "entityId": "icelandair",
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/"
+    },
+    {
+      "aircraftId": "fleet-20261001-078",
+      "registration": "TF-ICM",
+      "model": "737 MAX 8",
+      "entityId": "icelandair",
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/"
+    },
+    {
+      "aircraftId": "fleet-20261001-079",
+      "registration": "TF-ICO",
+      "model": "737 MAX 8",
+      "entityId": "icelandair",
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/"
+    },
+    {
+      "aircraftId": "fleet-20261001-080",
+      "registration": "TF-ICU",
+      "model": "737 MAX 8",
+      "entityId": "icelandair",
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/"
+    },
+    {
+      "aircraftId": "fleet-20261001-081",
+      "registration": "TF-ICF",
+      "model": "737 MAX 8",
+      "entityId": "icelandair",
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/"
+    },
+    {
+      "aircraftId": "fleet-20261001-082",
+      "registration": "TF-ICR",
+      "model": "737 MAX 8",
+      "entityId": "icelandair",
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/"
+    },
+    {
+      "aircraftId": "fleet-20261001-083",
+      "registration": "TF-ICS",
+      "model": "737 MAX 8",
+      "entityId": "icelandair",
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/"
+    },
+    {
+      "aircraftId": "fleet-20261001-084",
+      "registration": "TF-ICH",
+      "model": "737 MAX 8",
+      "entityId": "icelandair",
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/"
+    },
+    {
+      "aircraftId": "fleet-20261001-085",
+      "registration": "TF-ICG",
+      "model": "737 MAX 8",
+      "entityId": "icelandair",
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/"
+    },
+    {
+      "aircraftId": "fleet-20261001-086",
+      "registration": "TF-ICE",
+      "model": "737 MAX 8",
+      "entityId": "icelandair",
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/"
+    },
+    {
+      "aircraftId": "fleet-20261001-087",
+      "registration": "TF-ICJ",
+      "model": "737 MAX 8",
+      "entityId": "icelandair",
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/"
+    },
+    {
+      "aircraftId": "fleet-20261001-088",
+      "registration": "TF-ICP",
+      "model": "737 MAX 8",
+      "entityId": "icelandair",
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/"
+    },
+    {
+      "aircraftId": "fleet-20261001-089",
+      "registration": "TF-ICY",
+      "model": "737 MAX 8",
+      "entityId": "icelandair",
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/"
+    },
+    {
+      "aircraftId": "fleet-20261001-090",
+      "registration": "TF-ICN",
+      "model": "737 MAX 8",
+      "entityId": "icelandair",
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/"
+    },
+    {
+      "aircraftId": "fleet-20261001-091",
+      "registration": "TF-ICL",
+      "model": "737 MAX 8",
+      "entityId": "icelandair",
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/"
+    },
+    {
+      "aircraftId": "fleet-20261001-092",
+      "registration": "TF-ICI",
+      "model": "737 MAX 8",
+      "entityId": "icelandair",
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/"
+    },
+    {
+      "aircraftId": "fleet-20261001-093",
+      "registration": "TF-ICT",
+      "model": "737 MAX 8",
+      "entityId": "icelandair",
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/"
+    },
+    {
+      "aircraftId": "fleet-20261001-094",
+      "registration": "TF-ICD",
+      "model": "737 MAX 9",
+      "entityId": "icelandair",
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/"
+    },
+    {
+      "aircraftId": "fleet-20261001-095",
+      "registration": "TF-ICA",
+      "model": "737 MAX 9",
+      "entityId": "icelandair",
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/"
+    },
+    {
+      "aircraftId": "fleet-20261001-096",
+      "registration": "TF-ICC",
+      "model": "737 MAX 9",
+      "entityId": "icelandair",
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/"
+    },
+    {
+      "aircraftId": "fleet-20261001-097",
+      "registration": "TF-ICB",
+      "model": "737 MAX 9",
+      "entityId": "icelandair",
+      "sourceUrl": "https://www.icelandair.com/about/our-fleet/boeing-737-max/"
+    }
+  ]
+}

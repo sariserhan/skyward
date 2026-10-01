@@ -8,16 +8,22 @@ def run(page):
  page.route('**/api/**',f.mock)
  page.goto(f.URL+'/#airport=IAD',wait_until='domcontentloaded')
  menu=page.locator('.live-collections')
- menu.locator('summary').click()
+ menu.get_by_role('heading',name='Watch teams & fleets').wait_for()
  page.get_by_text('No matching airborne aircraft detected in the loaded map area.',exact=True).wait_for()
  assert menu.get_by_role('button').count()==0
+ assert menu.get_by_role('navigation',name='Featured aircraft collections').get_by_role('link').count()==3
+ menu.get_by_role('link',name='New England Patriots',exact=False).click()
+ page.get_by_label('Choose a collection').wait_for()
+ assert page.get_by_label('Choose a collection').input_value()=='new-england-patriots'
+ page.go_back()
+ menu.get_by_role('heading',name='Watch teams & fleets').wait_for()
  page.screenshot(path=str(f.ARTIFACTS/'live-collections-desktop.png'))
  page.set_viewport_size({'width':390,'height':844})
  page.get_by_role('button',name='Flights',exact=True).click()
  assert menu.is_visible()
  assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
  page.screenshot(path=str(f.ARTIFACTS/'live-collections-mobile.png'))
- menu.get_by_role('link',name='Explore live collections').click()
+ menu.get_by_role('link',name='Browse all teams & fleets →',exact=True).click()
  page.get_by_role('heading',name='Notable aircraft',exact=True).wait_for()
  assert not errors,errors
  print('PASS desktop/mobile live menu, hidden inactive entries, reference navigation, no script errors',flush=True)

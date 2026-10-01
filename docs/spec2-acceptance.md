@@ -86,3 +86,11 @@ AirLabs account permissions are PARTIAL with all eight requested questions
 documented in data-provider-compliance.md. Runtime calls and the live-check CLI
 fail closed pending reviewed evidence; no key value or account query was exposed.
 The catalog and existing non-AirLabs aircraft following remain independent.
+
+## Subsequent catalog expansion
+
+The later fleet expansion brings the current catalog to 122 aircraft / 16
+collections / 124 associations. See fleet-expansion-20261001.md for the source
+manifest, bounded discovery behavior and updated attachment review. The later
+attachment supplies actual URLs; earlier missing-URL notes describe the original
+attachment only. Personal live-tracking exclusions remain unchanged.

@@ -29,3 +29,23 @@ test('public context is bounded and old Giants identity cannot authorize live lo
  assert.equal(identityAt(c.aircraft.find(a=>a.id==='alaska-giants-855'),'registrations'),undefined);
  assert.equal(identityAt(c.aircraft.find(a=>a.id==='flying-bulls-dc6'),'registrations').value,'OE-LDM');
 });
+
+test('expanded fleet has over 120 unique airframes with explicit operator provenance',()=>{
+ assert.ok(c.aircraft.length>=120);
+ const regs=c.aircraft.flatMap(a=>a.registrations.filter(r=>!r.validTo).map(r=>r.value));
+ assert.equal(new Set(regs).size,regs.length);
+ assert.equal(entityAircraft(c,'finnair').length,76);
+ const regional=c.aircraft.find(a=>a.registrations.some(r=>r.value==='OH-LKE'));
+ assert.equal(regional.operator,'Norra (Finnair services)');
+ assert.equal(regional.icaoIdentities.length,0,'unverified hex must remain absent');
+ assert.equal(c.associations.find(a=>a.aircraftId===regional.id).associationType,'PUBLICLY_ASSOCIATED');
+});
+test('large collections support disjoint ten-aircraft batches without automatic requests',async()=>{
+ const {liveCandidates,eligibleLiveCandidates}=await import('../src/lib/liveCollections.ts');
+ const all=eligibleLiveCandidates(c,Date.parse('2026-10-01'),'finnair');
+ assert.equal(all.length,76);
+ const batch1=liveCandidates(c,Date.parse('2026-10-01'),'finnair',0),batch2=liveCandidates(c,Date.parse('2026-10-01'),'finnair',10);
+ assert.equal(batch1.length,10);assert.equal(batch2.length,10);
+ assert.ok(batch2.every(a=>!batch1.some(b=>a.id===b.id)));
+ assert.equal(liveCandidates(c,Date.parse('2026-10-01'),'finnair',70).length,6);
+});

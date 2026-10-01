@@ -614,3 +614,8 @@ for current source terms and unresolved account-specific permissions. Run
 `npm --prefix web run catalog:seed -- data/notable-aircraft.seed.json /tmp/catalog-draft.json`
 from the repository root, or use `node web/scripts/seed-airframes.mjs web/data/notable-aircraft.seed.json /tmp/catalog-draft.json`.
 Seed generation does not publish or change the source catalog.
+
+Aircraft discovery now includes 122 sourced airframes across 16 collections, with
+visible sidebar shortcuts and explicit batches for larger fleets. See
+[the fleet expansion review](docs/fleet-expansion-20261001.md) for sources, scope
+and validation. Catalog inclusion does not mean an aircraft is currently airborne.

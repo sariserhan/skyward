@@ -16,6 +16,10 @@ def run(page):
  page.goto(f.URL+'/notable-aircraft/')
  page.get_by_role('heading',name='Catch them in flight.',exact=True).wait_for()
  assert page.get_by_label('Choose a collection').locator('option',has_text='NOAA').count()==1
+ page.get_by_label('Choose a collection').select_option('finnair')
+ assert page.get_by_label('Aircraft batch').locator('option').count()==8
+ page.get_by_label('Aircraft batch').select_option('7')
+ assert not calls
  page.get_by_label('Choose a collection').select_option('new-england-patriots')
  assert not calls
  assert page.get_by_role('article').count()==0
