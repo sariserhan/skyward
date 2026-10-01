@@ -111,3 +111,25 @@ Run `npm --prefix web run check:free-budget` for a read-only Cloudflare account 
 Remaining limitations: no universal registry, licensed photograph catalog, complete flight-history endpoint, continuous worldwide event ingestion, or closed-tab email/push service. Those are not marked completed. No new paid service or Cloudflare resource was provisioned. The release remains local until the normal GitHub deployment.
 
 Validation commands: `npm --prefix web test`, `npm --prefix web run build`, and the `airframe-following.py` browser flow. Tests cover debounced transitions, coverage gaps, history bounds/identity validation, review candidates/conflicts, guided create/associate/archive, alert controls, imports, refresh and device layouts.
+
+### Curated directory (2026-10-01)
+
+`/notable-aircraft/` now provides search by organization, team, registration, manufacturer, model or serial; category filters; direct follow/unfollow controls; and linked source detail pages. Query/filter selections survive refresh in the URL. The initial directory contains **15 aircraft, 10 collections and 17 sourced associations**. Categories overlap (for example, a company's historic aircraft appears under both Business & aviation and Historic).
+
+Collections: New England Patriots, Seattle Kraken, San Francisco Giants, Alaska Airlines, Boeing, Icelandair, The Flying Bulls, NASA, NOAA and Orbis. This is a curated selection, not an exhaustive fleet or ownership registry. Personal entities remain excluded. No logos or aircraft photographs are copied from source sites.
+
+Public association `context` (optional, maximum 500 characters) explains what a source actually documents. It is separate from internal `notes`, which remain unpublished. The workbench can edit this context. Entity pages display aircraft-level source links, review dates and the context. Sports-themed airline liveries are not labeled team-owned transports.
+
+Source-review decisions:
+
+- Patriots: FAA registry confirms N36NE / MSN 25193 / A40B24 and N225NE / MSN 25194 / A1F4C5. Official team material describes transport and goodwill missions; registration-specific photographic metadata supports the public association at MEDIUM confidence. The photo host restricted direct page access; no image-license or current charter-operator claim is made. FAA mailing addresses and personal details are not imported.
+- Kraken: Alaska's October 2024 announcement identifies N933AK and the commemorative partnership; its media page identifies the 737-9 MAX. FAA supports MSN 44098 / ACF0D8. The livery is not evidence of passengers.
+- Giants: the September 2021 Alaska announcement identifies N855VA and its planned livery period. The historical registration remains MEDIUM, so it does not authorize a current observation lookup. Neither a new registration nor a retirement date is invented.
+- Boeing: the manufacturer's February 2026 story explicitly documents ZA004/N7874's retirement.
+- Icelandair: its media kit identifies TF-FIU; its Icelandic Hekla Aurora page explicitly reports withdrawal in October 2025. The older English promotional page is not treated as proof of current service.
+- Flying Bulls: the collection's DC-6B and P-38 stories identify OE-LDM (former N996DM) and N25Y. The DC-6 registration-change stories disagree on the exact date, so no precise date is fabricated. The old tail remains MEDIUM and the documented present tail HIGH, avoiding ambiguous live lookup. Historic does not mean retired.
+- Orbis: FAA confirms N330AU / MSN 46800 / A395E2; the organization's own site explains the MD-10 Flying Eye Hospital. No patient or staff identity is inferred.
+
+Every source URL is stored on the relevant catalog record and exposed through the aircraft/association source sections. Audited imports record the complete before/after catalog. No schema migration, new Worker, R2 object, external request on directory browsing, or database write was added. Existing explicit Premium following-list sync remains unchanged.
+
+Validation: `web/server/notable-directory.test.mjs` exercises category/search behavior, hidden/empty entities, duplicate associations, context bounds and historical-identifier lookup protection. `web/tests/browser/notable-directory.py` exercises category/query URLs, source navigation, follow persistence, empty-state reset and desktop/mobile layout while asserting no Cesium or tracking-feed fetch. The existing aircraft-following/editor browser regression remains applicable.

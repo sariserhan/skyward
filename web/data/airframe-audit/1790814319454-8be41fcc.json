@@ -1,0 +1,1674 @@
+{
+  "actor": "Codex FAA identity evidence review",
+  "action": "CATALOG_REVIEWED",
+  "createdAt": "2026-10-01T00:25:19.454Z",
+  "beforeHash": "d30a3dd780e16d342f5c8430e13073adeb7e2f0bdf813367c2e1f55ff89958d7",
+  "afterHash": "8be41fcc4a2a3c6d4edcadfaab908d9442a73de0cf7f2559d25886ad689bc591",
+  "before": {
+    "version": 1,
+    "aircraft": [
+      {
+        "id": "nasa-sca-905",
+        "manufacturer": "Boeing",
+        "model": "747",
+        "variant": "Shuttle Carrier Aircraft",
+        "category": "Historic aircraft",
+        "retired": true,
+        "registrations": [
+          {
+            "sourceUrl": "https://www.nasa.gov/wp-content/uploads/2025/01/sca-historical-narrative.pdf",
+            "sourceName": "NASA Shuttle Carrier Aircraft historical narrative",
+            "verifiedAt": "2026-09-30",
+            "confidence": "HIGH",
+            "value": "N905NA",
+            "country": "US",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [],
+        "sources": [
+          {
+            "sourceUrl": "https://www.nasa.gov/wp-content/uploads/2025/01/sca-historical-narrative.pdf",
+            "sourceName": "NASA Shuttle Carrier Aircraft historical narrative",
+            "verifiedAt": "2026-09-30",
+            "confidence": "HIGH"
+          },
+          {
+            "sourceUrl": "https://www.nasa.gov/centers-and-facilities/armstrong/nasa-armstrong-fact-sheet-shuttle-carrier-aircraft/",
+            "sourceName": "NASA Armstrong Shuttle Carrier Aircraft fact sheet",
+            "verifiedAt": "2026-09-30",
+            "confidence": "HIGH"
+          }
+        ]
+      },
+      {
+        "id": "nasa-sca-911",
+        "manufacturer": "Boeing",
+        "model": "747",
+        "variant": "Shuttle Carrier Aircraft",
+        "category": "Historic aircraft",
+        "retired": true,
+        "registrations": [
+          {
+            "sourceUrl": "https://www.nasa.gov/wp-content/uploads/2025/01/sca-historical-narrative.pdf",
+            "sourceName": "NASA Shuttle Carrier Aircraft historical narrative",
+            "verifiedAt": "2026-09-30",
+            "confidence": "HIGH",
+            "value": "N911NA",
+            "country": "US",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [],
+        "sources": [
+          {
+            "sourceUrl": "https://www.nasa.gov/wp-content/uploads/2025/01/sca-historical-narrative.pdf",
+            "sourceName": "NASA Shuttle Carrier Aircraft historical narrative",
+            "verifiedAt": "2026-09-30",
+            "confidence": "HIGH"
+          },
+          {
+            "sourceUrl": "https://www.nasa.gov/centers-and-facilities/armstrong/nasa-armstrong-fact-sheet-shuttle-carrier-aircraft/",
+            "sourceName": "NASA Armstrong Shuttle Carrier Aircraft fact sheet",
+            "verifiedAt": "2026-09-30",
+            "confidence": "HIGH"
+          }
+        ]
+      },
+      {
+        "id": "noaa-orion-42",
+        "manufacturer": "Lockheed",
+        "model": "WP-3D Orion",
+        "category": "Public-service aircraft",
+        "operator": "NOAA",
+        "registrations": [
+          {
+            "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/lockheed-wp-3d-orion",
+            "sourceName": "NOAA aircraft fleet: Lockheed WP-3D Orion",
+            "verifiedAt": "2026-09-30",
+            "confidence": "HIGH",
+            "value": "N42RF",
+            "country": "US",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [],
+        "sources": [
+          {
+            "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/lockheed-wp-3d-orion",
+            "sourceName": "NOAA aircraft fleet: Lockheed WP-3D Orion",
+            "verifiedAt": "2026-09-30",
+            "confidence": "HIGH"
+          }
+        ]
+      },
+      {
+        "id": "noaa-orion-43",
+        "manufacturer": "Lockheed",
+        "model": "WP-3D Orion",
+        "category": "Public-service aircraft",
+        "operator": "NOAA",
+        "registrations": [
+          {
+            "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/lockheed-wp-3d-orion",
+            "sourceName": "NOAA aircraft fleet: Lockheed WP-3D Orion",
+            "verifiedAt": "2026-09-30",
+            "confidence": "HIGH",
+            "value": "N43RF",
+            "country": "US",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [],
+        "sources": [
+          {
+            "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/lockheed-wp-3d-orion",
+            "sourceName": "NOAA aircraft fleet: Lockheed WP-3D Orion",
+            "verifiedAt": "2026-09-30",
+            "confidence": "HIGH"
+          }
+        ]
+      },
+      {
+        "id": "noaa-gulfstream-49",
+        "manufacturer": "Gulfstream",
+        "model": "IV-SP",
+        "category": "Public-service aircraft",
+        "retired": false,
+        "registrations": [
+          {
+            "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/gulfstream-iv-sp",
+            "sourceName": "NOAA Gulfstream IV-SP fleet page",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH",
+            "value": "N49RF",
+            "country": "US",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [],
+        "sources": [
+          {
+            "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/gulfstream-iv-sp",
+            "sourceName": "NOAA Gulfstream IV-SP fleet page",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          }
+        ],
+        "operator": "NOAA"
+      },
+      {
+        "id": "nasa-sofia-747",
+        "manufacturer": "Boeing",
+        "model": "747SP",
+        "category": "Historic aircraft",
+        "retired": true,
+        "registrations": [
+          {
+            "sourceUrl": "https://www.nasa.gov/wp-content/uploads/2019/04/annual_report_2020-508.pdf",
+            "sourceName": "NASA FY2020 annual aircraft report",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH",
+            "value": "N747NA",
+            "country": "US",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [],
+        "sources": [
+          {
+            "sourceUrl": "https://www.nasa.gov/wp-content/uploads/2019/04/annual_report_2020-508.pdf",
+            "sourceName": "NASA FY2020 annual aircraft report",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          },
+          {
+            "sourceUrl": "https://www.nasa.gov/solar-system/nasas-retired-sofia-aircraft-finds-new-home-at-arizona-museum/",
+            "sourceName": "NASA SOFIA retirement and museum announcement",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          }
+        ]
+      },
+      {
+        "id": "boeing-767-25193",
+        "manufacturer": "Boeing",
+        "model": "767-323",
+        "category": "Sports-associated aircraft",
+        "registrations": [
+          {
+            "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=36NE",
+            "sourceName": "FAA aircraft registry: N36NE",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH",
+            "value": "N36NE",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [
+          {
+            "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=36NE",
+            "sourceName": "FAA aircraft registry: N36NE",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH",
+            "value": "a40b24",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "sources": [
+          {
+            "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=36NE",
+            "sourceName": "FAA aircraft registry: N36NE",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          },
+          {
+            "sourceUrl": "https://www.patriots.com/video/do-your-life-patriots-team-plane",
+            "sourceName": "New England Patriots: team plane and goodwill missions",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          },
+          {
+            "sourceUrl": "https://www.planespotters.net/photos/reg/N36NE?sort=aircraft",
+            "sourceName": "Planespotters photographic aircraft identification: N36NE",
+            "verifiedAt": "2026-10-01",
+            "confidence": "MEDIUM"
+          }
+        ],
+        "serialNumber": "25193",
+        "serialSeries": "767",
+        "yearBuilt": 1991
+      },
+      {
+        "id": "boeing-767-25194",
+        "manufacturer": "Boeing",
+        "model": "767-323",
+        "category": "Sports-associated aircraft",
+        "registrations": [
+          {
+            "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=225NE",
+            "sourceName": "FAA aircraft registry: N225NE",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH",
+            "value": "N225NE",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [
+          {
+            "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=225NE",
+            "sourceName": "FAA aircraft registry: N225NE",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH",
+            "value": "a1f4c5",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "sources": [
+          {
+            "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=225NE",
+            "sourceName": "FAA aircraft registry: N225NE",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          },
+          {
+            "sourceUrl": "https://www.patriots.com/video/do-your-life-patriots-team-plane",
+            "sourceName": "New England Patriots: team plane and goodwill missions",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          },
+          {
+            "sourceUrl": "https://www.planespotters.net/photo/1398124/n225ne-new-england-patriots-boeing-767-323er",
+            "sourceName": "Planespotters photographic aircraft identification: N225NE",
+            "verifiedAt": "2026-10-01",
+            "confidence": "MEDIUM"
+          }
+        ],
+        "serialNumber": "25194",
+        "serialSeries": "767",
+        "yearBuilt": 1991
+      },
+      {
+        "id": "alaska-kraken-933",
+        "manufacturer": "Boeing",
+        "model": "737-9 MAX",
+        "category": "Sports-associated aircraft",
+        "registrations": [
+          {
+            "sourceUrl": "https://news.alaskaair.com/community/alaska-airlines-seattle-kraken-aircraft-2024/",
+            "sourceName": "Alaska Airlines: 2024 Seattle Kraken aircraft unveiling",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH",
+            "value": "N933AK",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [],
+        "sources": [
+          {
+            "sourceUrl": "https://news.alaskaair.com/community/alaska-airlines-seattle-kraken-aircraft-2024/",
+            "sourceName": "Alaska Airlines: 2024 Seattle Kraken aircraft unveiling",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          }
+        ]
+      },
+      {
+        "id": "alaska-giants-855",
+        "manufacturer": "Airbus",
+        "model": "A320",
+        "category": "Sports-associated aircraft",
+        "registrations": [
+          {
+            "sourceUrl": "https://news.alaskaair.com/newsroom/san-francisco-giants-and-alaska-airlines-newest-livery-shows-up-in-a-giant-way/",
+            "sourceName": "Alaska Airlines: September 2021 Giants livery announcement",
+            "verifiedAt": "2026-10-01",
+            "confidence": "MEDIUM",
+            "value": "N855VA",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [],
+        "sources": [
+          {
+            "sourceUrl": "https://news.alaskaair.com/newsroom/san-francisco-giants-and-alaska-airlines-newest-livery-shows-up-in-a-giant-way/",
+            "sourceName": "Alaska Airlines: September 2021 Giants livery announcement",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          }
+        ]
+      },
+      {
+        "id": "boeing-za004",
+        "manufacturer": "Boeing",
+        "model": "787-8",
+        "category": "Historic aircraft",
+        "registrations": [
+          {
+            "sourceUrl": "https://www.boeing.com/features/2026/02/last-787-8-test-airplane-bows-out-after-years-of-breakthroughs",
+            "sourceName": "Boeing: ZA004 final flight and retirement, February 2026",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH",
+            "value": "N7874",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [],
+        "sources": [
+          {
+            "sourceUrl": "https://www.boeing.com/features/2026/02/last-787-8-test-airplane-bows-out-after-years-of-breakthroughs",
+            "sourceName": "Boeing: ZA004 final flight and retirement, February 2026",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          }
+        ],
+        "retired": true
+      },
+      {
+        "id": "icelandair-hekla-aurora",
+        "manufacturer": "Boeing",
+        "model": "757-200",
+        "category": "Historic aircraft",
+        "registrations": [
+          {
+            "sourceUrl": "https://pixels.icelandair.com/bltb17a9e70d02f6bab.pdf",
+            "sourceName": "Icelandair media kit: Hekla Aurora TF-FIU",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH",
+            "value": "TF-FIU",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [],
+        "sources": [
+          {
+            "sourceUrl": "https://pixels.icelandair.com/bltb17a9e70d02f6bab.pdf",
+            "sourceName": "Icelandair media kit: Hekla Aurora TF-FIU",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          },
+          {
+            "sourceUrl": "https://www.icelandair.com/is-is/um-okkur/flugflotinn/hekla-aurora/",
+            "sourceName": "Icelandair: Hekla Aurora retirement in October 2025",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          }
+        ],
+        "retired": true
+      },
+      {
+        "id": "orbis-md10-46800",
+        "manufacturer": "McDonnell Douglas",
+        "model": "MD-10-30F",
+        "category": "Public-service aircraft",
+        "registrations": [
+          {
+            "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=330AU",
+            "sourceName": "FAA aircraft registry: N330AU",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH",
+            "value": "N330AU",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [
+          {
+            "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=330AU",
+            "sourceName": "FAA aircraft registry: N330AU",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH",
+            "value": "a395e2",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "sources": [
+          {
+            "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=330AU",
+            "sourceName": "FAA aircraft registry: N330AU",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          },
+          {
+            "sourceUrl": "https://www.orbis.org/en/what-we-do/flying-eye-hospital",
+            "sourceName": "Orbis: Flying Eye Hospital",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          }
+        ],
+        "serialNumber": "46800",
+        "serialSeries": "DC-10",
+        "yearBuilt": 1973
+      },
+      {
+        "id": "flying-bulls-dc6",
+        "manufacturer": "Douglas",
+        "model": "DC-6B",
+        "category": "Historic aircraft",
+        "registrations": [
+          {
+            "sourceUrl": "https://www.flyingbulls.at/en/fleet/douglas-dc-6b",
+            "sourceName": "The Flying Bulls: Douglas DC-6B fleet profile",
+            "verifiedAt": "2026-10-01",
+            "confidence": "MEDIUM",
+            "value": "N996DM",
+            "validFrom": null,
+            "validTo": null
+          },
+          {
+            "sourceUrl": "https://www.flyingbulls.at/en/fleet/douglas-dc-6b",
+            "sourceName": "The Flying Bulls: Douglas DC-6B fleet profile",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH",
+            "value": "OE-LDM",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [],
+        "sources": [
+          {
+            "sourceUrl": "https://www.flyingbulls.at/en/fleet/douglas-dc-6b",
+            "sourceName": "The Flying Bulls: Douglas DC-6B fleet profile",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          }
+        ],
+        "yearBuilt": 1958
+      },
+      {
+        "id": "flying-bulls-p38",
+        "manufacturer": "Lockheed",
+        "model": "P-38 Lightning",
+        "category": "Historic aircraft",
+        "registrations": [
+          {
+            "sourceUrl": "https://www.flyingbulls.at/en/stories/unique-beauty",
+            "sourceName": "The Flying Bulls: P-38 Lightning N25Y",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH",
+            "value": "N25Y",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [],
+        "sources": [
+          {
+            "sourceUrl": "https://www.flyingbulls.at/en/stories/unique-beauty",
+            "sourceName": "The Flying Bulls: P-38 Lightning N25Y",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          }
+        ]
+      }
+    ],
+    "entities": [
+      {
+        "id": "nasa",
+        "slug": "nasa",
+        "displayName": "NASA",
+        "entityType": "ORGANIZATION",
+        "description": "Historic research and Shuttle Carrier aircraft associated with NASA. Retired aircraft are not presented as live flights."
+      },
+      {
+        "id": "noaa",
+        "slug": "noaa",
+        "displayName": "NOAA",
+        "entityType": "ORGANIZATION",
+        "description": "Public-service aircraft used for hurricane and atmospheric research. Observation availability varies by receiver coverage."
+      },
+      {
+        "id": "new-england-patriots",
+        "slug": "new-england-patriots",
+        "displayName": "New England Patriots",
+        "entityType": "SPORTS_TEAM",
+        "description": "Two Boeing 767 aircraft publicly associated with the team. These aircraft also serve other missions; an observation does not identify the passengers."
+      },
+      {
+        "id": "alaska-airlines",
+        "slug": "alaska-airlines",
+        "displayName": "Alaska Airlines",
+        "entityType": "COMPANY",
+        "description": "Selected aircraft with documented sports liveries. These are airline aircraft, not evidence of team ownership or a team travelling aboard."
+      },
+      {
+        "id": "seattle-kraken",
+        "slug": "seattle-kraken",
+        "displayName": "Seattle Kraken",
+        "entityType": "SPORTS_TEAM",
+        "description": "An Alaska Airlines aircraft unveiled with a Kraken commemorative livery in 2024. Branding does not make it a dedicated team transport."
+      },
+      {
+        "id": "san-francisco-giants",
+        "slug": "san-francisco-giants",
+        "displayName": "San Francisco Giants",
+        "entityType": "SPORTS_TEAM",
+        "description": "The documented 2021 Giants-themed Alaska Airlines A320. This historical livery entry does not claim that the paint scheme or operator is current."
+      },
+      {
+        "id": "boeing",
+        "slug": "boeing",
+        "displayName": "Boeing",
+        "entityType": "COMPANY",
+        "description": "Selected flight-test aircraft and their engineering history. The ZA004 Dreamliner was retired in February 2026."
+      },
+      {
+        "id": "icelandair",
+        "slug": "icelandair",
+        "displayName": "Icelandair",
+        "entityType": "COMPANY",
+        "description": "Selected airline heritage aircraft, including the Hekla Aurora special livery. Hekla Aurora left service in October 2025."
+      },
+      {
+        "id": "orbis",
+        "slug": "orbis",
+        "displayName": "Orbis",
+        "entityType": "ORGANIZATION",
+        "description": "The Flying Eye Hospital: an aircraft equipped for ophthalmic training. Aircraft movement does not establish patient or staff identities."
+      },
+      {
+        "id": "flying-bulls",
+        "slug": "flying-bulls",
+        "displayName": "The Flying Bulls",
+        "entityType": "COMPANY",
+        "description": "A public display and heritage aircraft collection. These entries describe the aircraft collection, not private individuals or their travel."
+      }
+    ],
+    "associations": [
+      {
+        "sourceUrl": "https://www.nasa.gov/centers-and-facilities/armstrong/nasa-armstrong-fact-sheet-shuttle-carrier-aircraft/",
+        "sourceName": "NASA Armstrong Shuttle Carrier Aircraft fact sheet",
+        "verifiedAt": "2026-09-30",
+        "confidence": "HIGH",
+        "id": "nasa-sca-905-association",
+        "aircraftId": "nasa-sca-905",
+        "entityId": "nasa",
+        "associationType": "FORMERLY_ASSOCIATED",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true
+      },
+      {
+        "sourceUrl": "https://www.nasa.gov/centers-and-facilities/armstrong/nasa-armstrong-fact-sheet-shuttle-carrier-aircraft/",
+        "sourceName": "NASA Armstrong Shuttle Carrier Aircraft fact sheet",
+        "verifiedAt": "2026-09-30",
+        "confidence": "HIGH",
+        "id": "nasa-sca-911-association",
+        "aircraftId": "nasa-sca-911",
+        "entityId": "nasa",
+        "associationType": "FORMERLY_ASSOCIATED",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true
+      },
+      {
+        "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/lockheed-wp-3d-orion",
+        "sourceName": "NOAA aircraft fleet: Lockheed WP-3D Orion",
+        "verifiedAt": "2026-09-30",
+        "confidence": "HIGH",
+        "id": "noaa-orion-42-association",
+        "aircraftId": "noaa-orion-42",
+        "entityId": "noaa",
+        "associationType": "OPERATOR",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true
+      },
+      {
+        "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/lockheed-wp-3d-orion",
+        "sourceName": "NOAA aircraft fleet: Lockheed WP-3D Orion",
+        "verifiedAt": "2026-09-30",
+        "confidence": "HIGH",
+        "id": "noaa-orion-43-association",
+        "aircraftId": "noaa-orion-43",
+        "entityId": "noaa",
+        "associationType": "OPERATOR",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true
+      },
+      {
+        "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/gulfstream-iv-sp",
+        "sourceName": "NOAA Gulfstream IV-SP fleet page",
+        "verifiedAt": "2026-10-01",
+        "confidence": "HIGH",
+        "id": "noaa-gulfstream-49-association",
+        "aircraftId": "noaa-gulfstream-49",
+        "entityId": "noaa",
+        "associationType": "OPERATOR",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true
+      },
+      {
+        "sourceUrl": "https://www.nasa.gov/solar-system/nasas-retired-sofia-aircraft-finds-new-home-at-arizona-museum/",
+        "sourceName": "NASA SOFIA retirement and museum announcement",
+        "verifiedAt": "2026-10-01",
+        "confidence": "HIGH",
+        "id": "nasa-sofia-747-association",
+        "aircraftId": "nasa-sofia-747",
+        "entityId": "nasa",
+        "associationType": "FORMERLY_ASSOCIATED",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true
+      },
+      {
+        "sourceUrl": "https://www.planespotters.net/photos/reg/N36NE?sort=aircraft",
+        "sourceName": "Planespotters photographic aircraft identification: N36NE",
+        "verifiedAt": "2026-10-01",
+        "confidence": "MEDIUM",
+        "id": "boeing-767-25193-new-england-patriots",
+        "aircraftId": "boeing-767-25193",
+        "entityId": "new-england-patriots",
+        "associationType": "PUBLICLY_ASSOCIATED",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true,
+        "context": "Photographic identification documents the Patriots association. The team separately describes team transport and goodwill missions. Current charter operator and occupants are not inferred."
+      },
+      {
+        "sourceUrl": "https://www.planespotters.net/photo/1398124/n225ne-new-england-patriots-boeing-767-323er",
+        "sourceName": "Planespotters photographic aircraft identification: N225NE",
+        "verifiedAt": "2026-10-01",
+        "confidence": "MEDIUM",
+        "id": "boeing-767-25194-new-england-patriots",
+        "aircraftId": "boeing-767-25194",
+        "entityId": "new-england-patriots",
+        "associationType": "PUBLICLY_ASSOCIATED",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true,
+        "context": "Photographic identification documents the Patriots association. The team separately describes team transport and goodwill missions. Current charter operator and occupants are not inferred."
+      },
+      {
+        "sourceUrl": "https://news.alaskaair.com/community/alaska-airlines-seattle-kraken-aircraft-2024/",
+        "sourceName": "Alaska Airlines: 2024 Seattle Kraken aircraft unveiling",
+        "verifiedAt": "2026-10-01",
+        "confidence": "HIGH",
+        "id": "alaska-kraken-933-seattle-kraken",
+        "aircraftId": "alaska-kraken-933",
+        "entityId": "seattle-kraken",
+        "associationType": "PUBLICLY_ASSOCIATED",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true,
+        "context": "Alaska announced this Kraken-themed airline aircraft in October 2024. This documents a livery partnership, not team ownership or passengers."
+      },
+      {
+        "sourceUrl": "https://news.alaskaair.com/community/alaska-airlines-seattle-kraken-aircraft-2024/",
+        "sourceName": "Alaska Airlines: 2024 Seattle Kraken aircraft unveiling",
+        "verifiedAt": "2026-10-01",
+        "confidence": "HIGH",
+        "id": "alaska-kraken-933-alaska-airlines",
+        "aircraftId": "alaska-kraken-933",
+        "entityId": "alaska-airlines",
+        "associationType": "PUBLICLY_ASSOCIATED",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true,
+        "context": "Alaska identified N933AK in its October 2024 unveiling. The source documents its operation at that time; current service and livery are not independently confirmed."
+      },
+      {
+        "sourceUrl": "https://news.alaskaair.com/newsroom/san-francisco-giants-and-alaska-airlines-newest-livery-shows-up-in-a-giant-way/",
+        "sourceName": "Alaska Airlines: September 2021 Giants livery announcement",
+        "verifiedAt": "2026-10-01",
+        "confidence": "HIGH",
+        "id": "alaska-giants-855-san-francisco-giants",
+        "aircraftId": "alaska-giants-855",
+        "entityId": "san-francisco-giants",
+        "associationType": "PUBLICLY_ASSOCIATED",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true,
+        "context": "The September 2021 announcement identified N855VA and planned the livery through 2022. Current paint, operator and registration are unconfirmed."
+      },
+      {
+        "sourceUrl": "https://news.alaskaair.com/newsroom/san-francisco-giants-and-alaska-airlines-newest-livery-shows-up-in-a-giant-way/",
+        "sourceName": "Alaska Airlines: September 2021 Giants livery announcement",
+        "verifiedAt": "2026-10-01",
+        "confidence": "HIGH",
+        "id": "alaska-giants-855-alaska-airlines",
+        "aircraftId": "alaska-giants-855",
+        "entityId": "alaska-airlines",
+        "associationType": "PUBLICLY_ASSOCIATED",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true,
+        "context": "Historical 2021 airline livery announcement; not a claim of current operator or ownership."
+      },
+      {
+        "sourceUrl": "https://www.boeing.com/features/2026/02/last-787-8-test-airplane-bows-out-after-years-of-breakthroughs",
+        "sourceName": "Boeing: ZA004 final flight and retirement, February 2026",
+        "verifiedAt": "2026-10-01",
+        "confidence": "HIGH",
+        "id": "boeing-za004-boeing",
+        "aircraftId": "boeing-za004",
+        "entityId": "boeing",
+        "associationType": "FORMERLY_ASSOCIATED",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true,
+        "context": "Boeing identifies ZA004 as N7874 and documents its final flight on February 11, 2026. This is a retired test aircraft."
+      },
+      {
+        "sourceUrl": "https://www.icelandair.com/is-is/um-okkur/flugflotinn/hekla-aurora/",
+        "sourceName": "Icelandair: Hekla Aurora retirement in October 2025",
+        "verifiedAt": "2026-10-01",
+        "confidence": "HIGH",
+        "id": "icelandair-hekla-aurora-icelandair",
+        "aircraftId": "icelandair-hekla-aurora",
+        "entityId": "icelandair",
+        "associationType": "FORMERLY_ASSOCIATED",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true,
+        "context": "Hekla Aurora, identified as TF-FIU in the airline media kit, was taken out of service in October 2025."
+      },
+      {
+        "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=330AU",
+        "sourceName": "FAA aircraft registry: N330AU",
+        "verifiedAt": "2026-10-01",
+        "confidence": "HIGH",
+        "id": "orbis-md10-46800-orbis",
+        "aircraftId": "orbis-md10-46800",
+        "entityId": "orbis",
+        "associationType": "REGISTERED_OWNER",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true,
+        "context": "The FAA identifies Project Orbis International as the registered organization. Orbis documents its MD-10 Flying Eye Hospital program."
+      },
+      {
+        "sourceUrl": "https://www.flyingbulls.at/en/fleet/douglas-dc-6b",
+        "sourceName": "The Flying Bulls: Douglas DC-6B fleet profile",
+        "verifiedAt": "2026-10-01",
+        "confidence": "HIGH",
+        "id": "flying-bulls-dc6-flying-bulls",
+        "aircraftId": "flying-bulls-dc6",
+        "entityId": "flying-bulls",
+        "associationType": "PUBLICLY_ASSOCIATED",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true,
+        "context": "The official collection profile identifies OE-LDM, formerly N996DM, and its 1958 construction. This historic aircraft is not marked retired."
+      },
+      {
+        "sourceUrl": "https://www.flyingbulls.at/en/stories/unique-beauty",
+        "sourceName": "The Flying Bulls: P-38 Lightning N25Y",
+        "verifiedAt": "2026-10-01",
+        "confidence": "HIGH",
+        "id": "flying-bulls-p38-flying-bulls",
+        "aircraftId": "flying-bulls-p38",
+        "entityId": "flying-bulls",
+        "associationType": "PUBLICLY_ASSOCIATED",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true,
+        "context": "The collection identifies its P-38 Lightning as N25Y. This is a heritage display aircraft, not a personal-transport association."
+      }
+    ]
+  },
+  "after": {
+    "version": 1,
+    "aircraft": [
+      {
+        "id": "nasa-sca-905",
+        "manufacturer": "Boeing",
+        "model": "747",
+        "variant": "Shuttle Carrier Aircraft",
+        "category": "Historic aircraft",
+        "retired": true,
+        "registrations": [
+          {
+            "sourceUrl": "https://www.nasa.gov/wp-content/uploads/2025/01/sca-historical-narrative.pdf",
+            "sourceName": "NASA Shuttle Carrier Aircraft historical narrative",
+            "verifiedAt": "2026-09-30",
+            "confidence": "HIGH",
+            "value": "N905NA",
+            "country": "US",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [],
+        "sources": [
+          {
+            "sourceUrl": "https://www.nasa.gov/wp-content/uploads/2025/01/sca-historical-narrative.pdf",
+            "sourceName": "NASA Shuttle Carrier Aircraft historical narrative",
+            "verifiedAt": "2026-09-30",
+            "confidence": "HIGH"
+          },
+          {
+            "sourceUrl": "https://www.nasa.gov/centers-and-facilities/armstrong/nasa-armstrong-fact-sheet-shuttle-carrier-aircraft/",
+            "sourceName": "NASA Armstrong Shuttle Carrier Aircraft fact sheet",
+            "verifiedAt": "2026-09-30",
+            "confidence": "HIGH"
+          }
+        ]
+      },
+      {
+        "id": "nasa-sca-911",
+        "manufacturer": "Boeing",
+        "model": "747",
+        "variant": "Shuttle Carrier Aircraft",
+        "category": "Historic aircraft",
+        "retired": true,
+        "registrations": [
+          {
+            "sourceUrl": "https://www.nasa.gov/wp-content/uploads/2025/01/sca-historical-narrative.pdf",
+            "sourceName": "NASA Shuttle Carrier Aircraft historical narrative",
+            "verifiedAt": "2026-09-30",
+            "confidence": "HIGH",
+            "value": "N911NA",
+            "country": "US",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [],
+        "sources": [
+          {
+            "sourceUrl": "https://www.nasa.gov/wp-content/uploads/2025/01/sca-historical-narrative.pdf",
+            "sourceName": "NASA Shuttle Carrier Aircraft historical narrative",
+            "verifiedAt": "2026-09-30",
+            "confidence": "HIGH"
+          },
+          {
+            "sourceUrl": "https://www.nasa.gov/centers-and-facilities/armstrong/nasa-armstrong-fact-sheet-shuttle-carrier-aircraft/",
+            "sourceName": "NASA Armstrong Shuttle Carrier Aircraft fact sheet",
+            "verifiedAt": "2026-09-30",
+            "confidence": "HIGH"
+          }
+        ]
+      },
+      {
+        "id": "noaa-orion-42",
+        "manufacturer": "Lockheed",
+        "model": "WP-3D Orion",
+        "category": "Public-service aircraft",
+        "operator": "NOAA",
+        "registrations": [
+          {
+            "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/lockheed-wp-3d-orion",
+            "sourceName": "NOAA aircraft fleet: Lockheed WP-3D Orion",
+            "verifiedAt": "2026-09-30",
+            "confidence": "HIGH",
+            "value": "N42RF",
+            "country": "US",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [],
+        "sources": [
+          {
+            "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/lockheed-wp-3d-orion",
+            "sourceName": "NOAA aircraft fleet: Lockheed WP-3D Orion",
+            "verifiedAt": "2026-09-30",
+            "confidence": "HIGH"
+          }
+        ]
+      },
+      {
+        "id": "noaa-orion-43",
+        "manufacturer": "Lockheed",
+        "model": "WP-3D Orion",
+        "category": "Public-service aircraft",
+        "operator": "NOAA",
+        "registrations": [
+          {
+            "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/lockheed-wp-3d-orion",
+            "sourceName": "NOAA aircraft fleet: Lockheed WP-3D Orion",
+            "verifiedAt": "2026-09-30",
+            "confidence": "HIGH",
+            "value": "N43RF",
+            "country": "US",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [],
+        "sources": [
+          {
+            "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/lockheed-wp-3d-orion",
+            "sourceName": "NOAA aircraft fleet: Lockheed WP-3D Orion",
+            "verifiedAt": "2026-09-30",
+            "confidence": "HIGH"
+          }
+        ]
+      },
+      {
+        "id": "noaa-gulfstream-49",
+        "manufacturer": "Gulfstream",
+        "model": "IV-SP",
+        "category": "Public-service aircraft",
+        "retired": false,
+        "registrations": [
+          {
+            "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/gulfstream-iv-sp",
+            "sourceName": "NOAA Gulfstream IV-SP fleet page",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH",
+            "value": "N49RF",
+            "country": "US",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [],
+        "sources": [
+          {
+            "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/gulfstream-iv-sp",
+            "sourceName": "NOAA Gulfstream IV-SP fleet page",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          }
+        ],
+        "operator": "NOAA"
+      },
+      {
+        "id": "nasa-sofia-747",
+        "manufacturer": "Boeing",
+        "model": "747SP",
+        "category": "Historic aircraft",
+        "retired": true,
+        "registrations": [
+          {
+            "sourceUrl": "https://www.nasa.gov/wp-content/uploads/2019/04/annual_report_2020-508.pdf",
+            "sourceName": "NASA FY2020 annual aircraft report",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH",
+            "value": "N747NA",
+            "country": "US",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [],
+        "sources": [
+          {
+            "sourceUrl": "https://www.nasa.gov/wp-content/uploads/2019/04/annual_report_2020-508.pdf",
+            "sourceName": "NASA FY2020 annual aircraft report",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          },
+          {
+            "sourceUrl": "https://www.nasa.gov/solar-system/nasas-retired-sofia-aircraft-finds-new-home-at-arizona-museum/",
+            "sourceName": "NASA SOFIA retirement and museum announcement",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          }
+        ]
+      },
+      {
+        "id": "boeing-767-25193",
+        "manufacturer": "Boeing",
+        "model": "767-323",
+        "category": "Sports-associated aircraft",
+        "registrations": [
+          {
+            "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=36NE",
+            "sourceName": "FAA aircraft registry: N36NE",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH",
+            "value": "N36NE",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [
+          {
+            "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=36NE",
+            "sourceName": "FAA aircraft registry: N36NE",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH",
+            "value": "a40b24",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "sources": [
+          {
+            "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=36NE",
+            "sourceName": "FAA aircraft registry: N36NE",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          },
+          {
+            "sourceUrl": "https://www.patriots.com/video/do-your-life-patriots-team-plane",
+            "sourceName": "New England Patriots: team plane and goodwill missions",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          },
+          {
+            "sourceUrl": "https://www.planespotters.net/photos/reg/N36NE?sort=aircraft",
+            "sourceName": "Planespotters photographic aircraft identification: N36NE",
+            "verifiedAt": "2026-10-01",
+            "confidence": "MEDIUM"
+          }
+        ],
+        "serialNumber": "25193",
+        "serialSeries": "767",
+        "yearBuilt": 1991
+      },
+      {
+        "id": "boeing-767-25194",
+        "manufacturer": "Boeing",
+        "model": "767-323",
+        "category": "Sports-associated aircraft",
+        "registrations": [
+          {
+            "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=225NE",
+            "sourceName": "FAA aircraft registry: N225NE",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH",
+            "value": "N225NE",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [
+          {
+            "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=225NE",
+            "sourceName": "FAA aircraft registry: N225NE",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH",
+            "value": "a1f4c5",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "sources": [
+          {
+            "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=225NE",
+            "sourceName": "FAA aircraft registry: N225NE",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          },
+          {
+            "sourceUrl": "https://www.patriots.com/video/do-your-life-patriots-team-plane",
+            "sourceName": "New England Patriots: team plane and goodwill missions",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          },
+          {
+            "sourceUrl": "https://www.planespotters.net/photo/1398124/n225ne-new-england-patriots-boeing-767-323er",
+            "sourceName": "Planespotters photographic aircraft identification: N225NE",
+            "verifiedAt": "2026-10-01",
+            "confidence": "MEDIUM"
+          }
+        ],
+        "serialNumber": "25194",
+        "serialSeries": "767",
+        "yearBuilt": 1991
+      },
+      {
+        "id": "alaska-kraken-933",
+        "manufacturer": "Boeing",
+        "model": "737-9 MAX",
+        "category": "Sports-associated aircraft",
+        "registrations": [
+          {
+            "sourceName": "FAA aircraft registry: N933AK",
+            "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?NNumberTxt=933AK",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH",
+            "value": "N933AK",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [
+          {
+            "sourceName": "FAA aircraft registry: N933AK",
+            "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?NNumberTxt=933AK",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH",
+            "value": "acf0d8",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "sources": [
+          {
+            "sourceUrl": "https://news.alaskaair.com/community/alaska-airlines-seattle-kraken-aircraft-2024/",
+            "sourceName": "Alaska Airlines: 2024 Seattle Kraken aircraft unveiling",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          },
+          {
+            "sourceName": "FAA aircraft registry: N933AK",
+            "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?NNumberTxt=933AK",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          },
+          {
+            "sourceName": "Alaska Airlines: Seattle Kraken Boeing 737-9 MAX",
+            "sourceUrl": "https://news.alaskaair.com/images-videos/seattle-kraken-aircraft-2024/",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          }
+        ],
+        "serialNumber": "44098",
+        "serialSeries": "737",
+        "yearBuilt": 2022
+      },
+      {
+        "id": "alaska-giants-855",
+        "manufacturer": "Airbus",
+        "model": "A320",
+        "category": "Sports-associated aircraft",
+        "registrations": [
+          {
+            "sourceUrl": "https://news.alaskaair.com/newsroom/san-francisco-giants-and-alaska-airlines-newest-livery-shows-up-in-a-giant-way/",
+            "sourceName": "Alaska Airlines: September 2021 Giants livery announcement",
+            "verifiedAt": "2026-10-01",
+            "confidence": "MEDIUM",
+            "value": "N855VA",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [],
+        "sources": [
+          {
+            "sourceUrl": "https://news.alaskaair.com/newsroom/san-francisco-giants-and-alaska-airlines-newest-livery-shows-up-in-a-giant-way/",
+            "sourceName": "Alaska Airlines: September 2021 Giants livery announcement",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          }
+        ]
+      },
+      {
+        "id": "boeing-za004",
+        "manufacturer": "Boeing",
+        "model": "787-8",
+        "category": "Historic aircraft",
+        "registrations": [
+          {
+            "sourceUrl": "https://www.boeing.com/features/2026/02/last-787-8-test-airplane-bows-out-after-years-of-breakthroughs",
+            "sourceName": "Boeing: ZA004 final flight and retirement, February 2026",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH",
+            "value": "N7874",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [],
+        "sources": [
+          {
+            "sourceUrl": "https://www.boeing.com/features/2026/02/last-787-8-test-airplane-bows-out-after-years-of-breakthroughs",
+            "sourceName": "Boeing: ZA004 final flight and retirement, February 2026",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          }
+        ],
+        "retired": true
+      },
+      {
+        "id": "icelandair-hekla-aurora",
+        "manufacturer": "Boeing",
+        "model": "757-200",
+        "category": "Historic aircraft",
+        "registrations": [
+          {
+            "sourceUrl": "https://pixels.icelandair.com/bltb17a9e70d02f6bab.pdf",
+            "sourceName": "Icelandair media kit: Hekla Aurora TF-FIU",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH",
+            "value": "TF-FIU",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [],
+        "sources": [
+          {
+            "sourceUrl": "https://pixels.icelandair.com/bltb17a9e70d02f6bab.pdf",
+            "sourceName": "Icelandair media kit: Hekla Aurora TF-FIU",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          },
+          {
+            "sourceUrl": "https://www.icelandair.com/is-is/um-okkur/flugflotinn/hekla-aurora/",
+            "sourceName": "Icelandair: Hekla Aurora retirement in October 2025",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          }
+        ],
+        "retired": true
+      },
+      {
+        "id": "orbis-md10-46800",
+        "manufacturer": "McDonnell Douglas",
+        "model": "MD-10-30F",
+        "category": "Public-service aircraft",
+        "registrations": [
+          {
+            "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=330AU",
+            "sourceName": "FAA aircraft registry: N330AU",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH",
+            "value": "N330AU",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [
+          {
+            "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=330AU",
+            "sourceName": "FAA aircraft registry: N330AU",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH",
+            "value": "a395e2",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "sources": [
+          {
+            "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=330AU",
+            "sourceName": "FAA aircraft registry: N330AU",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          },
+          {
+            "sourceUrl": "https://www.orbis.org/en/what-we-do/flying-eye-hospital",
+            "sourceName": "Orbis: Flying Eye Hospital",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          }
+        ],
+        "serialNumber": "46800",
+        "serialSeries": "DC-10",
+        "yearBuilt": 1973
+      },
+      {
+        "id": "flying-bulls-dc6",
+        "manufacturer": "Douglas",
+        "model": "DC-6B",
+        "category": "Historic aircraft",
+        "registrations": [
+          {
+            "sourceUrl": "https://www.flyingbulls.at/en/fleet/douglas-dc-6b",
+            "sourceName": "The Flying Bulls: Douglas DC-6B fleet profile",
+            "verifiedAt": "2026-10-01",
+            "confidence": "MEDIUM",
+            "value": "N996DM",
+            "validFrom": null,
+            "validTo": null
+          },
+          {
+            "sourceUrl": "https://www.flyingbulls.at/en/fleet/douglas-dc-6b",
+            "sourceName": "The Flying Bulls: Douglas DC-6B fleet profile",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH",
+            "value": "OE-LDM",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [],
+        "sources": [
+          {
+            "sourceUrl": "https://www.flyingbulls.at/en/fleet/douglas-dc-6b",
+            "sourceName": "The Flying Bulls: Douglas DC-6B fleet profile",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          }
+        ],
+        "yearBuilt": 1958
+      },
+      {
+        "id": "flying-bulls-p38",
+        "manufacturer": "Lockheed",
+        "model": "P-38 Lightning",
+        "category": "Historic aircraft",
+        "registrations": [
+          {
+            "sourceUrl": "https://www.flyingbulls.at/en/stories/unique-beauty",
+            "sourceName": "The Flying Bulls: P-38 Lightning N25Y",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH",
+            "value": "N25Y",
+            "validFrom": null,
+            "validTo": null
+          }
+        ],
+        "icaoIdentities": [],
+        "sources": [
+          {
+            "sourceUrl": "https://www.flyingbulls.at/en/stories/unique-beauty",
+            "sourceName": "The Flying Bulls: P-38 Lightning N25Y",
+            "verifiedAt": "2026-10-01",
+            "confidence": "HIGH"
+          }
+        ]
+      }
+    ],
+    "entities": [
+      {
+        "id": "nasa",
+        "slug": "nasa",
+        "displayName": "NASA",
+        "entityType": "ORGANIZATION",
+        "description": "Historic research and Shuttle Carrier aircraft associated with NASA. Retired aircraft are not presented as live flights."
+      },
+      {
+        "id": "noaa",
+        "slug": "noaa",
+        "displayName": "NOAA",
+        "entityType": "ORGANIZATION",
+        "description": "Public-service aircraft used for hurricane and atmospheric research. Observation availability varies by receiver coverage."
+      },
+      {
+        "id": "new-england-patriots",
+        "slug": "new-england-patriots",
+        "displayName": "New England Patriots",
+        "entityType": "SPORTS_TEAM",
+        "description": "Two Boeing 767 aircraft publicly associated with the team. These aircraft also serve other missions; an observation does not identify the passengers."
+      },
+      {
+        "id": "alaska-airlines",
+        "slug": "alaska-airlines",
+        "displayName": "Alaska Airlines",
+        "entityType": "COMPANY",
+        "description": "Selected aircraft with documented sports liveries. These are airline aircraft, not evidence of team ownership or a team travelling aboard."
+      },
+      {
+        "id": "seattle-kraken",
+        "slug": "seattle-kraken",
+        "displayName": "Seattle Kraken",
+        "entityType": "SPORTS_TEAM",
+        "description": "An Alaska Airlines aircraft unveiled with a Kraken commemorative livery in 2024. Branding does not make it a dedicated team transport."
+      },
+      {
+        "id": "san-francisco-giants",
+        "slug": "san-francisco-giants",
+        "displayName": "San Francisco Giants",
+        "entityType": "SPORTS_TEAM",
+        "description": "The documented 2021 Giants-themed Alaska Airlines A320. This historical livery entry does not claim that the paint scheme or operator is current."
+      },
+      {
+        "id": "boeing",
+        "slug": "boeing",
+        "displayName": "Boeing",
+        "entityType": "COMPANY",
+        "description": "Selected flight-test aircraft and their engineering history. The ZA004 Dreamliner was retired in February 2026."
+      },
+      {
+        "id": "icelandair",
+        "slug": "icelandair",
+        "displayName": "Icelandair",
+        "entityType": "COMPANY",
+        "description": "Selected airline heritage aircraft, including the Hekla Aurora special livery. Hekla Aurora left service in October 2025."
+      },
+      {
+        "id": "orbis",
+        "slug": "orbis",
+        "displayName": "Orbis",
+        "entityType": "ORGANIZATION",
+        "description": "The Flying Eye Hospital: an aircraft equipped for ophthalmic training. Aircraft movement does not establish patient or staff identities."
+      },
+      {
+        "id": "flying-bulls",
+        "slug": "flying-bulls",
+        "displayName": "The Flying Bulls",
+        "entityType": "COMPANY",
+        "description": "A public display and heritage aircraft collection. These entries describe the aircraft collection, not private individuals or their travel."
+      }
+    ],
+    "associations": [
+      {
+        "sourceUrl": "https://www.nasa.gov/centers-and-facilities/armstrong/nasa-armstrong-fact-sheet-shuttle-carrier-aircraft/",
+        "sourceName": "NASA Armstrong Shuttle Carrier Aircraft fact sheet",
+        "verifiedAt": "2026-09-30",
+        "confidence": "HIGH",
+        "id": "nasa-sca-905-association",
+        "aircraftId": "nasa-sca-905",
+        "entityId": "nasa",
+        "associationType": "FORMERLY_ASSOCIATED",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true
+      },
+      {
+        "sourceUrl": "https://www.nasa.gov/centers-and-facilities/armstrong/nasa-armstrong-fact-sheet-shuttle-carrier-aircraft/",
+        "sourceName": "NASA Armstrong Shuttle Carrier Aircraft fact sheet",
+        "verifiedAt": "2026-09-30",
+        "confidence": "HIGH",
+        "id": "nasa-sca-911-association",
+        "aircraftId": "nasa-sca-911",
+        "entityId": "nasa",
+        "associationType": "FORMERLY_ASSOCIATED",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true
+      },
+      {
+        "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/lockheed-wp-3d-orion",
+        "sourceName": "NOAA aircraft fleet: Lockheed WP-3D Orion",
+        "verifiedAt": "2026-09-30",
+        "confidence": "HIGH",
+        "id": "noaa-orion-42-association",
+        "aircraftId": "noaa-orion-42",
+        "entityId": "noaa",
+        "associationType": "OPERATOR",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true
+      },
+      {
+        "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/lockheed-wp-3d-orion",
+        "sourceName": "NOAA aircraft fleet: Lockheed WP-3D Orion",
+        "verifiedAt": "2026-09-30",
+        "confidence": "HIGH",
+        "id": "noaa-orion-43-association",
+        "aircraftId": "noaa-orion-43",
+        "entityId": "noaa",
+        "associationType": "OPERATOR",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true
+      },
+      {
+        "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/gulfstream-iv-sp",
+        "sourceName": "NOAA Gulfstream IV-SP fleet page",
+        "verifiedAt": "2026-10-01",
+        "confidence": "HIGH",
+        "id": "noaa-gulfstream-49-association",
+        "aircraftId": "noaa-gulfstream-49",
+        "entityId": "noaa",
+        "associationType": "OPERATOR",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true
+      },
+      {
+        "sourceUrl": "https://www.nasa.gov/solar-system/nasas-retired-sofia-aircraft-finds-new-home-at-arizona-museum/",
+        "sourceName": "NASA SOFIA retirement and museum announcement",
+        "verifiedAt": "2026-10-01",
+        "confidence": "HIGH",
+        "id": "nasa-sofia-747-association",
+        "aircraftId": "nasa-sofia-747",
+        "entityId": "nasa",
+        "associationType": "FORMERLY_ASSOCIATED",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true
+      },
+      {
+        "sourceUrl": "https://www.planespotters.net/photos/reg/N36NE?sort=aircraft",
+        "sourceName": "Planespotters photographic aircraft identification: N36NE",
+        "verifiedAt": "2026-10-01",
+        "confidence": "MEDIUM",
+        "id": "boeing-767-25193-new-england-patriots",
+        "aircraftId": "boeing-767-25193",
+        "entityId": "new-england-patriots",
+        "associationType": "PUBLICLY_ASSOCIATED",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true,
+        "context": "Photographic identification documents the Patriots association. The team separately describes team transport and goodwill missions. Current charter operator and occupants are not inferred."
+      },
+      {
+        "sourceUrl": "https://www.planespotters.net/photo/1398124/n225ne-new-england-patriots-boeing-767-323er",
+        "sourceName": "Planespotters photographic aircraft identification: N225NE",
+        "verifiedAt": "2026-10-01",
+        "confidence": "MEDIUM",
+        "id": "boeing-767-25194-new-england-patriots",
+        "aircraftId": "boeing-767-25194",
+        "entityId": "new-england-patriots",
+        "associationType": "PUBLICLY_ASSOCIATED",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true,
+        "context": "Photographic identification documents the Patriots association. The team separately describes team transport and goodwill missions. Current charter operator and occupants are not inferred."
+      },
+      {
+        "sourceUrl": "https://news.alaskaair.com/community/alaska-airlines-seattle-kraken-aircraft-2024/",
+        "sourceName": "Alaska Airlines: 2024 Seattle Kraken aircraft unveiling",
+        "verifiedAt": "2026-10-01",
+        "confidence": "HIGH",
+        "id": "alaska-kraken-933-seattle-kraken",
+        "aircraftId": "alaska-kraken-933",
+        "entityId": "seattle-kraken",
+        "associationType": "PUBLICLY_ASSOCIATED",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true,
+        "context": "Alaska announced this Kraken-themed airline aircraft in October 2024. This documents a livery partnership, not team ownership or passengers."
+      },
+      {
+        "sourceUrl": "https://news.alaskaair.com/community/alaska-airlines-seattle-kraken-aircraft-2024/",
+        "sourceName": "Alaska Airlines: 2024 Seattle Kraken aircraft unveiling",
+        "verifiedAt": "2026-10-01",
+        "confidence": "HIGH",
+        "id": "alaska-kraken-933-alaska-airlines",
+        "aircraftId": "alaska-kraken-933",
+        "entityId": "alaska-airlines",
+        "associationType": "PUBLICLY_ASSOCIATED",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true,
+        "context": "Alaska identified N933AK in its October 2024 unveiling. The source documents its operation at that time; current service and livery are not independently confirmed."
+      },
+      {
+        "sourceUrl": "https://news.alaskaair.com/newsroom/san-francisco-giants-and-alaska-airlines-newest-livery-shows-up-in-a-giant-way/",
+        "sourceName": "Alaska Airlines: September 2021 Giants livery announcement",
+        "verifiedAt": "2026-10-01",
+        "confidence": "HIGH",
+        "id": "alaska-giants-855-san-francisco-giants",
+        "aircraftId": "alaska-giants-855",
+        "entityId": "san-francisco-giants",
+        "associationType": "PUBLICLY_ASSOCIATED",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true,
+        "context": "The September 2021 announcement identified N855VA and planned the livery through 2022. Current paint, operator and registration are unconfirmed."
+      },
+      {
+        "sourceUrl": "https://news.alaskaair.com/newsroom/san-francisco-giants-and-alaska-airlines-newest-livery-shows-up-in-a-giant-way/",
+        "sourceName": "Alaska Airlines: September 2021 Giants livery announcement",
+        "verifiedAt": "2026-10-01",
+        "confidence": "HIGH",
+        "id": "alaska-giants-855-alaska-airlines",
+        "aircraftId": "alaska-giants-855",
+        "entityId": "alaska-airlines",
+        "associationType": "PUBLICLY_ASSOCIATED",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true,
+        "context": "Historical 2021 airline livery announcement; not a claim of current operator or ownership."
+      },
+      {
+        "sourceUrl": "https://www.boeing.com/features/2026/02/last-787-8-test-airplane-bows-out-after-years-of-breakthroughs",
+        "sourceName": "Boeing: ZA004 final flight and retirement, February 2026",
+        "verifiedAt": "2026-10-01",
+        "confidence": "HIGH",
+        "id": "boeing-za004-boeing",
+        "aircraftId": "boeing-za004",
+        "entityId": "boeing",
+        "associationType": "FORMERLY_ASSOCIATED",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true,
+        "context": "Boeing identifies ZA004 as N7874 and documents its final flight on February 11, 2026. This is a retired test aircraft."
+      },
+      {
+        "sourceUrl": "https://www.icelandair.com/is-is/um-okkur/flugflotinn/hekla-aurora/",
+        "sourceName": "Icelandair: Hekla Aurora retirement in October 2025",
+        "verifiedAt": "2026-10-01",
+        "confidence": "HIGH",
+        "id": "icelandair-hekla-aurora-icelandair",
+        "aircraftId": "icelandair-hekla-aurora",
+        "entityId": "icelandair",
+        "associationType": "FORMERLY_ASSOCIATED",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true,
+        "context": "Hekla Aurora, identified as TF-FIU in the airline media kit, was taken out of service in October 2025."
+      },
+      {
+        "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=330AU",
+        "sourceName": "FAA aircraft registry: N330AU",
+        "verifiedAt": "2026-10-01",
+        "confidence": "HIGH",
+        "id": "orbis-md10-46800-orbis",
+        "aircraftId": "orbis-md10-46800",
+        "entityId": "orbis",
+        "associationType": "REGISTERED_OWNER",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true,
+        "context": "The FAA identifies Project Orbis International as the registered organization. Orbis documents its MD-10 Flying Eye Hospital program."
+      },
+      {
+        "sourceUrl": "https://www.flyingbulls.at/en/fleet/douglas-dc-6b",
+        "sourceName": "The Flying Bulls: Douglas DC-6B fleet profile",
+        "verifiedAt": "2026-10-01",
+        "confidence": "HIGH",
+        "id": "flying-bulls-dc6-flying-bulls",
+        "aircraftId": "flying-bulls-dc6",
+        "entityId": "flying-bulls",
+        "associationType": "PUBLICLY_ASSOCIATED",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true,
+        "context": "The official collection profile identifies OE-LDM, formerly N996DM, and its 1958 construction. This historic aircraft is not marked retired."
+      },
+      {
+        "sourceUrl": "https://www.flyingbulls.at/en/stories/unique-beauty",
+        "sourceName": "The Flying Bulls: P-38 Lightning N25Y",
+        "verifiedAt": "2026-10-01",
+        "confidence": "HIGH",
+        "id": "flying-bulls-p38-flying-bulls",
+        "aircraftId": "flying-bulls-p38",
+        "entityId": "flying-bulls",
+        "associationType": "PUBLICLY_ASSOCIATED",
+        "validFrom": null,
+        "validTo": null,
+        "reviewed": true,
+        "context": "The collection identifies its P-38 Lightning as N25Y. This is a heritage display aircraft, not a personal-transport association."
+      }
+    ]
+  }
+}
