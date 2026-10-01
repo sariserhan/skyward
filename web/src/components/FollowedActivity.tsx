@@ -1,0 +1,5 @@
+import {useSpecialFlights} from '../lib/useSpecialFlights';
+export default function FollowedActivity({ids}:{ids:string[]}){
+ const snapshot=useSpecialFlights(),rows=snapshot.rows.filter(row=>ids.includes(row.aircraftId));
+ return <section className="airframe-card" aria-label="Followed aircraft airborne"><h2>Your aircraft in the sky</h2><p>Recent airborne matches from the shared worldwide check. No extra tracking requests are made for this list.</p>{rows.map(row=><p key={row.aircraftId}><a href={row.path+'#scene=flight&view=side'}>Watch {row.registration} · {row.name} →</a><small> · Position received {new Date(row.aircraft.observedAt??0).toLocaleTimeString()}</small></p>)}{!rows.length&&<p role="status">{snapshot.state==='loading'?'Checking featured aircraft…':snapshot.state==='unavailable'?'The shared check is temporarily unavailable.':'No recent airborne matches for your followed aircraft.'} Coverage is limited to the featured catalog; other follows can be checked on their profiles.</p>}</section>;
+}

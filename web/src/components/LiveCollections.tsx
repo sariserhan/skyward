@@ -9,7 +9,7 @@ export function LiveCollections(){
    <div className="special-aircraft-list">{snapshot.rows.map(row=><a className="special-aircraft-watch" key={row.aircraftId} href={row.path+'#scene=flight&view=side'} aria-label={`Watch ${row.name} aircraft live`}><strong>{row.name}</strong><small>{row.relationship}</small><span>{row.registration} · Airborne · Watch →</span></a>)}</div>
    {snapshot.state==='loading'?<p role="status">Checking special aircraft worldwide…</p>:snapshot.state==='unavailable'?<p role="status">Worldwide check unavailable. Retrying automatically.</p>:<p role="status">{snapshot.rows.length?`${snapshot.rows.length} airborne matches`:'No recent airborne matches received worldwide.'} · {snapshot.checkedAircraft}/{snapshot.totalAircraft} aircraft checked{snapshot.state==='partial'?' · Partial coverage':''}</p>}
    <small>Updates about once a minute. Coverage varies; branding does not identify passengers.</small>
-   <a className="live-collections-browse" href="/notable-aircraft/">Explore worldwide aircraft →</a><a href="/following/">Your followed aircraft →</a>
+   <a className="live-collections-browse" href="/notable-aircraft/">Explore worldwide aircraft →</a><a href="/following/">Your followed aircraft →</a><p><a href="/collections/sports/">Sports aircraft</a> · <a href="/collections/companies/">Companies</a></p>
   </div>
  </section>;
 }

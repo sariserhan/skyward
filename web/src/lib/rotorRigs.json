@@ -1,4 +1,61 @@
 {
+  "dc6": {
+    "groups": [
+      {
+        "nodes": [
+          "prop1",
+          "Spinner1"
+        ],
+        "axis": 2,
+        "pivot": [
+          8.0795095,
+          0.2648715,
+          8.417316500000002
+        ],
+        "kind": "propeller"
+      },
+      {
+        "nodes": [
+          "prop2",
+          "Spinner2"
+        ],
+        "axis": 2,
+        "pivot": [
+          3.8545845,
+          -0.08028850000000001,
+          9.282608
+        ],
+        "kind": "propeller"
+      },
+      {
+        "nodes": [
+          "prop3",
+          "Spinner3"
+        ],
+        "axis": 2,
+        "pivot": [
+          -3.8550005,
+          -0.08028850000000001,
+          9.282608
+        ],
+        "kind": "propeller"
+      },
+      {
+        "nodes": [
+          "prop4",
+          "Spinner4"
+        ],
+        "axis": 2,
+        "pivot": [
+          -8.0799995,
+          0.2648715,
+          8.417316500000002
+        ],
+        "kind": "propeller"
+      }
+    ],
+    "hide": []
+  },
   "pa18": {
     "groups": [
       {

@@ -19,7 +19,7 @@ export function downloadGlobeImage(v:Cesium.Viewer,label:string):Promise<void>{
     if(!width||!height)throw Error('Map is not visible.');
     const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height+104;const ctx=canvas.getContext('2d');if(!ctx)throw Error('Image export unavailable.');
     ctx.drawImage(source,0,0,width,height);ctx.fillStyle='#091e29';ctx.fillRect(0,height,width,104);ctx.fillStyle='#e3f1f6';ctx.font='14px sans-serif';
-    ctx.fillText(`Skyward · ${label} · ${new Date().toISOString()}`,12,height+22,width-24);
+    ctx.font='bold 16px sans-serif';ctx.fillText('sky',12,height+22);const w=ctx.measureText('sky').width;ctx.fillStyle='#8fdfc8';ctx.fillText('VV',12+w,height+22);const vv=ctx.measureText('VV').width;ctx.fillStyle='#e3f1f6';ctx.fillText(`ard · ${label} · skyvvard.com`,12+w+vv,height+22,width-36-w-vv);
     const credits=v.cesiumWidget.creditContainer.textContent?.replace(/\s+/g,' ').trim()??'';
     ctx.font='11px sans-serif';
     const lines=['Observed fixes + predicted motion; not a recording.',`Map: ${credits}`, 'Sources: ADSB.lol (ODbL), OpenStreetMap contributors, OurAirports, NASA Black Marble 2016.'];

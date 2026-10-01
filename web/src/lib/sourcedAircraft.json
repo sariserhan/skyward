@@ -495,7 +495,7 @@
   },
   {
     "id": "gazl",
-    "label": "Aérospatiale Gazelle",
+    "label": "A\u00e9rospatiale Gazelle",
     "types": [
       "GAZL"
     ],
@@ -602,5 +602,16 @@
     "uri": "models/sourced/b703-v1.gltf",
     "length": 45.55,
     "sourceRepository": "https://github.com/Ysurac/FlightAirMap-3dmodels"
+  },
+  {
+    "id": "dc6",
+    "label": "Douglas DC-6B",
+    "types": [
+      "DC6"
+    ],
+    "uri": "models/sourced/dc6-v1.gltf",
+    "length": 31.77,
+    "sourceRepository": "https://github.com/FGMEMBERS/dc6",
+    "branded": false
   }
 ]

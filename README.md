@@ -626,3 +626,18 @@ Only fresh, unambiguous airborne observations appear in the globe sidebar. Choos
 Other site views show a dismissible airborne announcement with a Watch flight button. Announcements omit the aircraft already being watched and pause while a dialog is open. Browser requests pause in hidden tabs and offline; expired observations disappear. Announcements are session-deduplicated and do not imply that an associated team, organization or person is onboard. No new paid-provider integration, scheduled job, or background notification service is used.
 
 Special-aircraft visual matching uses a generated registration index, filling missing feed types without changing observations. See [model and paint coverage for all 120 aircraft](docs/special-aircraft-visuals.md). Operator paint and exact promotional liveries are tracked separately; exact special paint remains an asset gap. The [120-aircraft source audit](docs/special-aircraft-asset-search.md) records additional model and livery candidates, license evidence and unresolved gaps; candidates are not installed assets.
+
+
+### Discovery and first visit
+
+New visitors on desktop and mobile see a dismissible introduction to real aircraft tracking, waiting for a flight, available weather and rendered passenger/cockpit views. Arrival estimates are distinguished from confirmed airline times. The introduction does not appear on direct flight links or recovered sessions. It can be reopened with **How to explore**.
+
+Aircraft profiles expose sourced identity, appearance fidelity and fresh shared-feed watch links. **Following → Your aircraft in the sky** reuses the existing worldwide snapshot; it adds no per-follow polling, database writes or background notifications. Only featured aircraft covered by that snapshot can appear there.
+
+`/collections/sports/`, `/collections/companies/`, `/collections/special/`, `/collections/historic/` and `/collections/public-service/` provide linked discovery pages with server-readable reference content and sitemap coverage. Public aircraft, organization and collection pages have distinct static 1200×630 social cards. Special flight links reuse their aircraft profile's card without asserting that a flight is currently airborne.
+
+After catalog/title changes, regenerate checked-in cards using `python web/scripts/prepare-social-cards.py` in an environment with Playwright/Chromium. This is maintainer tooling, not a production dependency. The cards add approximately 15 MiB of static assets and require no R2, D1 or image-generation Worker calls.
+
+Flight-view camera controls include **Share view**, restoring the selected viewpoint at the latest available position, and a branded PNG export with credits. A shared link is not a replay or an onboard video.
+
+After deployment, run `npm --prefix web run check:public -- https://skyvvard.com`. It checks all published profile sitemap entries and a bounded sample of page metadata, internal discovery links and image files without calling aviation APIs. The GitHub **Public discovery checks** workflow can run manually and after a successful GitHub deployment marked `production`; Cloudflare must publish that deployment status for the automatic trigger. Local release checks include desktop/mobile onboarding and discovery interactions.

@@ -1,6 +1,6 @@
 # Special-aircraft visual coverage
 
-Reviewed catalog mapping for 120 current featured aircraft. 64 have exact-type community geometry, 23 use an explicitly related family model, and 33 require an approximate fallback or more precise type identification. A model match does not certify every geometric detail.
+Reviewed catalog mapping for 120 current featured aircraft. 65 have exact-type community geometry, 23 use an explicitly related family model, and 32 require an approximate fallback or more precise type identification. A model match does not certify every geometric detail.
 
 The registration index fills missing feed types at ingestion/selection, preserves provider types and timestamps, and rejects conflicting types for registration-based paint selection. It does not infer aircraft appearance from team membership. Existing compatible operator textures can be selected by registration when the callsign does not identify an operator.
 
@@ -19,7 +19,7 @@ Regenerate with `node web/scripts/prepare-special-visuals.mjs` (also part of bui
 | N225NE | Boeing 767-323 | type | [Source](https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=225NE) |
 | N933AK | Boeing 737-9 MAX | family | [Source](https://news.alaskaair.com/community/alaska-airlines-seattle-kraken-aircraft-2024/) |
 | N330AU | McDonnell Douglas MD-10-30F | fallback | [Source](https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=330AU) |
-| OE-LDM | Douglas DC-6B | fallback | [Source](https://www.flyingbulls.at/en/fleet/douglas-dc-6b) |
+| OE-LDM | Douglas DC-6B | type | [Source](https://www.flyingbulls.at/en/fleet/douglas-dc-6b) |
 | N25Y | Lockheed P-38 Lightning | fallback | [Source](https://www.flyingbulls.at/en/stories/unique-beauty) |
 | N46RF | De Havilland Canada DHC-6-300 Twin Otter | fallback | [Source](https://www.omao.noaa.gov/aircraft-operations/aircraft/de-havilland-dhc-6-300-twin-otter) |
 | N48RF | De Havilland Canada DHC-6-300 Twin Otter | fallback | [Source](https://www.omao.noaa.gov/aircraft-operations/aircraft/de-havilland-dhc-6-300-twin-otter) |
@@ -136,3 +136,5 @@ Regenerate with `node web/scripts/prepare-special-visuals.mjs` (also part of bui
 Validation: 597 server/unit tests passed, one skipped; production build passed. Headless Chromium verified the special-aircraft link with the provider type deliberately omitted, selection of the A330-300 asset, appearance-reference visibility, reload, mobile announcement layout and stale removal. The Browser plugin was unavailable, so the existing Playwright harness ran on a temporary local server (1440×1000 and 390×844). Evidence is saved outside the repository at `/tmp/skyward-browser-76f2_jbk`. Exact texture appearance was not certified by this interaction test. No deployment performed.
 
 See the [complete model and livery source audit](special-aircraft-asset-search.md) for candidate downloads, compatibility limits and unresolved assets across all 120 registrations.
+
+The DC-6B now uses pinned GPL-2.0 FGMEMBERS geometry with four authored propeller rigs, cockpit glazing, measured light/gear anchors and retained editable source. Its paint is the source scheme, not a verified Flying Bulls repaint.

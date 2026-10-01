@@ -12,9 +12,12 @@ def bounds(g,names):
  return ([min(a['min'][i] for a in vals) for i in range(3)],[max(a['max'][i] for a in vals) for i in range(3)])
 def group(g,names,axis=None,center=None,kind='propeller'):
  lo,hi=bounds(g,names);axis=axis if axis is not None else min(range(3),key=lambda i:hi[i]-lo[i]);return dict(nodes=names,axis=axis,pivot=center or [(lo[i]+hi[i])/2 for i in range(3)],kind=kind)
-for id in ['pa18','pa28','pa32','sr22','dr40','pc12','c208','c182','q400','atr42','atr72','ec35','b407']:
+for id in ['dc6','pa18','pa28','pa32','sr22','dr40','pc12','c208','c182','q400','atr42','atr72','ec35','b407']:
  path=source/f'{id}-v1.gltf';g=json.loads(path.read_text());names=[n.get('name','') for n in g['nodes']];groups=[];hide=[]
- if id=='b407':
+ if id=='dc6':
+  for i in range(1,5):
+   lo,hi=bounds(g,[f'Spinner{i}']);groups.append(group(g,[f'prop{i}',f'Spinner{i}'],2,[(lo[k]+hi[k])/2 for k in range(3)]))
+ elif id=='b407':
   for file in [path,*sorted((source/'branded').glob('b407-*-v1.gltf'))]:
    model=json.loads(file.read_text())
    if not any(n.get('name')=='SkywardMainRotor' for n in model['nodes']):

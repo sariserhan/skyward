@@ -1,0 +1,40 @@
+name: Public discovery checks
+on:
+  workflow_dispatch:
+  deployment_status:
+permissions:
+  contents: read
+concurrency:
+  group: public-discovery
+  cancel-in-progress: true
+jobs:
+  public-pages:
+    if: github.event_name == 'workflow_dispatch' || (github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'production')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.deployment.sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Check deployed sitemap, canonical URLs, social cards and discovery links
+        run: node web/scripts/check-public-discovery.mjs https://skyvvard.com
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install browser test tooling
+        run: |
+          pip install playwright==1.58.0
+          python -m playwright install --with-deps chromium
+      - name: Check mobile discovery pages
+        run: python web/tests/browser/public-discovery.py https://skyvvard.com
+        env:
+          SKYWARD_QA_ARTIFACTS: /tmp/skyward-public
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: public-discovery-mobile
+          path: /tmp/skyward-public
+          retention-days: 3

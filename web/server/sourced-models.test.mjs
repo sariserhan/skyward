@@ -5,7 +5,7 @@ import {sourcedCatalog,sourcedModel} from '../src/lib/sourcedModels.ts';
 import {fleetUri,fallbackFleetUri,fleetProfile} from '../src/lib/flightPresentation.ts';
 const base=new URL('../public/',import.meta.url);
 test('sourced aircraft have explicit type mappings, family aliases and honest unsupported-type fallbacks',()=>{
- assert.equal(sourcedCatalog.length,64);
+ assert.equal(sourcedCatalog.length,65);
  for(const [type,id] of [['A320','a320'],['B738','b738'],['B788','b788'],['CRJ9','crj900'],['BCS3','cs300']]){assert.equal(sourcedModel(type).id,id);assert.equal(sourcedModel(type).match,'type');assert.ok(fleetUri({aircraftType:type,callsign:'THY1'}).startsWith('models/sourced/'));}
  assert.equal(sourcedModel('B77W').match,'family');assert.equal(sourcedModel('B77W').id,'b773');
  assert.equal(sourcedModel('B38M').id,'b39m');assert.equal(sourcedModel('B38M').match,'family');assert.equal(sourcedModel('ZZZZ'),null);assert.equal(fleetUri({aircraftType:'B38M',callsign:'RYR1'}),'models/sourced/branded/b39m-RYR-v1.gltf?tail=2');
@@ -24,7 +24,7 @@ test('every converted model has local buffers, bounded geometry, credits, licens
 test('unverified MAX geometry and related variants remain explicit family matches',()=>{for(const type of ['B37M','B38M','B39M','B3XM','A20N','A21N','B78X','AT76'])assert.equal(sourcedModel(type).match,'family');assert.match(sourcedModel('B38M').fidelityNote,/unverified/);});
 
 test('expanded aircraft use dedicated geometry across business, propeller, cargo and rotorcraft categories',()=>{
- for(const [type,id] of [['C750','c750'],['FA50','fa50'],['C182','c182'],['C208','c208'],['PC12','pc12'],['MD11','md11'],['DHC4','dhc4'],['AT75','atr72'],['E75L','e175'],['EC35','ec35']]){assert.equal(sourcedModel(type)?.id,id);assert.equal(sourcedModel(type)?.match,'type');assert.ok(existsSync(new URL(fleetUri({aircraftType:type,callsign:'THY1'}),base)));}
+ for(const [type,id] of [['DC6','dc6'],['C750','c750'],['FA50','fa50'],['C182','c182'],['C208','c208'],['PC12','pc12'],['MD11','md11'],['DHC4','dhc4'],['AT75','atr72'],['E75L','e175'],['EC35','ec35']]){assert.equal(sourcedModel(type)?.id,id);assert.equal(sourcedModel(type)?.match,'type');assert.ok(existsSync(new URL(fleetUri({aircraftType:type,callsign:'THY1'}),base)));}
  assert.equal(sourcedModel('AT76').id,'atr72');assert.equal(sourcedModel('E35L').id,'e145');assert.equal(sourcedModel('GLF6'),null);
  const allTypes=sourcedCatalog.flatMap(m=>m.types);assert.equal(new Set(allTypes).size,allTypes.length,'Each exact type has a single authoritative mapping');
 });

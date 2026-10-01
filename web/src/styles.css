@@ -497,3 +497,8 @@ body>.cesium-credit-lightbox-overlay .cesium-credit-lightbox-close{min-width:36p
 .phone-layout .flight-upgrade-banner>button,.phone-layout .observed-flight-upgrade span:last-child{display:none}
 .phone-layout .flight-compact .flight-voices{display:none}
 .phone-layout .flight-experience header{min-height:44px;margin-bottom:5px}
+
+.welcome-guide .welcome-find{width:100%;margin:0 0 16px;min-height:44px}.welcome-guide button{min-height:44px}.welcome-guide h2{line-height:1.25}
+@media(max-width:759px){.welcome-guide{bottom:var(--welcome-bottom,75px);max-height:calc(100dvh - var(--welcome-bottom,75px) - 16px);width:calc(100vw - 24px)}.welcome-guide>div{gap:6px;flex-wrap:wrap}.welcome-guide p{font-size:14px}}
+
+.flight-control-group .share-panel{position:relative;bottom:auto;right:auto;width:100%;max-width:100%;box-sizing:border-box;margin-top:8px;max-height:45dvh}

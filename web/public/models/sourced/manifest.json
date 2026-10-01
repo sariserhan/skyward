@@ -871,7 +871,7 @@
     },
     {
       "id": "gazl",
-      "label": "Aérospatiale Gazelle",
+      "label": "A\u00e9rospatiale Gazelle",
       "types": [
         "GAZL"
       ],
@@ -1058,6 +1058,23 @@
         "models/sourced/source/flightairmap/b707/misc.png.001.png"
       ],
       "sourceRepository": "https://github.com/Ysurac/FlightAirMap-3dmodels"
+    },
+    {
+      "id": "dc6",
+      "label": "Douglas DC-6B",
+      "types": [
+        "DC6"
+      ],
+      "uri": "models/sourced/dc6-v1.gltf",
+      "length": 31.77,
+      "sourceUrl": "https://raw.githubusercontent.com/FGMEMBERS/dc6/93b85a97efa5274cca16849c72aea5367e309ca2/Models/dc6.ac",
+      "sourceRepository": "https://github.com/FGMEMBERS/dc6",
+      "commit": "93b85a97efa5274cca16849c72aea5367e309ca2",
+      "license": "GPL-2.0",
+      "editableSources": [
+        "models/sourced/source/heritage/dc6/Models/dc6.ac",
+        "models/sourced/source/heritage/dc6/COPYING"
+      ]
     }
   ],
   "files": [
@@ -2355,6 +2372,26 @@
       "sourceUrl": "https://raw.githubusercontent.com/Ysurac/FlightAirMap-3dmodels/0906d9ba1bdd906ce45807e45ed706c09912db19/b707/707.blend",
       "sha256": "3548e1ec59570ab87bdc9a0b665adaacff67b56f73ed549e9a7cf2aff8921d3e",
       "bytes": 1813396
+    },
+    {
+      "path": "source/heritage/dc6/Models/dc6.ac",
+      "sourceUrl": "https://raw.githubusercontent.com/FGMEMBERS/dc6/93b85a97efa5274cca16849c72aea5367e309ca2/Models/dc6.ac",
+      "sha256": "00bfb14636dc40306c62ffc308432ceb9280619a481b0216ba8a255da88aa568"
+    },
+    {
+      "path": "source/heritage/dc6/COPYING",
+      "sourceUrl": "https://raw.githubusercontent.com/FGMEMBERS/dc6/93b85a97efa5274cca16849c72aea5367e309ca2/COPYING",
+      "sha256": "dcc100d4161cc0b7177545ab6e47216f84857cda3843847c792a25289852dcaa"
+    },
+    {
+      "path": "source/heritage/dc6/Models/paint1.png",
+      "sourceUrl": "https://raw.githubusercontent.com/FGMEMBERS/dc6/93b85a97efa5274cca16849c72aea5367e309ca2/Models/paint1.png",
+      "sha256": "73a1b200e70388b0cdf291f9fa2dbc5e449333271f243ec938bb388375413e1b"
+    },
+    {
+      "path": "source/heritage/dc6/README",
+      "sourceUrl": "https://raw.githubusercontent.com/FGMEMBERS/dc6/93b85a97efa5274cca16849c72aea5367e309ca2/README",
+      "sha256": "5394e4826aff3fd982958bb2425c727dba8b455b72a0181d5b148d1c8ca73996"
     }
   ]
 }

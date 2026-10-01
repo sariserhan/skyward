@@ -1,5 +1,7 @@
 # Special-aircraft model and livery search — 1 October 2026
 
+This is the sourcing snapshot before subsequent model imports. See [current installed coverage](special-aircraft-visuals.md) for the latest counts; the DC-6B candidate has since been converted and checked.
+
 **Search completed across all 120 current featured registrations. All exact assets have not been found or integrated.** This is a sourcing audit, not a claim that every aircraft now has its real paint.
 
 - Installed geometry: 64 exact-type matches, 23 family matches, 33 fallbacks after resolving B-18916 from the airline fleet listing.
