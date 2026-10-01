@@ -1,3 +1,5 @@
+import {fileFlightCatalog} from './published-flights-node.mjs';
+import {flightPublicationPath} from './published-flights.mjs';
 import {createSpecialFlights} from './special-flights.mjs';
 import {airframePage,airframeDocument} from './airframe-pages.mjs';
 import {SITE_ORIGIN} from './site.mjs';
@@ -34,6 +36,8 @@ const membership=await createConfiguredMembership({observations:()=>{const rows=
 
 const here = dirname(fileURLToPath(import.meta.url));
 const webRoot = resolve(here, '../dist');
+const publishedFlights=fileFlightCatalog(process.env.SKYWARD_FLIGHT_CATALOG_PATH||resolve(here,'../.local/published-flights.json'));
+await publishedFlights.ready;
 const gameRoot = resolve(here, '../../dist/web');
 const tripDiscovery=createTripDiscovery(feed);
 const airportWeather=createAirportWeather();
@@ -61,7 +65,7 @@ export const server = http.createServer(async (req, res) => {
     }
     const aircraftPage=airframePage(url.pathname);
     if(aircraftPage){if(aircraftPage.redirect){res.writeHead(308,{Location:aircraftPage.redirect});return res.end();}res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'public, max-age=300'});return res.end(req.method==='HEAD'?undefined:airframeDocument(aircraftPage,await readFile(resolve(webRoot,'index.html'),'utf8')));}
-    const published=publicPage(url,{SKYWARD_PUBLIC_ORIGIN:SITE_ORIGIN,...process.env});
+    const published=publicPage(url,{SKYWARD_PUBLIC_ORIGIN:SITE_ORIGIN,...process.env},flightPublicationPath(url.pathname)?{flights:await publishedFlights.records()}:{});
     if(published){if(published.location){res.writeHead(published.status,{Location:published.location,'Cache-Control':'no-store'});return res.end();}if(published.observatory)published.body=observatoryDocument(published,await readFile(resolve(webRoot,'index.html'),'utf8'));res.writeHead(published.status,{'Content-Type':published.type,'Cache-Control':published.status===200?'public, max-age=300':'no-store'});return res.end(req.method==='HEAD'?undefined:published.body);}
     if (url.pathname === '/healthz' || url.pathname === '/readyz') {
       try { await stat(resolve(webRoot, 'index.html')); return json(res, 200, { status: 'ok', service: 'skyward', upstream: 'not checked' }); }
@@ -99,7 +103,9 @@ export const server = http.createServer(async (req, res) => {
           const lat = url.searchParams.get('lat')?.trim() ? Number(url.searchParams.get('lat')) : NaN;
           const lon = url.searchParams.get('lon')?.trim() ? Number(url.searchParams.get('lon')) : NaN;
           try { routePath(callsign, lat, lon); } catch (e) { return json(res, 400, { error: e.message }); }
-          return json(res, 200, await feed.route(callsign, lat, lon));
+          const route=await feed.route(callsign,lat,lon);
+          try{await publishedFlights.observe(route,feed,lat,lon);}catch{console.error('Flight publication storage failed; route response remains available.');}
+          return json(res,200,route);
         }
         if (url.pathname === '/api/search') {
           const kind = url.searchParams.get('kind'); const q = url.searchParams.get('q');

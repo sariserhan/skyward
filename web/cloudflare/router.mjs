@@ -1,3 +1,4 @@
+import {flightPublicationPath} from '../server/published-flights.mjs';
 import {airframePage} from '../server/airframe-pages.mjs';
 import {observatoryDocument} from '../server/observatory-document.mjs';
 import {publicPage} from '../server/public-pages.mjs';
@@ -42,7 +43,13 @@ export async function handle(request,env){
  if(path.startsWith('/watch/models/')){const response=await env.ASSETS.fetch(request);return response.status===404?error(404):response;}
  if(['/watch','/watch/','/watch/index.html','/index.html'].includes(path))return Response.redirect(url.origin+'/'+url.search,308);
  if(['/airport-simulation','/flight-simulator'].includes(path))return Response.redirect(url.origin+path+'/'+url.search,308);
- const page=publicPage(url,env);if(page){if(page.location)return new Response(null,{status:page.status,headers:{Location:page.location}});if(page.observatory){const shell=await env.ASSETS.fetch(new Request(new URL('/watch/index.html',url)));if(!shell.ok)return error(503);page.body=observatoryDocument(page,await shell.text());}return new Response(request.method==='HEAD'?null:page.body,{status:page.status,headers:{'Content-Type':page.type,'Cache-Control':page.status===200?'public, max-age=300':'no-store'}});}
+ let page;
+ if(env.COORDINATOR&&flightPublicationPath(path)){
+  const endpoint=new URL('/internal/flight-pages',url);endpoint.searchParams.set('path',path+url.search);
+  const key=new Request(endpoint),cache=globalThis.caches?.default;let response=await cache?.match(key);
+  if(!response){const result=await coordinator(env).fetch(key);if(!result.ok)return error(503);response=new Response(result.body,{headers:{'Content-Type':'application/json','Cache-Control':'public, max-age=300'}});await cache?.put(key,response.clone());}
+  page=await response.json();
+ }else page=publicPage(url,env);if(page){if(page.location)return new Response(null,{status:page.status,headers:{Location:page.location}});if(page.observatory){const shell=await env.ASSETS.fetch(new Request(new URL('/watch/index.html',url)));if(!shell.ok)return error(503);page.body=observatoryDocument(page,await shell.text());}return new Response(request.method==='HEAD'?null:page.body,{status:page.status,headers:{'Content-Type':page.type,'Cache-Control':page.status===200?'public, max-age=300':'no-store'}});}
  const game=path.startsWith('/airport-simulation/'),flight=path==='/flight-simulator/',account=path==='/account/';
  if(game||flight){const access=await (await coordinator(env).fetch(new Request(new URL('/internal/access',url),{headers:request.headers}))).json();if(!access.allowed||game&&path==='/airport-simulation/'&&url.searchParams.get('embed')!=='1')return new Response(request.method==='HEAD'?null:simulatorPage(access),{status:access.status,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'private, no-store','X-Robots-Tag':'noindex'}});if(game)return r2Asset(request,env,'airport-simulation/'+(path.slice('/airport-simulation/'.length)||'index.html'),true);}
  if(path==='/'||account||flight){const response=await env.ASSETS.fetch(new Request(new URL('/watch/index.html',url),{method:request.method}));const headers=new Headers(response.headers);headers.set('Cache-Control','no-store');if(account||flight)headers.set('X-Robots-Tag','noindex, nofollow');return new Response(response.body,{status:response.status,headers});}

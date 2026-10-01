@@ -1,3 +1,5 @@
+import {PublishedFlights,flightPublicationPath} from '../server/published-flights.mjs';
+import {publicPage} from '../server/public-pages.mjs';
 import {createSpecialFlights} from '../server/special-flights.mjs';
 import {createTravelMetrics} from '../server/travel-metrics.mjs';
 import {workerFetch} from './fetch.mjs';
@@ -19,6 +21,8 @@ const json=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control
 export class SkywardCoordinator extends DurableObject{
  constructor(ctx,env){super(ctx,env);this.ctx=ctx;this.env=env;this.tail=Promise.resolve();this.rates=new Map();this.metrics=createTravelMetrics({env});
   this.feed=configuredFeed({env,fetchImpl:workerFetch});this.specialFlights=createSpecialFlights(this.feed.primary);this.weather=createLocalWeather({fetchImpl:workerFetch});this.airportWeather=createAirportWeather({fetchImpl:workerFetch});this.music=createAurowall({env});this.trips=createTripDiscovery(this.feed);
+  this.ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS published_flights(code TEXT PRIMARY KEY,body TEXT NOT NULL)');
+  this.publishedFlights=new PublishedFlights({load:async()=>[...this.ctx.storage.sql.exec('SELECT body FROM published_flights')].map(r=>JSON.parse(r.body)),save:async record=>{this.ctx.storage.sql.exec('INSERT INTO published_flights(code,body) VALUES(?,?) ON CONFLICT(code) DO UPDATE SET body=excluded.body',record.code,JSON.stringify(record));}});
   this.ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS daily_budget(day TEXT PRIMARY KEY,requests INTEGER NOT NULL)');
   if(env.BETTER_AUTH_SECRET&&env.RESEND_API_KEY){
    this.auth=createD1Auth(env,{waitUntil:p=>ctx.waitUntil(p)});const {pool,transaction}=d1Pool(env.DB);
@@ -36,6 +40,7 @@ export class SkywardCoordinator extends DurableObject{
     await this.env.DB.batch([this.env.DB.prepare('DELETE FROM user WHERE id IN (SELECT id FROM user WHERE emailVerified=0 AND createdAt < ? LIMIT 100)').bind(new Date(Date.now()-7*86400000).toISOString()),this.env.DB.prepare('DELETE FROM session WHERE id IN (SELECT id FROM session WHERE expiresAt < ? LIMIT 200)').bind(new Date().toISOString()),this.env.DB.prepare('DELETE FROM verification WHERE id IN (SELECT id FROM verification WHERE expiresAt < ? LIMIT 200)').bind(new Date().toISOString()),this.env.DB.prepare('DELETE FROM rateLimit WHERE key IN (SELECT key FROM rateLimit WHERE lastRequest < ? LIMIT 500)').bind(Date.now()-86400000)]);
     this.ctx.storage.sql.exec('DELETE FROM daily_budget WHERE day < ?',day);return json({ok:true});
    }
+   if(path==='/internal/flight-pages'){const target=new URL(url.searchParams.get('path')||'/',this.env.SKYWARD_PUBLIC_ORIGIN);if(!flightPublicationPath(target.pathname))return json({error:'Not found'},404);return json(publicPage(target,this.env,{flights:await this.publishedFlights.records()}));}
    if(path==='/internal/access'){const response=await nodeHandler(request,async(req,res)=>{const access=await this.membership?.simulatorAccess(req)??{allowed:false,status:401};res.writeHead(200,{'Content-Type':'application/json'});res.end(JSON.stringify(access));return true;});return response;}
    const ip=request.headers.get('cf-connecting-ip')||'local',now=Date.now(),old=this.rates.get(ip),rate=old&&now-old.at<60000?old:{at:now,count:0};rate.count++;this.rates.set(ip,rate);if(this.rates.size>1000)this.rates.delete(this.rates.keys().next().value);if(rate.count>120)return json({error:'Please wait before refreshing.'},429);
    if(path==='/api/travel-metrics')return nodeHandler(request,(req,res,u)=>this.metrics.handle(req,res,u));
@@ -46,7 +51,7 @@ export class SkywardCoordinator extends DurableObject{
    if(path==='/api/special-flights')return json(await this.specialFlights());
    if(path==='/api/area'){const values=['lat','lon','radius'].map(k=>url.searchParams.has(k)&&url.searchParams.get(k).trim()?Number(url.searchParams.get(k)):NaN);valid(()=>cameraAreaPath(...values));return json(await this.feed.cameraArea(...values));}
    if(path==='/api/aircraft'){const id=url.searchParams.get('airport');if(!Object.hasOwn(AIRPORTS,id))return json({error:'Choose an airport'},400);return json(await this.feed.area(id));}
-   if(path==='/api/route'){const args=[url.searchParams.get('callsign'),Number(url.searchParams.get('lat')),Number(url.searchParams.get('lon'))];valid(()=>routePath(...args));return json(await this.feed.route(...args));}
+   if(path==='/api/route'){const args=[url.searchParams.get('callsign'),Number(url.searchParams.get('lat')),Number(url.searchParams.get('lon'))];valid(()=>routePath(...args));const route=await this.feed.route(...args);try{await this.publishedFlights.observe(route,this.feed,args[1],args[2]);}catch{console.error('Flight publication storage failed; route response remains available.');}return json(route);}
    if(path==='/api/search'){const args=[url.searchParams.get('kind'),url.searchParams.get('q')];valid(()=>searchPath(...args));return json(await this.feed.search(...args));}
    if(path==='/api/status'){const {totalMs,...stats}=this.feed.stats;return json({...stats,sources:this.feed.sources,pending:this.feed.pending.size,meanProviderMs:stats.started?Math.round(totalMs/stats.started):0});}
    if(path==='/api/feed-sources')return json({sources:this.feed.sources});

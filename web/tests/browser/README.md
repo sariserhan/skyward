@@ -123,3 +123,9 @@ also be started manually; browser tooling is installed separately from app depen
 tower, radar, tracked-flight, and external simulator zoom buttons. It verifies
 camera changes, disabled limits, retained flight tracking, and mobile layout,
 with screenshots saved under the temporary directory or `SKYWARD_QA_ARTIFACTS`.
+
+`npm run test:flight-publication` uses the same Node Playwright setup and an
+isolated fixture catalog to verify published flight HTML with JavaScript enabled
+and disabled, desktop/mobile layout, directory links, canonical metadata,
+sitemap inclusion, and shared camera fragments. Reference pages must make zero
+aviation API requests. Fixture data stays in a temporary directory.
