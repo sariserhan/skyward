@@ -10,6 +10,12 @@ uniform float cityLightStrength;
 in vec2 v_textureCoordinates;
 void main(){
  vec4 color=texture(colorTexture,v_textureCoordinates);
+ // Aircraft keep their own solar/material lighting across the horizon.
+ // Selection uses Cesium's visible-fragment ID buffer, so terrain occlusion
+ // and gaps between wings/gear remain correct (no screen-space cutout).
+ #ifdef CZM_SELECTED_FEATURE
+ if(czm_selected()){out_FragColor=color;return;}
+ #endif
  // Post-process depthTexture is a depth component, not RGBA-packed globe depth.
  float depth=texture(depthTexture,v_textureCoordinates).r;
  if(depth<=0.0||depth>=1.0){out_FragColor=color;return;}
@@ -44,6 +50,25 @@ void main(){
 }`;
 export function installNightMap(C:typeof Cesium,v:Cesium.Viewer){
  const stage=v.scene.postProcessStages.add(new C.PostProcessStage({name:'skyward-night-readability',fragmentShader:nightReadabilityShader,uniforms:{cityLights:`${import.meta.env.BASE_URL}data/night-lights/black-marble-2016.jpg`,cityLightStrength:()=>{const t=Math.max(0,Math.min(1,(v.camera.positionCartographic.height-300_000)/1_700_000));return t*t*(3-2*t);}}}));
+ // Restrict the ID mask to nearby visible aircraft, not the entire fleet.
+ // Preserve array identity when unchanged to avoid shader/texture rebuilds.
+ let protectedModels:Cesium.Model[]=[];
+ const maskAircraft=()=>{
+  const models:Cesium.Model[]=[];
+  const visit=(primitives:Cesium.PrimitiveCollection)=>{for(let i=0;i<primitives.length;i++){
+   const primitive=primitives.get(i);
+   if(primitive instanceof C.PrimitiveCollection){visit(primitive);continue;}
+   if(!(primitive instanceof C.Model)||!primitive.ready||!primitive.show)continue;
+   const id=typeof primitive.id==='string'?primitive.id:primitive.id?.id;
+   if(typeof id!=='string'||!(id.startsWith('aircraft-')||id==='flight-simulation'))continue;
+   if(C.Cartesian3.distance(v.camera.positionWC,primitive.boundingSphere.center)<5000)models.push(primitive);
+  }};
+  visit(v.scene.primitives);
+  models.sort((a,b)=>C.Cartesian3.distanceSquared(v.camera.positionWC,a.boundingSphere.center)-C.Cartesian3.distanceSquared(v.camera.positionWC,b.boundingSphere.center));
+  models.length=Math.min(models.length,8);
+  if(models.length!==protectedModels.length||models.some(m=>!protectedModels.includes(m))){protectedModels=models;(stage as {selected?:Cesium.Model[]}).selected=models.length?models:undefined;}
+ };
+ const removeMask=v.scene.preRender.addEventListener(maskAircraft);
  let active=true,layer:Cesium.ImageryLayer|undefined;
  const place=()=>{if(!layer)return;if(v.imageryLayers.contains(layer))v.imageryLayers.raiseToTop(layer);else if(hasBaseImagery(v))v.imageryLayers.add(layer);};
  // This global composite resolves roughly 11 km per pixel at the equator.
@@ -60,5 +85,5 @@ export function installNightMap(C:typeof Cesium,v:Cesium.Viewer){
   layer=new C.ImageryLayer(provider,{dayAlpha:0,nightAlpha:.62,brightness:2.0,contrast:1.1});
   nightLayers.add(layer);updateDetail();place();v.scene.requestRender();
  }).catch(()=>{/* Local texture unavailable: retain the readable base map. */});
- return()=>{active=false;onFrame();onLayer();if(!v.isDestroyed()){v.scene.postProcessStages.remove(stage);if(layer&&v.imageryLayers.contains(layer))v.imageryLayers.remove(layer,true);}};
+ return()=>{active=false;removeMask();onFrame();onLayer();if(!v.isDestroyed()){v.scene.postProcessStages.remove(stage);if(layer&&v.imageryLayers.contains(layer))v.imageryLayers.remove(layer,true);}};
 }
