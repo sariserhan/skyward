@@ -1,13 +1,11 @@
 {
-  "finishedAt":"2026-09-30T02:55:33.613514+00:00",
-  "requested":1152,
-  "requests":1,
-  "downloadBytes":0,
-  "stopped":"HTTP 429; stopped; Retry-After=None",
+  "finishedAt":"2026-10-01T00:52:31.746705+00:00",
+  "requested":4,
+  "requests":6,
+  "downloadBytes":246314,
+  "stopped":"Interrupted; checkpoints preserved",
   "outcomes":{
-    "imported":87,
-    "unavailable":36,
-    "not_attempted":1028,
-    "review_required":1
+    "imported":2,
+    "unavailable":2
   }
 }

@@ -9,10 +9,19 @@ export function insideSurface(p:Point,surface:AirportGeometry['surfaces'][number
 export function airportParkingStands(airport:AirportGeometry,clearance=30){
  const c=Math.cos(airport.lat*Math.PI/180),used=new Set<string>();
  const endpoints=(airport.paths??[]).filter(p=>p.kind==='parking_position'&&p.points.length>1).flatMap(p=>[p.points[0],p.points.at(-1)!]);
- return airport.gates.flatMap(g=>{
+
+ const named=airport.gates.flatMap(g=>{
   const point=endpoints.filter(p=>meters(p,g.position,c)<90&&!used.has(p.join('/'))&&groundSegmentClear(airport,{lon:p[0],lat:p[1]},{lon:p[0],lat:p[1]},clearance)).sort((a,b)=>meters(a,g.position,c)-meters(b,g.position,c))[0];
   if(!point)return [];used.add(point.join('/'));return [{label:g.label,position:point}];
  });
+ // Retain safely mapped stands even if gate-name pins are absent or too far away.
+ // Do not manufacture an operational gate assignment from those centerlines.
+ const unassigned=(airport.paths??[]).filter(p=>p.kind==='parking_position'&&p.points.length>1).flatMap((p,i)=>{
+  const point=p.points.at(-1)!;
+  if(used.has(point.join('/'))||!groundSegmentClear(airport,{lon:point[0],lat:point[1]},{lon:point[0],lat:point[1]},clearance))return [];
+  used.add(point.join('/'));return [{label:`unassigned mapped stand ${i+1}`,position:point}];
+ });
+ return [...named,...unassigned];
 }
 /** Decorative short bridges only where a mapped apron joins a nearby terminal.
  * Missing geometry yields no bridge; these are not measured boarding bridges. */

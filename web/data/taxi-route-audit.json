@@ -1,0 +1,8070 @@
+{
+  "clearanceMeters": 30,
+  "scope": "Mapped runway-to-stand connectivity; not live gate assignment or visual certification",
+  "airports": [
+    {
+      "id": "AAC",
+      "total": 2,
+      "mapped": 0,
+      "paths": 23,
+      "gates": 0
+    },
+    {
+      "id": "AAE",
+      "total": 4,
+      "mapped": 4,
+      "paths": 47,
+      "gates": 0
+    },
+    {
+      "id": "AAL",
+      "total": 4,
+      "mapped": 0,
+      "paths": 16,
+      "gates": 0
+    },
+    {
+      "id": "AAN",
+      "total": 2,
+      "mapped": 2,
+      "paths": 189,
+      "gates": 0
+    },
+    {
+      "id": "AAR",
+      "total": 4,
+      "mapped": 3,
+      "paths": 27,
+      "gates": 0
+    },
+    {
+      "id": "ABA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 59,
+      "gates": 0
+    },
+    {
+      "id": "ABB",
+      "total": 0,
+      "mapped": 0,
+      "paths": 18,
+      "gates": 0
+    },
+    {
+      "id": "ABD",
+      "total": 4,
+      "mapped": 0,
+      "paths": 26,
+      "gates": 0
+    },
+    {
+      "id": "ABJ",
+      "total": 2,
+      "mapped": 2,
+      "paths": 139,
+      "gates": 0
+    },
+    {
+      "id": "ABQ",
+      "total": 6,
+      "mapped": 0,
+      "paths": 192,
+      "gates": 24
+    },
+    {
+      "id": "ABV",
+      "total": 2,
+      "mapped": 0,
+      "paths": 67,
+      "gates": 0
+    },
+    {
+      "id": "ABZ",
+      "total": 2,
+      "mapped": 1,
+      "paths": 175,
+      "gates": 13
+    },
+    {
+      "id": "ACA",
+      "total": 4,
+      "mapped": 0,
+      "paths": 70,
+      "gates": 15
+    },
+    {
+      "id": "ACC",
+      "total": 2,
+      "mapped": 0,
+      "paths": 85,
+      "gates": 14
+    },
+    {
+      "id": "ACE",
+      "total": 2,
+      "mapped": 2,
+      "paths": 83,
+      "gates": 12
+    },
+    {
+      "id": "ADB",
+      "total": 4,
+      "mapped": 4,
+      "paths": 246,
+      "gates": 20
+    },
+    {
+      "id": "ADD",
+      "total": 4,
+      "mapped": 4,
+      "paths": 166,
+      "gates": 26
+    },
+    {
+      "id": "ADE",
+      "total": 2,
+      "mapped": 0,
+      "paths": 45,
+      "gates": 0
+    },
+    {
+      "id": "ADJ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 38,
+      "gates": 1
+    },
+    {
+      "id": "ADL",
+      "total": 4,
+      "mapped": 4,
+      "paths": 209,
+      "gates": 49
+    },
+    {
+      "id": "ADZ",
+      "total": 2,
+      "mapped": 1,
+      "paths": 15,
+      "gates": 3
+    },
+    {
+      "id": "AEP",
+      "total": 2,
+      "mapped": 2,
+      "paths": 134,
+      "gates": 20
+    },
+    {
+      "id": "AER",
+      "total": 4,
+      "mapped": 0,
+      "paths": 311,
+      "gates": 27
+    },
+    {
+      "id": "AES",
+      "total": 2,
+      "mapped": 0,
+      "paths": 17,
+      "gates": 3
+    },
+    {
+      "id": "AEY",
+      "total": 2,
+      "mapped": 0,
+      "paths": 8,
+      "gates": 0
+    },
+    {
+      "id": "AGA",
+      "total": 2,
+      "mapped": 2,
+      "paths": 92,
+      "gates": 0
+    },
+    {
+      "id": "AGP",
+      "total": 4,
+      "mapped": 4,
+      "paths": 465,
+      "gates": 24
+    },
+    {
+      "id": "AGT",
+      "total": 2,
+      "mapped": 0,
+      "paths": 40,
+      "gates": 0
+    },
+    {
+      "id": "AGU",
+      "total": 2,
+      "mapped": 0,
+      "paths": 60,
+      "gates": 4
+    },
+    {
+      "id": "AHB",
+      "total": 2,
+      "mapped": 2,
+      "paths": 22,
+      "gates": 0
+    },
+    {
+      "id": "AJF",
+      "total": 2,
+      "mapped": 0,
+      "paths": 32,
+      "gates": 0
+    },
+    {
+      "id": "AKL",
+      "total": 2,
+      "mapped": 2,
+      "paths": 355,
+      "gates": 57
+    },
+    {
+      "id": "AKX",
+      "total": 2,
+      "mapped": 0,
+      "paths": 58,
+      "gates": 2
+    },
+    {
+      "id": "ALA",
+      "total": 4,
+      "mapped": 1,
+      "paths": 366,
+      "gates": 16
+    },
+    {
+      "id": "ALB",
+      "total": 4,
+      "mapped": 4,
+      "paths": 111,
+      "gates": 15
+    },
+    {
+      "id": "ALC",
+      "total": 2,
+      "mapped": 0,
+      "paths": 118,
+      "gates": 84
+    },
+    {
+      "id": "ALG",
+      "total": 4,
+      "mapped": 4,
+      "paths": 283,
+      "gates": 31
+    },
+    {
+      "id": "ALP",
+      "total": 2,
+      "mapped": 0,
+      "paths": 37,
+      "gates": 0
+    },
+    {
+      "id": "AMD",
+      "total": 2,
+      "mapped": 2,
+      "paths": 141,
+      "gates": 10
+    },
+    {
+      "id": "AMM",
+      "total": 4,
+      "mapped": 0,
+      "paths": 144,
+      "gates": 13
+    },
+    {
+      "id": "AMQ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 21,
+      "gates": 0
+    },
+    {
+      "id": "AMS",
+      "total": 12,
+      "mapped": 12,
+      "paths": 727,
+      "gates": 140
+    },
+    {
+      "id": "ANC",
+      "total": 6,
+      "mapped": 6,
+      "paths": 394,
+      "gates": 36
+    },
+    {
+      "id": "ANF",
+      "total": 2,
+      "mapped": 0,
+      "paths": 47,
+      "gates": 4
+    },
+    {
+      "id": "ANU",
+      "total": 2,
+      "mapped": 0,
+      "paths": 23,
+      "gates": 0
+    },
+    {
+      "id": "AOE",
+      "total": 2,
+      "mapped": 2,
+      "paths": 16,
+      "gates": 0
+    },
+    {
+      "id": "AOJ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 39,
+      "gates": 0
+    },
+    {
+      "id": "APL",
+      "total": 4,
+      "mapped": 0,
+      "paths": 21,
+      "gates": 0
+    },
+    {
+      "id": "APW",
+      "total": 2,
+      "mapped": 0,
+      "paths": 7,
+      "gates": 0
+    },
+    {
+      "id": "AQI",
+      "total": 2,
+      "mapped": 0,
+      "paths": 7,
+      "gates": 0
+    },
+    {
+      "id": "AQJ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 97,
+      "gates": 0
+    },
+    {
+      "id": "AQP",
+      "total": 2,
+      "mapped": 2,
+      "paths": 20,
+      "gates": 4
+    },
+    {
+      "id": "ARN",
+      "total": 6,
+      "mapped": 5,
+      "paths": 342,
+      "gates": 58
+    },
+    {
+      "id": "ASB",
+      "total": 4,
+      "mapped": 4,
+      "paths": 252,
+      "gates": 15
+    },
+    {
+      "id": "ASF",
+      "total": 4,
+      "mapped": 0,
+      "paths": 84,
+      "gates": 0
+    },
+    {
+      "id": "ASR",
+      "total": 2,
+      "mapped": 1,
+      "paths": 38,
+      "gates": 0
+    },
+    {
+      "id": "ASU",
+      "total": 2,
+      "mapped": 2,
+      "paths": 110,
+      "gates": 0
+    },
+    {
+      "id": "ASW",
+      "total": 2,
+      "mapped": 2,
+      "paths": 124,
+      "gates": 4
+    },
+    {
+      "id": "ATH",
+      "total": 4,
+      "mapped": 4,
+      "paths": 256,
+      "gates": 53
+    },
+    {
+      "id": "ATL",
+      "total": 10,
+      "mapped": 10,
+      "paths": 735,
+      "gates": 201
+    },
+    {
+      "id": "ATQ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 105,
+      "gates": 0
+    },
+    {
+      "id": "ATZ",
+      "total": 2,
+      "mapped": 2,
+      "paths": 56,
+      "gates": 0
+    },
+    {
+      "id": "AUA",
+      "total": 2,
+      "mapped": 2,
+      "paths": 142,
+      "gates": 8
+    },
+    {
+      "id": "AUH",
+      "total": 4,
+      "mapped": 4,
+      "paths": 691,
+      "gates": 95
+    },
+    {
+      "id": "AUS",
+      "total": 4,
+      "mapped": 4,
+      "paths": 209,
+      "gates": 40
+    },
+    {
+      "id": "AVV",
+      "total": 2,
+      "mapped": 2,
+      "paths": 41,
+      "gates": 6
+    },
+    {
+      "id": "AWA",
+      "total": 2,
+      "mapped": 1,
+      "paths": 8,
+      "gates": 0
+    },
+    {
+      "id": "AWZ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 34,
+      "gates": 0
+    },
+    {
+      "id": "AYT",
+      "total": 6,
+      "mapped": 4,
+      "paths": 748,
+      "gates": 29
+    },
+    {
+      "id": "BAH",
+      "total": 4,
+      "mapped": 0,
+      "paths": 132,
+      "gates": 27
+    },
+    {
+      "id": "BAQ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BAV",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BAX",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BBI",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BBK",
+      "total": 2,
+      "mapped": 0,
+      "paths": 30,
+      "gates": 0
+    },
+    {
+      "id": "BBU",
+      "total": 2,
+      "mapped": 2,
+      "paths": 90,
+      "gates": 0
+    },
+    {
+      "id": "BCD",
+      "total": 0,
+      "mapped": 0,
+      "paths": 20,
+      "gates": 3
+    },
+    {
+      "id": "BCM",
+      "total": 2,
+      "mapped": 2,
+      "paths": 15,
+      "gates": 0
+    },
+    {
+      "id": "BCN",
+      "total": 6,
+      "mapped": 6,
+      "paths": 699,
+      "gates": 73
+    },
+    {
+      "id": "BCU",
+      "total": 0,
+      "mapped": 0,
+      "paths": 5,
+      "gates": 0
+    },
+    {
+      "id": "BDA",
+      "total": 2,
+      "mapped": 2,
+      "paths": 84,
+      "gates": 6
+    },
+    {
+      "id": "BDJ",
+      "total": 2,
+      "mapped": 1,
+      "paths": 41,
+      "gates": 5
+    },
+    {
+      "id": "BDL",
+      "total": 4,
+      "mapped": 0,
+      "paths": 157,
+      "gates": 0
+    },
+    {
+      "id": "BDQ",
+      "total": 2,
+      "mapped": 1,
+      "paths": 30,
+      "gates": 0
+    },
+    {
+      "id": "BDS",
+      "total": 4,
+      "mapped": 0,
+      "paths": 15,
+      "gates": 0
+    },
+    {
+      "id": "BEG",
+      "total": 4,
+      "mapped": 4,
+      "paths": 199,
+      "gates": 31
+    },
+    {
+      "id": "BEL",
+      "total": 4,
+      "mapped": 3,
+      "paths": 149,
+      "gates": 20
+    },
+    {
+      "id": "BEM",
+      "total": 2,
+      "mapped": 0,
+      "paths": 9,
+      "gates": 0
+    },
+    {
+      "id": "BEN",
+      "total": 4,
+      "mapped": 4,
+      "paths": 48,
+      "gates": 0
+    },
+    {
+      "id": "BER",
+      "total": 4,
+      "mapped": 4,
+      "paths": 381,
+      "gates": 44
+    },
+    {
+      "id": "BES",
+      "total": 4,
+      "mapped": 2,
+      "paths": 60,
+      "gates": 9
+    },
+    {
+      "id": "BEW",
+      "total": 2,
+      "mapped": 0,
+      "paths": 91,
+      "gates": 0
+    },
+    {
+      "id": "BEY",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BFN",
+      "total": 4,
+      "mapped": 0,
+      "paths": 169,
+      "gates": 0
+    },
+    {
+      "id": "BFS",
+      "total": 4,
+      "mapped": 4,
+      "paths": 121,
+      "gates": 15
+    },
+    {
+      "id": "BGF",
+      "total": 2,
+      "mapped": 0,
+      "paths": 20,
+      "gates": 0
+    },
+    {
+      "id": "BGI",
+      "total": 2,
+      "mapped": 2,
+      "paths": 58,
+      "gates": 0
+    },
+    {
+      "id": "BGO",
+      "total": 2,
+      "mapped": 2,
+      "paths": 134,
+      "gates": 23
+    },
+    {
+      "id": "BGW",
+      "total": 4,
+      "mapped": 4,
+      "paths": 123,
+      "gates": 36
+    },
+    {
+      "id": "BGY",
+      "total": 4,
+      "mapped": 2,
+      "paths": 68,
+      "gates": 27
+    },
+    {
+      "id": "BHK",
+      "total": 2,
+      "mapped": 0,
+      "paths": 48,
+      "gates": 3
+    },
+    {
+      "id": "BHM",
+      "total": 4,
+      "mapped": 4,
+      "paths": 249,
+      "gates": 19
+    },
+    {
+      "id": "BHO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 26,
+      "gates": 0
+    },
+    {
+      "id": "BHX",
+      "total": 2,
+      "mapped": 2,
+      "paths": 190,
+      "gates": 54
+    },
+    {
+      "id": "BIA",
+      "total": 2,
+      "mapped": 2,
+      "paths": 115,
+      "gates": 4
+    },
+    {
+      "id": "BIO",
+      "total": 4,
+      "mapped": 3,
+      "paths": 93,
+      "gates": 16
+    },
+    {
+      "id": "BJA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 22,
+      "gates": 0
+    },
+    {
+      "id": "BJL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BJM",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BJV",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BJX",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BKI",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BKK",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BKO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BLA",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BLJ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BLL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BLQ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BLR",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BLZ",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BME",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BNA",
+      "total": 8,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BND",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BNE",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BNX",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BOD",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BOG",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BOI",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BOJ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BOM",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BON",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BOO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BOS",
+      "total": 12,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BOY",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BPN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BPS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BQT",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BRC",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BRE",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BRI",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BRM",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BRS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BRU",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BSA",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BSB",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BSG",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BSK",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BSL",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BSR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BSZ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BTH",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BTJ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BTS",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BUD",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BUF",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BUQ",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BUR",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BUS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BVA",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BVB",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BVC",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BWA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BWI",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BWN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BXY",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BZE",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "BZV",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CA-1291",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CA-1292",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CAG",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CAI",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CAN",
+      "total": 10,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CAP",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CAY",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CBB",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CCJ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CCK",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CCP",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CCS",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CCU",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CDG",
+      "total": 10,
+      "mapped": 9,
+      "paths": 1257,
+      "gates": 299
+    },
+    {
+      "id": "CEB",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CEI",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CEK",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CFE",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CFK",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CFU",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CGB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CGH",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CGK",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CGN",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CGO",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CGP",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CGQ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CGY",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CHC",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CHQ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CHS",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CIA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CIT",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CIX",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CJB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CJJ",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CJS",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CJU",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CKG",
+      "total": 8,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CKY",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CLE",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CLJ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CLO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CLT",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CMB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CMH",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CMN",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CMW",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CND",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CNF",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CNN",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CNS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CNX",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "COK",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "COO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "COR",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "COS",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "COV",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CPH",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CPT",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CRA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CRD",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CRK",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CRL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CRZ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CSX",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CTA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CTG",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CTS",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CTU",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CUL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CUN",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CUR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CUU",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CUZ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CVG",
+      "total": 8,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CWB",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CWL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CXI",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CXR",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CZL",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "CZM",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DAC",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DAD",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DAL",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DAM",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DAR",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DAT",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DBB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DBV",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DCA",
+      "total": 6,
+      "mapped": 6,
+      "paths": 242,
+      "gates": 59
+    },
+    {
+      "id": "DEB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DEL",
+      "total": 8,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DEN",
+      "total": 12,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DFW",
+      "total": 14,
+      "mapped": 0,
+      "paths": 460,
+      "gates": 168
+    },
+    {
+      "id": "DIA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DIL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DIR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DJE",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DJG",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DJJ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DJT",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DLA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DLC",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DLM",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DMB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DME",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DMK",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DMM",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DNH",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DOH",
+      "total": 4,
+      "mapped": 4,
+      "paths": 610,
+      "gates": 107
+    },
+    {
+      "id": "DPS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DQM",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DRP",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DRS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DRW",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DSM",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DSN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DSS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DSY",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DTM",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DTW",
+      "total": 12,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DUB",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DUR",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DUS",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DVO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DWC",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DXB",
+      "total": 4,
+      "mapped": 4,
+      "paths": 1050,
+      "gates": 113
+    },
+    {
+      "id": "DXN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DYG",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DYU",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DZA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "DZN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "EBB",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "EBL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ECN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "EDI",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "EDL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "EDO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "EHU",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "EIN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "EIS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ELP",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ELQ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ELS",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "EMA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ENO",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ENU",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ERF",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ESB",
+      "total": 4,
+      "mapped": 4,
+      "paths": 310,
+      "gates": 20
+    },
+    {
+      "id": "ESM",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ETM",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "EUN",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "EVE",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "EVN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "EWR",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "EZE",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FAE",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FAO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FAT",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FBM",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FCO",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FDF",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FDH",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FEZ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FIH",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FJR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FKB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FKI",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FLL",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FLN",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FLR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FMM",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FMO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FNA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FNC",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FNJ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FOC",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FOR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FPO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FRA",
+      "total": 8,
+      "mapped": 7,
+      "paths": 1030,
+      "gates": 122
+    },
+    {
+      "id": "FRW",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FSC",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FSZ",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FUE",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "FUK",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GAN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GAU",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GBE",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GCM",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GDL",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GDN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GEG",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GEO",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GES",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GHV",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GIB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GIG",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GJL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GLA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GMP",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GND",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GNJ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GNY",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GOA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GOH",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GOI",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GOJ",
+      "total": 8,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GOM",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GOT",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GOU",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GOX",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GRJ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GRO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GRQ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GRR",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GRU",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GRV",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GRZ",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GSM",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GSO",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GSV",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GUA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GUM",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GUW",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GVA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GWD",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GXF",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GYD",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GYE",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GYN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "GZT",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HAH",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HAJ",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HAK",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HAM",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HAN",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HAQ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HAS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HAV",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HBA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HBE",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HDY",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HEA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HEL",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HER",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HET",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HFE",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HGA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HGH",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HHN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HIA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HIJ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HIR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HKD",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HKG",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HKT",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HLA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HLD",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HLP",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HMB",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HMO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HND",
+      "total": 8,
+      "mapped": 8,
+      "paths": 1052,
+      "gates": 95
+    },
+    {
+      "id": "HNL",
+      "total": 12,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HOF",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HOG",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HOU",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HPH",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HRB",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HRE",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HRG",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HSA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HSG",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HSN",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HSR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HSS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HTA",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HUI",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HUN",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HUX",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HWR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "HYD",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "IAD",
+      "total": 8,
+      "mapped": 8,
+      "paths": 455,
+      "gates": 130
+    },
+    {
+      "id": "IAH",
+      "total": 10,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "IAR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "IAS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "IBR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "IBZ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ICN",
+      "total": 8,
+      "mapped": 8,
+      "paths": 1072,
+      "gates": 150
+    },
+    {
+      "id": "IDR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "IFN",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "IGU",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "IKA",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "IKT",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "IKU",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ILO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ILR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "IMF",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "INC",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "IND",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "INI",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "INN",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "IOM",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "IPC",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "IPH",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "IQQ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "IQT",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ISB",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ISK",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "IST",
+      "total": 12,
+      "mapped": 11,
+      "paths": 1551,
+      "gates": 87
+    },
+    {
+      "id": "ITM",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "IVL",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "IXB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "IXC",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "IXE",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "IXZ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "JAF",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "JAI",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "JAX",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "JCL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "JED",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "JFK",
+      "total": 8,
+      "mapped": 8,
+      "paths": 475,
+      "gates": 137
+    },
+    {
+      "id": "JGN",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "JHB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "JHG",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "JIB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "JIJ",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "JJN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "JNB",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "JPA",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "JRO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "JTR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "JUB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "JUJ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "JUL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KAD",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KAN",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KBL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KBV",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KCH",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KCZ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KDH",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KDU",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KEF",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KEJ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KER",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KGD",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KGF",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KGL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KGS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KHG",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KHH",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KHI",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KHN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KIH",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KIJ",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KIK",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KIM",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KIN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KIS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KIX",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KJA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KKJ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KLO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KLU",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KLV",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KMG",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KMI",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KMJ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KMQ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KMS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KNO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KOA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KOJ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KOS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KOV",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KQT",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KRK",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KRN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KRR",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KRS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KRT",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KSA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KSF",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KSN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KTI",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KTM",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KTT",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KTW",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KUF",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KUL",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KUN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KUO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KUT",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KVA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KWE",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KWI",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KWL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KYA",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KZN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "KZO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LAD",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LAE",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LAO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LAQ",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LAS",
+      "total": 8,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LAX",
+      "total": 8,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LBA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LBD",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LBV",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LCA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LCJ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LED",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LEJ",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LFW",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LGA",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LGB",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LGK",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LGW",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LHE",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LHR",
+      "total": 4,
+      "mapped": 4,
+      "paths": 721,
+      "gates": 147
+    },
+    {
+      "id": "LHW",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LIH",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LIL",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LIM",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LIN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LIR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LIS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LJG",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LJU",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LKO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LLA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LLW",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LNZ",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LOP",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LOS",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LPA",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LPB",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LPI",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LPL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LPP",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LPQ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LRM",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LTN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LTO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LUN",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LUX",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LUZ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LVI",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LWN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LXA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LXR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LYA",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LYG",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LYP",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "LYS",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MAA",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MAD",
+      "total": 8,
+      "mapped": 6,
+      "paths": 1174,
+      "gates": 104
+    },
+    {
+      "id": "MAH",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MAJ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MAN",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MAO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MAR",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MBA",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MBJ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MCI",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MCO",
+      "total": 8,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MCT",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MCX",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MCY",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MCZ",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MDC",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MDE",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MDL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MDW",
+      "total": 8,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MDZ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MED",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MEL",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MEM",
+      "total": 8,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MEX",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MFM",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MFU",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MGA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MGQ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MHD",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MIA",
+      "total": 8,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MID",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MIU",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MJI",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MJN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MKE",
+      "total": 10,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MLA",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MLE",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MLM",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MMK",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MMX",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MNI",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MNL",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MPL",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MPM",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MQF",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MQP",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MRS",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MRU",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MRV",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MSP",
+      "total": 8,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MSQ",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MST",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MSU",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MSY",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MTY",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MUB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MUC",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MUH",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MUX",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MVD",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MWX",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MWZ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MXP",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MYJ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MYR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MZG",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MZR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "MZT",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NAG",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NAJ",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NAN",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NAP",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NAS",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NAT",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NAV",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NBJ",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NBO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NCE",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NCL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NCU",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NDB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NDG",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NDJ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NDR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NG-0005",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NGB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NGO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NGS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NIM",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NJC",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NJF",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NKC",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NKG",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NLA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NLU",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NMA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NMI",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NNG",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NOC",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NOS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NOU",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NQN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NQZ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NRN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NRT",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NSI",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NSK",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NTE",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NTL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NUE",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NUM",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NVT",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NYO",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "NYT",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OAK",
+      "total": 8,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OAX",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OCS",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ODE",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OEC",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OGG",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OHD",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OHS",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OKA",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OKC",
+      "total": 8,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OKJ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OLB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OMA",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OMO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OMR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OMS",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ONT",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OOL",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OPO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ORD",
+      "total": 16,
+      "mapped": 0,
+      "paths": 1139,
+      "gates": 219
+    },
+    {
+      "id": "ORF",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ORK",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ORN",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ORU",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ORY",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OSL",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OSR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OSS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OST",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OTP",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OUA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OUD",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OUL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OVB",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OVD",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OXB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OZG",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "OZZ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PAD",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PAP",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PBC",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PBH",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PBM",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PCL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PDG",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PDL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PDV",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PDX",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PED",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PEE",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PEG",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PEK",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PEN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PER",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PEV",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PEW",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PFO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PHC",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PHE",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PHH",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PHL",
+      "total": 8,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PHX",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PIE",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PIK",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PIT",
+      "total": 8,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PKC",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PKX",
+      "total": 8,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PKZ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PLQ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PLS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PLX",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PLZ",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PMC",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PMI",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PMO",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PMV",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PNK",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PNQ",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PNR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PNS",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "POA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "POG",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "POM",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "POS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "POZ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PPG",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PPK",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PPS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PPT",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PQC",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PRG",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PRN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PSA",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PSD",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PSP",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PSR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PTG",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PTP",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PTY",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PUJ",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PUQ",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PUS",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PUY",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PVD",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PVG",
+      "total": 8,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PVH",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PVR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PWM",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PWQ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PYK",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PZO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "PZU",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "QRO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RAI",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RAK",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RAR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RBA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RBR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RDU",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "REC",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RES",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "REU",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RGL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RGN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RHO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RIC",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RIX",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RIY",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RJK",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RKT",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RKZ",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RMF",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RMI",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RML",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RMO",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RMQ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RMU",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RNO",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ROB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ROC",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ROP",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ROR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ROS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RSI",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RSW",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RTB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RTM",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RUH",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RUN",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RVN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "RZE",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SAG",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SAH",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SAI",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SAL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SAN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SAP",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SAT",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SAV",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SAW",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SBD",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SBZ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SCL",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SCO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SCQ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SCR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SCU",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SCV",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SDF",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SDJ",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SDQ",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SDU",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SEA",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SEZ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SFB",
+      "total": 8,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SFO",
+      "total": 8,
+      "mapped": 8,
+      "paths": 521,
+      "gates": 121
+    },
+    {
+      "id": "SFS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SGC",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SGN",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SHA",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SHE",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SHJ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SHO",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SID",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SIN",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SJC",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SJD",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SJJ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SJO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SJU",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SJW",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SKB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SKD",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SKG",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SKO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SKP",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SKT",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SKX",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SLA",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SLC",
+      "total": 8,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SLL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SLZ",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SMF",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SNA",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SNC",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SNN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SNU",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SOC",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SOF",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SPU",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SPX",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SRE",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SRG",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SRQ",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SSA",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SSG",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SSH",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "STI",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "STL",
+      "total": 8,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "STN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "STR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "STT",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "STV",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SUB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SUF",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SUV",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SVD",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SVG",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SVO",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SVQ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SVX",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SWA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SXB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SXM",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SXR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SYD",
+      "total": 6,
+      "mapped": 6,
+      "paths": 575,
+      "gates": 73
+    },
+    {
+      "id": "SYR",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SYX",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SYZ",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SZB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SZG",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SZX",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "SZZ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TAB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TAE",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TAG",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TAK",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TAO",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TAS",
+      "total": 4,
+      "mapped": 3,
+      "paths": 287,
+      "gates": 5
+    },
+    {
+      "id": "TAZ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TBS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TBU",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TBZ",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TET",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TFN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TFS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TFU",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TGD",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "THR",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TIA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TIF",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TIJ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TIR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TJM",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TJU",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TKK",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TKS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TKU",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TLC",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TLL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TLM",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TLS",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TLV",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TML",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TMM",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TMP",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TMR",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TMS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TNA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TNG",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TNN",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TNR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TOF",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TOM",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TOS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TPA",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TPE",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TQO",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TRD",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TRF",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TRN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TRS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TRU",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TRV",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TRW",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TRZ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TSA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TSF",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TSN",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TSR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TTU",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TUC",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TUK",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TUL",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TUN",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TUS",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TUU",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TXN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TYN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TYS",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "TZL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "UBN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "UET",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "UFA",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "UGC",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "UIO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "UKB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "UKK",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ULH",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "UME",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "UPG",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "URA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "URC",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "USM",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "UTH",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "UTP",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "UUD",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "UUS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "UVF",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "UYU",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VAA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VAR",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VAV",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VBY",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VCA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VCE",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VCP",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VER",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VFA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VGA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VIE",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VIL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VIX",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VKO",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VLC",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VLI",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VLN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VNO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VNS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VOG",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VRA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VRN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VSA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VST",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VTE",
+      "total": 2,
+      "mapped": 0,
+      "paths": 117,
+      "gates": 6
+    },
+    {
+      "id": "VTZ",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VVI",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VVO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "VXE",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "WAW",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "WDH",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "WLG",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "WLS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "WMI",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "WNZ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "WRO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "WTB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "WUH",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "WUX",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "WVB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "XBJ",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "XIY",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "XMN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "XNN",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "XPL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "YAP",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "YCU",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "YEG",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "YHM",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "YHZ",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "YIA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "YIW",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "YKS",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "YLW",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "YNB",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "YNT",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "YNY",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "YNZ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "YOW",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "YQB",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "YQG",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "YUL",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "YVR",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "YWG",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "YXE",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "YYC",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "YYJ",
+      "total": 6,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "YYT",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "YYZ",
+      "total": 10,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ZAD",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ZAG",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ZAH",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ZAM",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ZAZ",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ZCO",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ZHA",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ZIA",
+      "total": 0,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ZIH",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ZNZ",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ZQN",
+      "total": 4,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ZRH",
+      "total": 8,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ZSA",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ZSE",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ZUH",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    },
+    {
+      "id": "ZYL",
+      "total": 2,
+      "mapped": 0,
+      "paths": 0,
+      "gates": 0
+    }
+  ]
+}

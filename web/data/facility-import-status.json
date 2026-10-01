@@ -114,10 +114,10 @@
     "status":"imported"
   },
   "LAX":{
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "recordedAt":"2026-09-27T03:15:41.752890+00:00",
-    "retryAfter":null,
-    "status":"unavailable"
+    "status":"unavailable",
+    "recordedAt":"2026-10-01T00:49:25.113723+00:00",
+    "reason":"Incomplete Overpass response: runtime error: Query timed out in \"query\" at line 1 after 46 seconds.",
+    "importerVersion":2
   },
   "LHR":{
     "buildings":207,
@@ -134,11 +134,10 @@
     "status":"imported"
   },
   "ORD":{
-    "buildings":581,
-    "gates":219,
-    "recordedAt":"2026-09-27T02:51:25.422126+00:00",
-    "retrievedAt":"2026-09-27T02:43:42.535908+00:00",
-    "status":"imported"
+    "status":"unavailable",
+    "recordedAt":"2026-10-01T00:49:25.113726+00:00",
+    "reason":"Incomplete Overpass response: runtime error: Query timed out in \"query\" at line 1 after 46 seconds.",
+    "importerVersion":2
   },
   "SIN":{
     "reason":"HTTP Error 504: Gateway Timeout",
@@ -1811,194 +1810,792 @@
   },
   "BAQ":{
     "status":"unavailable",
-    "recordedAt":"2026-09-30T02:51:34.546118+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
+    "recordedAt":"2026-10-01T00:49:25.113729+00:00",
+    "reason":"Incomplete Overpass response: runtime error: Query timed out in \"query\" at line 1 after 46 seconds.",
     "importerVersion":2
   },
   "BAV":{
     "status":"unavailable",
-    "recordedAt":"2026-09-30T02:51:34.546143+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
+    "recordedAt":"2026-10-01T00:49:25.113731+00:00",
+    "reason":"Incomplete Overpass response: runtime error: Query timed out in \"query\" at line 1 after 46 seconds.",
     "importerVersion":2
   },
   "BAX":{
     "status":"unavailable",
-    "recordedAt":"2026-09-30T02:51:34.546149+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
+    "recordedAt":"2026-10-01T00:49:25.113733+00:00",
+    "reason":"Incomplete Overpass response: runtime error: Query timed out in \"query\" at line 1 after 46 seconds.",
     "importerVersion":2
   },
   "BBI":{
     "status":"unavailable",
-    "recordedAt":"2026-09-30T02:51:34.546153+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
+    "recordedAt":"2026-10-01T00:49:25.113734+00:00",
+    "reason":"Incomplete Overpass response: runtime error: Query timed out in \"query\" at line 1 after 46 seconds.",
     "importerVersion":2
   },
   "BBK":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:51:34.546159+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:49:36.998060+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"way/192347460",
+    "audit":{
+      "rejected":{},
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":20,
+      "courtyards":0,
+      "polygonParts":74
+    },
+    "counts":{
+      "surfaces":74,
+      "gates":0,
+      "paths":30
+    },
+    "retrievedAt":"2026-10-01T00:49:36.976830+00:00",
+    "status":"imported",
+    "buildings":72,
+    "gates":0
   },
   "BBU":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:51:34.546163+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:49:37.044419+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"way/84575254",
+    "audit":{
+      "rejected":{},
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":16,
+      "courtyards":0,
+      "polygonParts":100
+    },
+    "counts":{
+      "surfaces":100,
+      "gates":0,
+      "paths":90
+    },
+    "retrievedAt":"2026-10-01T00:49:36.976830+00:00",
+    "status":"imported",
+    "buildings":90,
+    "gates":0
   },
   "BCD":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:51:34.546168+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:49:37.055362+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"way/56298919",
+    "audit":{
+      "rejected":{},
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":15,
+      "courtyards":0,
+      "polygonParts":22
+    },
+    "counts":{
+      "surfaces":22,
+      "gates":3,
+      "paths":20
+    },
+    "retrievedAt":"2026-10-01T00:49:36.976830+00:00",
+    "status":"imported",
+    "buildings":20,
+    "gates":3
   },
   "BCM":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:51:34.546172+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:49:37.065279+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"way/84575502",
+    "audit":{
+      "rejected":{},
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":14,
+      "courtyards":0,
+      "polygonParts":42
+    },
+    "counts":{
+      "surfaces":42,
+      "gates":0,
+      "paths":15
+    },
+    "retrievedAt":"2026-10-01T00:49:36.976830+00:00",
+    "status":"imported",
+    "buildings":39,
+    "gates":0
   },
   "BCN":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:51:34.546177+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:49:37.119445+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"way/314726876",
+    "audit":{
+      "rejected":{
+        "overlapping polygon parts":1
+      },
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":292,
+      "courtyards":4,
+      "polygonParts":53
+    },
+    "counts":{
+      "surfaces":53,
+      "gates":73,
+      "paths":699
+    },
+    "retrievedAt":"2026-10-01T00:49:36.976830+00:00",
+    "status":"imported",
+    "buildings":22,
+    "gates":73
   },
   "BCU":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:51:34.546181+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:49:37.132474+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"way/501791289",
+    "audit":{
+      "rejected":{},
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":4,
+      "courtyards":0,
+      "polygonParts":25
+    },
+    "counts":{
+      "surfaces":25,
+      "gates":0,
+      "paths":5
+    },
+    "retrievedAt":"2026-10-01T00:49:36.976830+00:00",
+    "status":"imported",
+    "buildings":24,
+    "gates":0
   },
   "BDA":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:51:34.546185+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:49:37.156162+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"relation/12500122",
+    "audit":{
+      "rejected":{},
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":47,
+      "courtyards":0,
+      "polygonParts":28
+    },
+    "counts":{
+      "surfaces":28,
+      "gates":6,
+      "paths":84
+    },
+    "retrievedAt":"2026-10-01T00:49:36.976830+00:00",
+    "status":"imported",
+    "buildings":21,
+    "gates":6
   },
   "BDJ":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:51:34.546189+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:49:37.184330+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"way/674050854",
+    "audit":{
+      "rejected":{},
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":35,
+      "courtyards":4,
+      "polygonParts":79
+    },
+    "counts":{
+      "surfaces":79,
+      "gates":5,
+      "paths":41
+    },
+    "retrievedAt":"2026-10-01T00:49:36.976830+00:00",
+    "status":"imported",
+    "buildings":77,
+    "gates":5
   },
   "BDL":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:51:34.546193+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:50:03.810997+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"relation/15539417",
+    "audit":{
+      "rejected":{},
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":123,
+      "courtyards":2,
+      "polygonParts":157
+    },
+    "counts":{
+      "surfaces":157,
+      "gates":0,
+      "paths":157
+    },
+    "retrievedAt":"2026-10-01T00:50:03.763298+00:00",
+    "status":"imported",
+    "buildings":148,
+    "gates":0
   },
   "BDQ":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:51:34.546197+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:50:03.820819+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"way/28851359",
+    "audit":{
+      "rejected":{},
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":34,
+      "courtyards":0,
+      "polygonParts":14
+    },
+    "counts":{
+      "surfaces":14,
+      "gates":0,
+      "paths":30
+    },
+    "retrievedAt":"2026-10-01T00:50:03.763298+00:00",
+    "status":"imported",
+    "buildings":9,
+    "gates":0
   },
   "BDS":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:51:34.546202+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:50:03.894726+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"way/928340267",
+    "audit":{
+      "rejected":{
+        "path_crosses_airport_boundary":3
+      },
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":12,
+      "courtyards":2,
+      "polygonParts":256
+    },
+    "counts":{
+      "surfaces":256,
+      "gates":0,
+      "paths":15
+    },
+    "retrievedAt":"2026-10-01T00:50:03.763298+00:00",
+    "status":"imported",
+    "buildings":242,
+    "gates":0
   },
   "BEG":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:51:34.546206+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:50:03.972369+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"way/238163974",
+    "audit":{
+      "rejected":{},
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":139,
+      "courtyards":0,
+      "polygonParts":103
+    },
+    "counts":{
+      "surfaces":103,
+      "gates":31,
+      "paths":199
+    },
+    "retrievedAt":"2026-10-01T00:50:03.763298+00:00",
+    "status":"imported",
+    "buildings":95,
+    "gates":31
   },
   "BEL":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:52:53.596611+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:50:04.023046+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"way/207073943",
+    "audit":{
+      "rejected":{},
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":121,
+      "courtyards":0,
+      "polygonParts":132
+    },
+    "counts":{
+      "surfaces":132,
+      "gates":20,
+      "paths":149
+    },
+    "retrievedAt":"2026-10-01T00:50:03.763298+00:00",
+    "status":"imported",
+    "buildings":104,
+    "gates":20
   },
   "BEM":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:52:53.596625+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:50:04.030187+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"way/1008285905",
+    "audit":{
+      "rejected":{},
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":7,
+      "courtyards":0,
+      "polygonParts":7
+    },
+    "counts":{
+      "surfaces":7,
+      "gates":0,
+      "paths":9
+    },
+    "retrievedAt":"2026-10-01T00:50:03.763298+00:00",
+    "status":"imported",
+    "buildings":4,
+    "gates":0
   },
   "BEN":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:52:53.596628+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:50:04.102373+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"relation/10736637",
+    "audit":{
+      "rejected":{},
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":32,
+      "courtyards":0,
+      "polygonParts":256
+    },
+    "counts":{
+      "surfaces":256,
+      "gates":0,
+      "paths":48
+    },
+    "retrievedAt":"2026-10-01T00:50:03.763298+00:00",
+    "status":"imported",
+    "buildings":235,
+    "gates":0
   },
   "BER":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:52:53.596630+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:50:04.210873+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"way/859790021",
+    "audit":{
+      "rejected":{
+        "relation has no outer ring":2,
+        "building_crosses_airport_boundary":2
+      },
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":78,
+      "courtyards":3,
+      "polygonParts":172
+    },
+    "counts":{
+      "surfaces":172,
+      "gates":44,
+      "paths":381
+    },
+    "retrievedAt":"2026-10-01T00:50:03.763298+00:00",
+    "status":"imported",
+    "buildings":159,
+    "gates":44
   },
   "BES":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:52:53.596632+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:50:30.938762+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"way/5369273",
+    "audit":{
+      "rejected":{
+        "building_crosses_airport_boundary":1
+      },
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":51,
+      "courtyards":0,
+      "polygonParts":19
+    },
+    "counts":{
+      "surfaces":19,
+      "gates":9,
+      "paths":60
+    },
+    "retrievedAt":"2026-10-01T00:50:24.175659+00:00",
+    "status":"imported",
+    "buildings":12,
+    "gates":9
   },
   "BEW":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:52:53.596634+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:50:30.974616+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"way/326084669",
+    "audit":{
+      "rejected":{},
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":10,
+      "courtyards":0,
+      "polygonParts":114
+    },
+    "counts":{
+      "surfaces":114,
+      "gates":0,
+      "paths":91
+    },
+    "retrievedAt":"2026-10-01T00:50:24.175659+00:00",
+    "status":"imported",
+    "buildings":111,
+    "gates":0
   },
   "BEY":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:52:53.596635+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:50:30.978281+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"way/1551171417",
+    "audit":{
+      "rejected":{},
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":0,
+      "courtyards":0,
+      "polygonParts":0
+    },
+    "counts":{
+      "surfaces":0,
+      "gates":0,
+      "paths":0
+    },
+    "retrievedAt":"2026-10-01T00:50:30.927533+00:00",
+    "status":"empty",
+    "reason":"No validated facilities observed; existing map retained"
   },
   "BFN":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:52:53.596637+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:50:30.990727+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"way/274719750",
+    "audit":{
+      "rejected":{},
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":59,
+      "courtyards":0,
+      "polygonParts":29
+    },
+    "counts":{
+      "surfaces":29,
+      "gates":0,
+      "paths":169
+    },
+    "retrievedAt":"2026-10-01T00:50:24.175659+00:00",
+    "status":"imported",
+    "buildings":25,
+    "gates":0
   },
   "BGF":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:52:53.596639+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:50:31.059860+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"relation/10756531",
+    "audit":{
+      "rejected":{},
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":22,
+      "courtyards":10,
+      "polygonParts":452
+    },
+    "counts":{
+      "surfaces":452,
+      "gates":0,
+      "paths":20
+    },
+    "retrievedAt":"2026-10-01T00:50:24.175659+00:00",
+    "status":"imported",
+    "buildings":447,
+    "gates":0
   },
   "BGI":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:52:53.596640+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:50:31.175887+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"way/52494538",
+    "audit":{
+      "rejected":{},
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":38,
+      "courtyards":0,
+      "polygonParts":68
+    },
+    "counts":{
+      "surfaces":68,
+      "gates":0,
+      "paths":58
+    },
+    "retrievedAt":"2026-10-01T00:50:24.175659+00:00",
+    "status":"imported",
+    "buildings":64,
+    "gates":0
   },
   "BGO":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:52:53.596642+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:50:31.277336+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"relation/6303432",
+    "audit":{
+      "rejected":{},
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":85,
+      "courtyards":0,
+      "polygonParts":74
+    },
+    "counts":{
+      "surfaces":74,
+      "gates":23,
+      "paths":134
+    },
+    "retrievedAt":"2026-10-01T00:50:24.175659+00:00",
+    "status":"imported",
+    "buildings":59,
+    "gates":23
   },
   "BGW":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:52:53.596643+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:50:31.397860+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"way/949531944",
+    "audit":{
+      "rejected":{
+        "path_crosses_airport_boundary":3
+      },
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":45,
+      "courtyards":4,
+      "polygonParts":175
+    },
+    "counts":{
+      "surfaces":175,
+      "gates":36,
+      "paths":123
+    },
+    "retrievedAt":"2026-10-01T00:50:24.175659+00:00",
+    "status":"imported",
+    "buildings":165,
+    "gates":36
   },
   "BGY":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:52:53.596645+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:50:57.549655+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"way/74362857",
+    "audit":{
+      "rejected":{
+        "path_crosses_airport_boundary":1
+      },
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":36,
+      "courtyards":7,
+      "polygonParts":42
+    },
+    "counts":{
+      "surfaces":42,
+      "gates":27,
+      "paths":68
+    },
+    "retrievedAt":"2026-10-01T00:50:57.522354+00:00",
+    "status":"imported",
+    "buildings":39,
+    "gates":27
   },
   "BHK":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:52:53.596646+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:50:57.554653+00:00",
+    "importerVersion":2,
+    "matching":"bounded_aviation_fallback",
+    "boundaryOsmId":null,
+    "audit":{
+      "rejected":{},
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":23,
+      "courtyards":0,
+      "polygonParts":4
+    },
+    "counts":{
+      "surfaces":4,
+      "gates":3,
+      "paths":48
+    },
+    "retrievedAt":"2026-10-01T00:50:57.522354+00:00",
+    "status":"imported",
+    "buildings":2,
+    "gates":3
   },
   "BHM":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:52:53.596648+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:50:57.594238+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"way/224422644",
+    "audit":{
+      "rejected":{},
+      "duplicatesOmitted":6,
+      "isolatedPathEndpoints":137,
+      "courtyards":13,
+      "polygonParts":120
+    },
+    "counts":{
+      "surfaces":120,
+      "gates":19,
+      "paths":249
+    },
+    "retrievedAt":"2026-10-01T00:50:57.522354+00:00",
+    "status":"imported",
+    "buildings":114,
+    "gates":19
   },
   "BHO":{
-    "status":"unavailable",
-    "recordedAt":"2026-09-30T02:52:53.596649+00:00",
-    "reason":"HTTP Error 504: Gateway Timeout",
-    "importerVersion":2
+    "recordedAt":"2026-10-01T00:50:57.615266+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"relation/19448273",
+    "audit":{
+      "rejected":{
+        "overlapping polygon parts":1
+      },
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":14,
+      "courtyards":0,
+      "polygonParts":34
+    },
+    "counts":{
+      "surfaces":34,
+      "gates":0,
+      "paths":26
+    },
+    "retrievedAt":"2026-10-01T00:50:57.522354+00:00",
+    "status":"imported",
+    "buildings":28,
+    "gates":0
+  },
+  "SFO":{
+    "recordedAt":"2026-10-01T00:51:44.196164+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"way/545819287",
+    "audit":{
+      "rejected":{
+        "path_crosses_airport_boundary":1
+      },
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":332,
+      "courtyards":6,
+      "polygonParts":162
+    },
+    "counts":{
+      "surfaces":162,
+      "gates":121,
+      "paths":521
+    },
+    "retrievedAt":"2026-10-01T00:51:44.138344+00:00",
+    "status":"imported",
+    "buildings":145,
+    "gates":121
+  },
+  "DCA":{
+    "recordedAt":"2026-10-01T00:52:05.135102+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"relation/9313825",
+    "audit":{
+      "rejected":{
+        "overlapping polygon parts":1
+      },
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":245,
+      "courtyards":0,
+      "polygonParts":88
+    },
+    "counts":{
+      "surfaces":88,
+      "gates":59,
+      "paths":242
+    },
+    "retrievedAt":"2026-10-01T00:52:05.100847+00:00",
+    "status":"imported",
+    "buildings":80,
+    "gates":59
+  },
+  "BHX":{
+    "recordedAt":"2026-10-01T00:50:57.630840+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"relation/2437117",
+    "audit":{
+      "rejected":{},
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":143,
+      "courtyards":0,
+      "polygonParts":35
+    },
+    "counts":{
+      "surfaces":35,
+      "gates":54,
+      "paths":190
+    },
+    "retrievedAt":"2026-10-01T00:50:57.522354+00:00",
+    "status":"imported",
+    "buildings":29,
+    "gates":54
+  },
+  "BIA":{
+    "recordedAt":"2026-10-01T00:50:57.658449+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"way/42019348",
+    "audit":{
+      "rejected":{},
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":44,
+      "courtyards":0,
+      "polygonParts":46
+    },
+    "counts":{
+      "surfaces":46,
+      "gates":4,
+      "paths":115
+    },
+    "retrievedAt":"2026-10-01T00:50:57.522354+00:00",
+    "status":"imported",
+    "buildings":43,
+    "gates":4
+  },
+  "BIO":{
+    "recordedAt":"2026-10-01T00:50:57.702574+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"way/167055954",
+    "audit":{
+      "rejected":{},
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":67,
+      "courtyards":0,
+      "polygonParts":79
+    },
+    "counts":{
+      "surfaces":79,
+      "gates":16,
+      "paths":93
+    },
+    "retrievedAt":"2026-10-01T00:50:57.522354+00:00",
+    "status":"imported",
+    "buildings":74,
+    "gates":16
+  },
+  "BJA":{
+    "recordedAt":"2026-10-01T00:50:57.715206+00:00",
+    "importerVersion":2,
+    "matching":"icao",
+    "boundaryOsmId":"way/356725163",
+    "audit":{
+      "rejected":{},
+      "duplicatesOmitted":0,
+      "isolatedPathEndpoints":13,
+      "courtyards":0,
+      "polygonParts":28
+    },
+    "counts":{
+      "surfaces":28,
+      "gates":0,
+      "paths":22
+    },
+    "retrievedAt":"2026-10-01T00:50:57.522354+00:00",
+    "status":"imported",
+    "buildings":27,
+    "gates":0
   }
 }

@@ -1,3 +1,4 @@
+import {connectedTaxiPaths} from './taxiConnectivity.ts';
 import {airportParkingStands} from './airportScenery.ts';
 import {groundSegmentClear,groundRouteClear} from './groundSafety.ts';
 import type {AirportGeometry} from '../types.ts';
@@ -11,12 +12,12 @@ const distance=(a:Point,b:Point)=>Math.hypot(a.x-b.x,a.y-b.y);
 export function planTaxi(airport:AirportGeometry,from:{lon:number;lat:number},to:{lon:number;lat:number},clearance=30):TaxiRoute|null{
  const key=`${from.lon}/${from.lat}/${to.lon}/${to.lat}/${clearance}`;let plans=cache.get(airport);if(!plans){plans=new Map();cache.set(airport,plans);}if(plans.has(key))return plans.get(key)!;
  const fail=()=>{plans!.set(key,null);return null;};
- if(!airport.paths?.length||!airport.gates?.length)return fail();
+ if(!airport.paths?.length)return fail();
  const c=Math.cos(airport.lat*Math.PI/180);if(Math.abs(c)<.01)return fail();
  const project=(lon:number,lat:number)=>({x:((lon-airport.lon+540)%360-180)*111120*c,y:(lat-airport.lat)*111120});
  const geo=(p:Point)=>({lon:airport.lon+p.x/(111120*c),lat:airport.lat+p.y/111120});
  const nodes:Node[]=[],ids=new Map<string,number>();
- for(const path of airport.paths){if(!['taxiway','taxilane','parking_position'].includes(path.kind))continue;let previous:number|undefined;
+ for(const path of connectedTaxiPaths(airport)){if(!['taxiway','taxilane','parking_position'].includes(path.kind))continue;let previous:number|undefined;
   for(const [lon,lat] of path.points){if(!Number.isFinite(lon)||!Number.isFinite(lat))return fail();const id=`${lon.toFixed(5)}/${lat.toFixed(5)}`;let index=ids.get(id);
    if(index===undefined){index=nodes.length;ids.set(id,index);nodes.push({...project(lon,lat),lon,lat,parking:false,edges:new Map()});if(nodes.length>20000)return fail();}
    if(path.kind==='parking_position')nodes[index].parking=true;
@@ -28,13 +29,27 @@ export function planTaxi(airport:AirportGeometry,from:{lon:number;lat:number},to
  for(const gate of airportParkingStands(airport,clearance)){const p=project(...gate.position);let best=-1,near=2;nodes.forEach((n,i)=>{const d=distance(p,n);if(n.parking&&d<near){near=d;best=i;}});if(best>=0)gates.set(best,gate.label);}
  if(!gates.size)return fail();
  const a=project(from.lon,from.lat),b=project(to.lon,to.lat),dx=b.x-a.x,dy=b.y-a.y,L=Math.hypot(dx,dy);if(L<400)return fail();
+ // A mapped taxiway may cross the runway between its stored vertices. Seed the
+ // actual intersection instead of requiring an OSM vertex within 30 m of centerline.
+ const count=nodes.length;
+ for(let i=0;i<count;i++)for(const [j] of [...nodes[i].edges]){
+  if(j<=i||j>=count)continue;
+  const p=nodes[i],q=nodes[j],sx=q.x-p.x,sy=q.y-p.y,det=dx*sy-dy*sx;
+  if(Math.abs(det)<.001)continue;
+  const px=p.x-a.x,py=p.y-a.y,t=(px*sy-py*sx)/det,u=(px*dy-py*dx)/det;
+  if(t<.4||t>.9||u<=.001||u>=.999)continue;
+  const v={x:a.x+t*dx,y:a.y+t*dy},position=geo(v);
+  if(!groundSegmentClear(airport,position,position,clearance))continue;
+  const index=nodes.length,node:Node={...v,...position,parking:false,edges:new Map([[i,distance(v,p)],[j,distance(v,q)]])};
+  nodes.push(node);p.edges.set(index,distance(v,p));q.edges.set(index,distance(v,q));
+ }
  const costs=nodes.map(()=>Infinity),parents=nodes.map(()=>-1),roots=nodes.map(()=>-1),stops=new Map<number,Point>();
  const heap:{id:number;cost:number}[]=[];
  const push=(item:{id:number;cost:number})=>{heap.push(item);let i=heap.length-1;while(i){const p=(i-1)>>1;if(heap[p].cost<=item.cost)break;heap[i]=heap[p];i=p;}heap[i]=item;};
  const pop=()=>{const first=heap[0],last=heap.pop()!;if(heap.length){let i=0;while(i*2+1<heap.length){let j=i*2+1;if(j+1<heap.length&&heap[j+1].cost<heap[j].cost)j++;if(heap[j].cost>=last.cost)break;heap[i]=heap[j];i=j;}heap[i]=last;}return first;};
  nodes.forEach((n,i)=>{const t=((n.x-a.x)*dx+(n.y-a.y)*dy)/(L*L),p={x:a.x+t*dx,y:a.y+t*dy};if(t<.4||t>.9||distance(p,n)>30||!groundSegmentClear(airport,geo(p),n,clearance))return;costs[i]=Math.abs(t-.65)*L*.25;roots[i]=i;stops.set(i,p);push({id:i,cost:costs[i]});});
  let end=-1;
- while(heap.length){const current=pop();if(current.cost!==costs[current.id])continue;if(gates.has(current.id)){end=current.id;break;}for(const [next,d] of nodes[current.id].edges){const cost=current.cost+d;if(cost<costs[next]){costs[next]=cost;parents[next]=current.id;roots[next]=roots[current.id];push({id:next,cost});}}}
+ while(heap.length){const current=pop();if(current.cost!==costs[current.id])continue;if(gates.has(current.id)){if(!gates.get(current.id)!.startsWith('unassigned mapped stand ')){end=current.id;break;}if(end<0)end=current.id;}for(const [next,d] of nodes[current.id].edges){const cost=current.cost+d;if(cost<costs[next]){costs[next]=cost;parents[next]=current.id;roots[next]=roots[current.id];push({id:next,cost});}}}
  if(end<0)return fail();
  const chain:Point[]=[];for(let i=end;i>=0;i=parents[i])chain.push(nodes[i]);chain.reverse();const exit=stops.get(roots[end])!,stop={x:exit.x-dx/L*25,y:exit.y-dy/L*25};chain.unshift(exit);chain.unshift(stop);
  for(let i=chain.length-1;i>0;i--)if(distance(chain[i],chain[i-1])<.1)chain.splice(i,1);
