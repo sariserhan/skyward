@@ -1,3 +1,4 @@
+import {airlineNames} from '../src/lib/airlineNames.ts';
 import airportCatalog from '../data/airport-catalog.json' with {type:'json'};
 const airportByCode=new Map(Object.entries(airportCatalog).flatMap(([id,a])=>[[id,a],[a.icao,a]]));
 // AirLabs v9 flight details. Never used by the position-refresh loop.
@@ -32,7 +33,7 @@ export function normalizeFlight(body, expected, now = Date.now()) {
   return {status: expected.date ? 'MATCHED_DATED_FLIGHT' : expected.hex ? 'MATCHED_RECENT_AIRCRAFT' : 'UNVERIFIED_FLIGHT_INSTANCE', flight: {
     callsign: text(r.flight_icao), number: text(r.flight_iata), hex,
     status: text(r.status), departure: endpoint('dep'), arrival: endpoint('arr'),
-    baggage: text(r.arr_baggage), aircraftType: text(r.aircraft_icao),
+    registration: text(r.reg_number), baggage: text(r.arr_baggage), aircraftType: text(r.aircraft_icao),
     positionObservedAt: observed,
   }};
 }
@@ -70,4 +71,15 @@ export async function fetchAirLabsSchedules({apiKey,airport,direction='departure
  let body;try{const r=await fetchImpl(url,{signal:AbortSignal.timeout(8000),redirect:'error'});if(!r.ok)throw Error();body=await r.json();if(body.error||!Array.isArray(body.response))throw Error();}catch{throw Error('Schedule lookup unavailable. No automatic retry was made.');}
  const flights=body.response.slice(0,50).flatMap(r=>{const code=text(r.flight_icao);if(!code||!/^[A-Z]{3}[A-Z0-9]{1,7}$/.test(code))return [];const side=direction==='departures'?'dep':'arr';if(r[`${side}_${lookup.kind}`]!==lookup.code)return [];return [normalizeFlight({response:r},{callsign:code},now).flight].filter(Boolean);});
  return {mode:'live',fetchedAt:now,airport,direction,flights,partial:true,message:'Up to 50 received schedules. Coverage varies; this is not a complete airport timetable.'};
+}
+
+export async function fetchAirLabsAirlineSchedules({apiKey,airline,fetchImpl=fetch,now=Date.now()}){
+ if(!Object.hasOwn(airlineNames,airline)||!apiKey)throw Error('Choose a supported airline.');
+ const url=new URL('https://airlabs.co/api/v9/schedules');url.searchParams.set('airline_icao',airline);url.searchParams.set('limit','50');url.searchParams.set('api_key',apiKey);
+ let body;try{const r=await fetchImpl(url,{signal:AbortSignal.timeout(8000),redirect:'error'});if(!r.ok)throw Error();body=await r.json();if(body.error||!Array.isArray(body.response))throw Error();}catch{throw Error('Airline schedules are unavailable. No automatic retry was made.');}
+ const flights=body.response.slice(0,50).flatMap(r=>{
+  const code=text(r?.flight_icao);if(r?.airline_icao!==airline||!code||!new RegExp('^'+airline+'[A-Z0-9]{1,7}$').test(code))return [];
+  return [normalizeFlight({response:r},{callsign:code},now).flight].filter(Boolean);
+ });
+ return {mode:'live',provider:'AirLabs',airline,fetchedAt:now,flights,partial:true,horizonHours:10};
 }

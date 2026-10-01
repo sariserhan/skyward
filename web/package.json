@@ -89,6 +89,7 @@
     "catalog:import": "node scripts/import-airframes.mjs",
     "check:free-budget": "node --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/check-free-budget.mjs",
     "check:public": "node scripts/check-public-discovery.mjs",
+    "test:airline-board": "npm run build && node tests/browser/airline-board.mjs",
     "test:airport-board": "npm run build && node tests/browser/airport-board.mjs",
     "test:flight-publication": "npm run build && node tests/browser/flight-publication.mjs",
     "test:zoom-controls": "npm run build && node tests/browser/zoom-controls.mjs",

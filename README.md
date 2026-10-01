@@ -655,3 +655,13 @@ Schedules use the existing authenticated `/api/premium/schedules` service and it
 Live rows require the existing AirLabs configuration, verified account-specific permissions in `web/data/airlabs-permissions.json`, and a verified paid subscription. The current permissions file remains unresolved: these pages therefore show an honest unavailable state until the service is configured. All airports have pages, but provider coverage is not guaranteed. Operational boards use `noindex,follow` because their schedule data requires authenticated access; the existing public airport reference pages remain in the sitemap.
 
 Validate with `node --test web/server/airport-board.test.mjs` and `npm --prefix web run test:airport-board` (existing Node Playwright required).
+
+### Airline flight pages
+
+`/airlines/` lists the recognized operator catalog; `/airlines/THY/` opens Turkish Airlines and lowercase paths redirect to the uppercase canonical URL. Airline links are available in public navigation, the globe's tools, aircraft operator labels, and published flight references. Unknown operators return 404.
+
+Each airline board displays all supplied, provider-reported active, or upcoming scheduled flights. Upcoming requires a future scheduled/estimated departure and excludes cancellations; unknown dates remain in All supplied. Rows include ticket/tracking codes, origin/destination, UTC departure and arrival dates, estimates/actual times, aircraft type and registration when supplied, terminal/gate details, and status. Missing future aircraft assignments are never inferred from a callsign's previous aircraft.
+
+The authenticated `/api/premium/airline-schedules` endpoint queries AirLabs by `airline_icao`, validates returned operator/callsign identity, and shares the existing five-minute cache, in-flight coalescing, entitlement checks and paid-request budgets. One explicit check requests at most 50 rows with no automatic pagination or background paid polling. The provider documents a future schedule window of up to 10 hours; this is not a complete or long-range timetable. Filtering loaded results uses no extra requests. Live rows remain disabled until the existing AirLabs permission/configuration requirements are satisfied.
+
+The public airline directory is in the sitemap. Authenticated schedule boards use `noindex,follow`, consistent with airport boards. Verify with `node --test web/server/airline-board.test.mjs` and `npm --prefix web run test:airline-board` using the existing Node Playwright setup.

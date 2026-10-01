@@ -1,3 +1,4 @@
+import {airlineNames} from '../src/lib/airlineNames.ts';
 import {billingConfigured,subscriptionSummary} from './billing-status.mjs';
 import {createStripeWebhook} from './stripe-webhook.mjs';
 import {embeddedCheckout,existingSubscription,stripePrices,configuredPrices,selectedPrice,checkoutPlans,checkoutStatus} from './stripe-checkout.mjs';
@@ -122,6 +123,7 @@ export function createAccountMembership({env=process.env,pool,auth,origin,transa
     const k=`${callsign}:${hex||'unassigned'}:${date}`,metadata={};for(const side of ['from','to']){const v=typeof b[side]==='string'?b[side].trim().toUpperCase():'';if(v&&!Object.hasOwn(airports,v))fail(400,'Choose an airport from the directory.');if(v)metadata[side]=v;}
     await transaction(`journeys:${u.id}`,async db=>{if(b.remove===true){await db.query('DELETE FROM skyward_journeys WHERE user_id=$1 AND key=$2',[u.id,k]);return;}const old=await one('SELECT key FROM skyward_journeys WHERE user_id=$1 AND key=$2',[u.id,k],db);if(!old&&Number((await one('SELECT COUNT(*) n FROM skyward_journeys WHERE user_id=$1',[u.id],db)).n)>=50)fail(429,'Keep up to 50 saved journeys.');await db.query('INSERT INTO skyward_journeys VALUES($1,$2,$3) ON CONFLICT(user_id,key) DO UPDATE SET body=excluded.body',[u.id,k,JSON.stringify({key:k,callsign,hex,date,...metadata,alerts:b.alerts===true})]);});send(200,{ok:true});return true;
    }
+   if(path==='/api/premium/airline-schedules'&&req.method==='POST'){const airline=String(b.airline||'').trim().toUpperCase();if(!Object.hasOwn(airlineNames,airline))fail(400,'Choose a supported airline.');send(200,await live.airlineSchedules(u,airline));return true;}
    if(path==='/api/premium/schedules'&&req.method==='POST'){const airport=String(b.airport||'').toUpperCase();if(!Object.hasOwn(airports,airport)||!['departures','arrivals'].includes(b.direction))fail(400,'Choose an airport and board direction.');send(200,await live.schedules(u,airport,b.direction));return true;}
    if(path==='/api/premium/details'&&req.method==='POST'){send(200,await lookup(u,b.key));return true;}
    fail(404,'Endpoint not found.');

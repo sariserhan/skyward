@@ -82,6 +82,7 @@ test('D1 paid lookup budgets reject user, service and spending exhaustion before
    assert.equal((await call('IAD')).status,200);assert.equal(calls,1);
    assert.equal((await call('IAD')).status,200);assert.equal(calls,1,'same query is cached');
    assert.equal((await call('IST')).status,429);assert.equal(calls,1,'exhausted budget makes no upstream request');
+   const airline=await nodeHandler(new Request(origin+'/api/premium/airline-schedules',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json'},body:JSON.stringify({airline:'THY'})}),(req,res,url)=>membership.handle(req,res,url));assert.equal(airline.status,429);assert.equal(calls,1,'airline boards respect the same account budget');
    paid=false;assert.equal((await call('IAD')).status,403,'free accounts cannot access the paid cache');assert.equal(calls,1);
   }finally{db.close();}
  }

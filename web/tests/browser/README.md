@@ -134,3 +134,8 @@ aviation API requests. Fixture data stays in a temporary directory.
 airport-local dates, arrivals/departures, gates, filtering, stale rows on errors,
 responses arriving after a tab switch, keyboard navigation, full screen, mobile
 layout, and unavailable/unsigned-in states. Schedule requests are fixture-only.
+
+`npm run test:airline-board` checks airline-directory navigation, active and
+upcoming filters, UTC dates, origin/destination and aircraft fields, missing data,
+search, keyboard tabs, mobile layout, failed refreshes, mismatched airline
+responses, and unavailable access. All paid schedule responses are fixtures.
