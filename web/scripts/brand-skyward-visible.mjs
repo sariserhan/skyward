@@ -25,11 +25,11 @@ for(const [id,L,D] of [['a320',38,4],['b738',40,3.8],['b789',63,5.8]]){
  }
  if(!rows.some(r=>r.n[0]>0)||!rows.some(r=>r.n[0]<0))throw Error('Missing fuselage side '+id);
  for(const image of g.images??[])if(image.uri?.includes('/airlines/'))image.uri='../../../airlines/SKYWARD-tail-v2.png';
- const texture=g.textures.length;g.images.push({uri:'../../../airlines/SKYWARD-body-v2.png'});g.textures.push({source:g.images.length-1,sampler:g.textures.at(-1).sampler});
- const material=g.materials.length;g.materials.push({name:'SkyWard fuselage title',doubleSided:true,alphaMode:'MASK',alphaCutoff:.1,pbrMetallicRoughness:{baseColorTexture:{index:texture},metallicFactor:0,roughnessFactor:.65},emissiveFactor:[.25,.25,.25],emissiveTexture:{index:texture}});
+ const texture=g.textures.length;g.images.push({uri:'../../../airlines/SKYWARD-body-v3.png'});g.textures.push({source:g.images.length-1,sampler:g.textures.at(-1).sampler});
+ const material=g.materials.length;g.materials.push({name:'skyVVard fuselage title',doubleSided:true,alphaMode:'MASK',alphaCutoff:.1,pbrMetallicRoughness:{baseColorTexture:{index:texture},metallicFactor:0,roughnessFactor:.65},emissiveFactor:[.25,.25,.25],emissiveTexture:{index:texture}});
  const chunks=[],attrs={};let offset=0;
  for(const [key,field,dim] of [['POSITION','p',3],['NORMAL','n',3],['TEXCOORD_0','uv',2]]){const values=rows.flatMap(r=>r[field]),data=Buffer.alloc(values.length*4);values.forEach((v,i)=>data.writeFloatLE(v,i*4));chunks.push(data);g.bufferViews.push({buffer:g.buffers.length,byteOffset:offset,byteLength:data.length,target:34962});offset+=data.length;attrs[key]=g.accessors.length;g.accessors.push({bufferView:g.bufferViews.length-1,componentType:5126,count:rows.length,type:'VEC'+dim,...(key==='POSITION'?{min:[0,1,2].map(i=>Math.min(...rows.map(r=>r.p[i]))),max:[0,1,2].map(i=>Math.max(...rows.map(r=>r.p[i])))}:{})});}
- const file=id+'-SKYWARD-body-v2.bin';fs.writeFileSync(new URL(file,root),Buffer.concat(chunks));g.buffers.push({uri:file,byteLength:offset});g.meshes.push({name:'SkyWard fuselage title',primitives:[{attributes:attrs,material}]});g.nodes.push({name:'SkyWardFuselageBranding',mesh:g.meshes.length-1});g.scenes[g.scene??0].nodes.push(g.nodes.length-1);
+ const file=id+'-SKYWARD-body-v2.bin';fs.writeFileSync(new URL(file,root),Buffer.concat(chunks));g.buffers.push({uri:file,byteLength:offset});g.meshes.push({name:'skyVVard fuselage title',primitives:[{attributes:attrs,material}]});g.nodes.push({name:'SkyWardFuselageBranding',mesh:g.meshes.length-1});g.scenes[g.scene??0].nodes.push(g.nodes.length-1);
 
  // Expand the orbit mark over the upper fin, clipping it to real tail surfaces.
  const tail=g.meshes.find(m=>m.name==='Airline tail surface overlay'),logo=tail.primitives[1];
