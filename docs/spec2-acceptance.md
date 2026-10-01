@@ -9,8 +9,8 @@ lookups, or new database storage were performed.
 | --- | --- | --- |
 | Seed import mechanism | PASS | `airframeSeed.ts`, CLI and spec2 tests: idempotent additive imports, stable IDs, conflicting records and duplicate serial/identifiers rejected; publication remains a separately reviewed existing command. |
 | Entire supplied 26-row seed list | PARTIAL | Two Patriots records are present and included in the seed; importing them is a no-op. The other 24 rows are named-person live-tracking seeds and were not imported. Citation placeholders in the attachment are not source URLs. No placeholder or unsupported identity is marked verified. |
-| Public UI | PARTIAL | Existing directory, organization profiles, aircraft profiles, aircraft follows and source disclaimers work. Added methodology, verification/history labels, association types, review due labels and category filters. No personal live-tracking pages were implemented. No automatic global historical-flight feed is available; existing source-backed identity history and local historical imports remain. |
-| Data compliance | PARTIAL | Provider inventory and source links are in `data-provider-compliance.md`. Public credits and privacy-field exclusion are implemented. AirLabs account-specific rights, upstream route dataset terms and production provider contact/restrictions remain unverified. No claim of full production compliance. |
+| Public UI | PARTIAL | Existing directory, organization profiles, aircraft profiles, aircraft follows and source disclaimers work. Added methodology, verification/history labels, association types, review due labels and category filters. No personal live-tracking pages were implemented. Recent observed tracks retain up to 60 positions checked on the page, with original timestamps and no extra fetches or database writes. Current and historical aircraft are separated in collections. No personal live-tracking pages are provided. |
+| Data compliance | PARTIAL | Provider inventory and source links are in `data-provider-compliance.md`. Public credits and privacy-field exclusion are implemented. AirLabs account-specific rights, production provider contact/restrictions remain unverified. No claim of full production compliance. |
 | Identity and following | PASS | Existing permanent aircraft IDs, registration timelines, conflict detection, merges and follows retained. Charter callsigns are validated in a separate editorial dataset and never converted into aircraft identities. |
 
 ## Requirement mapping
@@ -23,7 +23,7 @@ provider or privacy-address discovery interface was added.
 airframes. `catalog:seed` generates a new review draft without publishing or
 mutating the catalog. Existing `catalog:import` writes an audited publication
 change after review. Explicit VERIFIED/HISTORICAL/UNVERIFIED states are validated;
-unverified aircraft and associations are excluded from the public projection.
+unverified aircraft and associations are excluded from the public projection. Seed imports now require explicit status on every aircraft and association and lastVerifiedAt on every association.
 Historical airframes cannot authorize observation checks.
 
 7–8: HISTORIC_ASSOCIATION and REPORTED_CHARTER join the distinct existing types.
@@ -39,6 +39,9 @@ existing Sports/Historic/Public service taxonomy. Categories without sourced
 records show no matches. Displayed association types, status and verification
 history remain distinct; no personal live-tracking pages are exposed.
 
+The route-hint dataset license was verified as CC0 in both the upstream VRS and
+ADSB.lol mirror repositories; evidence is recorded in the provider inventory.
+
 13–15, 19: Provider permission inventory documents cache/history, attribution,
 redistribution and privacy handling with unresolved items explicitly marked. The
 public catalog uses a field whitelist; unknown contact/address fields and internal
@@ -53,7 +56,7 @@ follows and optional Premium sync. Tracking infrastructure was not rewritten.
 
 ## Reproducible validation
 
-Executed locally: build passed; 576 tests passed, 1 skipped, 0 failed. All three
+Executed locally: build passed; 579 tests passed, 1 skipped, 0 failed. All three
 browser checks below passed, including mobile overflow, verification selection,
 local follows, historical lookup restrictions and methodology navigation.
 Cloudflare static packaging passed; no assets were uploaded.
@@ -67,3 +70,9 @@ Cloudflare static packaging passed; no assets were uploaded.
 - `node web/scripts/prepare-cloudflare.mjs`: local packaging only, no deployment.
 
 The supplied spec is **not fully accepted** while the PARTIAL rows above remain.
+
+Browser plugin unavailable; local Playwright validated directory → organization → historical section,
+profile → observation → recent track, mobile layout and zero automatic tracking calls.
+Remaining external information: AirLabs plan/public-display agreement, production provider
+contact status and any account-specific restrictions. The excluded personal tracking
+seeds are not a pending implementation promise.

@@ -3,6 +3,7 @@ import {reviewIdentities} from './airframeReview.ts';
 /** Additive import: never overwrite evidence or choose between ambiguous identities. */
 export function importAirframeSeed(current:Catalog,input:unknown):Catalog{
  const seed=validateCatalog(input),next=structuredClone(current);
+ if(seed.aircraft.some(a=>!a.status)||seed.associations.some(a=>!a.status||!a.lastVerifiedAt))throw Error('Every seed requires an explicit verification status; associations also require lastVerifiedAt.');
  for(const key of ['aircraft','entities','associations'] as const){
   for(const row of seed[key]){
    const prior=next[key].find(a=>a.id===row.id);

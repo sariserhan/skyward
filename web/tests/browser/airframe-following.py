@@ -96,6 +96,8 @@ def run(page):
  assert len(lookup)==0
  page.get_by_role('button',name='Check latest observation',exact=True).click()
  page.get_by_text('Airborne',exact=True).wait_for()
+ page.get_by_role('heading',name='Recent observed track',exact=True).wait_for()
+ page.get_by_text('1 observed position',exact=True).wait_for()
  assert page.get_by_role('button',name='Check available shortly',exact=True).is_disabled()
  assert page.get_by_role('link',name='View aircraft on globe',exact=True).get_attribute('href')=='/#aircraft=abcdef'
  assert len(lookup)==1
@@ -115,6 +117,8 @@ def run(page):
  assert page.get_by_role('link',name='Local fixture',exact=True).count()==0
  page.reload()
  page.get_by_text('Airborne',exact=True).wait_for()
+ page.get_by_role('heading',name='Recent observed track',exact=True).wait_for()
+ page.get_by_text('1 observed position',exact=True).wait_for()
  assert page.get_by_role('button',name='Check available shortly',exact=True).is_disabled()
  assert len(lookup)==1
  # Withdrawing a catalog entry must not erase a user's explicit follow.
@@ -125,6 +129,8 @@ def run(page):
  page.get_by_text('No aircraft followed yet.',exact=False).wait_for()
  page.goto(f.URL+'/aircraft/nasa-sca-905/')
  page.get_by_text('Airborne',exact=True).wait_for()
+ page.get_by_role('heading',name='Recent observed track',exact=True).wait_for()
+ page.get_by_text('1 observed position',exact=True).wait_for()
  page.set_viewport_size({'width':1440,'height':1000})
  page.screenshot(path=str(f.ARTIFACTS/'airframes-profile.png'))
  assert not errors,errors

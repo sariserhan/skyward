@@ -32,3 +32,33 @@ test('charter identifiers have bounded seasons and are not physical aircraft IDs
 test('methodology is public, source linked and included in the sitemap',()=>{
  const p=publicPage(new URL('https://skyvvard.com/methodology/'));assert.equal(p.status,200);assert.match(p.body,/90 days/);assert.match(p.body,/odbl/);assert.match(publicPage(new URL('https://skyvvard.com/sitemap.xml'),{SKYWARD_PUBLIC_ORIGIN:'https://skyvvard.com'}).body,/methodology/);
 });
+
+test('seeds must explicitly state verification and association review date',()=>{
+ for(const [key,field] of [['aircraft','status'],['associations','status'],['associations','lastVerifiedAt']]){
+  const incomplete=structuredClone(seed);delete incomplete[key][0][field];
+  assert.throws(()=>importAirframeSeed(source,incomplete),/explicit verification status/);
+ }
+});
+
+test('historical airframes and expired associations are separate from current collections',async()=>{
+ const {entityAircraftGroups}=await import('../src/lib/notableDirectory.ts');
+ const c=structuredClone(source),id=seed.entities[0].id;
+ assert.equal(entityAircraftGroups(c,id).current.length,2);
+ const association=c.associations.find(s=>s.entityId===id);association.validTo='2020-01-01';
+ const groups=entityAircraftGroups(c,id);
+ assert.equal(groups.current.length,1);assert.equal(groups.history.length,1);
+ assert.equal(groups.history[0].id,association.aircraftId);
+ c.aircraft.find(a=>a.id===groups.current[0].id).status='HISTORICAL';
+ assert.equal(entityAircraftGroups(c,id).current.length,0);
+});
+
+test('page-local track is bounded and rejects duplicate, older and invalid fixes',async()=>{
+ const {appendAirframeTrack}=await import('../src/lib/airframeTrack.ts');
+ const point={hex:'abcdef',registration:'TEST',lat:39,lon:-77,observedAt:1};
+ let rows=[];for(let i=1;i<=65;i++)rows=appendAirframeTrack(rows,{...point,observedAt:i});
+ assert.equal(rows.length,60);assert.equal(rows[0].observedAt,6);
+ assert.equal(appendAirframeTrack(rows,{...point,observedAt:65}),rows);
+ assert.equal(appendAirframeTrack(rows,point),rows);
+ assert.equal(appendAirframeTrack(rows,{...point,observedAt:66,lat:NaN}),rows);
+ assert.equal(appendAirframeTrack(rows,null),rows);
+});
