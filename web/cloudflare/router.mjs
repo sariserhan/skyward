@@ -23,6 +23,17 @@ export async function handle(request,env){
  const aircraftPage=airframePage(path);if(aircraftPage?.redirect)return Response.redirect(url.origin+aircraftPage.redirect,308);
  if(path.startsWith('/internal/'))return error(404);
  if(path==='/healthz'||path==='/readyz')return Response.json({service:'skyward',status:'ok',accountsConfigured:!!(env.BETTER_AUTH_SECRET&&env.RESEND_API_KEY),assetsConfigured:!!env.SKYWARD_ASSET_RELEASE},{headers:{'Cache-Control':'no-store'}});
+ // One canonical edge cache key; viewer cookies and query strings never reach this public feed.
+ if(path==='/api/special-flights'){
+  if(!['GET','HEAD'].includes(request.method))return error(405);
+  const key=new Request(new URL('/api/special-flights',url)),cache=globalThis.caches?.default;
+  const hit=await cache?.match(key);if(hit)return request.method==='HEAD'?new Response(null,hit):hit;
+  const result=await coordinator(env).fetch(key),headers=new Headers(result.headers);
+  headers.set('Cache-Control',result.ok?'public, max-age=30':'no-store');
+  const response=new Response(result.body,{status:result.status,headers});
+  if(response.ok)await cache?.put(key,response.clone());
+  return request.method==='HEAD'?new Response(null,response):response;
+ }
  if(path.startsWith('/api/')||path.startsWith('/share/')||path.startsWith('/travelers')){
   if(request.body){const reader=request.body.getReader(),chunks=[];let size=0;while(true){const part=await reader.read();if(part.done)break;size+=part.value.length;if(size>65536){await reader.cancel();return Response.json({error:'Request too large'},{status:413});}chunks.push(part.value);}const body=new Uint8Array(size);let offset=0;for(const chunk of chunks){body.set(chunk,offset);offset+=chunk.length;}request=new Request(request,{body});}
   return coordinator(env).fetch(request);

@@ -202,22 +202,23 @@ export default function App() {
   const tower=()=>{routeEpoch.current++;navigateSelection(`/airports/${airport}/`);setSyntheticSelection(null);setGroundAnimation(false);setSpotter(false);setSession(null);setMode('3D');setFollowing(false);feed.clearSelected();setReplay(null);setCamera(c=>({type:'tower',airport,serial:c.serial+1}));};
   const airport3D=()=>{const g=geometry?.airports.find(a=>a.id===airport);if(!g)return;setGroundAnimation(false);setReplay(null);setMode('3D');setPreferences(p=>({...p,structures:true}));focusFacility(airport3DTarget(g));};
   const overview=()=>{routeEpoch.current++;navigateSelection(`/airports/${airport}/`);setSyntheticSelection(null);setSpotter(false);setPanel('airport');setFollowing(false);feed.clearSelected();setReplay(null);setCamera(c=>({type:'overview',airport,serial:c.serial+1}));};
-  const closeDetails = () => {routeEpoch.current++;if(location.pathname.startsWith('/flights/')||selectedAircraft?.simulation)navigateSelection('/');setSyntheticSelection(null);setSpotter(false);setSession(null);setPanel('none');setFollowing(false);feed.clearSelected();};
+  const closeDetails = () => {routeEpoch.current++;if(observatoryRoute(location.pathname)?.kind==='flight'||selectedAircraft?.simulation)navigateSelection('/');setSyntheticSelection(null);setSpotter(false);setSession(null);setPanel('none');setFollowing(false);feed.clearSelected();};
   const openLocation=useRef<()=>void>(()=>{});
   openLocation.current=()=>{
     const path=observatoryRoute(location.pathname),view=parseView(location.hash),epoch=++routeEpoch.current;
     initialIntent.current=false;setFlightRequest(null);setSyntheticSelection(null);setGroundAnimation(false);setSpotter(false);setSession(null);setReplay(null);setFollowing(false);feed.clearSelected();setMobileOpen(false);setDiscoveryNotice('');updateRouteMetadata();
     if(path?.kind==='airport'){setAirport(path.id);setPanel('airport');setCamera(c=>({type:'airport',airport:path.id,pose:view.camera,serial:c.serial+1}));return;}
+    const registration=path?.kind==='flight'?path.registration:undefined;
     const code=path?.kind==='flight'?path.code:null,date=path?.kind==='flight'?path.date:undefined;
     if(code||view.aircraft){
       setPanel('none');
       if(date&&date!==new Date().toISOString().slice(0,10)){setDiscoveryNotice(`No historical tracking is available for ${code} on ${date} (UTC). Open the undated flight link for the latest available observation.`);return;}
       setDiscoveryNotice(`Looking for ${code??view.aircraft}…`);
-      void feed.lookup(code?'callsign':'hex',code??view.aircraft,a=>routeEpoch.current===epoch&&(!code||a.callsign.trim().toUpperCase()===code)&&(!date||a.observedAt!==null&&new Date(a.observedAt).toISOString().slice(0,10)===date)).then(a=>{
+      void feed.lookup(registration?'registration':code?'callsign':'hex',code??view.aircraft,a=>routeEpoch.current===epoch&&(!code||(registration?a.registration.toUpperCase()===registration:a.callsign.trim().toUpperCase()===code))&&(!date||a.observedAt!==null&&new Date(a.observedAt).toISOString().slice(0,10)===date)).then(a=>{
         if(routeEpoch.current!==epoch)return;
         if(!a){setDiscoveryNotice(`No matching observation is currently available for ${code??view.aircraft}${date?' on '+date+' (UTC)':''}. Coverage varies; try again later.`);return;}
         setDiscoveryNotice('');setPanel('aircraft');setCamera(c=>({type:'aircraft',pose:view.camera,serial:c.serial+1}));
-        if(view.sceneView){setMode('3D');setFlightRequest({hex:a.hex,view:view.sceneView,serial:++requestSerial.current});}
+        if(view.sceneView||registration){setMode('3D');setFlightRequest({hex:a.hex,view:view.sceneView??'side',serial:++requestSerial.current});}
       });return;
     }
     if(view.hasView){setAirport(view.airport);setPanel('airport');setCamera(c=>({type:'airport',airport:view.airport,serial:c.serial+1}));}

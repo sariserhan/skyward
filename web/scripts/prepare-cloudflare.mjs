@@ -1,3 +1,4 @@
+import {specialFlightPaths} from '../src/lib/specialFlightRoutes.ts';
 import {airframePage,airframeDocument,airframePaths} from '../server/airframe-pages.mjs';
 import {publicPage} from '../server/public-pages.mjs';
 import {observatoryDocument} from '../server/observatory-document.mjs';
@@ -15,6 +16,7 @@ try{await stat(resolve(root,'../dist/web/index.html'));await walk(resolve(root,'
 // Airport entry pages are generated once per build and served by Static Assets, not Workers.
 const shell=await readFile(resolve(dist,'index.html'),'utf8');
 for(const id of Object.keys(catalog)){const path=`/airports/${id}/`,page=publicPage(new URL(path,'https://skyvvard.com'),{SKYWARD_PUBLIC_ORIGIN:'https://skyvvard.com'});await mkdir(resolve(assets,'airports',id),{recursive:true});await writeFile(resolve(assets,'airports',id,'index.html'),observatoryDocument(page,shell));staticCount++;}
+for(const path of specialFlightPaths()){const page=publicPage(new URL(path,'https://skyvvard.com'),{SKYWARD_PUBLIC_ORIGIN:'https://skyvvard.com'});await mkdir(resolve(assets,'.'+path),{recursive:true});await writeFile(resolve(assets,'.'+path,'index.html'),observatoryDocument(page,shell));staticCount++;}
 for(const path of airframePaths()){const page=airframePage(path);if(page.redirect)continue;await mkdir(resolve(assets,'.'+path),{recursive:true});await writeFile(resolve(assets,'.'+path,'index.html'),airframeDocument(page,shell));staticCount++;}
 const methodology=publicPage(new URL('/methodology/','https://skyvvard.com'),{SKYWARD_PUBLIC_ORIGIN:'https://skyvvard.com'});await mkdir(resolve(assets,'methodology'),{recursive:true});await writeFile(resolve(assets,'methodology/index.html'),methodology.body);staticCount++;
 if(staticCount>19000)throw Error('Static asset count exceeds the conservative free-plan budget');

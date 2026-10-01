@@ -142,3 +142,15 @@ Sources are linked to the exact reviewed identity/association evidence. No artic
 Production build passed. Server/unit suite: 588 passed, 1 skipped. Browser checks cover the reference directory, live discovery and sidebar on desktop/mobile: collection shortcuts, source navigation, follow persistence, batch bounds, cooldown persistence and zero automatic directory tracking requests. The existing Playwright harness was used because the Browser plugin is unavailable. Screenshots were captured; direct image inspection was blocked by the sandbox mountinfo error. No deployment performed.
 
 Filtering now builds an association index once per evaluation instead of repeatedly scanning every entity/association pair. A local Node check of 600 collection filters took 28 ms; this is a CPU smoke check, not a browser rendering benchmark.
+
+## Worldwide discovery follow-up
+
+The sidebar now discovers eligible aircraft independently of the map bounds. All 120 current featured registrations fit into one free-provider request, shared by concurrent visitors through the existing coordinator (60-second refresh, 30-second edge cache). A live verification returned 13 fresh airborne matches in one request; this is a point-in-time result, not a coverage promise.
+
+Batch support was checked against the [provider's published API schema](https://api.adsb.lol/api/openapi.json), [API implementation](https://github.com/adsblol/api/blob/main/src/adsb_api/utils/api_v2.py), and [readsb query documentation](https://github.com/wiedehopf/readsb/blob/dev/README-json.md). The application caps each batch at 150 registrations. Only curated identities can enter this endpoint.
+
+Collection routes such as `/ufc/9m-xxd/` open the aircraft and retain source-backed identity metadata. Off-globe pages use the same snapshot for dismissible Watch announcements. Historical associations, simulated aircraft, ambiguous matches, ground observations and fixes older than two minutes are excluded. Hidden/offline tabs stop polling. Aircraft activity does not establish occupants or trip purpose.
+
+This supersedes the earlier zero-automatic-request description for site browsing: the new shared monitor runs approximately once a minute while visible, without paid API calls, position-history storage, new database tables, R2 objects or scheduled jobs. AirLabs licensing/deployment gates are unchanged.
+
+Follow-up validation: 594 server/unit tests passed, one skipped; production build and Cloudflare dry run passed. Headless Chromium covered worldwide sidebar selection outside the camera bounds, custom-route reload, off-globe announcements, dismissal persistence, stale removal, mobile viewport bounds, and existing directory lookup/cooldown behavior. Evidence: `/tmp/skyward-browser-w1dlp357` and `/tmp/skyward-browser-00fgajje`. Screenshots were captured; direct image inspection was blocked by the filesystem sandbox helper. No production deployment performed.

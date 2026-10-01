@@ -11,6 +11,7 @@ def rows():
  return [a,{**a,'hex':'123abc','callsign':'SIA222','registration':'9V-TEST','aircraftType':'A320','lon':a['lon']-.1},{**a,'hex':'dddddd','callsign':'OLD333','lon':a['lon']+1,'lat':a['lat']+.5,'observedAt':anchor-300000}]
 def mock(r):
  u=urllib.parse.urlparse(r.request.url);q=urllib.parse.parse_qs(u.query);stamp=int(time.time()*1000)
+ if u.path=='/api/special-flights':r.fulfill(json=dict(state='ready',rows=[],checkedAt=stamp,checkedAircraft=120,totalAircraft=120));return
  if u.path=='/api/status':r.fulfill(json=dict(started=10,failed=0,pending=0,cacheHits=3,meanProviderMs=200,lastSuccessAt=stamp,lastPositionAt=stamp));return
  if u.path=='/api/route':r.fulfill(json=dict(callsign=q.get('callsign',['THY111'])[0],source='Test fixture',sourceUrl='https://example.invalid',fetchedAt=stamp,status='PLAUSIBLE',airports=[dict(icao='KIAD',iata='IAD',name='Dulles',city='Washington',lat=38.947,lon=-77.46),dict(icao='EGLL',iata='LHR',name='Heathrow',city='London',lat=51.47,lon=-.45)]));return
  data=rows()

@@ -4,6 +4,6 @@ export function observatoryDocument(page,shell){
  if(!assets.includes('type="module"'))throw Error('Observatory build is unavailable');
  const analytics=shell.match(/<script id="analytics-bootstrap">[\s\S]*?<\/script>/)?.[0]||'';
  const head=page.body.match(/<head>([\s\S]*?)<\/head>/)[1].replace(/<link rel="stylesheet" href="\/watch\/public-pages.css">/,'');
- const content=page.body.match(/<body>([\s\S]*?)<\/body>/)[1];
- return `<!doctype html><html lang="en"><head>${head}${assets}${analytics}</head><body style="margin:0;background:#09141c;color:#edf4f6"><div id="root"><div style="font:16px system-ui;max-width:900px;margin:auto;padding:24px">${content}<p role="status">Loading the interactive observatory…</p></div></div></body></html>`;
+ const content=page.body.match(/<body>([\s\S]*?)<\/body>/)[1].replace(/<script defer src="\/watch\/special-flights.js"><\/script>/g,'');
+ return `<!doctype html><html lang="en"><head>${head}${assets}${analytics}</head><body style="margin:0;background:#09141c;color:#edf4f6"><div id="root"><div style="font:16px system-ui;max-width:900px;margin:auto;padding:24px">${content}<p role="status">Loading the interactive observatory…</p></div></div><script defer src="/watch/special-flights.js"></script></body></html>`;
 }

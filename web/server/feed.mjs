@@ -38,6 +38,10 @@ export function searchPath(kind, input) {
   throw new Error('Use a valid callsign, aircraft registration, or six-character ICAO hex.');
 }
 
+export function registrationBatchPath(registrations){
+ if(!Array.isArray(registrations)||registrations.length<1||registrations.length>150||registrations.some(r=>typeof r!=='string'||!/^[A-Z0-9-]{2,12}$/.test(r)))throw Error('Invalid registration batch');
+ return '/v2/reg/'+[...new Set(registrations)].sort().join(',');
+}
 export function cameraAreaPath(lat,lon,radius){
   if(![lat,lon,radius].every(v=>typeof v==='number'&&Number.isFinite(v))||Math.abs(lat)>90||Math.abs(lon)>180||!Number.isInteger(radius)||radius<1||radius>250)throw new Error('Use valid coordinates and a radius of 1–250 nautical miles.');
   // Canonical paths share cache entries across clients without expanding radius.
@@ -156,5 +160,6 @@ export class FeedClient {
     const bucket=radius<=225?cameraAreaPath(Math.round(+queryLat*2)/2,((Math.round(+queryLon*2)/2+540)%360)-180,radius+25):path;
     return this.request(bucket).then(value=>({...value,aircraft:value.aircraft.filter(a=>a.lat!==null&&a.lon!==null&&distanceNm(+queryLat,+queryLon,a.lat,a.lon)<=radius)}));
   }
+  registrations(values) { return this.request(registrationBatchPath(values)); }
   search(kind, query) { return this.request(searchPath(kind, query)); }
 }

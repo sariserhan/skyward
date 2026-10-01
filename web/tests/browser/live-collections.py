@@ -1,30 +1,55 @@
-"""Side menu discovery remains usable on desktop and phone without extra feed requests."""
+"""Worldwide discovery -> dedicated route -> selected aircraft, plus off-globe announcements."""
+import time,urllib.parse
 import regression as f
+from playwright.sync_api import expect
 
 def run(page):
- errors=[]
+ errors=[];calls=[]
  page.on('pageerror',lambda e:errors.append(str(e)))
  page.add_init_script(f.INIT)
- page.route('**/api/**',f.mock)
+ aircraft=dict(hex='750123',registration='9M-XXD',callsign='XAX123',aircraftType='A333',lat=3.1,lon=101.7,altitude=33000,ground=False,groundSpeed=450,heading=90,verticalRate=0,sourceType='fixture')
+ def special(route):
+  calls.append(route.request.url);stamp=int(time.time()*1000)
+  route.fulfill(json=dict(state='ready',checkedAt=stamp,checkedAircraft=120,totalAircraft=120,rows=[dict(path='/ufc/9m-xxd/',aircraftId='notable-fixture',registration='9M-XXD',entityId='ufc',name='UFC',relationship='Team-branded airline aircraft',aircraft={**aircraft,'observedAt':stamp})]))
+ def api(route):
+  path=urllib.parse.urlparse(route.request.url).path
+  if path=='/api/search':route.fulfill(json=dict(aircraft=[{**aircraft,'observedAt':int(time.time()*1000)}],source='fixture',fetchedAt=int(time.time()*1000)));return
+  f.mock(route)
+ page.route('**/api/**',api);page.route('**/api/special-flights',special)
  page.goto(f.URL+'/#airport=IAD',wait_until='domcontentloaded')
- menu=page.locator('.live-collections')
- menu.get_by_role('heading',name='Watch teams & icons').wait_for()
- page.get_by_text('No matching airborne aircraft detected in the loaded map area.',exact=True).wait_for()
- assert menu.get_by_role('button').count()==0
- assert menu.get_by_role('navigation',name='Featured aircraft collections').get_by_role('link').count()==4
- menu.get_by_role('link',name='New England Patriots',exact=False).click()
- page.get_by_label('Choose a collection').wait_for()
- assert page.get_by_label('Choose a collection').input_value()=='new-england-patriots'
- page.go_back()
- menu.get_by_role('heading',name='Watch teams & icons').wait_for()
- page.screenshot(path=str(f.ARTIFACTS/'live-collections-desktop.png'))
+ menu=page.locator('.live-collections');watch=menu.get_by_role('link',name='Watch UFC aircraft live',exact=True)
+ watch.wait_for(timeout=60000)
+ assert '120/120 aircraft checked' in menu.inner_text()
+ assert len(calls)==1
+ assert page.locator('.special-flight-banner').count()==0
+ assert '9M-XXD' in watch.inner_text()
+ page.screenshot(path=str(f.ARTIFACTS/'special-worldwide-desktop.png'))
+ watch.click()
+ page.get_by_role('region',name='Passenger flight view').wait_for(timeout=60000)
+ assert '/ufc/9m-xxd/' in page.url
+ assert 'UFC' in page.title()
+ page.wait_for_function("window.__viewer?.entities.getById('aircraft-750123')",timeout=60000)
+ assert page.locator('.special-flight-banner').count()==0
+ page.reload();page.get_by_role('region',name='Passenger flight view').wait_for(timeout=60000)
+ assert '/ufc/9m-xxd/' in page.url
+ # Public reference pages have the same lightweight monitor without the globe engine.
+ page.goto(f.URL+'/about/')
+ banner=page.get_by_role('complementary',name='Special aircraft airborne')
+ banner.wait_for()
+ assert 'UFC aircraft is airborne' in banner.inner_text()
+ assert banner.get_by_role('link',name='Watch flight →').get_attribute('href').startswith('/ufc/9m-xxd/')
+ assert page.evaluate('window.__viewer===undefined')
  page.set_viewport_size({'width':390,'height':844})
- page.get_by_role('button',name='Flights',exact=True).click()
- assert menu.is_visible()
  assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
- page.screenshot(path=str(f.ARTIFACTS/'live-collections-mobile.png'))
- menu.get_by_role('link',name='Explore worldwide aircraft →',exact=True).click()
- page.get_by_role('heading',name='Notable aircraft',exact=True).wait_for()
+ box=banner.bounding_box();assert box['x']>=0 and box['x']+box['width']<=390
+ page.screenshot(path=str(f.ARTIFACTS/'special-announcement-mobile.png'))
+ banner.get_by_role('button',name='Dismiss aircraft announcement').click();expect(banner).to_have_count(0)
+ page.reload();page.wait_for_timeout(700);expect(banner).to_have_count(0)
+ # Expired fixes disappear without waiting for another successful API response.
+ page.set_viewport_size({'width':1440,'height':1000});page.goto(f.URL+'/#airport=IAD',wait_until='domcontentloaded');watch.wait_for(timeout=60000)
+ page.evaluate('window.__shift+=121000');page.route('**/api/special-flights',lambda r:r.fulfill(json=dict(state='ready',checkedAt=0,checkedAircraft=120,totalAircraft=120,rows=[])))
+ expect(watch).to_have_count(0,timeout=12000)
+ assert not page.locator('vite-error-overlay,.cesium-widget-errorPanel').count()
  assert not errors,errors
- print('PASS desktop/mobile live menu, hidden inactive entries, reference navigation, no script errors',flush=True)
+ print('PASS worldwide sidebar outside camera area, dedicated route/reload, off-globe banner, dismissal, mobile bounds and stale removal',flush=True)
 if __name__=='__main__':f.serve(run)

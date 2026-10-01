@@ -1,3 +1,4 @@
+import {createSpecialFlights} from '../server/special-flights.mjs';
 import {createTravelMetrics} from '../server/travel-metrics.mjs';
 import {workerFetch} from './fetch.mjs';
 import {DurableObject} from 'cloudflare:workers';
@@ -17,14 +18,14 @@ const valid=fn=>{try{return fn();}catch(e){throw Object.assign(e,{status:400});}
 const json=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store'}});
 export class SkywardCoordinator extends DurableObject{
  constructor(ctx,env){super(ctx,env);this.ctx=ctx;this.env=env;this.tail=Promise.resolve();this.rates=new Map();this.metrics=createTravelMetrics({env});
-  this.feed=configuredFeed({env,fetchImpl:workerFetch});this.weather=createLocalWeather({fetchImpl:workerFetch});this.airportWeather=createAirportWeather({fetchImpl:workerFetch});this.music=createAurowall({env});this.trips=createTripDiscovery(this.feed);
+  this.feed=configuredFeed({env,fetchImpl:workerFetch});this.specialFlights=createSpecialFlights(this.feed.primary);this.weather=createLocalWeather({fetchImpl:workerFetch});this.airportWeather=createAirportWeather({fetchImpl:workerFetch});this.music=createAurowall({env});this.trips=createTripDiscovery(this.feed);
   this.ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS daily_budget(day TEXT PRIMARY KEY,requests INTEGER NOT NULL)');
   if(env.BETTER_AUTH_SECRET&&env.RESEND_API_KEY){
    this.auth=createD1Auth(env,{waitUntil:p=>ctx.waitUntil(p)});const {pool,transaction}=d1Pool(env.DB);
    this.membership=createAccountMembership({env,pool,fetchImpl:workerFetch,auth:this.auth,origin:env.SKYWARD_PUBLIC_ORIGIN,transact:transaction,throttleRequest:async()=>{},observations:()=>{const rows=new Map();for(const p of this.feed.providers)for(const item of p.client.cache.values())for(const a of item.value?.aircraft??[])if((a.observedAt??0)>(rows.get(a.hex)?.observedAt??0))rows.set(a.hex,a);return [...rows.values()];}});
   }
  }
- fetch(request){const run=this.tail.then(()=>this.route(request));this.tail=run.catch(()=>{});return run;}
+ fetch(request){if(new URL(request.url).pathname==='/api/special-flights')return this.route(request);const run=this.tail.then(()=>this.route(request));this.tail=run.catch(()=>{});return run;}
  async route(request){
   const url=new URL(request.url),path=url.pathname;
   try{
@@ -42,6 +43,7 @@ export class SkywardCoordinator extends DurableObject{
    if(this.membership){const r=await nodeHandler(request,(req,res,u)=>this.membership.handle(req,res,u));if(r){if(r.status>=500)this.metrics.record('server_request_error');return r;}}
    if(path==='/api/account')return json({enabled:false,authProvider:'better-auth',mode:'test',user:null,billingReady:false,liveDetailsReady:false});
    if(!['GET','HEAD'].includes(request.method))return json({error:'Method not allowed'},405);
+   if(path==='/api/special-flights')return json(await this.specialFlights());
    if(path==='/api/area'){const values=['lat','lon','radius'].map(k=>url.searchParams.has(k)&&url.searchParams.get(k).trim()?Number(url.searchParams.get(k)):NaN);valid(()=>cameraAreaPath(...values));return json(await this.feed.cameraArea(...values));}
    if(path==='/api/aircraft'){const id=url.searchParams.get('airport');if(!Object.hasOwn(AIRPORTS,id))return json({error:'Choose an airport'},400);return json(await this.feed.area(id));}
    if(path==='/api/route'){const args=[url.searchParams.get('callsign'),Number(url.searchParams.get('lat')),Number(url.searchParams.get('lon'))];valid(()=>routePath(...args));return json(await this.feed.route(...args));}

@@ -17,3 +17,5 @@
 .live-collection-shortcuts a span{font-size:10px;color:#bed5d8;font-weight:400}
 .live-collections-browse{min-height:44px;display:flex;align-items:center;font-weight:650}
 .live-collections-content button strong{overflow-wrap:anywhere}
+.special-aircraft-list{max-height:350px;overflow-y:auto;display:grid;gap:8px;overscroll-behavior:contain}
+.special-aircraft-watch{display:grid;gap:4px;text-decoration:none;padding:12px;border:1px solid #548c82;border-radius:8px;background:#183b3f;min-height:44px;overflow-wrap:anywhere}.special-aircraft-watch strong{color:#e8f5f2;font-size:14px}

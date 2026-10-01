@@ -1,0 +1,970 @@
+[
+  {
+    "path": "/noaa/n42rf/",
+    "aircraftId": "noaa-orion-42",
+    "registration": "N42RF",
+    "entityId": "noaa",
+    "name": "NOAA",
+    "relationship": "Public-service aircraft"
+  },
+  {
+    "path": "/noaa/n43rf/",
+    "aircraftId": "noaa-orion-43",
+    "registration": "N43RF",
+    "entityId": "noaa",
+    "name": "NOAA",
+    "relationship": "Public-service aircraft"
+  },
+  {
+    "path": "/noaa/n49rf/",
+    "aircraftId": "noaa-gulfstream-49",
+    "registration": "N49RF",
+    "entityId": "noaa",
+    "name": "NOAA",
+    "relationship": "Public-service aircraft"
+  },
+  {
+    "path": "/new-england-patriots/n36ne/",
+    "aircraftId": "boeing-767-25193",
+    "registration": "N36NE",
+    "entityId": "new-england-patriots",
+    "name": "New England Patriots",
+    "relationship": "Sports-associated aircraft"
+  },
+  {
+    "path": "/new-england-patriots/n225ne/",
+    "aircraftId": "boeing-767-25194",
+    "registration": "N225NE",
+    "entityId": "new-england-patriots",
+    "name": "New England Patriots",
+    "relationship": "Sports-associated aircraft"
+  },
+  {
+    "path": "/seattle-kraken/n933ak/",
+    "aircraftId": "alaska-kraken-933",
+    "registration": "N933AK",
+    "entityId": "seattle-kraken",
+    "name": "Seattle Kraken",
+    "relationship": "Sports-associated aircraft"
+  },
+  {
+    "path": "/alaska-airlines/n933ak/",
+    "aircraftId": "alaska-kraken-933",
+    "registration": "N933AK",
+    "entityId": "alaska-airlines",
+    "name": "Alaska Airlines",
+    "relationship": "Sports-associated aircraft"
+  },
+  {
+    "path": "/orbis/n330au/",
+    "aircraftId": "orbis-md10-46800",
+    "registration": "N330AU",
+    "entityId": "orbis",
+    "name": "Orbis",
+    "relationship": "Public-service aircraft"
+  },
+  {
+    "path": "/flying-bulls/oe-ldm/",
+    "aircraftId": "flying-bulls-dc6",
+    "registration": "OE-LDM",
+    "entityId": "flying-bulls",
+    "name": "Red Bull · The Flying Bulls",
+    "relationship": "Historic aircraft"
+  },
+  {
+    "path": "/flying-bulls/n25y/",
+    "aircraftId": "flying-bulls-p38",
+    "registration": "N25Y",
+    "entityId": "flying-bulls",
+    "name": "Red Bull · The Flying Bulls",
+    "relationship": "Historic aircraft"
+  },
+  {
+    "path": "/noaa/n46rf/",
+    "aircraftId": "noaa-twin-otter-46",
+    "registration": "N46RF",
+    "entityId": "noaa",
+    "name": "NOAA",
+    "relationship": "Research aircraft"
+  },
+  {
+    "path": "/noaa/n48rf/",
+    "aircraftId": "noaa-twin-otter-48",
+    "registration": "N48RF",
+    "entityId": "noaa",
+    "name": "NOAA",
+    "relationship": "Research aircraft"
+  },
+  {
+    "path": "/noaa/n56rf/",
+    "aircraftId": "noaa-twin-otter-56",
+    "registration": "N56RF",
+    "entityId": "noaa",
+    "name": "NOAA",
+    "relationship": "Research aircraft"
+  },
+  {
+    "path": "/noaa/n57rf/",
+    "aircraftId": "noaa-twin-otter-57",
+    "registration": "N57RF",
+    "entityId": "noaa",
+    "name": "NOAA",
+    "relationship": "Research aircraft"
+  },
+  {
+    "path": "/alaska-airlines/n985ak/",
+    "aircraftId": "alaska-seattle-world-cup-985",
+    "registration": "N985AK",
+    "entityId": "alaska-airlines",
+    "name": "Alaska Airlines",
+    "relationship": "Airline special livery"
+  },
+  {
+    "path": "/new-york-jets/n746jb/",
+    "aircraftId": "jetblue-746",
+    "registration": "N746JB",
+    "entityId": "new-york-jets",
+    "name": "New York Jets",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/boston-celtics/n595jb/",
+    "aircraftId": "jetblue-595",
+    "registration": "N595JB",
+    "entityId": "boston-celtics",
+    "name": "Boston Celtics",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/boston-bruins/n632jb/",
+    "aircraftId": "jetblue-632",
+    "registration": "N632JB",
+    "entityId": "boston-bruins",
+    "name": "Boston Bruins",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/brooklyn-nets/n633jb/",
+    "aircraftId": "jetblue-633",
+    "registration": "N633JB",
+    "entityId": "brooklyn-nets",
+    "name": "Brooklyn Nets",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/boston-red-sox/n605jb/",
+    "aircraftId": "jetblue-605",
+    "registration": "N605JB",
+    "entityId": "boston-red-sox",
+    "name": "Boston Red Sox",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/flying-bulls/oe-xtv/",
+    "aircraftId": "notable-global-20261001-001",
+    "registration": "OE-XTV",
+    "entityId": "flying-bulls",
+    "name": "Red Bull · The Flying Bulls",
+    "relationship": "Heritage display aircraft"
+  },
+  {
+    "path": "/flying-bulls/oe-ckw/",
+    "aircraftId": "notable-global-20261001-002",
+    "registration": "OE-CKW",
+    "entityId": "flying-bulls",
+    "name": "Red Bull · The Flying Bulls",
+    "relationship": "Heritage display aircraft"
+  },
+  {
+    "path": "/flying-bulls/oe-adm/",
+    "aircraftId": "notable-global-20261001-003",
+    "registration": "OE-ADM",
+    "entityId": "flying-bulls",
+    "name": "Red Bull · The Flying Bulls",
+    "relationship": "Heritage display aircraft"
+  },
+  {
+    "path": "/flying-bulls/oe-xdm/",
+    "aircraftId": "notable-global-20261001-004",
+    "registration": "OE-XDM",
+    "entityId": "flying-bulls",
+    "name": "Red Bull · The Flying Bulls",
+    "relationship": "Heritage display aircraft"
+  },
+  {
+    "path": "/flying-bulls/n11fx/",
+    "aircraftId": "notable-global-20261001-005",
+    "registration": "N11FX",
+    "entityId": "flying-bulls",
+    "name": "Red Bull · The Flying Bulls",
+    "relationship": "Heritage display aircraft"
+  },
+  {
+    "path": "/flying-bulls/d-hsdm/",
+    "aircraftId": "notable-global-20261001-006",
+    "registration": "D-HSDM",
+    "entityId": "flying-bulls",
+    "name": "Red Bull · The Flying Bulls",
+    "relationship": "Heritage display aircraft"
+  },
+  {
+    "path": "/flying-bulls/d-htdm/",
+    "aircraftId": "notable-global-20261001-007",
+    "registration": "D-HTDM",
+    "entityId": "flying-bulls",
+    "name": "Red Bull · The Flying Bulls",
+    "relationship": "Heritage display aircraft"
+  },
+  {
+    "path": "/flying-bulls/d-hudm/",
+    "aircraftId": "notable-global-20261001-008",
+    "registration": "D-HUDM",
+    "entityId": "flying-bulls",
+    "name": "Red Bull · The Flying Bulls",
+    "relationship": "Heritage display aircraft"
+  },
+  {
+    "path": "/flying-bulls/oe-xsy/",
+    "aircraftId": "notable-global-20261001-009",
+    "registration": "OE-XSY",
+    "entityId": "flying-bulls",
+    "name": "Red Bull · The Flying Bulls",
+    "relationship": "Heritage display aircraft"
+  },
+  {
+    "path": "/flying-bulls/n80fs/",
+    "aircraftId": "notable-global-20261001-010",
+    "registration": "N80FS",
+    "entityId": "flying-bulls",
+    "name": "Red Bull · The Flying Bulls",
+    "relationship": "Heritage display aircraft"
+  },
+  {
+    "path": "/flying-bulls/oe-edm/",
+    "aircraftId": "notable-global-20261001-011",
+    "registration": "OE-EDM",
+    "entityId": "flying-bulls",
+    "name": "Red Bull · The Flying Bulls",
+    "relationship": "Heritage display aircraft"
+  },
+  {
+    "path": "/flying-bulls/n991dm/",
+    "aircraftId": "notable-global-20261001-012",
+    "registration": "N991DM",
+    "entityId": "flying-bulls",
+    "name": "Red Bull · The Flying Bulls",
+    "relationship": "Heritage display aircraft"
+  },
+  {
+    "path": "/flying-bulls/oe-eas/",
+    "aircraftId": "notable-global-20261001-013",
+    "registration": "OE-EAS",
+    "entityId": "flying-bulls",
+    "name": "Red Bull · The Flying Bulls",
+    "relationship": "Heritage display aircraft"
+  },
+  {
+    "path": "/flying-bulls/oe-xfb/",
+    "aircraftId": "notable-global-20261001-014",
+    "registration": "OE-XFB",
+    "entityId": "flying-bulls",
+    "name": "Red Bull · The Flying Bulls",
+    "relationship": "Heritage display aircraft"
+  },
+  {
+    "path": "/flying-bulls/oe-arn/",
+    "aircraftId": "notable-global-20261001-015",
+    "registration": "OE-ARN",
+    "entityId": "flying-bulls",
+    "name": "Red Bull · The Flying Bulls",
+    "relationship": "Heritage display aircraft"
+  },
+  {
+    "path": "/flying-bulls/oe-aro/",
+    "aircraftId": "notable-global-20261001-016",
+    "registration": "OE-ARO",
+    "entityId": "flying-bulls",
+    "name": "Red Bull · The Flying Bulls",
+    "relationship": "Heritage display aircraft"
+  },
+  {
+    "path": "/flying-bulls/n50429/",
+    "aircraftId": "notable-global-20261001-017",
+    "registration": "N50429",
+    "entityId": "flying-bulls",
+    "name": "Red Bull · The Flying Bulls",
+    "relationship": "Heritage display aircraft"
+  },
+  {
+    "path": "/flying-bulls/n68rw/",
+    "aircraftId": "notable-global-20261001-018",
+    "registration": "N68RW",
+    "entityId": "flying-bulls",
+    "name": "Red Bull · The Flying Bulls",
+    "relationship": "Heritage display aircraft"
+  },
+  {
+    "path": "/flying-bulls/n6123c/",
+    "aircraftId": "notable-global-20261001-019",
+    "registration": "N6123C",
+    "entityId": "flying-bulls",
+    "name": "Red Bull · The Flying Bulls",
+    "relationship": "Heritage display aircraft"
+  },
+  {
+    "path": "/flying-bulls/oe-efb/",
+    "aircraftId": "notable-global-20261001-020",
+    "registration": "OE-EFB",
+    "entityId": "flying-bulls",
+    "name": "Red Bull · The Flying Bulls",
+    "relationship": "Heritage display aircraft"
+  },
+  {
+    "path": "/flying-bulls/oe-emm/",
+    "aircraftId": "notable-global-20261001-021",
+    "registration": "OE-EMM",
+    "entityId": "flying-bulls",
+    "name": "Red Bull · The Flying Bulls",
+    "relationship": "Heritage display aircraft"
+  },
+  {
+    "path": "/flying-bulls/oe-fse/",
+    "aircraftId": "notable-global-20261001-022",
+    "registration": "OE-FSE",
+    "entityId": "flying-bulls",
+    "name": "Red Bull · The Flying Bulls",
+    "relationship": "Heritage display aircraft"
+  },
+  {
+    "path": "/flying-bulls/oe-emd/",
+    "aircraftId": "notable-global-20261001-023",
+    "registration": "OE-EMD",
+    "entityId": "flying-bulls",
+    "name": "Red Bull · The Flying Bulls",
+    "relationship": "Heritage display aircraft"
+  },
+  {
+    "path": "/flying-bulls/oe-amm/",
+    "aircraftId": "notable-global-20261001-024",
+    "registration": "OE-AMM",
+    "entityId": "flying-bulls",
+    "name": "Red Bull · The Flying Bulls",
+    "relationship": "Heritage display aircraft"
+  },
+  {
+    "path": "/flying-bulls/oe-erb/",
+    "aircraftId": "notable-global-20261001-025",
+    "registration": "OE-ERB",
+    "entityId": "flying-bulls",
+    "name": "Red Bull · The Flying Bulls",
+    "relationship": "Heritage display aircraft"
+  },
+  {
+    "path": "/montreal-alouettes/c-gnlw/",
+    "aircraftId": "notable-global-20261001-026",
+    "registration": "C-GNLW",
+    "entityId": "montreal-alouettes",
+    "name": "Montreal Alouettes",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/vegas-golden-knights/n736ka/",
+    "aircraftId": "notable-global-20261001-027",
+    "registration": "N736KA",
+    "entityId": "vegas-golden-knights",
+    "name": "Vegas Golden Knights",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/washington-huskies/n662qx/",
+    "aircraftId": "notable-global-20261001-028",
+    "registration": "N662QX",
+    "entityId": "washington-huskies",
+    "name": "Washington Huskies",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/washington-state-cougars/n661qx/",
+    "aircraftId": "notable-global-20261001-029",
+    "registration": "N661QX",
+    "entityId": "washington-state-cougars",
+    "name": "Washington State Cougars",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/las-vegas-raiders/n328nv/",
+    "aircraftId": "notable-global-20261001-030",
+    "registration": "N328NV",
+    "entityId": "las-vegas-raiders",
+    "name": "Las Vegas Raiders",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/vegas-golden-knights/n302nv/",
+    "aircraftId": "notable-global-20261001-031",
+    "registration": "N302NV",
+    "entityId": "vegas-golden-knights",
+    "name": "Vegas Golden Knights",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/chennai-super-kings/a6-ejb/",
+    "aircraftId": "notable-global-20261001-032",
+    "registration": "A6-EJB",
+    "entityId": "chennai-super-kings",
+    "name": "Chennai Super Kings",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/abu-dhabi-grand-prix/a6-blv/",
+    "aircraftId": "notable-global-20261001-033",
+    "registration": "A6-BLV",
+    "entityId": "abu-dhabi-grand-prix",
+    "name": "Abu Dhabi Grand Prix",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/grand-slam-tennis/a6-euh/",
+    "aircraftId": "notable-global-20261001-034",
+    "registration": "A6-EUH",
+    "entityId": "grand-slam-tennis",
+    "name": "Grand Slam Tennis",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/nba/a6-eod/",
+    "aircraftId": "notable-global-20261001-035",
+    "registration": "A6-EOD",
+    "entityId": "nba",
+    "name": "NBA",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/asian-beach-games/b-6520/",
+    "aircraftId": "notable-global-20261001-036",
+    "registration": "B-6520",
+    "entityId": "asian-beach-games",
+    "name": "Asian Beach Games",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/manchester-united/9m-mtl/",
+    "aircraftId": "notable-global-20261001-037",
+    "registration": "9M-MTL",
+    "entityId": "manchester-united",
+    "name": "Manchester United",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/ufc/9m-xxd/",
+    "aircraftId": "notable-global-20261001-038",
+    "registration": "9M-XXD",
+    "entityId": "ufc",
+    "name": "UFC",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/hull-city/9h-cxg/",
+    "aircraftId": "notable-global-20261001-039",
+    "registration": "9H-CXG",
+    "entityId": "hull-city",
+    "name": "Hull City",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/vfb-stuttgart/tc-soi/",
+    "aircraftId": "notable-global-20261001-040",
+    "registration": "TC-SOI",
+    "entityId": "vfb-stuttgart",
+    "name": "VfB Stuttgart",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/team-t-rkiye/tc-jnb/",
+    "aircraftId": "notable-global-20261001-041",
+    "registration": "TC-JNB",
+    "entityId": "team-t-rkiye",
+    "name": "Team Türkiye",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/french-rugby/ec-lvu/",
+    "aircraftId": "notable-global-20261001-042",
+    "registration": "EC-LVU",
+    "entityId": "french-rugby",
+    "name": "French Rugby",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/athletic-club-bilbao/ec-luo/",
+    "aircraftId": "notable-global-20261001-043",
+    "registration": "EC-LUO",
+    "entityId": "athletic-club-bilbao",
+    "name": "Athletic Club Bilbao",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/africa-cup-of-nations/cn-max/",
+    "aircraftId": "notable-global-20261001-044",
+    "registration": "CN-MAX",
+    "entityId": "africa-cup-of-nations",
+    "name": "Africa Cup of Nations",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/team-chile/cc-bed/",
+    "aircraftId": "notable-global-20261001-045",
+    "registration": "CC-BED",
+    "entityId": "team-chile",
+    "name": "Team Chile",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/argentina-football/lv-fvh/",
+    "aircraftId": "notable-global-20261001-046",
+    "registration": "LV-FVH",
+    "entityId": "argentina-football",
+    "name": "Argentina Football",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/minnesota-golden-gophers/n809sy/",
+    "aircraftId": "notable-global-20261001-047",
+    "registration": "N809SY",
+    "entityId": "minnesota-golden-gophers",
+    "name": "Minnesota Golden Gophers",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/seattle-mariners/n710al/",
+    "aircraftId": "notable-global-20261001-048",
+    "registration": "N710AL",
+    "entityId": "seattle-mariners",
+    "name": "Seattle Mariners",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/manchester-city/a6-bnd/",
+    "aircraftId": "notable-global-20261001-049",
+    "registration": "A6-BND",
+    "entityId": "manchester-city",
+    "name": "Manchester City",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/borussia-dortmund/d-aewm/",
+    "aircraftId": "notable-global-20261001-050",
+    "registration": "D-AEWM",
+    "entityId": "borussia-dortmund",
+    "name": "Borussia Dortmund",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/paris-saint-germain/a7-bek/",
+    "aircraftId": "notable-global-20261001-051",
+    "registration": "A7-BEK",
+    "entityId": "paris-saint-germain",
+    "name": "Paris Saint-Germain",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/formula-1/a7-beg/",
+    "aircraftId": "notable-global-20261001-052",
+    "registration": "A7-BEG",
+    "entityId": "formula-1",
+    "name": "Formula 1",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/formula-1/a7-bel/",
+    "aircraftId": "notable-global-20261001-053",
+    "registration": "A7-BEL",
+    "entityId": "formula-1",
+    "name": "Formula 1",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/team-usa/n531dn/",
+    "aircraftId": "notable-global-20261001-054",
+    "registration": "N531DN",
+    "entityId": "team-usa",
+    "name": "Team USA",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/team-usa/n521dn/",
+    "aircraftId": "notable-global-20261001-055",
+    "registration": "N521DN",
+    "entityId": "team-usa",
+    "name": "Team USA",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/los-angeles-2028/n522dz/",
+    "aircraftId": "notable-global-20261001-056",
+    "registration": "N522DZ",
+    "entityId": "los-angeles-2028",
+    "name": "Los Angeles 2028",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/team-usa/n411dx/",
+    "aircraftId": "notable-global-20261001-057",
+    "registration": "N411DX",
+    "entityId": "team-usa",
+    "name": "Team USA",
+    "relationship": "Team-branded airline aircraft"
+  },
+  {
+    "path": "/pok-mon-jets/ja607a/",
+    "aircraftId": "notable-global-20261001-058",
+    "registration": "JA607A",
+    "entityId": "pok-mon-jets",
+    "name": "Pokémon jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/pok-mon-jets/ja894a/",
+    "aircraftId": "notable-global-20261001-059",
+    "registration": "JA894A",
+    "entityId": "pok-mon-jets",
+    "name": "Pokémon jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/pok-mon-jets/ja784a/",
+    "aircraftId": "notable-global-20261001-060",
+    "registration": "JA784A",
+    "entityId": "pok-mon-jets",
+    "name": "Pokémon jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/pok-mon-jets/b-18916/",
+    "aircraftId": "notable-global-20261001-061",
+    "registration": "B-18916",
+    "entityId": "pok-mon-jets",
+    "name": "Pokémon jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/pok-mon-jets/b-18101/",
+    "aircraftId": "notable-global-20261001-062",
+    "registration": "B-18101",
+    "entityId": "pok-mon-jets",
+    "name": "Pokémon jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/pok-mon-jets/pk-gmu/",
+    "aircraftId": "notable-global-20261001-063",
+    "registration": "PK-GMU",
+    "entityId": "pok-mon-jets",
+    "name": "Pokémon jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/pok-mon-jets/9v-ojj/",
+    "aircraftId": "notable-global-20261001-064",
+    "registration": "9V-OJJ",
+    "entityId": "pok-mon-jets",
+    "name": "Pokémon jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/pok-mon-jets/ja73ab/",
+    "aircraftId": "notable-global-20261001-065",
+    "registration": "JA73AB",
+    "entityId": "pok-mon-jets",
+    "name": "Pokémon jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/pok-mon-jets/ja73ng/",
+    "aircraftId": "notable-global-20261001-066",
+    "registration": "JA73NG",
+    "entityId": "pok-mon-jets",
+    "name": "Pokémon jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/pok-mon-jets/hl8306/",
+    "aircraftId": "notable-global-20261001-067",
+    "registration": "HL8306",
+    "entityId": "pok-mon-jets",
+    "name": "Pokémon jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/hello-kitty-sanrio-jets/b-16740/",
+    "aircraftId": "notable-global-20261001-068",
+    "registration": "B-16740",
+    "entityId": "hello-kitty-sanrio-jets",
+    "name": "Hello Kitty & Sanrio jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/hello-kitty-sanrio-jets/b-16217/",
+    "aircraftId": "notable-global-20261001-069",
+    "registration": "B-16217",
+    "entityId": "hello-kitty-sanrio-jets",
+    "name": "Hello Kitty & Sanrio jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/hello-kitty-sanrio-jets/b-16722/",
+    "aircraftId": "notable-global-20261001-070",
+    "registration": "B-16722",
+    "entityId": "hello-kitty-sanrio-jets",
+    "name": "Hello Kitty & Sanrio jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/hello-kitty-sanrio-jets/b-16332/",
+    "aircraftId": "notable-global-20261001-071",
+    "registration": "B-16332",
+    "entityId": "hello-kitty-sanrio-jets",
+    "name": "Hello Kitty & Sanrio jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/hello-kitty-sanrio-jets/b-16333/",
+    "aircraftId": "notable-global-20261001-072",
+    "registration": "B-16333",
+    "entityId": "hello-kitty-sanrio-jets",
+    "name": "Hello Kitty & Sanrio jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/harry-potter-jets/cc-bgm/",
+    "aircraftId": "notable-global-20261001-073",
+    "registration": "CC-BGM",
+    "entityId": "harry-potter-jets",
+    "name": "Harry Potter jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/harry-potter-jets/pr-mya/",
+    "aircraftId": "notable-global-20261001-074",
+    "registration": "PR-MYA",
+    "entityId": "harry-potter-jets",
+    "name": "Harry Potter jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/superman-jet/n542vl/",
+    "aircraftId": "notable-global-20261001-075",
+    "registration": "N542VL",
+    "entityId": "superman-jet",
+    "name": "Superman jet",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/spongebob-jet/n207nv/",
+    "aircraftId": "notable-global-20261001-076",
+    "registration": "N207NV",
+    "entityId": "spongebob-jet",
+    "name": "SpongeBob jet",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/pok-mon-jets/pk-gpy/",
+    "aircraftId": "notable-global-20261001-077",
+    "registration": "PK-GPY",
+    "entityId": "pok-mon-jets",
+    "name": "Pokémon jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/disney-character-jets/b-18055/",
+    "aircraftId": "notable-global-20261001-078",
+    "registration": "B-18055",
+    "entityId": "disney-character-jets",
+    "name": "Disney character jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/warner-bros-world-jet/a6-bma/",
+    "aircraftId": "notable-global-20261001-079",
+    "registration": "A6-BMA",
+    "entityId": "warner-bros-world-jet",
+    "name": "Warner Bros. World jet",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/star-wars-jets/ja743a/",
+    "aircraftId": "notable-global-20261001-080",
+    "registration": "JA743A",
+    "entityId": "star-wars-jets",
+    "name": "Star Wars jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/disney-character-jets/b-8119/",
+    "aircraftId": "notable-global-20261001-081",
+    "registration": "B-8119",
+    "entityId": "disney-character-jets",
+    "name": "Disney character jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/disney-character-jets/b-5976/",
+    "aircraftId": "notable-global-20261001-082",
+    "registration": "B-5976",
+    "entityId": "disney-character-jets",
+    "name": "Disney character jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/disney-character-jets/b-6635/",
+    "aircraftId": "notable-global-20261001-083",
+    "registration": "B-6635",
+    "entityId": "disney-character-jets",
+    "name": "Disney character jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/disney-character-jets/b-6507/",
+    "aircraftId": "notable-global-20261001-084",
+    "registration": "B-6507",
+    "entityId": "disney-character-jets",
+    "name": "Disney character jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/legoland-jet/b-9957/",
+    "aircraftId": "notable-global-20261001-085",
+    "registration": "B-9957",
+    "entityId": "legoland-jet",
+    "name": "LEGOLAND jet",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/persona-5-royal-jet/9m-aff/",
+    "aircraftId": "notable-global-20261001-086",
+    "registration": "9M-AFF",
+    "entityId": "persona-5-royal-jet",
+    "name": "Persona 5 Royal jet",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/sonic-the-hedgehog-jet/9m-xxu/",
+    "aircraftId": "notable-global-20261001-087",
+    "registration": "9M-XXU",
+    "entityId": "sonic-the-hedgehog-jet",
+    "name": "Sonic the Hedgehog jet",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/the-smurfs-jet/tc-spy/",
+    "aircraftId": "notable-global-20261001-088",
+    "registration": "TC-SPY",
+    "entityId": "the-smurfs-jet",
+    "name": "The Smurfs jet",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/star-trek-jet/tc-spo/",
+    "aircraftId": "notable-global-20261001-089",
+    "registration": "TC-SPO",
+    "entityId": "star-trek-jet",
+    "name": "Star Trek jet",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/tintin-jet/oo-snb/",
+    "aircraftId": "notable-global-20261001-090",
+    "registration": "OO-SNB",
+    "entityId": "tintin-jet",
+    "name": "Tintin jet",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/disney-character-jets/pr-ysh/",
+    "aircraftId": "notable-global-20261001-091",
+    "registration": "PR-YSH",
+    "entityId": "disney-character-jets",
+    "name": "Disney character jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/disney-character-jets/pr-ysi/",
+    "aircraftId": "notable-global-20261001-092",
+    "registration": "PR-YSI",
+    "entityId": "disney-character-jets",
+    "name": "Disney character jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/disney-character-jets/pr-ysk/",
+    "aircraftId": "notable-global-20261001-093",
+    "registration": "PR-YSK",
+    "entityId": "disney-character-jets",
+    "name": "Disney character jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/disney-character-jets/pr-yjf/",
+    "aircraftId": "notable-global-20261001-094",
+    "registration": "PR-YJF",
+    "entityId": "disney-character-jets",
+    "name": "Disney character jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/disney-character-jets/pr-ysr/",
+    "aircraftId": "notable-global-20261001-095",
+    "registration": "PR-YSR",
+    "entityId": "disney-character-jets",
+    "name": "Disney character jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/disney-character-jets/n537as/",
+    "aircraftId": "notable-global-20261001-096",
+    "registration": "N537AS",
+    "entityId": "disney-character-jets",
+    "name": "Disney character jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/star-wars-jets/n538as/",
+    "aircraftId": "notable-global-20261001-097",
+    "registration": "N538AS",
+    "entityId": "star-wars-jets",
+    "name": "Star Wars jets",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/nintendo-mario-jet/n561jb/",
+    "aircraftId": "notable-global-20261001-098",
+    "registration": "N561JB",
+    "entityId": "nintendo-mario-jet",
+    "name": "Nintendo Mario jet",
+    "relationship": "Entertainment"
+  },
+  {
+    "path": "/qantas-flying-art/vh-x4a/",
+    "aircraftId": "notable-global-20261001-099",
+    "registration": "VH-X4A",
+    "entityId": "qantas-flying-art",
+    "name": "Qantas Flying Art",
+    "relationship": "Special livery"
+  },
+  {
+    "path": "/qantas-flying-art/vh-znd/",
+    "aircraftId": "notable-global-20261001-100",
+    "registration": "VH-ZND",
+    "entityId": "qantas-flying-art",
+    "name": "Qantas Flying Art",
+    "relationship": "Special livery"
+  },
+  {
+    "path": "/qantas-flying-art/vh-xzj/",
+    "aircraftId": "notable-global-20261001-101",
+    "registration": "VH-XZJ",
+    "entityId": "qantas-flying-art",
+    "name": "Qantas Flying Art",
+    "relationship": "Special livery"
+  }
+]

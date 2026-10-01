@@ -1,3 +1,4 @@
+import {createSpecialFlights} from './special-flights.mjs';
 import {airframePage,airframeDocument} from './airframe-pages.mjs';
 import {SITE_ORIGIN} from './site.mjs';
 import {sendHttpError} from './error-pages.mjs';
@@ -28,6 +29,7 @@ import {createConfiguredMembership} from './membership-config.mjs';
 import {createAirportWeather} from './airport-weather.mjs';
 import {simulatorPage} from './simulator.mjs';
 const feed = configuredFeed();
+const specialFlights=createSpecialFlights(feed.primary);
 const membership=await createConfiguredMembership({observations:()=>{const rows=new Map();for(const p of feed.providers)for(const item of p.client.cache.values())for(const a of item.value?.aircraft??[]){if((a.observedAt??0)>(rows.get(a.hex)?.observedAt??0))rows.set(a.hex,a);}return [...rows.values()];}});
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -73,6 +75,7 @@ export const server = http.createServer(async (req, res) => {
       if (rate.count > 60) { res.setHeader('Retry-After', String(Math.max(1, Math.ceil((rate.start + 60000 - Date.now()) / 1000)))); return json(res, 429, { error: 'Please wait a moment before refreshing.' }); }
       if (rates.size > 500) rates.delete(rates.keys().next().value);
       try {
+        if(url.pathname==='/api/special-flights')return json(res,200,await specialFlights());
         if(url.pathname==='/api/trips'){try{return json(res,200,url.searchParams.get('sample')==='1'?await tripResponse(url.searchParams):tripDiscovery(tripQuery(url.searchParams)));}catch(e){return json(res,e.status||503,{error:e.status?e.message:'Trip lookup unavailable.'});}}
         if(url.pathname==='/api/weather-overview')return json(res,200,await localWeather.overview());
         if(url.pathname==='/api/aurowall'){try{return json(res,200,await aurowall());}catch{return json(res,503,{error:'Music library is temporarily unavailable. Please retry.'});}}

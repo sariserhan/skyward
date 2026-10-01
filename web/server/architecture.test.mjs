@@ -7,7 +7,7 @@ import {FeedClient} from './feed.mjs';
 const env={SKYWARD_PUBLIC_ORIGIN:'https://skyward.example'};
 const page=path=>publicPage(new URL(path,'https://unused.invalid'),env);
 test('airport pages have real catalog facts and canonical links without a globe dependency',()=>{
- const p=page('/airports/TAS/');assert.equal(p.status,200);assert.match(p.body,/Tashkent/);assert.match(p.body,/#airport=TAS/);assert.match(p.body,/rel="canonical" href="https:\/\/skyward.example\/airports\/TAS\/"/);assert.doesNotMatch(p.body,/<script(?! type="application\/ld\+json")|Cesium|live flight count: /);
+ const p=page('/airports/TAS/');assert.equal(p.status,200);assert.match(p.body,/Tashkent/);assert.match(p.body,/#airport=TAS/);assert.match(p.body,/rel="canonical" href="https:\/\/skyward.example\/airports\/TAS\/"/);assert.doesNotMatch(p.body,/<script(?! type="application\/ld\+json"| defer src="\/watch\/special-flights.js")|Cesium|live flight count: /);
  assert.equal(page('/airports/tas').location,'/airports/TAS/');assert.equal(page('/airports/XXX/').status,404);
 });
 test('directory query is escaped, bounded, searchable and paginated',()=>{
