@@ -1,0 +1,11 @@
+.live-collections{flex-shrink:0;margin:0 0 16px;border:1px solid #427c73;border-radius:12px;background:linear-gradient(125deg,#173f43,#102632);color:#e8f5f2;overflow:hidden}
+.live-collections summary{cursor:pointer;padding:13px 14px;list-style:none;display:grid;gap:5px;min-height:44px}
+.live-collections summary::-webkit-details-marker{display:none}
+.live-collections summary>span:nth-child(2){display:flex;justify-content:space-between;font-size:16px;font-weight:650}
+.live-collections .live-collections-kicker{font-size:10px;letter-spacing:.14em;color:#8fdfc8;font-weight:750}
+.live-collections small{font-size:11px;line-height:1.5;color:#bed5d8}
+.live-collections-content{padding:0 14px 14px;display:grid;gap:10px}
+.live-collections-content p{font-size:12px;line-height:1.5;margin:0}
+.live-collections-content button{display:grid;gap:5px;text-align:left;padding:12px;border:1px solid #548c82;border-radius:8px;background:#183b3f;color:#e8f5f2;min-height:44px}
+.live-collections-content button span,.live-collections-content a{font-size:12px;color:#8fdfc8}
+.live-collections summary:focus-visible,.live-collections button:focus-visible,.live-collections a:focus-visible{outline:2px solid #8fdfc8;outline-offset:-3px}

@@ -133,3 +133,15 @@ Source-review decisions:
 Every source URL is stored on the relevant catalog record and exposed through the aircraft/association source sections. Audited imports record the complete before/after catalog. No schema migration, new Worker, R2 object, external request on directory browsing, or database write was added. Existing explicit Premium following-list sync remains unchanged.
 
 Validation: `web/server/notable-directory.test.mjs` exercises category/search behavior, hidden/empty entities, duplicate associations, context bounds and historical-identifier lookup protection. `web/tests/browser/notable-directory.py` exercises category/query URLs, source navigation, follow persistence, empty-state reset and desktop/mobile layout while asserting no Cesium or tracking-feed fetch. The existing aircraft-following/editor browser regression remains applicable.
+
+### Live side-menu discovery
+
+The aircraft browser's **Watch live · Teams & fleets** section matches the static
+catalog against observations already loaded by the map. It adds no polling or
+account writes. Entries require a current high-confidence ICAO identity, a
+reviewed non-person/non-historic association, an airborne position no older than
+two minutes, and a non-retired aircraft. Ground, synthetic, stale and conflicting
+registration observations are hidden. This is area-scoped discovery, not a
+worldwide active-fleet search. Selecting a result opens the existing aircraft
+viewer; no follow action is required. The separate reference directory retains
+historical aircraft and evidence, and is explicitly labeled as reference material.

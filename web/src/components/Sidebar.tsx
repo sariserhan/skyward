@@ -1,3 +1,4 @@
+import {LiveCollections} from './LiveCollections';
 import {SavedFlights} from './SavedFlights';
 import {coverageMessage} from '../lib/coverageMessage';
 import {TrafficFilters} from './TrafficFilters';
@@ -21,6 +22,7 @@ export function Sidebar(p: Props) {
   const rows = useMemo(() => p.aircraft.filter(a => (!query || `${a.callsign} ${a.registration} ${a.hex}`.toLowerCase().includes(query.toLowerCase()))).sort((a, b) => (b.observedAt ?? 0) - (a.observedAt ?? 0) || a.callsign.localeCompare(b.callsign)), [p.aircraft, query]);
   return <aside className="sidebar" aria-label="Aircraft browser">
     <div className="sidebar-title"><h2>{p.watching ? 'Your watchlist' : 'Airspace'}</h2><Radio size={18} className="muted"/></div>
+    <LiveCollections aircraft={p.allAircraft} now={p.now} select={p.select}/>
     <div className="airport-directory">
       <label className="search-field"><Search size={17}/><input aria-label="Search airports" placeholder="Airport, city, country or code" value={airportQuery} onFocus={()=>setAirportSearchOpen(true)} onChange={e=>{setAirportQuery(e.target.value);setAirportSearchOpen(true);}} onKeyDown={e=>{if(e.key==='Escape')setAirportSearchOpen(false);}}/>{airportSearchOpen&&<button aria-label="Close airport search" onClick={()=>setAirportSearchOpen(false)}><X size={14}/></button>}</label>
       <small>{Object.keys(AIRPORTS).length.toLocaleString()} major airports worldwide</small>
