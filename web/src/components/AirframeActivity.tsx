@@ -1,0 +1,10 @@
+import {useEffect,useRef,useState} from 'react';
+import {activityLabel,emptyActivity,observeActivity,type ActivityType} from '../lib/airframeActivity';
+import type {AirframeObservation} from '../lib/airframeObservations';
+export default function AirframeActivity({row,source,followed}:{row:AirframeObservation|null;source:string;followed:boolean}){
+ const [state,setState]=useState(emptyActivity),[enabled,setEnabled]=useState<ActivityType[]>([]),[notice,setNotice]=useState('');const consumed=useRef(0);
+ useEffect(()=>{if(!followed){setEnabled([]);setNotice('');}},[followed]);
+ useEffect(()=>{if(row)setState(s=>observeActivity(s,row,source));},[row,source]);
+ useEffect(()=>{const latest=state.events.filter(e=>e.at>consumed.current);consumed.current=Math.max(consumed.current,...state.events.map(e=>e.at));const alert=latest.filter(e=>followed&&enabled.includes(e.type));if(alert.length)setNotice(alert.map(e=>activityLabel[e.type]).join(' · '));},[state.events,enabled,followed]);
+ return <section className="airframe-card"><h2>Observed activity</h2><p>Local to this open page. Check observations or enable bounded page monitoring to update. No background tracking or server storage. Repeated airborne/ground observations do not establish a departure airport or arrival time.</p><details><summary>Aircraft activity alerts · {followed&&enabled.length?'on':'off'}</summary><p>Follow this aircraft to enable in-page alerts. Preferences reset when this page closes.</p>{(Object.keys(activityLabel) as ActivityType[]).map(type=><label className="airframe-check" key={type}><input type="checkbox" disabled={!followed} checked={enabled.includes(type)} onChange={e=>setEnabled(v=>e.target.checked?[...v,type]:v.filter(t=>t!==type))}/>{activityLabel[type]}</label>)}</details>{notice&&followed&&<p role="status">{notice}</p>}{state.events.length?<ol>{state.events.slice().reverse().map(e=><li key={e.type+e.at}>{activityLabel[e.type]} · {e.registration} · {new Date(e.at).toISOString()} · {e.source}</li>)}</ol>:<p>No fresh observations recorded in this session.</p>}</section>;
+}

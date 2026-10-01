@@ -84,6 +84,7 @@
     "check:stripe": "node --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/check-stripe.mjs",
     "check:launch": "node scripts/check-launch.mjs",
     "catalog:check": "node scripts/prepare-airframes.mjs",
-    "catalog:import": "node scripts/import-airframes.mjs"
+    "catalog:import": "node scripts/import-airframes.mjs",
+    "check:free-budget": "node --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/check-free-budget.mjs"
   }
 }
