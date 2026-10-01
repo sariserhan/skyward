@@ -535,6 +535,165 @@
           "confidence": "HIGH"
         }
       ]
+    },
+    {
+      "id": "noaa-twin-otter-46",
+      "manufacturer": "De Havilland Canada",
+      "model": "DHC-6-300 Twin Otter",
+      "operator": "NOAA",
+      "category": "Research aircraft",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/de-havilland-dhc-6-300-twin-otter",
+          "sourceName": "NOAA Twin Otter fleet specifications",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "N46RF",
+          "country": "US",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/de-havilland-dhc-6-300-twin-otter",
+          "sourceName": "NOAA Twin Otter fleet specifications",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "noaa-twin-otter-48",
+      "manufacturer": "De Havilland Canada",
+      "model": "DHC-6-300 Twin Otter",
+      "operator": "NOAA",
+      "category": "Research aircraft",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/de-havilland-dhc-6-300-twin-otter",
+          "sourceName": "NOAA Twin Otter fleet specifications",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "N48RF",
+          "country": "US",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/de-havilland-dhc-6-300-twin-otter",
+          "sourceName": "NOAA Twin Otter fleet specifications",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "noaa-twin-otter-56",
+      "manufacturer": "De Havilland Canada",
+      "model": "DHC-6-300 Twin Otter",
+      "operator": "NOAA",
+      "category": "Research aircraft",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/de-havilland-dhc-6-300-twin-otter",
+          "sourceName": "NOAA Twin Otter fleet specifications",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "N56RF",
+          "country": "US",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [
+        {
+          "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=56RF",
+          "sourceName": "FAA N56RF aircraft registration",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "a7260e",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "sources": [
+        {
+          "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/de-havilland-dhc-6-300-twin-otter",
+          "sourceName": "NOAA Twin Otter fleet specifications",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        },
+        {
+          "sourceUrl": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=56RF",
+          "sourceName": "FAA N56RF aircraft registration",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ],
+      "serialNumber": "788",
+      "yearBuilt": 1982
+    },
+    {
+      "id": "noaa-twin-otter-57",
+      "manufacturer": "De Havilland Canada",
+      "model": "DHC-6-300 Twin Otter",
+      "operator": "NOAA",
+      "category": "Research aircraft",
+      "registrations": [
+        {
+          "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/de-havilland-dhc-6-300-twin-otter",
+          "sourceName": "NOAA Twin Otter fleet specifications",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "N57RF",
+          "country": "US",
+          "validFrom": null,
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/de-havilland-dhc-6-300-twin-otter",
+          "sourceName": "NOAA Twin Otter fleet specifications",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
+    },
+    {
+      "id": "alaska-seattle-world-cup-985",
+      "manufacturer": "Boeing",
+      "model": "737-9 MAX",
+      "variant": "Seattle World Cup 2026 commemorative livery",
+      "operator": "Alaska Airlines",
+      "category": "Airline special livery",
+      "registrations": [
+        {
+          "sourceUrl": "https://news.alaskaair.com/company/seattle-fifa-world-cup-2026-local-organizing-committee-livery/",
+          "sourceName": "Alaska Airlines Seattle World Cup livery announcement, June 10 2026",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH",
+          "value": "N985AK",
+          "country": "US",
+          "validFrom": "2026-06-10",
+          "validTo": null
+        }
+      ],
+      "icaoIdentities": [],
+      "sources": [
+        {
+          "sourceUrl": "https://news.alaskaair.com/company/seattle-fifa-world-cup-2026-local-organizing-committee-livery/",
+          "sourceName": "Alaska Airlines Seattle World Cup livery announcement, June 10 2026",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
+        }
+      ]
     }
   ],
   "entities": [
@@ -841,6 +1000,76 @@
       "validTo": null,
       "reviewed": true,
       "context": "The collection identifies its P-38 Lightning as N25Y. This is a heritage display aircraft, not a personal-transport association."
+    },
+    {
+      "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/de-havilland-dhc-6-300-twin-otter",
+      "sourceName": "NOAA Twin Otter fleet specifications",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "noaa-twin-otter-46-noaa",
+      "aircraftId": "noaa-twin-otter-46",
+      "entityId": "noaa",
+      "associationType": "OPERATOR",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "NOAA identifies this registration in its Twin Otter research fleet. A research mission does not imply a point-to-point passenger destination."
+    },
+    {
+      "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/de-havilland-dhc-6-300-twin-otter",
+      "sourceName": "NOAA Twin Otter fleet specifications",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "noaa-twin-otter-48-noaa",
+      "aircraftId": "noaa-twin-otter-48",
+      "entityId": "noaa",
+      "associationType": "OPERATOR",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "NOAA identifies this registration in its Twin Otter research fleet. A research mission does not imply a point-to-point passenger destination."
+    },
+    {
+      "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/de-havilland-dhc-6-300-twin-otter",
+      "sourceName": "NOAA Twin Otter fleet specifications",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "noaa-twin-otter-56-noaa",
+      "aircraftId": "noaa-twin-otter-56",
+      "entityId": "noaa",
+      "associationType": "OPERATOR",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "NOAA identifies this registration in its Twin Otter research fleet. A research mission does not imply a point-to-point passenger destination."
+    },
+    {
+      "sourceUrl": "https://www.omao.noaa.gov/aircraft-operations/aircraft/de-havilland-dhc-6-300-twin-otter",
+      "sourceName": "NOAA Twin Otter fleet specifications",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "noaa-twin-otter-57-noaa",
+      "aircraftId": "noaa-twin-otter-57",
+      "entityId": "noaa",
+      "associationType": "OPERATOR",
+      "validFrom": null,
+      "validTo": null,
+      "reviewed": true,
+      "context": "NOAA identifies this registration in its Twin Otter research fleet. A research mission does not imply a point-to-point passenger destination."
+    },
+    {
+      "sourceUrl": "https://news.alaskaair.com/company/seattle-fifa-world-cup-2026-local-organizing-committee-livery/",
+      "sourceName": "Alaska Airlines Seattle World Cup livery announcement, June 10 2026",
+      "verifiedAt": "2026-10-01",
+      "confidence": "HIGH",
+      "id": "alaska-seattle-world-cup-985-alaska",
+      "aircraftId": "alaska-seattle-world-cup-985",
+      "entityId": "alaska-airlines",
+      "associationType": "OPERATOR",
+      "validFrom": "2026-06-10",
+      "validTo": null,
+      "reviewed": true,
+      "context": "Alaska identifies this 737-9 MAX in its June 2026 Seattle World Cup promotion. This is a scheduled airline aircraft with commemorative branding, not a team charter; current paint scheme is unconfirmed."
     }
   ]
 }

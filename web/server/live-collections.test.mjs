@@ -14,3 +14,11 @@ test('only recent airborne observed organizational aircraft appear',()=>{
 test('retired, historical associations and personal collections cannot become live entries',()=>{
  for(const change of [d=>d.aircraft.find(x=>x.id===a.id).retired=true,d=>d.entities.forEach(e=>e.entityType='PERSON'),d=>d.associations.forEach(s=>s.validTo='2026-09-30'),d=>d.associations.forEach(s=>s.associationType='FORMERLY_ASSOCIATED')]){const d=structuredClone(c);change(d);assert.equal(liveCollections(d,[row],now).length,0);}
 });
+test('registration-only fleet entries require an unambiguous matching observation',()=>{
+ const reg={...row,hex:'abcdef',registration:'N985AK'};
+ assert.match(liveCollections(c,[reg],now)[0].names,/Alaska/);
+ assert.equal(liveCollections(c,[reg,{...reg,hex:'fedcba'}],now).length,0);
+ const conflict=structuredClone(c);const a=conflict.aircraft.find(a=>a.id==='alaska-seattle-world-cup-985');conflict.aircraft.push({...a,id:'different-airframe'});
+ assert.equal(liveCollections(conflict,[reg],now).length,0);
+ assert.equal(liveCollections(c,[{...reg,observedAt:now-121000}],now).length,0);
+});

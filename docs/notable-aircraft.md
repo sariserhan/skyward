@@ -153,3 +153,21 @@ No checks run on page load or in the background. A one-minute session cooldown
 survives tab changes and reloads when session storage is available; requests abort
 on leaving and stop on errors. Only matched, recent airborne observations produce
 Watch live links. Results expire after two minutes and make no passenger claim.
+
+### Additional organizational fleet records (2026-10-01)
+
+The catalog now contains 20 airframes in 10 collections. Added NOAA's N46RF,
+N48RF, N56RF and N57RF DHC-6-300 Twin Otters using NOAA's fleet specifications;
+N56RF also has FAA serial/ICAO evidence. Added Alaska Airlines N985AK, a Boeing
+737-9 MAX with the Seattle World Cup commemorative livery documented in the
+operator's June 10, 2026 announcement. This is airline branding, not a team charter
+or a guarantee that its paint scheme remains unchanged. Evidence URLs accompany
+each record; missing ICAO identities are left empty, never calculated or guessed.
+
+Live discovery can be scoped to a collection, still capped at ten checks and a
+shared one-minute session cooldown. A current verified registration can be queried
+when ICAO evidence is unavailable. Results must match the registration exactly,
+match an established ICAO address when present, have no conflicting catalog identity,
+and contain only one observed address for that registration. Stale, ground and
+ambiguous results are excluded. Cards show the verified model and destination
+unknown; the existing flight viewer obtains route data separately if available.
