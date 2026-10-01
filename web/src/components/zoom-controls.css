@@ -1,0 +1,5 @@
+.camera-zoom-controls{display:inline-flex;align-items:center;gap:4px;flex-shrink:0}
+.camera-zoom-controls>button{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:0 10px;border:1px solid #526e7b;border-radius:7px;background:#0d2836;color:#edf4f6;font:22px/1 system-ui;cursor:pointer}
+.camera-zoom-controls>button:disabled{opacity:.4;cursor:default}
+.camera-zoom-controls>button:focus-visible{outline:2px solid #8fdfc8;outline-offset:2px}
+.tower-radar .camera-zoom-controls{margin-top:8px}

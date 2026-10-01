@@ -118,3 +118,8 @@ in the mobile canvas. Screenshots and `results.json` are retained for review.
 These are Chromium software-renderer checks, not physical-device certification.
 The `Aircraft visual regression` workflow runs for relevant pull requests and can
 also be started manually; browser tooling is installed separately from app dependencies.
+
+`npm run test:zoom-controls` uses the same Node Playwright setup to check globe,
+tower, radar, tracked-flight, and external simulator zoom buttons. It verifies
+camera changes, disabled limits, retained flight tracking, and mobile layout,
+with screenshots saved under the temporary directory or `SKYWARD_QA_ARTIFACTS`.

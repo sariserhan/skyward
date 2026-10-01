@@ -272,10 +272,12 @@ export function Globe(p: Props) {
       v.camera.percentageChanged = .02;
       const removeChanged = v.camera.changed.addEventListener(updateReadout);
       const removeEnd = v.camera.moveEnd.addEventListener(updateReadout);
-      const resize = new ResizeObserver(()=>{v.resize();updateReadout();}); resize.observe(container.current);
+      // Canvas sizing writes layout; defer it beyond ResizeObserver delivery.
+      let resizeFrame=0;
+      const resize = new ResizeObserver(()=>{cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(()=>{if(!v.isDestroyed()){v.resize();updateReadout();}});}); resize.observe(container.current);
       const removeTiles=v.scene.globe.tileLoadProgressEvent.addEventListener((count:number)=>setTilesLoading(count>0));
       const previousCleanup = cleanupInput;
-      cleanupInput=()=>{previousCleanup();removeTiles();removeChanged();removeEnd();resize.disconnect();};
+      cleanupInput=()=>{previousCleanup();removeTiles();removeChanged();removeEnd();resize.disconnect();cancelAnimationFrame(resizeFrame);};
       updateReadout();
       let recoveryTimer:ReturnType<typeof setTimeout>|undefined;
       const pose=():RecoveryPose=>{const pos=v.camera.positionCartographic;return {lon:C.Math.toDegrees(pos.longitude),lat:C.Math.toDegrees(pos.latitude),height:pos.height,heading:v.camera.heading,pitch:v.camera.pitch,roll:v.camera.roll};};
