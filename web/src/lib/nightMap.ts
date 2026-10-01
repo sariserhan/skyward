@@ -53,6 +53,7 @@ export function installNightMap(C:typeof Cesium,v:Cesium.Viewer){
  // Restrict the ID mask to nearby visible aircraft, not the entire fleet.
  // Preserve array identity when unchanged to avoid shader/texture rebuilds.
  let protectedModels:Cesium.Model[]=[];
+ let protectedPickIds:unknown[]=[];
  const maskAircraft=()=>{
   const models:Cesium.Model[]=[];
   const visit=(primitives:Cesium.PrimitiveCollection)=>{for(let i=0;i<primitives.length;i++){
@@ -66,7 +67,12 @@ export function installNightMap(C:typeof Cesium,v:Cesium.Viewer){
   visit(v.scene.primitives);
   models.sort((a,b)=>C.Cartesian3.distanceSquared(v.camera.positionWC,a.boundingSphere.center)-C.Cartesian3.distanceSquared(v.camera.positionWC,b.boundingSphere.center));
   models.length=Math.min(models.length,8);
-  if(models.length!==protectedModels.length||models.some(m=>!protectedModels.includes(m))){protectedModels=models;(stage as {selected?:Cesium.Model[]}).selected=models.length?models:undefined;}
+  // Custom shaders and other pipeline changes recreate a model's pick IDs
+  // without replacing the Model. Refresh Cesium's cached selection texture too.
+  const pickIds=models.flatMap(m=>(m as Cesium.Model&{pickIds?:unknown[]}).pickIds??[]);
+  if(models.length!==protectedModels.length||models.some(m=>!protectedModels.includes(m))||pickIds.length!==protectedPickIds.length||pickIds.some((id,i)=>id!==protectedPickIds[i])){
+   protectedModels=models;protectedPickIds=pickIds;(stage as {selected?:Cesium.Model[]}).selected=models.length?models:undefined;
+  }
  };
  const removeMask=v.scene.preRender.addEventListener(maskAircraft);
  let active=true,layer:Cesium.ImageryLayer|undefined;

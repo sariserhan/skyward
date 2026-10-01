@@ -31,8 +31,20 @@ export function installSolarLighting(C:Engine,v:Cesium.Viewer){
  const disposeNight=installNightMap(C,v);
  // Conservative clearcoat-like response for legacy matte paint. Preserve dark
  // rubber/glass, transparent parts, metals and already-authored roughness.
- const paintShader=new C.CustomShader({fragmentShaderText:`void fragmentMain(FragmentInput fsInput,inout czm_modelMaterial material){
+ const paintShader=new C.CustomShader({uniforms:{u_aircraftSun:{type:C.UniformType.VEC3,value:sunDirectionFixed(C,v.clock.currentTime)}},fragmentShaderText:`void fragmentMain(FragmentInput fsInput,inout czm_modelMaterial material){
   float paint=smoothstep(.25,.55,max(material.diffuse.r,max(material.diffuse.g,material.diffuse.b)));
+  // Keep broad tail faces readable in side view as well as grazing edges.
+  // The cool fill has a small floor so very dark liveries retain a silhouette.
+  vec3 worldPosition=fsInput.attributes.positionWC;
+  vec3 earthNormal=normalize(worldPosition/vec3(6378137.0*6378137.0,6378137.0*6378137.0,6356752.3*6356752.3));
+  float elevation=asin(clamp(dot(earthNormal,u_aircraftSun),-1.0,1.0));
+  float height=max(0.0,length(worldPosition)-length(normalize(worldPosition)*vec3(6378137.0,6378137.0,6356752.3)));
+  float horizonDip=acos(6371000.0/(6371000.0+height));
+  float night=1.0-smoothstep(radians(-6.0),radians(2.0),elevation+horizonDip);
+  float facing=abs(dot(normalize(fsInput.attributes.normalEC),normalize(-fsInput.attributes.positionEC)));
+  float rim=pow(1.0-facing,3.0);
+  vec3 faceFill=vec3(.012,.018,.028)*(.4+.6*facing*facing);
+  if(material.alpha>.98){material.emissive+=night*(material.diffuse*vec3(.055,.065,.085)+faceFill+vec3(.018,.026,.042)*rim);}
   if(material.alpha>.98&&max(material.specular.r,max(material.specular.g,material.specular.b))<.1&&material.roughness>.85){material.roughness=mix(material.roughness,.46,paint);}
  }`});
  const globe=v.scene.globe;v.clock.clockStep=C.ClockStep.SYSTEM_CLOCK;v.clock.shouldAnimate=true;
@@ -61,7 +73,7 @@ export function installSolarLighting(C:Engine,v:Cesium.Viewer){
  };
  const update=()=>{
   if(document.hidden)return;
-  const now=Date.now();if(Math.abs(now-updated)>1000){sun=sunDirectionFixed(C,v.clock.currentTime);updated=now;}
+  const now=Date.now();if(Math.abs(now-updated)>1000){sun=sunDirectionFixed(C,v.clock.currentTime);paintShader.setUniform('u_aircraftSun',sun);updated=now;}
   for(const e of v.entities.values)wire(e);
   for(let i=0;i<v.dataSources.length;i++)for(const e of v.dataSources.get(i).entities.values)wire(e);
  };
