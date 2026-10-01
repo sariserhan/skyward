@@ -2,6 +2,7 @@ import {useEffect,useRef,useState} from 'react';
 import {identityAt, type Catalog} from '../lib/airframeCatalog';
 import {matchAirframeObservation} from '../lib/airframeObservations';
 import {eligibleLiveCandidates,liveCandidates,liveCollections} from '../lib/liveCollections';
+import {isNotableAircraft} from '../lib/notableDirectory';
 import type {Aircraft} from '../types';
 const cooldownKey='skyward.live-directory-check.v1';
 function nextCheck(){try{const value=Number(sessionStorage.getItem(cooldownKey));return Number.isFinite(value)&&value>Date.now()&&value<=Date.now()+60000?value:0;}catch{return 0;}}
@@ -29,12 +30,12 @@ export default function LiveDirectory({c}:{c:Catalog}){
   }catch(e){if(!ctrl.signal.aborted)setMessage(e instanceof Error?e.message:'Unable to check observations.');}
   finally{if(!ctrl.signal.aborted){setBusy(false);controller.current=null;}}
  };
- const active=liveCollections(c,rows,now);
+ const active=liveCollections(c,rows,now,!!collection);
  return <section aria-label="Live aircraft collections">
   <p className="airframe-eyebrow">Team jets. Iconic fleets. A window into the skies.</p>
   <h2>Catch them in flight.</h2>
-  <p>Discover airborne aircraft associated with teams, airlines and organizations. Choose an aircraft and watch its journey on the globe.</p>
-  <label>Choose a collection<select value={collection} disabled={busy} onChange={e=>{setCollection(e.target.value);setBatch(0);const params=new URLSearchParams(location.search);if(e.target.value)params.set('collection',e.target.value);else params.delete('collection');history.replaceState(null,'',location.pathname+(params.size?'?'+params:''));setRows([]);setMessage('');}}><option value="">All collections · up to 10 aircraft</option><option value="sports">Sports teams · up to 10 aircraft</option>{c.entities.filter(e=>liveCandidates(c,now,e.id).length>0).map(e=><option key={e.id} value={e.id}>{e.displayName}</option>)}</select></label>
+  <p>Explore team aircraft, sports and entertainment liveries, and distinctive organizational aircraft worldwide. Find a recent airborne observation to watch on the globe.</p>
+  <label>Choose a collection<select value={collection} disabled={busy} onChange={e=>{setCollection(e.target.value);setBatch(0);const params=new URLSearchParams(location.search);if(e.target.value)params.set('collection',e.target.value);else params.delete('collection');history.replaceState(null,'',location.pathname+(params.size?'?'+params:''));setRows([]);setMessage('');}}><option value="">Featured worldwide · up to 10 aircraft</option><option value="sports">Sports teams · up to 10 aircraft</option><optgroup label="Teams, brands &amp; organizations">{c.entities.filter(e=>eligibleLiveCandidates(c,now,e.id).some(isNotableAircraft)).map(e=><option key={e.id} value={e.id}>{e.displayName}</option>)}</optgroup><optgroup label="Airline fleets · separate from featured aircraft">{c.entities.filter(e=>eligibleLiveCandidates(c,now,e.id).length>0&&!eligibleLiveCandidates(c,now,e.id).some(isNotableAircraft)).map(e=><option key={e.id} value={e.id}>{e.displayName}</option>)}</optgroup></select></label>
   {candidates.length>10&&<label>Aircraft batch<select aria-label="Aircraft batch" disabled={busy} value={batch} onChange={e=>{setBatch(Number(e.target.value));setRows([]);setMessage('');}}>{Array.from({length:Math.ceil(candidates.length/10)},(_,i)=><option key={i} value={i}>Aircraft {i*10+1}–{Math.min(candidates.length,(i+1)*10)} of {candidates.length}</option>)}</select></label>}
   <button onClick={check} disabled={busy||now<next}>{busy?'Checking aircraft…':now<next?'Check available shortly':'Find airborne aircraft'}</button>
   <p><small>Up to 10 checks per request. No automatic background polling.</small></p>

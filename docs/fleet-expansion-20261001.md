@@ -1,6 +1,8 @@
 # Fleet expansion and sidebar discovery — 2026-10-01
 
-The public catalog now has **122 distinct airframes, 16 collections and 124
+Superseded counts: see [the global notable expansion](global-notables-20261001.md). The 97 ordinary aircraft below are separate and do not count toward the featured-aircraft target.
+
+This earlier expansion produced **122 distinct airframes, 16 collections and 124
 associations**. These are not 122 teams or 122 flights currently airborne.
 The expansion adds 97 aircraft to the existing 25:
 

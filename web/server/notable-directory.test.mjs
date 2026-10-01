@@ -21,7 +21,7 @@ test('directory hides empty, archived and unpublished entities and deduplicates 
  const next=structuredClone(c);next.entities.push({id:'empty',displayName:'Empty',entityType:'COMPANY'});
  assert.ok(!directoryMatches(next,'','All').some(e=>e.id==='empty'));
  next.entities.find(e=>e.id==='new-england-patriots').archived=true;assert.equal(directoryMatches(next,'Patriots','Sports').length,0);
- const association=next.associations.find(a=>a.entityId==='flying-bulls');next.associations.push({...association,id:'duplicate'});assert.equal(entityAircraft(next,'flying-bulls').length,2);
+ const association=next.associations.find(a=>a.entityId==='flying-bulls');next.associations.push({...association,id:'duplicate'});assert.equal(entityAircraft(next,'flying-bulls').length,entityAircraft(c,'flying-bulls').length);
 });
 test('public context is bounded and old Giants identity cannot authorize live lookup',()=>{
  const next=structuredClone(source);next.associations[0].context='x'.repeat(501);assert.throws(()=>validateCatalog(next),/context/);

@@ -94,3 +94,6 @@ collections / 124 associations. See fleet-expansion-20261001.md for the source
 manifest, bounded discovery behavior and updated attachment review. The later
 attachment supplies actual URLs; earlier missing-URL notes describe the original
 attachment only. Personal live-tracking exclusions remain unchanged.
+
+
+The subsequent [global notable expansion](global-notables-20261001.md) brings the catalog to 223 aircraft / 60 entities / 225 associations. Featured discovery includes 120 non-historical candidates plus six historical records, with the 97 ordinary airline aircraft separated. Branded liveries have an explicit relationship type. Provider licensing gates remain unchanged.
