@@ -36,7 +36,7 @@
     "prepare:assets": "node scripts/copy-cesium.mjs",
     "predev": "npm run prepare:assets",
     "dev": "vite --host 0.0.0.0",
-    "build": "npm run prepare:assets && node scripts/prepare-airframes.mjs && node scripts/prepare-coverage.mjs && node scripts/prepare-airport-assets.mjs && tsc -b && vite build",
+    "build": "npm run prepare:assets && node scripts/prepare-airframes.mjs && node scripts/prepare-special-visuals.mjs && node scripts/prepare-coverage.mjs && node scripts/prepare-airport-assets.mjs && tsc -b && vite build",
     "start": "node --env-file-if-exists=.env --env-file-if-exists=.env.local server/index.mjs",
     "test": "node --test server/*.test.mjs",
     "prepare:fleet": "python3 scripts/make-aircraft.py",

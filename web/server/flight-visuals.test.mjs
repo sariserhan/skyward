@@ -28,7 +28,7 @@ test('model budgets are bounded and distance fades do not hide far symbols',()=>
 });
 test('full liveries only replace supported type/operator pairs and preserve aircraft geometry',()=>{
  const root=new URL('../public/',import.meta.url),catalog=JSON.parse(readFileSync(new URL('../src/lib/fullLiveries.json',import.meta.url)));
- assert.equal(catalog.length,34);assert.ok(fullLivery({aircraftType:'B738',callsign:'THY1'}));assert.equal(fullLivery({aircraftType:'A359',callsign:'THY1'}),null);
+ assert.equal(catalog.length,36);assert.ok(fullLivery({aircraftType:'B738',callsign:'THY1'}));assert.equal(fullLivery({aircraftType:'A359',callsign:'THY1'}),null);
  for(const m of catalog){const file=new URL(m.uri,root),g=JSON.parse(readFileSync(file)),base=JSON.parse(readFileSync(new URL(`models/sourced/${m.model}-v1.gltf`,root)));assert.deepEqual(g.meshes,base.meshes);assert.deepEqual(g.nodes,base.nodes);assert.equal(g.extras.skyward.livery.registrationMatch,false);for(const image of g.images??[])if(image.uri)assert.ok(readFileSync(new URL(image.uri,file)).length>0);}
  assert.equal(sourcedModel('A3ST').id,'beluga');assert.equal(sourcedModel('AS21').id,'ask21');assert.equal(sourcedModel('B463').match,'family');
 });

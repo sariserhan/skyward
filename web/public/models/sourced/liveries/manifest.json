@@ -55,7 +55,9 @@
         "AVA": "A320-AVA",
         "VLG": "A320-211/VLG",
         "NKS": "A320-231/NKS",
-        "JST": "A320-JST"
+        "JST": "A320-JST",
+        "TAM": "A320-231/A320-TAM-SA",
+        "VOI": "A320-231/VOI"
       },
       "folder": "Models/Liveries/"
     }
@@ -378,6 +380,24 @@
       "source": "https://raw.githubusercontent.com/FGMEMBERS/A320-family/00038142d3443d7f4aec9410520df608e8ae7ba8/Models/Liveries/A320-JST.png",
       "sha256": "6a4608594497f1b14a660ffb23edddb91cc8b6658825409a135d765ae1920495",
       "bytes": 491661
+    },
+    {
+      "file": "a320-TAM.png",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/A320-family/00038142d3443d7f4aec9410520df608e8ae7ba8/Models/Liveries/A320-231/A320-TAM-SA.png",
+      "sha256": "747fc3692234cbaa273d6d15a1ef6a27bd4cd4c05cee59eea3a147f6b20ae448",
+      "bytes": 438825
+    },
+    {
+      "file": "a320-VOI.png",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/A320-family/00038142d3443d7f4aec9410520df608e8ae7ba8/Models/Liveries/A320-231/VOI.png",
+      "sha256": "5bd76b582250af1f54488caa132f8fab9666f010064418473a2997a65f6f9afa",
+      "bytes": 438856
+    },
+    {
+      "file": "a320-VOI.xml",
+      "source": "https://raw.githubusercontent.com/FGMEMBERS/A320-family/00038142d3443d7f4aec9410520df608e8ae7ba8/Models/Liveries/A320-231/VOI.xml",
+      "sha256": "c702f5ee31adfbb9975ecdb0047b5f596f9edc87a48b9f740c2490e30de45778",
+      "bytes": 207
     }
   ]
 }

@@ -1,3 +1,4 @@
+import {withSpecialAircraftType} from './specialAircraftVisuals';
 import {providerRetryAt} from './trafficRetry';
 import {nextObservationLookup} from './observationPolling';
 import {useAccountWatches} from './useAccountWatches';
@@ -36,7 +37,7 @@ export function useObservatory(airport: AirportId, alertsEnabled = false) {
   const searchController = useRef<AbortController | null>(null);
   const refreshRef = useRef<() => void>(() => {});
   const ingest = useCallback((rows: Aircraft[]) => {
-    rows=qualityRows(rows.filter(a=>!a.simulation&&!a.hex.startsWith('skyward-')),accepted.current);
+    rows=qualityRows(rows.map(withSpecialAircraftType).filter(a=>!a.simulation&&!a.hex.startsWith('skyward-')),accepted.current);
     retainMotion(motionHistories.current,rows,selectedRef.current?.hex);
     for (const a of rows) {
       const old=recent.current.get(a.hex);
@@ -59,7 +60,7 @@ export function useObservatory(airport: AirportId, alertsEnabled = false) {
     setObservations([...recent.current.values()]);
     return rows;
   }, []);
-  const select = useCallback((a: Aircraft) => { a=qualityRows([a],accepted.current)[0]; if((histories.current.get(a.hex)?.length??0)<(motionHistories.current.get(a.hex)?.length??0)){histories.current.set(a.hex,[...motionHistories.current.get(a.hex)!]);if(histories.current.size>250){const oldest=[...histories.current.keys()].find(hex=>hex!==a.hex);if(oldest)histories.current.delete(oldest);}} selectedRef.current = a; setSelected(a); setSelectedError(''); setTrail(histories.current.get(a.hex) ?? []); }, []);
+  const select = useCallback((a: Aircraft) => { a=qualityRows([withSpecialAircraftType(a)],accepted.current)[0]; if((histories.current.get(a.hex)?.length??0)<(motionHistories.current.get(a.hex)?.length??0)){histories.current.set(a.hex,[...motionHistories.current.get(a.hex)!]);if(histories.current.size>250){const oldest=[...histories.current.keys()].find(hex=>hex!==a.hex);if(oldest)histories.current.delete(oldest);}} selectedRef.current = a; setSelected(a); setSelectedError(''); setTrail(histories.current.get(a.hex) ?? []); }, []);
   useEffect(() => {
     let alive = true, inFlight = false, nextAttempt = 0, cooldown = 0, failures = 0;
     const controller = new AbortController();

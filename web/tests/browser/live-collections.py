@@ -7,7 +7,7 @@ def run(page):
  errors=[];calls=[]
  page.on('pageerror',lambda e:errors.append(str(e)))
  page.add_init_script(f.INIT)
- aircraft=dict(hex='750123',registration='9M-XXD',callsign='XAX123',aircraftType='A333',lat=3.1,lon=101.7,altitude=33000,ground=False,groundSpeed=450,heading=90,verticalRate=0,sourceType='fixture')
+ aircraft=dict(hex='750123',registration='9M-XXD',callsign='XAX123',aircraftType='',lat=3.1,lon=101.7,altitude=33000,ground=False,groundSpeed=450,heading=90,verticalRate=0,sourceType='fixture')
  def special(route):
   calls.append(route.request.url);stamp=int(time.time()*1000)
   route.fulfill(json=dict(state='ready',checkedAt=stamp,checkedAircraft=120,totalAircraft=120,rows=[dict(path='/ufc/9m-xxd/',aircraftId='notable-fixture',registration='9M-XXD',entityId='ufc',name='UFC',relationship='Team-branded airline aircraft',aircraft={**aircraft,'observedAt':stamp})]))
@@ -30,6 +30,9 @@ def run(page):
  assert 'UFC' in page.title()
  page.wait_for_function("window.__viewer?.entities.getById('aircraft-750123')",timeout=60000)
  assert page.locator('.special-flight-banner').count()==0
+ page.wait_for_function("window.__viewer.entities.getById('aircraft-750123').model.uri.getValue(__viewer.clock.currentTime).includes('a333')")
+ page.get_by_text('Aircraft model & livery details',exact=True).click()
+ expect(page.get_by_role('link',name='This aircraft’s appearance reference')).to_be_visible()
  page.reload();page.get_by_role('region',name='Passenger flight view').wait_for(timeout=60000)
  assert '/ufc/9m-xxd/' in page.url
  # Public reference pages have the same lightweight monitor without the globe engine.

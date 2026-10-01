@@ -236,5 +236,19 @@
     "uri": "models/sourced/liveries/a320-JST-v1.gltf",
     "source": "https://github.com/FGMEMBERS/A320-family/tree/00038142d3443d7f4aec9410520df608e8ae7ba8",
     "license": "GPL-2.0"
+  },
+  {
+    "model": "a320",
+    "operator": "TAM",
+    "uri": "models/sourced/liveries/a320-TAM-v1.gltf",
+    "source": "https://github.com/FGMEMBERS/A320-family/tree/00038142d3443d7f4aec9410520df608e8ae7ba8",
+    "license": "GPL-2.0"
+  },
+  {
+    "model": "a320",
+    "operator": "VOI",
+    "uri": "models/sourced/liveries/a320-VOI-v1.gltf",
+    "source": "https://github.com/FGMEMBERS/A320-family/tree/00038142d3443d7f4aec9410520df608e8ae7ba8",
+    "license": "GPL-2.0"
   }
 ]
