@@ -24,3 +24,9 @@ test('registration can select operator textures but never claims exact special p
  assert.equal(fullLivery({...a,simulation:{}}),null);
  for(const operator of ['TAM','VOI']){const paint=fullLivery({aircraftType:'A320',callsign:operator+'1'});assert.ok(paint);const uri=new URL('../public/'+paint.uri,import.meta.url),g=JSON.parse(readFileSync(uri));for(const image of g.images){if(image.uri&&!image.uri.startsWith('data:'))assert.ok(existsSync(new URL(image.uri,uri)));}assert.equal(g.extras.skyward.livery.registrationMatch,false);}
 });
+
+test('China Airlines primary fleet listing resolves B-18916 to the existing A350-900 model',()=>{
+ const a=withSpecialAircraftType({registration:'B-18916',aircraftType:'',callsign:'CAL1'});
+ assert.equal(a.aircraftType,'A359');assert.match(fleetUri(a),/a359/);
+ assert.equal(specialAircraftVisual(a).exactLivery,false);
+});

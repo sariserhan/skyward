@@ -1,0 +1,663 @@
+{
+  "checkedAt": "2026-10-01",
+  "method": "One targeted web query for every current featured registration, plus model repository and brand searches. Search hits are discovery leads, not verified files, licenses, current liveries, or completeness guarantees.",
+  "batches": [
+    {
+      "registrations": [
+        "N42RF",
+        "N43RF",
+        "N49RF",
+        "N36NE"
+      ],
+      "queries": [
+        "\"N42RF\" aircraft livery model download",
+        "\"N43RF\" aircraft livery model download",
+        "\"N49RF\" aircraft livery model download",
+        "\"N36NE\" aircraft livery model download"
+      ],
+      "candidates": [
+        {
+          "title": "Asobo Citation Longitude NOAA N49RF \"Gonzo\" Livery [8K] - Aircraft Liveries for MSFS | Flightsim.to",
+          "url": "https://fr.flightsim.to/addon/37206/asobo-citation-longitude-noaa-n49rf-gonzo-livery-8k",
+          "matchedRegistrations": [
+            "N49RF"
+          ]
+        }
+      ]
+    },
+    {
+      "registrations": [
+        "N225NE",
+        "N933AK",
+        "N330AU",
+        "OE-LDM"
+      ],
+      "queries": [
+        "\"N225NE\" aircraft livery model download",
+        "\"N933AK\" aircraft livery model download",
+        "\"N330AU\" aircraft livery model download",
+        "\"OE-LDM\" aircraft livery model download"
+      ],
+      "candidates": []
+    },
+    {
+      "registrations": [
+        "N25Y",
+        "N46RF",
+        "N48RF",
+        "N56RF"
+      ],
+      "queries": [
+        "\"N25Y\" aircraft livery model download",
+        "\"N46RF\" aircraft livery model download",
+        "\"N48RF\" aircraft livery model download",
+        "\"N56RF\" aircraft livery model download"
+      ],
+      "candidates": [
+        {
+          "title": "Flying Iron Lockheed P-38L Lightning - N25Y - Flying Bulls (Red Bull) Livery - Aircraft Liveries for MSFS | Flightsim.to",
+          "url": "https://flightsim.to/addon/21306/flying-iron-lockheed-p-38l-lightning-n25y-flying-bulls-red-bull-livery",
+          "matchedRegistrations": [
+            "N25Y"
+          ]
+        },
+        {
+          "title": "NOAA N48RF livery for the Aerosoft DHC-6 Twin Otter Wheels Cargo version - Aircraft Liveries for MSFS | Flightsim.to",
+          "url": "https://da.flightsim.to/addon/27087/noaa-n48rf-livery-for-the-aerosoft-dhc-6-twin-otter-wheels-cargo-version",
+          "matchedRegistrations": [
+            "N48RF"
+          ]
+        }
+      ]
+    },
+    {
+      "registrations": [
+        "N57RF",
+        "N985AK",
+        "N746JB",
+        "N595JB"
+      ],
+      "queries": [
+        "\"N57RF\" aircraft livery model download",
+        "\"N985AK\" aircraft livery model download",
+        "\"N746JB\" aircraft livery model download",
+        "\"N595JB\" aircraft livery model download"
+      ],
+      "candidates": []
+    },
+    {
+      "registrations": [
+        "N632JB",
+        "N633JB",
+        "N605JB",
+        "OE-XTV"
+      ],
+      "queries": [
+        "\"N632JB\" aircraft livery model download",
+        "\"N633JB\" aircraft livery model download",
+        "\"N605JB\" aircraft livery model download",
+        "\"OE-XTV\" aircraft livery model download"
+      ],
+      "candidates": []
+    },
+    {
+      "registrations": [
+        "OE-CKW",
+        "OE-ADM",
+        "OE-XDM",
+        "N11FX"
+      ],
+      "queries": [
+        "\"OE-CKW\" aircraft livery model download",
+        "\"OE-ADM\" aircraft livery model download",
+        "\"OE-XDM\" aircraft livery model download",
+        "\"N11FX\" aircraft livery model download"
+      ],
+      "candidates": []
+    },
+    {
+      "registrations": [
+        "D-HSDM",
+        "D-HTDM",
+        "D-HUDM",
+        "OE-XSY"
+      ],
+      "queries": [
+        "\"D-HSDM\" aircraft livery model download",
+        "\"D-HTDM\" aircraft livery model download",
+        "\"D-HUDM\" aircraft livery model download",
+        "\"OE-XSY\" aircraft livery model download"
+      ],
+      "candidates": []
+    },
+    {
+      "registrations": [
+        "N80FS",
+        "OE-EDM",
+        "N991DM",
+        "OE-EAS"
+      ],
+      "queries": [
+        "\"N80FS\" aircraft livery model download",
+        "\"OE-EDM\" aircraft livery model download",
+        "\"N991DM\" aircraft livery model download",
+        "\"OE-EAS\" aircraft livery model download"
+      ],
+      "candidates": []
+    },
+    {
+      "registrations": [
+        "OE-XFB",
+        "OE-ARN",
+        "OE-ARO",
+        "N50429"
+      ],
+      "queries": [
+        "\"OE-XFB\" livery download",
+        "\"OE-ARN\" livery download",
+        "\"OE-ARO\" livery download",
+        "\"N50429\" livery download"
+      ],
+      "candidates": []
+    },
+    {
+      "registrations": [
+        "N68RW",
+        "N6123C",
+        "OE-EFB",
+        "OE-EMM"
+      ],
+      "queries": [
+        "\"N68RW\" livery download",
+        "\"N6123C\" livery download",
+        "\"OE-EFB\" livery download",
+        "\"OE-EMM\" livery download"
+      ],
+      "candidates": []
+    },
+    {
+      "registrations": [
+        "OE-FSE",
+        "OE-EMD",
+        "OE-AMM",
+        "OE-ERB"
+      ],
+      "queries": [
+        "\"OE-FSE\" livery download",
+        "\"OE-EMD\" livery download",
+        "\"OE-AMM\" livery download",
+        "\"OE-ERB\" livery download"
+      ],
+      "candidates": []
+    },
+    {
+      "registrations": [
+        "C-GNLW",
+        "N736KA",
+        "N662QX",
+        "N661QX"
+      ],
+      "queries": [
+        "\"C-GNLW\" livery download",
+        "\"N736KA\" livery download",
+        "\"N662QX\" livery download",
+        "\"N661QX\" livery download"
+      ],
+      "candidates": [
+        {
+          "title": "Liveries Requests - FSS E175 livery Request (N661QX) - Flightsim.to",
+          "url": "https://flightsim.to/requests/liveries/30115/fss-e175-livery-request-n661qx",
+          "matchedRegistrations": [
+            "N661QX"
+          ]
+        }
+      ]
+    },
+    {
+      "registrations": [
+        "N328NV",
+        "N302NV",
+        "A6-EJB",
+        "A6-BLV"
+      ],
+      "queries": [
+        "\"N328NV\" livery download",
+        "\"N302NV\" livery download",
+        "\"A6-EJB\" livery download",
+        "\"A6-BLV\" livery download"
+      ],
+      "candidates": [
+        {
+          "title": "ToLiss 319 Master Repaint Forum - Requests and Links - Page 31 - Airbus A319 - X-Plane.Org Forum",
+          "url": "https://forums.x-plane.org/forums/topic/141438-toliss-319-master-repaint-forum-requests-and-links/?page=31",
+          "matchedRegistrations": [
+            "N302NV"
+          ]
+        }
+      ]
+    },
+    {
+      "registrations": [
+        "A6-EUH",
+        "A6-EOD",
+        "B-6520",
+        "9M-MTL"
+      ],
+      "queries": [
+        "\"A6-EUH\" livery download",
+        "\"A6-EOD\" livery download",
+        "\"B-6520\" livery download",
+        "\"9M-MTL\" livery download"
+      ],
+      "candidates": [
+        {
+          "title": "[LAMINAR A330] Malaysia Airlines [9M-MTL] Manchester United Special Livery - X-Plane.to",
+          "url": "https://new.x-plane.to/file/2216/laminar-a330-malaysia-airlines-9m-mtl-manchester-united-special-livery",
+          "matchedRegistrations": [
+            "9M-MTL"
+          ]
+        }
+      ]
+    },
+    {
+      "registrations": [
+        "9M-XXD",
+        "9H-CXG",
+        "TC-SOI",
+        "TC-JNB"
+      ],
+      "queries": [
+        "\"9M-XXD\" livery download",
+        "\"9H-CXG\" livery download",
+        "\"TC-SOI\" livery download",
+        "\"TC-JNB\" livery download"
+      ],
+      "candidates": [
+        {
+          "title": "Turkish Airlines Team Türkiye Livery (TC-JNB) - X-Plane.to",
+          "url": "https://sv.x-plane.to/file/1034/turkish-airlines-team-turkiye-livery-tc-jnb",
+          "matchedRegistrations": [
+            "TC-JNB"
+          ]
+        }
+      ]
+    },
+    {
+      "registrations": [
+        "EC-LVU",
+        "EC-LUO",
+        "CN-MAX",
+        "CC-BED"
+      ],
+      "queries": [
+        "\"EC-LVU\" livery download",
+        "\"EC-LUO\" livery download",
+        "\"CN-MAX\" livery download",
+        "\"CC-BED\" livery download"
+      ],
+      "candidates": []
+    },
+    {
+      "registrations": [
+        "LV-FVH",
+        "N809SY",
+        "N710AL",
+        "A6-BND"
+      ],
+      "queries": [
+        "\"LV-FVH\" livery download",
+        "\"N809SY\" livery download",
+        "\"N710AL\" livery download",
+        "\"A6-BND\" livery download"
+      ],
+      "candidates": []
+    },
+    {
+      "registrations": [
+        "D-AEWM",
+        "A7-BEK",
+        "A7-BEG",
+        "A7-BEL"
+      ],
+      "queries": [
+        "\"D-AEWM\" livery download",
+        "\"A7-BEK\" livery download",
+        "\"A7-BEG\" livery download",
+        "\"A7-BEL\" livery download"
+      ],
+      "candidates": []
+    },
+    {
+      "registrations": [
+        "N531DN",
+        "N521DN",
+        "N522DZ",
+        "N411DX"
+      ],
+      "queries": [
+        "\"N531DN\" livery download",
+        "\"N521DN\" livery download",
+        "\"N522DZ\" livery download",
+        "\"N411DX\" livery download"
+      ],
+      "candidates": [
+        {
+          "title": "Delta \"Team USA\" livery for X-Works A330 NEO - X-Plane.to",
+          "url": "https://fr.x-plane.to/file/320/delta-team-usa-livery-for-x-works-a330-neo",
+          "matchedRegistrations": [
+            "N411DX"
+          ]
+        }
+      ]
+    },
+    {
+      "registrations": [
+        "JA607A",
+        "JA894A",
+        "JA784A",
+        "B-18916"
+      ],
+      "queries": [
+        "\"JA607A\" livery download",
+        "\"JA894A\" livery download",
+        "\"JA784A\" livery download",
+        "\"B-18916\" livery download"
+      ],
+      "candidates": []
+    },
+    {
+      "registrations": [
+        "B-18101",
+        "PK-GMU",
+        "9V-OJJ",
+        "JA73AB"
+      ],
+      "queries": [
+        "\"B-18101\" livery download",
+        "\"PK-GMU\" livery download",
+        "\"9V-OJJ\" livery download",
+        "\"JA73AB\" livery download"
+      ],
+      "candidates": []
+    },
+    {
+      "registrations": [
+        "JA73NG",
+        "HL8306",
+        "B-16740",
+        "B-16217"
+      ],
+      "queries": [
+        "\"JA73NG\" livery download",
+        "\"HL8306\" livery download",
+        "\"B-16740\" livery download",
+        "\"B-16217\" livery download"
+      ],
+      "candidates": []
+    },
+    {
+      "registrations": [
+        "B-16722",
+        "B-16332",
+        "B-16333",
+        "CC-BGM"
+      ],
+      "queries": [
+        "\"B-16722\" livery download",
+        "\"B-16332\" livery download",
+        "\"B-16333\" livery download",
+        "\"CC-BGM\" livery download"
+      ],
+      "candidates": [
+        {
+          "title": "EVA Air Laminar A330-300 Livery Three-Pack - X-Plane.to",
+          "url": "https://de.x-plane.to/file/1563/eva-air-laminar-a330-300-livery-three-pack",
+          "matchedRegistrations": [
+            "B-16332"
+          ]
+        }
+      ]
+    },
+    {
+      "registrations": [
+        "PR-MYA",
+        "N542VL",
+        "N207NV",
+        "PK-GPY"
+      ],
+      "queries": [
+        "\"PR-MYA\" livery download",
+        "\"N542VL\" livery download",
+        "\"N207NV\" livery download",
+        "\"PK-GPY\" livery download"
+      ],
+      "candidates": []
+    },
+    {
+      "registrations": [
+        "B-18055",
+        "A6-BMA",
+        "JA743A",
+        "B-8119"
+      ],
+      "queries": [
+        "\"B-18055\" livery download",
+        "\"A6-BMA\" livery download",
+        "\"JA743A\" livery download",
+        "\"B-8119\" livery download"
+      ],
+      "candidates": []
+    },
+    {
+      "registrations": [
+        "B-5976",
+        "B-6635",
+        "B-6507",
+        "B-9957"
+      ],
+      "queries": [
+        "\"B-5976\" livery download",
+        "\"B-6635\" livery download",
+        "\"B-6507\" livery download",
+        "\"B-9957\" livery download"
+      ],
+      "candidates": []
+    },
+    {
+      "registrations": [
+        "9M-AFF",
+        "9M-XXU",
+        "TC-SPY",
+        "TC-SPO"
+      ],
+      "queries": [
+        "\"9M-AFF\" livery download",
+        "\"9M-XXU\" livery download",
+        "\"TC-SPY\" livery download",
+        "\"TC-SPO\" livery download"
+      ],
+      "candidates": []
+    },
+    {
+      "registrations": [
+        "OO-SNB",
+        "PR-YSH",
+        "PR-YSI",
+        "PR-YSK"
+      ],
+      "queries": [
+        "\"OO-SNB\" livery download",
+        "\"PR-YSH\" livery download",
+        "\"PR-YSI\" livery download",
+        "\"PR-YSK\" livery download"
+      ],
+      "candidates": []
+    },
+    {
+      "registrations": [
+        "PR-YJF",
+        "PR-YSR",
+        "N537AS",
+        "N538AS"
+      ],
+      "queries": [
+        "\"PR-YJF\" livery download",
+        "\"PR-YSR\" livery download",
+        "\"N537AS\" livery download",
+        "\"N538AS\" livery download"
+      ],
+      "candidates": []
+    },
+    {
+      "registrations": [
+        "N561JB",
+        "VH-X4A",
+        "VH-ZND",
+        "VH-XZJ"
+      ],
+      "queries": [
+        "\"N561JB\" livery download",
+        "\"VH-X4A\" livery download",
+        "\"VH-ZND\" livery download",
+        "\"VH-XZJ\" livery download"
+      ],
+      "candidates": []
+    }
+  ],
+  "broadSearches": [
+    {
+      "queries": [
+        "Pokemon Pikachu jet ANA FlightGear livery download",
+        "EVA Hello Kitty FlightGear livery download",
+        "Qantas Yam Dreaming FlightGear livery download",
+        "JetBlue New York Jets Fenix livery"
+      ],
+      "candidates": [
+        {
+          "title": "Download - FlightGear",
+          "url": "https://www.flightgear.org/download/",
+          "matchedRegistrations": []
+        },
+        {
+          "title": "FlightGear Liveries | Liveries",
+          "url": "https://liveries.flightgear.org/liveries.php?id=1316",
+          "matchedRegistrations": []
+        },
+        {
+          "title": "Download data package - FlightGear",
+          "url": "https://www.flightgear.org/download/data/",
+          "matchedRegistrations": []
+        },
+        {
+          "title": "Download mirrors - FlightGear",
+          "url": "https://www.flightgear.org/download/mirrors/",
+          "matchedRegistrations": []
+        },
+        {
+          "title": "FlightGear forum • View topic - IDG-A32X Liveries",
+          "url": "https://forum.flightgear.org/viewtopic.php?f=13&p=319689&t=32122",
+          "matchedRegistrations": []
+        },
+        {
+          "title": "Eva Air Hello Kitty - Aircraft Liveries for MSFS | Flightsim.to",
+          "url": "https://flightsim.to/addon/628/eva-air-hello-kitty",
+          "matchedRegistrations": []
+        },
+        {
+          "title": "FlightGear forum • View topic - Liveries download here! A330, A320, 737 and more!",
+          "url": "https://forum.flightgear.org/viewtopic.php?f=13&t=32758",
+          "matchedRegistrations": []
+        }
+      ]
+    },
+    {
+      "queries": [
+        "Manchester United Malaysia Airlines livery download",
+        "Real Madrid Emirates A380 livery download",
+        "Alaska Kraken livery download",
+        "Etihad Manchester City livery download"
+      ],
+      "candidates": [
+        {
+          "title": "Emirates Real Madrid Livery | 4k - Aircraft Liveries for MSFS | Flightsim.to",
+          "url": "https://flightsim.to/addon/84802/real-madrid-livery-4k",
+          "matchedRegistrations": []
+        },
+        {
+          "title": "AVSIM Library",
+          "url": "https://library.avsim.net/search/basic/root/etihad%20777?page=10",
+          "matchedRegistrations": []
+        }
+      ]
+    },
+    {
+      "queries": [
+        "Azul Disney Mickey Donald Daisy Goofy livery download",
+        "Alaska Pixar Star Wars livery download",
+        "Qatar Formula 1 livery download",
+        "Air New Zealand Pokemon special livery"
+      ],
+      "candidates": [
+        {
+          "title": "[A32NX] Fbw Azul Pateta nas nuvens - Disney - PR-YSR (8k) - Aircraft Liveries for MSFS | Flightsim.to",
+          "url": "https://flightsim.to/addon/70450/fbw-azul-pateta-nas-nuvens-disney-pr-ysr-8k",
+          "matchedRegistrations": [
+            "PR-YSR"
+          ]
+        },
+        {
+          "title": "Azul Pateta PR-YSR | Fenix A320 V2 CFM - Aircraft Liveries for MSFS | Flightsim.to",
+          "url": "https://flightsim.to/addon/70261/fenix-a320-azul-linhas-areas-pateta-nas-nuvens-pr-ysr-cfm",
+          "matchedRegistrations": [
+            "PR-YSR"
+          ]
+        }
+      ]
+    },
+    {
+      "queries": [
+        "FlightGear Bell 47 GPL model",
+        "FlightGear AH-1 Cobra model download",
+        "Fairchild PT19 3d model free license",
+        "Vulcanair P68 3d model free license"
+      ],
+      "candidates": [
+        {
+          "title": "Download - FlightGear",
+          "url": "https://www.flightgear.org/download/",
+          "matchedRegistrations": []
+        },
+        {
+          "title": "Download data package - FlightGear",
+          "url": "https://www.flightgear.org/download/data/",
+          "matchedRegistrations": []
+        },
+        {
+          "title": "Helicopter - FlightGear wiki",
+          "url": "https://wiki.flightgear.org/Helicopter",
+          "matchedRegistrations": []
+        },
+        {
+          "title": "Es/Helicóptero - FlightGear wiki",
+          "url": "https://wiki.flightgear.org/Es/Helic%C3%B3ptero",
+          "matchedRegistrations": []
+        },
+        {
+          "title": "Fr/Helicoptere - FlightGear wiki",
+          "url": "https://wiki.flightgear.org/Fr/Helicoptere",
+          "matchedRegistrations": []
+        },
+        {
+          "title": "FlightGear forum • View topic - Bell AH-1W SuperCobra",
+          "url": "https://forum.flightgear.org/viewtopic.php?f=4&p=380930&t=38731",
+          "matchedRegistrations": []
+        },
+        {
+          "title": "FlightGear forum • View topic - Bell AH-1 Cobra[Released V 1.2]",
+          "url": "https://forum.flightgear.org/viewtopic.php?f=4&start=330&t=10130",
+          "matchedRegistrations": []
+        }
+      ]
+    }
+  ]
+}

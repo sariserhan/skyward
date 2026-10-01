@@ -1,0 +1,1656 @@
+{
+  "checkedAt": "2026-10-01",
+  "scope": "All 120 current featured registrations. Candidate is not approval or deployment. Not located means not found in these searches, not nonexistent.",
+  "aircraft": [
+    {
+      "aircraftId": "noaa-orion-42",
+      "registration": "N42RF",
+      "aircraft": "Lockheed WP-3D Orion",
+      "currentModelMatch": "fallback",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N42RF\" aircraft livery model download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.omao.noaa.gov/aircraft-operations/aircraft/lockheed-wp-3d-orion"
+    },
+    {
+      "aircraftId": "noaa-orion-43",
+      "registration": "N43RF",
+      "aircraft": "Lockheed WP-3D Orion",
+      "currentModelMatch": "fallback",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N43RF\" aircraft livery model download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.omao.noaa.gov/aircraft-operations/aircraft/lockheed-wp-3d-orion"
+    },
+    {
+      "aircraftId": "noaa-gulfstream-49",
+      "registration": "N49RF",
+      "aircraft": "Gulfstream IV-SP",
+      "currentModelMatch": "fallback",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N49RF\" aircraft livery model download",
+      "liveryCandidates": [
+        {
+          "title": "Asobo Citation Longitude NOAA N49RF \"Gonzo\" Livery [8K] - Aircraft Liveries for MSFS | Flightsim.to",
+          "url": "https://fr.flightsim.to/addon/37206/asobo-citation-longitude-noaa-n49rf-gonzo-livery-8k",
+          "status": "REJECTED_WRONG_AIRCRAFT",
+          "note": "Discovery lead only: file, exact paint, model compatibility and commercial web reuse not verified.",
+          "webReady": false
+        }
+      ],
+      "liveryStatus": "NO_USABLE_CANDIDATE_FOUND",
+      "appearanceReference": "https://www.omao.noaa.gov/aircraft-operations/aircraft/gulfstream-iv-sp"
+    },
+    {
+      "aircraftId": "boeing-767-25193",
+      "registration": "N36NE",
+      "aircraft": "Boeing 767-323",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N36NE\" aircraft livery model download",
+      "liveryCandidates": [
+        {
+          "title": "New England Patriots 767",
+          "url": "https://www.captainsim.com/cgi-bin/products.pl?action=show_liveries&product=b767",
+          "platform": "FSX / Captain Sim",
+          "status": "SEARCH_LISTING_ONLY",
+          "note": "No commercial web reuse grant verified; requires another simulator model.",
+          "webReady": false
+        }
+      ],
+      "liveryStatus": "CANDIDATES_NEED_REVIEW",
+      "appearanceReference": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=36NE"
+    },
+    {
+      "aircraftId": "boeing-767-25194",
+      "registration": "N225NE",
+      "aircraft": "Boeing 767-323",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N225NE\" aircraft livery model download",
+      "liveryCandidates": [
+        {
+          "title": "Patriots 767 repaint",
+          "url": "https://library.avsim.net/file/231931-boeing-767-300-ge-omni-air-international-new-england-patriots-n225ne",
+          "platform": "Simulator repaint",
+          "status": "SEARCH_LISTING_ONLY",
+          "note": "Detail page unavailable to fetch; file and reuse terms not verified.",
+          "webReady": false
+        }
+      ],
+      "liveryStatus": "CANDIDATES_NEED_REVIEW",
+      "appearanceReference": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=225NE"
+    },
+    {
+      "aircraftId": "alaska-kraken-933",
+      "registration": "N933AK",
+      "aircraft": "Boeing 737-9 MAX",
+      "currentModelMatch": "family",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N933AK\" aircraft livery model download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://news.alaskaair.com/community/alaska-airlines-seattle-kraken-aircraft-2024/"
+    },
+    {
+      "aircraftId": "orbis-md10-46800",
+      "registration": "N330AU",
+      "aircraft": "McDonnell Douglas MD-10-30F",
+      "currentModelMatch": "fallback",
+      "modelCandidate": {
+        "repository": "FGMEMBERS/MD-10",
+        "revision": "c2aeb40f6a967f7d88b443f410023ff59d22309d",
+        "url": "https://github.com/FGMEMBERS/MD-10/tree/c2aeb40f6a967f7d88b443f410023ff59d22309d",
+        "status": "GPL_SOURCE_CONVERSION_REQUIRED",
+        "webReady": false,
+        "variantMatch": "UNVERIFIED_FAMILY_CANDIDATE"
+      },
+      "liverySearchQuery": "\"N330AU\" aircraft livery model download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=330AU"
+    },
+    {
+      "aircraftId": "flying-bulls-dc6",
+      "registration": "OE-LDM",
+      "aircraft": "Douglas DC-6B",
+      "currentModelMatch": "fallback",
+      "modelCandidate": {
+        "repository": "FGMEMBERS/dc6",
+        "revision": "93b85a97efa5274cca16849c72aea5367e309ca2",
+        "url": "https://github.com/FGMEMBERS/dc6/tree/93b85a97efa5274cca16849c72aea5367e309ca2",
+        "status": "GPL_SOURCE_CONVERSION_REQUIRED",
+        "webReady": false,
+        "variantMatch": "UNVERIFIED_FAMILY_CANDIDATE"
+      },
+      "liverySearchQuery": "\"OE-LDM\" aircraft livery model download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flyingbulls.at/en/fleet/douglas-dc-6b"
+    },
+    {
+      "aircraftId": "flying-bulls-p38",
+      "registration": "N25Y",
+      "aircraft": "Lockheed P-38 Lightning",
+      "currentModelMatch": "fallback",
+      "modelCandidate": {
+        "repository": "FGMEMBERS/P-38-Lightning",
+        "revision": "cfe15819b10c8483eb2952f546f15be0a34bf2a3",
+        "url": "https://github.com/FGMEMBERS/P-38-Lightning/tree/cfe15819b10c8483eb2952f546f15be0a34bf2a3",
+        "status": "GPL_SOURCE_CONVERSION_REQUIRED",
+        "webReady": false,
+        "variantMatch": "UNVERIFIED_FAMILY_CANDIDATE"
+      },
+      "liverySearchQuery": "\"N25Y\" aircraft livery model download",
+      "liveryCandidates": [
+        {
+          "title": "Flying Iron Lockheed P-38L Lightning - N25Y - Flying Bulls (Red Bull) Livery - Aircraft Liveries for MSFS | Flightsim.to",
+          "url": "https://flightsim.to/addon/21306/flying-iron-lockheed-p-38l-lightning-n25y-flying-bulls-red-bull-livery",
+          "status": "SEARCH_LISTING_ONLY",
+          "note": "Discovery lead only: file, exact paint, model compatibility and commercial web reuse not verified.",
+          "webReady": false
+        }
+      ],
+      "liveryStatus": "CANDIDATES_NEED_REVIEW",
+      "appearanceReference": "https://www.flyingbulls.at/en/stories/unique-beauty"
+    },
+    {
+      "aircraftId": "noaa-twin-otter-46",
+      "registration": "N46RF",
+      "aircraft": "De Havilland Canada DHC-6-300 Twin Otter",
+      "currentModelMatch": "fallback",
+      "modelCandidate": {
+        "repository": "FGMEMBERS/dhc6",
+        "revision": "ed826b950acfe9aed737808f24ddb26a4f9a8c78",
+        "url": "https://github.com/FGMEMBERS/dhc6/tree/ed826b950acfe9aed737808f24ddb26a4f9a8c78",
+        "status": "LICENSE_REVIEW_REQUIRED",
+        "webReady": false,
+        "variantMatch": "UNVERIFIED_FAMILY_CANDIDATE"
+      },
+      "liverySearchQuery": "\"N46RF\" aircraft livery model download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.omao.noaa.gov/aircraft-operations/aircraft/de-havilland-dhc-6-300-twin-otter"
+    },
+    {
+      "aircraftId": "noaa-twin-otter-48",
+      "registration": "N48RF",
+      "aircraft": "De Havilland Canada DHC-6-300 Twin Otter",
+      "currentModelMatch": "fallback",
+      "modelCandidate": {
+        "repository": "FGMEMBERS/dhc6",
+        "revision": "ed826b950acfe9aed737808f24ddb26a4f9a8c78",
+        "url": "https://github.com/FGMEMBERS/dhc6/tree/ed826b950acfe9aed737808f24ddb26a4f9a8c78",
+        "status": "LICENSE_REVIEW_REQUIRED",
+        "webReady": false,
+        "variantMatch": "UNVERIFIED_FAMILY_CANDIDATE"
+      },
+      "liverySearchQuery": "\"N48RF\" aircraft livery model download",
+      "liveryCandidates": [
+        {
+          "title": "NOAA N48RF livery for the Aerosoft DHC-6 Twin Otter Wheels Cargo version - Aircraft Liveries for MSFS | Flightsim.to",
+          "url": "https://da.flightsim.to/addon/27087/noaa-n48rf-livery-for-the-aerosoft-dhc-6-twin-otter-wheels-cargo-version",
+          "status": "SEARCH_LISTING_ONLY",
+          "note": "Discovery lead only: file, exact paint, model compatibility and commercial web reuse not verified.",
+          "webReady": false
+        }
+      ],
+      "liveryStatus": "CANDIDATES_NEED_REVIEW",
+      "appearanceReference": "https://www.omao.noaa.gov/aircraft-operations/aircraft/de-havilland-dhc-6-300-twin-otter"
+    },
+    {
+      "aircraftId": "noaa-twin-otter-56",
+      "registration": "N56RF",
+      "aircraft": "De Havilland Canada DHC-6-300 Twin Otter",
+      "currentModelMatch": "fallback",
+      "modelCandidate": {
+        "repository": "FGMEMBERS/dhc6",
+        "revision": "ed826b950acfe9aed737808f24ddb26a4f9a8c78",
+        "url": "https://github.com/FGMEMBERS/dhc6/tree/ed826b950acfe9aed737808f24ddb26a4f9a8c78",
+        "status": "LICENSE_REVIEW_REQUIRED",
+        "webReady": false,
+        "variantMatch": "UNVERIFIED_FAMILY_CANDIDATE"
+      },
+      "liverySearchQuery": "\"N56RF\" aircraft livery model download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.omao.noaa.gov/aircraft-operations/aircraft/de-havilland-dhc-6-300-twin-otter"
+    },
+    {
+      "aircraftId": "noaa-twin-otter-57",
+      "registration": "N57RF",
+      "aircraft": "De Havilland Canada DHC-6-300 Twin Otter",
+      "currentModelMatch": "fallback",
+      "modelCandidate": {
+        "repository": "FGMEMBERS/dhc6",
+        "revision": "ed826b950acfe9aed737808f24ddb26a4f9a8c78",
+        "url": "https://github.com/FGMEMBERS/dhc6/tree/ed826b950acfe9aed737808f24ddb26a4f9a8c78",
+        "status": "LICENSE_REVIEW_REQUIRED",
+        "webReady": false,
+        "variantMatch": "UNVERIFIED_FAMILY_CANDIDATE"
+      },
+      "liverySearchQuery": "\"N57RF\" aircraft livery model download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.omao.noaa.gov/aircraft-operations/aircraft/de-havilland-dhc-6-300-twin-otter"
+    },
+    {
+      "aircraftId": "alaska-seattle-world-cup-985",
+      "registration": "N985AK",
+      "aircraft": "Boeing 737-9 MAX",
+      "currentModelMatch": "family",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N985AK\" aircraft livery model download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://news.alaskaair.com/company/seattle-fifa-world-cup-2026-local-organizing-committee-livery/"
+    },
+    {
+      "aircraftId": "jetblue-746",
+      "registration": "N746JB",
+      "aircraft": "Airbus A320-232",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N746JB\" aircraft livery model download",
+      "liveryCandidates": [
+        {
+          "title": "NY Jets FlightFactor A320",
+          "url": "https://forum.inibuilds.com/files/file/3015-jetblue-flightfactor-a320-ny-jets-n746jb/",
+          "platform": "X-Plane / FlightFactor",
+          "status": "PAGE_CHECKED",
+          "note": "Requires FlightFactor, Matavia and engine mod. Download sign-in and reuse review needed.",
+          "webReady": false
+        }
+      ],
+      "liveryStatus": "CANDIDATES_NEED_REVIEW",
+      "appearanceReference": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=746JB"
+    },
+    {
+      "aircraftId": "jetblue-595",
+      "registration": "N595JB",
+      "aircraft": "Airbus A320-232",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N595JB\" aircraft livery model download",
+      "liveryCandidates": [
+        {
+          "title": "Boston Celtics FlightFactor A320",
+          "url": "https://forum.inibuilds.com/files/file/3014-jetblue-flightfactor-a320-boston-celtics-n595jb/",
+          "platform": "X-Plane / FlightFactor",
+          "status": "PAGE_CHECKED",
+          "note": "Requires FlightFactor, Matavia and engine mod. Base textures credited as permission-dependent.",
+          "webReady": false
+        }
+      ],
+      "liveryStatus": "CANDIDATES_NEED_REVIEW",
+      "appearanceReference": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=595JB"
+    },
+    {
+      "aircraftId": "jetblue-632",
+      "registration": "N632JB",
+      "aircraft": "Airbus A320-232",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N632JB\" aircraft livery model download",
+      "liveryCandidates": [
+        {
+          "title": "Boston Bruins FSLabs listing",
+          "url": "https://liverydo.wixsite.com/liverydo/a320fslabs",
+          "platform": "FSLabs",
+          "status": "SEARCH_LISTING_ONLY",
+          "note": "Registration in creator listing; download and reuse not verified.",
+          "webReady": false
+        }
+      ],
+      "liveryStatus": "CANDIDATES_NEED_REVIEW",
+      "appearanceReference": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=632JB"
+    },
+    {
+      "aircraftId": "jetblue-633",
+      "registration": "N633JB",
+      "aircraft": "Airbus A320-232",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N633JB\" aircraft livery model download",
+      "liveryCandidates": [
+        {
+          "title": "Brooklyn Nets Fenix A320",
+          "url": "https://flightsim.to/addon/69957/jetblue-bk-blue-brooklyn-nets-n623jb-fenixsim-a320-v2",
+          "platform": "MSFS / Fenix",
+          "status": "PERMISSION_REQUIRED",
+          "note": "Author explicitly requires permission for modification and redistribution. URL has old typo; page identifies N633JB.",
+          "webReady": false
+        }
+      ],
+      "liveryStatus": "CANDIDATES_NEED_REVIEW",
+      "appearanceReference": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=633JB"
+    },
+    {
+      "aircraftId": "jetblue-605",
+      "registration": "N605JB",
+      "aircraft": "Airbus A320-232",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N605JB\" aircraft livery model download",
+      "liveryCandidates": [
+        {
+          "title": "Blue Monster Red Sox Fenix A320",
+          "url": "https://fr.flightsim.to/addon/73136/jetblue-blue-monster-n605jb-w-cabin-fenix-a320-v2-8k-4k",
+          "platform": "MSFS / Fenix",
+          "status": "SEARCH_LISTING_ONLY",
+          "note": "Exact registration advertised; asset files, texture compatibility and reuse not verified.",
+          "webReady": false
+        }
+      ],
+      "liveryStatus": "CANDIDATES_NEED_REVIEW",
+      "appearanceReference": "https://registry.faa.gov/AircraftInquiry/Search/NNumberResult?nNumberTxt=605JB"
+    },
+    {
+      "aircraftId": "notable-global-20261001-001",
+      "registration": "OE-XTV",
+      "aircraft": "Airbus Helicopters AS350 B3+",
+      "currentModelMatch": "fallback",
+      "modelCandidate": {
+        "repository": "FGMEMBERS/AS350",
+        "revision": "d52b1d8e1d30eec8a9f6a33b8c74ec7f1dcb1386",
+        "url": "https://github.com/FGMEMBERS/AS350/tree/d52b1d8e1d30eec8a9f6a33b8c74ec7f1dcb1386",
+        "status": "GPL_SOURCE_CONVERSION_REQUIRED",
+        "webReady": false,
+        "variantMatch": "UNVERIFIED_FAMILY_CANDIDATE"
+      },
+      "liverySearchQuery": "\"OE-XTV\" aircraft livery model download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flyingbulls.at/en/fleet/as-350-b3-ecureuil"
+    },
+    {
+      "aircraftId": "notable-global-20261001-002",
+      "registration": "OE-CKW",
+      "aircraft": "Aviat Husky",
+      "currentModelMatch": "fallback",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"OE-CKW\" aircraft livery model download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flyingbulls.at/en/fleet/aviat-husky"
+    },
+    {
+      "aircraftId": "notable-global-20261001-003",
+      "registration": "OE-ADM",
+      "aircraft": "Beechcraft T-34 Mentor",
+      "currentModelMatch": "fallback",
+      "modelCandidate": {
+        "repository": "FGMEMBERS/T-34",
+        "revision": "cd97bce474b3c101e8038e31f268777108549a44",
+        "url": "https://github.com/FGMEMBERS/T-34/tree/cd97bce474b3c101e8038e31f268777108549a44",
+        "status": "GPL_SOURCE_CONVERSION_REQUIRED",
+        "webReady": false,
+        "variantMatch": "UNVERIFIED_FAMILY_CANDIDATE"
+      },
+      "liverySearchQuery": "\"OE-ADM\" aircraft livery model download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flyingbulls.at/en/fleet/beech-t-34-mentor"
+    },
+    {
+      "aircraftId": "notable-global-20261001-004",
+      "registration": "OE-XDM",
+      "aircraft": "Bell 47 G-3B-1 Soloy",
+      "currentModelMatch": "fallback",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"OE-XDM\" aircraft livery model download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flyingbulls.at/en/fleet/bell-47-g-3b-1-soloy"
+    },
+    {
+      "aircraftId": "notable-global-20261001-005",
+      "registration": "N11FX",
+      "aircraft": "Bell AH-1F Cobra",
+      "currentModelMatch": "fallback",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N11FX\" aircraft livery model download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flyingbulls.at/en/fleet/bell-cobra-209/ah-1f"
+    },
+    {
+      "aircraftId": "notable-global-20261001-006",
+      "registration": "D-HSDM",
+      "aircraft": "MBB BO105 C",
+      "currentModelMatch": "fallback",
+      "modelCandidate": {
+        "repository": "FGMEMBERS/bo105",
+        "revision": "42e171a4d1c49c3ebacdc168b56ffca0f8eb2284",
+        "url": "https://github.com/FGMEMBERS/bo105/tree/42e171a4d1c49c3ebacdc168b56ffca0f8eb2284",
+        "status": "GPL_SOURCE_CONVERSION_REQUIRED",
+        "webReady": false,
+        "variantMatch": "UNVERIFIED_FAMILY_CANDIDATE"
+      },
+      "liverySearchQuery": "\"D-HSDM\" aircraft livery model download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flyingbulls.at/en/fleet/bo105-c"
+    },
+    {
+      "aircraftId": "notable-global-20261001-007",
+      "registration": "D-HTDM",
+      "aircraft": "MBB BO105 C",
+      "currentModelMatch": "fallback",
+      "modelCandidate": {
+        "repository": "FGMEMBERS/bo105",
+        "revision": "42e171a4d1c49c3ebacdc168b56ffca0f8eb2284",
+        "url": "https://github.com/FGMEMBERS/bo105/tree/42e171a4d1c49c3ebacdc168b56ffca0f8eb2284",
+        "status": "GPL_SOURCE_CONVERSION_REQUIRED",
+        "webReady": false,
+        "variantMatch": "UNVERIFIED_FAMILY_CANDIDATE"
+      },
+      "liverySearchQuery": "\"D-HTDM\" aircraft livery model download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flyingbulls.at/en/fleet/bo105-c"
+    },
+    {
+      "aircraftId": "notable-global-20261001-008",
+      "registration": "D-HUDM",
+      "aircraft": "MBB BO105 S",
+      "currentModelMatch": "fallback",
+      "modelCandidate": {
+        "repository": "FGMEMBERS/bo105",
+        "revision": "42e171a4d1c49c3ebacdc168b56ffca0f8eb2284",
+        "url": "https://github.com/FGMEMBERS/bo105/tree/42e171a4d1c49c3ebacdc168b56ffca0f8eb2284",
+        "status": "GPL_SOURCE_CONVERSION_REQUIRED",
+        "webReady": false,
+        "variantMatch": "UNVERIFIED_FAMILY_CANDIDATE"
+      },
+      "liverySearchQuery": "\"D-HUDM\" aircraft livery model download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flyingbulls.at/en/fleet/bo105-s-media-helikopter"
+    },
+    {
+      "aircraftId": "notable-global-20261001-009",
+      "registration": "OE-XSY",
+      "aircraft": "Bristol 171 Sycamore",
+      "currentModelMatch": "fallback",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"OE-XSY\" aircraft livery model download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flyingbulls.at/en/fleet/bristol-171-sycamore"
+    },
+    {
+      "aircraftId": "notable-global-20261001-010",
+      "registration": "N80FS",
+      "aircraft": "Canadair Sabre Mk6",
+      "currentModelMatch": "fallback",
+      "modelCandidate": {
+        "repository": "FGMEMBERS/F-86",
+        "revision": "a4c4a6e0deee81dd10f148a634dd0da6512f40db",
+        "url": "https://github.com/FGMEMBERS/F-86/tree/a4c4a6e0deee81dd10f148a634dd0da6512f40db",
+        "status": "LICENSE_REVIEW_REQUIRED",
+        "webReady": false,
+        "variantMatch": "UNVERIFIED_FAMILY_CANDIDATE"
+      },
+      "liverySearchQuery": "\"N80FS\" aircraft livery model download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flyingbulls.at/en/fleet/canadair-f86-sabre-mk6"
+    },
+    {
+      "aircraftId": "notable-global-20261001-011",
+      "registration": "OE-EDM",
+      "aircraft": "Cessna 208 Amphibian Caravan",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"OE-EDM\" aircraft livery model download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flyingbulls.at/en/fleet/cessna-208-amphibian-caravan"
+    },
+    {
+      "aircraftId": "notable-global-20261001-012",
+      "registration": "N991DM",
+      "aircraft": "Cessna 337 Skymaster",
+      "currentModelMatch": "fallback",
+      "modelCandidate": {
+        "repository": "FGMEMBERS/Cessna337",
+        "revision": "893e5a04f90c12ba631e87f748e1a4c9bfa49d5f",
+        "url": "https://github.com/FGMEMBERS/Cessna337/tree/893e5a04f90c12ba631e87f748e1a4c9bfa49d5f",
+        "status": "GPL_SOURCE_CONVERSION_REQUIRED",
+        "webReady": false,
+        "variantMatch": "UNVERIFIED_FAMILY_CANDIDATE"
+      },
+      "liverySearchQuery": "\"N991DM\" aircraft livery model download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flyingbulls.at/en/fleet/cessna-337-skymaster-push-pull"
+    },
+    {
+      "aircraftId": "notable-global-20261001-013",
+      "registration": "OE-EAS",
+      "aircraft": "Vought F4U-4 Corsair",
+      "currentModelMatch": "fallback",
+      "modelCandidate": {
+        "repository": "FGMEMBERS/F4U",
+        "revision": "43e713e7fe7fbb519039d5db5aeff152a4fc0029",
+        "url": "https://github.com/FGMEMBERS/F4U/tree/43e713e7fe7fbb519039d5db5aeff152a4fc0029",
+        "status": "LICENSE_REVIEW_REQUIRED",
+        "webReady": false,
+        "variantMatch": "UNVERIFIED_FAMILY_CANDIDATE"
+      },
+      "liverySearchQuery": "\"OE-EAS\" aircraft livery model download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flyingbulls.at/en/fleet/chance-vought-f4u-4-corsair"
+    },
+    {
+      "aircraftId": "notable-global-20261001-014",
+      "registration": "OE-XFB",
+      "aircraft": "Eurocopter EC135",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"OE-XFB\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flyingbulls.at/en/fleet/eurocopter-ec135"
+    },
+    {
+      "aircraftId": "notable-global-20261001-015",
+      "registration": "OE-ARN",
+      "aircraft": "Extra 330LX",
+      "currentModelMatch": "fallback",
+      "modelCandidate": {
+        "repository": "cobe571/EXTRA-EA300",
+        "revision": "78a586ea9d71ed26dfc49d62aebaf873de89433f",
+        "url": "https://github.com/cobe571/EXTRA-EA300/tree/78a586ea9d71ed26dfc49d62aebaf873de89433f",
+        "status": "GPL_SOURCE_CONVERSION_REQUIRED",
+        "webReady": false,
+        "variantMatch": "UNVERIFIED_FAMILY_CANDIDATE"
+      },
+      "liverySearchQuery": "\"OE-ARN\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flyingbulls.at/en/fleet/extra-300-lx"
+    },
+    {
+      "aircraftId": "notable-global-20261001-016",
+      "registration": "OE-ARO",
+      "aircraft": "Extra 330LX",
+      "currentModelMatch": "fallback",
+      "modelCandidate": {
+        "repository": "cobe571/EXTRA-EA300",
+        "revision": "78a586ea9d71ed26dfc49d62aebaf873de89433f",
+        "url": "https://github.com/cobe571/EXTRA-EA300/tree/78a586ea9d71ed26dfc49d62aebaf873de89433f",
+        "status": "GPL_SOURCE_CONVERSION_REQUIRED",
+        "webReady": false,
+        "variantMatch": "UNVERIFIED_FAMILY_CANDIDATE"
+      },
+      "liverySearchQuery": "\"OE-ARO\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flyingbulls.at/en/fleet/extra-300-lx"
+    },
+    {
+      "aircraftId": "notable-global-20261001-017",
+      "registration": "N50429",
+      "aircraft": "Fairchild PT-19",
+      "currentModelMatch": "fallback",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N50429\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flyingbulls.at/en/fleet/fairchild-pt-19"
+    },
+    {
+      "aircraftId": "notable-global-20261001-018",
+      "registration": "N68RW",
+      "aircraft": "Grumman F8F-2 Bearcat",
+      "currentModelMatch": "fallback",
+      "modelCandidate": {
+        "repository": "FGMEMBERS/F8F-VooDooBear",
+        "revision": "fbef3bb342832e3f5579af6bbb5fe2719c81fee1",
+        "url": "https://github.com/FGMEMBERS/F8F-VooDooBear/tree/fbef3bb342832e3f5579af6bbb5fe2719c81fee1",
+        "status": "LICENSE_REVIEW_REQUIRED",
+        "webReady": false,
+        "variantMatch": "UNVERIFIED_FAMILY_CANDIDATE"
+      },
+      "liverySearchQuery": "\"N68RW\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flyingbulls.at/en/fleet/grumman-f8f-2-bearcat"
+    },
+    {
+      "aircraftId": "notable-global-20261001-019",
+      "registration": "N6123C",
+      "aircraft": "North American B-25J Mitchell",
+      "currentModelMatch": "fallback",
+      "modelCandidate": {
+        "repository": "FGMEMBERS/B-25",
+        "revision": "56d608dee3626de5c4272974e06bd1889b1da2ea",
+        "url": "https://github.com/FGMEMBERS/B-25/tree/56d608dee3626de5c4272974e06bd1889b1da2ea",
+        "status": "GPL_SOURCE_CONVERSION_REQUIRED",
+        "webReady": false,
+        "variantMatch": "UNVERIFIED_FAMILY_CANDIDATE"
+      },
+      "liverySearchQuery": "\"N6123C\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flyingbulls.at/en/fleet/north-american-b-25j-mitchell"
+    },
+    {
+      "aircraftId": "notable-global-20261001-020",
+      "registration": "OE-EFB",
+      "aircraft": "North American P-51D Mustang",
+      "currentModelMatch": "fallback",
+      "modelCandidate": {
+        "repository": "FGMEMBERS/p51d",
+        "revision": "cb3bcd6ef41182f6b1bae91395f38d0dadd974e5",
+        "url": "https://github.com/FGMEMBERS/p51d/tree/cb3bcd6ef41182f6b1bae91395f38d0dadd974e5",
+        "status": "LICENSE_REVIEW_REQUIRED",
+        "webReady": false,
+        "variantMatch": "UNVERIFIED_FAMILY_CANDIDATE"
+      },
+      "liverySearchQuery": "\"OE-EFB\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flyingbulls.at/en/fleet/north-american-p51-d-mustang"
+    },
+    {
+      "aircraftId": "notable-global-20261001-021",
+      "registration": "OE-EMM",
+      "aircraft": "North American T-28B",
+      "currentModelMatch": "fallback",
+      "modelCandidate": {
+        "repository": "FGMEMBERS/North-American-T28D-Trojan",
+        "revision": "2e0147565e2e93ec07611550433d74dde070433a",
+        "url": "https://github.com/FGMEMBERS/North-American-T28D-Trojan/tree/2e0147565e2e93ec07611550433d74dde070433a",
+        "status": "GPL_SOURCE_CONVERSION_REQUIRED",
+        "webReady": false,
+        "variantMatch": "UNVERIFIED_FAMILY_CANDIDATE"
+      },
+      "liverySearchQuery": "\"OE-EMM\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flyingbulls.at/en/fleet/north-american-t-28b"
+    },
+    {
+      "aircraftId": "notable-global-20261001-022",
+      "registration": "OE-FSE",
+      "aircraft": "Vulcanair P.68TC Observer",
+      "currentModelMatch": "fallback",
+      "modelCandidate": {
+        "repository": "FlightGear FGAddon / Partenavia-P68",
+        "revision": "21677",
+        "url": "https://svn.code.sf.net/p/flightgear/fgaddon/trunk/Aircraft/Partenavia-P68/",
+        "meshUrl": "https://svn.code.sf.net/p/flightgear/fgaddon/trunk/Aircraft/Partenavia-P68/AI/Aircraft/Partenavia-P68/Models/OBS.ac",
+        "licenseUrl": "https://svn.code.sf.net/p/flightgear/fgaddon/trunk/Aircraft/Partenavia-P68/COPYING",
+        "status": "GPL_SOURCE_CONVERSION_REQUIRED",
+        "variantMatch": "OBSERVER_VARIANT_FOUND_TC_DETAILS_UNVERIFIED",
+        "webReady": false
+      },
+      "liverySearchQuery": "\"OE-FSE\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flyingbulls.at/en/fleet/p68tc-observer"
+    },
+    {
+      "aircraftId": "notable-global-20261001-023",
+      "registration": "OE-EMD",
+      "aircraft": "Pilatus PC-6 Porter",
+      "currentModelMatch": "fallback",
+      "modelCandidate": {
+        "repository": "FGMEMBERS/PC-6",
+        "revision": "e4b5776dde5b041171fb5a5ab641e92edc81ec7f",
+        "url": "https://github.com/FGMEMBERS/PC-6/tree/e4b5776dde5b041171fb5a5ab641e92edc81ec7f",
+        "status": "LICENSE_REVIEW_REQUIRED",
+        "webReady": false,
+        "variantMatch": "UNVERIFIED_FAMILY_CANDIDATE"
+      },
+      "liverySearchQuery": "\"OE-EMD\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flyingbulls.at/en/fleet/pilatus-porter-pc-6"
+    },
+    {
+      "aircraftId": "notable-global-20261001-024",
+      "registration": "OE-AMM",
+      "aircraft": "Boeing PT-17 Stearman",
+      "currentModelMatch": "fallback",
+      "modelCandidate": {
+        "repository": "FGMEMBERS/Stearman",
+        "revision": "db57b5b2c33eac5463c1b0ace6804ea1c265e306",
+        "url": "https://github.com/FGMEMBERS/Stearman/tree/db57b5b2c33eac5463c1b0ace6804ea1c265e306",
+        "status": "GPL_SOURCE_CONVERSION_REQUIRED",
+        "webReady": false,
+        "variantMatch": "UNVERIFIED_FAMILY_CANDIDATE"
+      },
+      "liverySearchQuery": "\"OE-AMM\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flyingbulls.at/en/fleet/pt-17-stearman"
+    },
+    {
+      "aircraftId": "notable-global-20261001-025",
+      "registration": "OE-ERB",
+      "aircraft": "North American T-6",
+      "currentModelMatch": "fallback",
+      "modelCandidate": {
+        "repository": "FGMEMBERS/North-American-T6-Texan",
+        "revision": "886ed8f9c313adadf0ea5bf229a8c9f265521f5e",
+        "url": "https://github.com/FGMEMBERS/North-American-T6-Texan/tree/886ed8f9c313adadf0ea5bf229a8c9f265521f5e",
+        "status": "GPL_SOURCE_CONVERSION_REQUIRED",
+        "webReady": false,
+        "variantMatch": "UNVERIFIED_FAMILY_CANDIDATE"
+      },
+      "liverySearchQuery": "\"OE-ERB\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flyingbulls.at/en/fleet/t-6"
+    },
+    {
+      "aircraftId": "notable-global-20261001-026",
+      "registration": "C-GNLW",
+      "aircraft": "Boeing 737-200",
+      "currentModelMatch": "family",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"C-GNLW\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-sports-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-027",
+      "registration": "N736KA",
+      "aircraft": "Boeing 737-700",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N736KA\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-sports-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-028",
+      "registration": "N662QX",
+      "aircraft": "Embraer E175",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N662QX\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-sports-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-029",
+      "registration": "N661QX",
+      "aircraft": "Embraer E175",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N661QX\" livery download",
+      "liveryCandidates": [
+        {
+          "title": "Liveries Requests - FSS E175 livery Request (N661QX) - Flightsim.to",
+          "url": "https://flightsim.to/requests/liveries/30115/fss-e175-livery-request-n661qx",
+          "status": "REQUEST_ONLY",
+          "note": "Discovery lead only: file, exact paint, model compatibility and commercial web reuse not verified.",
+          "webReady": false
+        }
+      ],
+      "liveryStatus": "NO_USABLE_CANDIDATE_FOUND",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-sports-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-030",
+      "registration": "N328NV",
+      "aircraft": "Airbus A319",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N328NV\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-sports-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-031",
+      "registration": "N302NV",
+      "aircraft": "Airbus A319",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N302NV\" livery download",
+      "liveryCandidates": [
+        {
+          "title": "ToLiss 319 Master Repaint Forum - Requests and Links - Page 31 - Airbus A319 - X-Plane.Org Forum",
+          "url": "https://forums.x-plane.org/forums/topic/141438-toliss-319-master-repaint-forum-requests-and-links/?page=31",
+          "status": "REQUEST_ONLY",
+          "note": "Discovery lead only: file, exact paint, model compatibility and commercial web reuse not verified.",
+          "webReady": false
+        }
+      ],
+      "liveryStatus": "NO_USABLE_CANDIDATE_FOUND",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-sports-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-032",
+      "registration": "A6-EJB",
+      "aircraft": "Airbus A320neo",
+      "currentModelMatch": "family",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"A6-EJB\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-sports-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-033",
+      "registration": "A6-BLV",
+      "aircraft": "Boeing 787-9",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"A6-BLV\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-sports-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-034",
+      "registration": "A6-EUH",
+      "aircraft": "Airbus A380",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"A6-EUH\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-sports-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-035",
+      "registration": "A6-EOD",
+      "aircraft": "Airbus A380",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"A6-EOD\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-sports-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-036",
+      "registration": "B-6520",
+      "aircraft": "Airbus A330-300",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"B-6520\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-sports-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-037",
+      "registration": "9M-MTL",
+      "aircraft": "Airbus A330-300",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"9M-MTL\" livery download",
+      "liveryCandidates": [
+        {
+          "title": "[LAMINAR A330] Malaysia Airlines [9M-MTL] Manchester United Special Livery - X-Plane.to",
+          "url": "https://new.x-plane.to/file/2216/laminar-a330-malaysia-airlines-9m-mtl-manchester-united-special-livery",
+          "status": "SEARCH_LISTING_ONLY",
+          "note": "Discovery lead only: file, exact paint, model compatibility and commercial web reuse not verified.",
+          "webReady": false
+        }
+      ],
+      "liveryStatus": "CANDIDATES_NEED_REVIEW",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-sports-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-038",
+      "registration": "9M-XXD",
+      "aircraft": "Airbus A330-300",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"9M-XXD\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-sports-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-039",
+      "registration": "9H-CXG",
+      "aircraft": "Boeing 737-800",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"9H-CXG\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-sports-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-040",
+      "registration": "TC-SOI",
+      "aircraft": "Boeing 737 MAX 8",
+      "currentModelMatch": "family",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"TC-SOI\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-sports-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-041",
+      "registration": "TC-JNB",
+      "aircraft": "Airbus A330-200",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"TC-JNB\" livery download",
+      "liveryCandidates": [
+        {
+          "title": "Turkish Airlines Team Türkiye Livery (TC-JNB) - X-Plane.to",
+          "url": "https://sv.x-plane.to/file/1034/turkish-airlines-team-turkiye-livery-tc-jnb",
+          "status": "SEARCH_LISTING_ONLY",
+          "note": "Discovery lead only: file, exact paint, model compatibility and commercial web reuse not verified.",
+          "webReady": false
+        }
+      ],
+      "liveryStatus": "CANDIDATES_NEED_REVIEW",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-sports-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-042",
+      "registration": "EC-LVU",
+      "aircraft": "Airbus A320",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"EC-LVU\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-sports-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-043",
+      "registration": "EC-LUO",
+      "aircraft": "Airbus A320",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"EC-LUO\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-sports-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-044",
+      "registration": "CN-MAX",
+      "aircraft": "Boeing 737 MAX 8",
+      "currentModelMatch": "family",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"CN-MAX\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-sports-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-045",
+      "registration": "CC-BED",
+      "aircraft": "Airbus A321",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"CC-BED\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.aerotime.aero/articles/let-the-games-begin-seven-airlines-sporting-2024-paris-summer-olympic-liveries"
+    },
+    {
+      "aircraftId": "notable-global-20261001-046",
+      "registration": "LV-FVH",
+      "aircraft": "Airbus A330-200",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"LV-FVH\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.planespotters.net/photo/1932052/lv-fvh-aerolineas-argentinas-airbus-a330-202"
+    },
+    {
+      "aircraftId": "notable-global-20261001-047",
+      "registration": "N809SY",
+      "aircraft": "Boeing 737-800",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N809SY\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://hnlrarebirds.blogspot.com/2026/04/sun-country-airlines-n809sy.html?m=0"
+    },
+    {
+      "aircraftId": "notable-global-20261001-048",
+      "registration": "N710AL",
+      "aircraft": "Boeing 737 MAX 9",
+      "currentModelMatch": "family",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N710AL\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.alaskaair.com/content/travel-info/our-aircraft/737-9-max-mariners"
+    },
+    {
+      "aircraftId": "notable-global-20261001-049",
+      "registration": "A6-BND",
+      "aircraft": "Boeing 787-9",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"A6-BND\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.mediaoffice.abudhabi/en/transport/etihad-airways-fly-european-champions-manchester-city-on-club-themed-dreamliner-to-manchester/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-050",
+      "registration": "D-AEWM",
+      "aircraft": "Airbus A320",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"D-AEWM\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.planespotters.net/airframe/airbus-a320-200-d-aewm-eurowings/34ww81"
+    },
+    {
+      "aircraftId": "notable-global-20261001-051",
+      "registration": "A7-BEK",
+      "aircraft": "Boeing 777-300ER",
+      "currentModelMatch": "family",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"A7-BEK\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.airhistory.net/photo/874411/A7-BEK"
+    },
+    {
+      "aircraftId": "notable-global-20261001-052",
+      "registration": "A7-BEG",
+      "aircraft": "Boeing 777-300ER",
+      "currentModelMatch": "family",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"A7-BEG\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.jetphotos.com/photo/12004096"
+    },
+    {
+      "aircraftId": "notable-global-20261001-053",
+      "registration": "A7-BEL",
+      "aircraft": "Boeing 777-300ER",
+      "currentModelMatch": "family",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"A7-BEL\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.karlcacchioli.com/work/f1-aircraft-livery"
+    },
+    {
+      "aircraftId": "notable-global-20261001-054",
+      "registration": "N531DN",
+      "aircraft": "Airbus A350-900",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N531DN\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.scramble.nl/civil-news/delta-to-introduce-3rd-team-usa-aircraft"
+    },
+    {
+      "aircraftId": "notable-global-20261001-055",
+      "registration": "N521DN",
+      "aircraft": "Airbus A350-900",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N521DN\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.scramble.nl/civil-news/delta-to-introduce-3rd-team-usa-aircraft"
+    },
+    {
+      "aircraftId": "notable-global-20261001-056",
+      "registration": "N522DZ",
+      "aircraft": "Airbus A350-900",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N522DZ\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.scramble.nl/civil-news/delta-to-introduce-3rd-team-usa-aircraft"
+    },
+    {
+      "aircraftId": "notable-global-20261001-057",
+      "registration": "N411DX",
+      "aircraft": "Airbus A330-900",
+      "currentModelMatch": "family",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N411DX\" livery download",
+      "liveryCandidates": [
+        {
+          "title": "Delta \"Team USA\" livery for X-Works A330 NEO - X-Plane.to",
+          "url": "https://fr.x-plane.to/file/320/delta-team-usa-livery-for-x-works-a330-neo",
+          "status": "SEARCH_LISTING_ONLY",
+          "note": "Discovery lead only: file, exact paint, model compatibility and commercial web reuse not verified.",
+          "webReady": false
+        }
+      ],
+      "liveryStatus": "CANDIDATES_NEED_REVIEW",
+      "appearanceReference": "https://www.airhistory.net/photo/486237/N411DX"
+    },
+    {
+      "aircraftId": "notable-global-20261001-058",
+      "registration": "JA607A",
+      "aircraft": "Boeing 767-300ER",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"JA607A\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/just-for-fun/pokemon-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-059",
+      "registration": "JA894A",
+      "aircraft": "Boeing 787-9",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"JA894A\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/just-for-fun/pokemon-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-060",
+      "registration": "JA784A",
+      "aircraft": "Boeing 777-300ER",
+      "currentModelMatch": "family",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"JA784A\" livery download",
+      "liveryCandidates": [
+        {
+          "title": "ANA Eevee Jet JA784A PMDG 777 repaint",
+          "url": "https://library.avsim.net/file/228773-p3dv5-pmdg-777-300er-ana-pokemon-eevee-jet-nh-ja784a",
+          "platform": "P3D / PMDG",
+          "status": "SEARCH_LISTING_ONLY",
+          "note": "Registration-specific listing found; download, UV compatibility and redistribution terms not verified.",
+          "webReady": false
+        }
+      ],
+      "liveryStatus": "CANDIDATES_NEED_REVIEW",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/just-for-fun/pokemon-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-061",
+      "registration": "B-18916",
+      "aircraft": "Airbus A350-900",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"B-18916\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/just-for-fun/pokemon-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-062",
+      "registration": "B-18101",
+      "aircraft": "Airbus A321neo",
+      "currentModelMatch": "family",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"B-18101\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/just-for-fun/pokemon-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-063",
+      "registration": "PK-GMU",
+      "aircraft": "Boeing 737-800",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"PK-GMU\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/just-for-fun/pokemon-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-064",
+      "registration": "9V-OJJ",
+      "aircraft": "Boeing 787-9",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"9V-OJJ\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/just-for-fun/pokemon-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-065",
+      "registration": "JA73AB",
+      "aircraft": "Boeing 737-800",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"JA73AB\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/just-for-fun/pokemon-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-066",
+      "registration": "JA73NG",
+      "aircraft": "Boeing 737-800",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"JA73NG\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/just-for-fun/pokemon-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-067",
+      "registration": "HL8306",
+      "aircraft": "Boeing 737-800",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"HL8306\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/just-for-fun/pokemon-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-068",
+      "registration": "B-16740",
+      "aircraft": "Boeing 777-300ER",
+      "currentModelMatch": "family",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"B-16740\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.evaair.com/zh-hk/fly-prepare/our-fleets/eva-special-livery-jets/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-069",
+      "registration": "B-16217",
+      "aircraft": "Airbus A321",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"B-16217\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.evaair.com/zh-hk/fly-prepare/our-fleets/eva-special-livery-jets/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-070",
+      "registration": "B-16722",
+      "aircraft": "Boeing 777-300ER",
+      "currentModelMatch": "family",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"B-16722\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.evaair.com/zh-hk/fly-prepare/our-fleets/eva-special-livery-jets/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-071",
+      "registration": "B-16332",
+      "aircraft": "Airbus A330-300",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"B-16332\" livery download",
+      "liveryCandidates": [
+        {
+          "title": "EVA Air Laminar A330-300 Livery Three-Pack - X-Plane.to",
+          "url": "https://de.x-plane.to/file/1563/eva-air-laminar-a330-300-livery-three-pack",
+          "status": "SEARCH_LISTING_ONLY",
+          "note": "Discovery lead only: file, exact paint, model compatibility and commercial web reuse not verified.",
+          "webReady": false
+        }
+      ],
+      "liveryStatus": "CANDIDATES_NEED_REVIEW",
+      "appearanceReference": "https://www.evaair.com/zh-hk/fly-prepare/our-fleets/eva-special-livery-jets/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-072",
+      "registration": "B-16333",
+      "aircraft": "Airbus A330-300",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"B-16333\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.evaair.com/zh-hk/fly-prepare/our-fleets/eva-special-livery-jets/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-073",
+      "registration": "CC-BGM",
+      "aircraft": "Boeing 787-9",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"CC-BGM\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-entertainment-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-074",
+      "registration": "PR-MYA",
+      "aircraft": "Airbus A320",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"PR-MYA\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-entertainment-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-075",
+      "registration": "N542VL",
+      "aircraft": "Airbus A321neo",
+      "currentModelMatch": "family",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N542VL\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-entertainment-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-076",
+      "registration": "N207NV",
+      "aircraft": "Airbus A320",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N207NV\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-entertainment-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-077",
+      "registration": "PK-GPY",
+      "aircraft": "Airbus A330-300",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"PK-GPY\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-entertainment-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-078",
+      "registration": "B-18055",
+      "aircraft": "Boeing 777-300ER",
+      "currentModelMatch": "family",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"B-18055\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-entertainment-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-079",
+      "registration": "A6-BMA",
+      "aircraft": "Boeing 787-10",
+      "currentModelMatch": "family",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"A6-BMA\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-entertainment-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-080",
+      "registration": "JA743A",
+      "aircraft": "Boeing 777-200ER",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"JA743A\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-entertainment-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-081",
+      "registration": "B-8119",
+      "aircraft": "Airbus A320",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"B-8119\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-entertainment-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-082",
+      "registration": "B-5976",
+      "aircraft": "Airbus A330-300",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"B-5976\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-entertainment-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-083",
+      "registration": "B-6635",
+      "aircraft": "Airbus A320",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"B-6635\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-entertainment-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-084",
+      "registration": "B-6507",
+      "aircraft": "Airbus A330-300",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"B-6507\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-entertainment-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-085",
+      "registration": "B-9957",
+      "aircraft": "Airbus A321",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"B-9957\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-entertainment-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-086",
+      "registration": "9M-AFF",
+      "aircraft": "Airbus A320",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"9M-AFF\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-entertainment-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-087",
+      "registration": "9M-XXU",
+      "aircraft": "Airbus A330-300",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"9M-XXU\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-entertainment-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-088",
+      "registration": "TC-SPY",
+      "aircraft": "Boeing 737-800",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"TC-SPY\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-entertainment-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-089",
+      "registration": "TC-SPO",
+      "aircraft": "Boeing 737-800",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"TC-SPO\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-entertainment-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-090",
+      "registration": "OO-SNB",
+      "aircraft": "Airbus A320",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"OO-SNB\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.flightradar24.com/blog/flight-tracking-news/special-aircraft-tracking/tracking-special-entertainment-liveries/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-091",
+      "registration": "PR-YSH",
+      "aircraft": "Airbus A320neo",
+      "currentModelMatch": "family",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"PR-YSH\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.aeromuseu.com.br/ACB_AZUL.htm"
+    },
+    {
+      "aircraftId": "notable-global-20261001-092",
+      "registration": "PR-YSI",
+      "aircraft": "Airbus A320neo",
+      "currentModelMatch": "family",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"PR-YSI\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.aeromuseu.com.br/ACB_AZUL.htm"
+    },
+    {
+      "aircraftId": "notable-global-20261001-093",
+      "registration": "PR-YSK",
+      "aircraft": "Airbus A320neo",
+      "currentModelMatch": "family",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"PR-YSK\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.aeromuseu.com.br/ACB_AZUL.htm"
+    },
+    {
+      "aircraftId": "notable-global-20261001-094",
+      "registration": "PR-YJF",
+      "aircraft": "Airbus A321neo",
+      "currentModelMatch": "family",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"PR-YJF\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://aeromagazine.uol.com.br/artigo/azul-tera-o-aviao-da-margarida.html"
+    },
+    {
+      "aircraftId": "notable-global-20261001-095",
+      "registration": "PR-YSR",
+      "aircraft": "Airbus A320neo",
+      "currentModelMatch": "family",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"PR-YSR\" livery download",
+      "liveryCandidates": [
+        {
+          "title": "Azul Goofy A32NX",
+          "url": "https://flightsim.to/addon/70450/fbw-azul-pateta-nas-nuvens-disney-pr-ysr-8k",
+          "platform": "MSFS / A32NX",
+          "status": "PAGE_CHECKED",
+          "note": "Artwork download page found; no applicable web redistribution grant verified.",
+          "webReady": false
+        }
+      ],
+      "liveryStatus": "CANDIDATES_NEED_REVIEW",
+      "appearanceReference": "https://pt.linkedin.com/posts/azulinhasaereas_azul-goofy-frotamagica-activity-7200839894292684802-IF1J"
+    },
+    {
+      "aircraftId": "notable-global-20261001-096",
+      "registration": "N537AS",
+      "aircraft": "Boeing 737-800",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N537AS\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.alaskaair.com/content/travel-info/our-aircraft/737-800-friendship-and-beyond-disneyland-resort"
+    },
+    {
+      "aircraftId": "notable-global-20261001-097",
+      "registration": "N538AS",
+      "aircraft": "Boeing 737-800",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N538AS\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://news.alaskaair.com/alaska-airlines/starwars-galaxysedge-livery/"
+    },
+    {
+      "aircraftId": "notable-global-20261001-098",
+      "registration": "N561JB",
+      "aircraft": "Airbus A320",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"N561JB\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://news.jetblue.com/latest-news/press-release-details/2025/Wahoo-JetBlue-Debuts-Special-Livery-Featuring-Mario-and-Friends/default.aspx"
+    },
+    {
+      "aircraftId": "notable-global-20261001-099",
+      "registration": "VH-X4A",
+      "aircraft": "Airbus A220-300",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"VH-X4A\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.qantas.com/en-au/onboard/fleet/flying-art"
+    },
+    {
+      "aircraftId": "notable-global-20261001-100",
+      "registration": "VH-ZND",
+      "aircraft": "Boeing 787-9",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"VH-ZND\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.qantas.com/en-au/onboard/fleet/flying-art"
+    },
+    {
+      "aircraftId": "notable-global-20261001-101",
+      "registration": "VH-XZJ",
+      "aircraft": "Boeing 737-800",
+      "currentModelMatch": "type",
+      "modelCandidate": null,
+      "liverySearchQuery": "\"VH-XZJ\" livery download",
+      "liveryCandidates": [],
+      "liveryStatus": "NOT_LOCATED_IN_CHECKED_SOURCES",
+      "appearanceReference": "https://www.qantas.com/en-au/onboard/fleet/flying-art"
+    }
+  ]
+}

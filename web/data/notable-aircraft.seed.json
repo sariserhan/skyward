@@ -5416,7 +5416,7 @@
     {
       "id": "notable-global-20261001-061",
       "manufacturer": "Airbus",
-      "model": "A350",
+      "model": "A350-900",
       "operator": "China Airlines",
       "category": "Entertainment",
       "status": "VERIFIED",
@@ -5439,6 +5439,12 @@
           "sourceName": "Flightradar24 Pokémon aircraft reference (April 2026)",
           "verifiedAt": "2026-10-01",
           "confidence": "MEDIUM"
+        },
+        {
+          "sourceUrl": "https://www.china-airlines.com/tw/en/Images/%E8%88%AA%E7%A9%BA%E5%99%A8%E8%B3%87%E8%A8%8A_20260320_tcm264-3270.pdf",
+          "sourceName": "China Airlines aircraft information, 20 March 2026 (search-indexed table; direct PDF fetch returned 403)",
+          "verifiedAt": "2026-10-01",
+          "confidence": "HIGH"
         }
       ]
     },

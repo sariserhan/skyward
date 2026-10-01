@@ -1,0 +1,4125 @@
+{
+  "checkedAt": "2026-10-01",
+  "note": "Source trees and root license text inspected. Variants, geometry, texture mapping, animation and conversion are not certified by existence of source files. No models imported in this audit.",
+  "repositories": [
+    {
+      "repo": "FGMEMBERS/IDG-MD-10X",
+      "revision": "90679e62a613557792e410a35f2ea261a626b9ca",
+      "truncated": false,
+      "licenses": [],
+      "meshes": [
+        {
+          "path": "Models/Autopush/cursor.ac",
+          "bytes": 9610
+        },
+        {
+          "path": "Models/Autopush/cursor_sharp.ac",
+          "bytes": 1019
+        },
+        {
+          "path": "Models/Autopush/waypoint.ac",
+          "bytes": 3325
+        },
+        {
+          "path": "Models/KC-10A-GE.ac",
+          "bytes": 4588595
+        },
+        {
+          "path": "Models/MD-10-30-GE.ac",
+          "bytes": 4910534
+        },
+        {
+          "path": "Models/MD-10-30F-GE.ac",
+          "bytes": 4366822
+        }
+      ],
+      "designs": [],
+      "sourceUrl": "https://github.com/FGMEMBERS/IDG-MD-10X/tree/90679e62a613557792e410a35f2ea261a626b9ca",
+      "reviewStatus": "LICENSE_REVIEW_REQUIRED",
+      "webReady": false
+    },
+    {
+      "repo": "FGMEMBERS/MD-10",
+      "revision": "c2aeb40f6a967f7d88b443f410023ff59d22309d",
+      "truncated": false,
+      "licenses": [
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/FGMEMBERS/MD-10/c2aeb40f6a967f7d88b443f410023ff59d22309d/LICENSE",
+          "gnu": true,
+          "version": "2"
+        }
+      ],
+      "meshes": [
+        {
+          "path": "Models/Cabin/cabin.ac",
+          "bytes": 1701545
+        },
+        {
+          "path": "Models/Cabin/cargo_area.ac",
+          "bytes": 1335127
+        },
+        {
+          "path": "Models/GE-CF6-50.ac",
+          "bytes": 117198
+        },
+        {
+          "path": "Models/KC-10-boom.ac",
+          "bytes": 79849
+        },
+        {
+          "path": "Models/KC-10-fuselage.ac",
+          "bytes": 762167
+        },
+        {
+          "path": "Models/Lights/empty.ac",
+          "bytes": 26
+        },
+        {
+          "path": "Models/Lights/greennav.ac",
+          "bytes": 12758
+        },
+        {
+          "path": "Models/Lights/landing-bare.ac",
+          "bytes": 17390
+        },
+        {
+          "path": "Models/Lights/landing.ac",
+          "bytes": 17873
+        },
+        {
+          "path": "Models/Lights/light-cone.ac",
+          "bytes": 17884
+        },
+        {
+          "path": "Models/Lights/light-flare.ac",
+          "bytes": 12282
+        },
+        {
+          "path": "Models/Lights/panel.ac",
+          "bytes": 978
+        },
+        {
+          "path": "Models/Lights/rednav.ac",
+          "bytes": 12756
+        },
+        {
+          "path": "Models/Lights/strobe.ac",
+          "bytes": 12756
+        },
+        {
+          "path": "Models/Lights/transparentlight.ac",
+          "bytes": 673
+        },
+        {
+          "path": "Models/Lights/whitelight.ac",
+          "bytes": 340
+        },
+        {
+          "path": "Models/MD-10-engine-nacelle.ac",
+          "bytes": 89981
+        },
+        {
+          "path": "Models/MD-10-fuselage.ac",
+          "bytes": 810584
+        },
+        {
+          "path": "Models/MD-10-gear.ac",
+          "bytes": 565963
+        },
+        {
+          "path": "Models/MD-10-hstab.ac",
+          "bytes": 25701
+        },
+        {
+          "path": "Models/MD-10-vstab.ac",
+          "bytes": 93500
+        },
+        {
+          "path": "Models/MD-10-wings.ac",
+          "bytes": 193042
+        },
+        {
+          "path": "Models/MD-10CF-fuselage.ac",
+          "bytes": 726223
+        },
+        {
+          "path": "Models/MD-10CF-fuselage_section.ac",
+          "bytes": 77275
+        },
+        {
+          "path": "Models/MD-10F-fuselage.ac",
+          "bytes": 839144
+        },
+        {
+          "path": "Models/MD-10F-fuselage_section.ac",
+          "bytes": 77275
+        },
+        {
+          "path": "Models/Refuel-Lights/BlueLight.ac",
+          "bytes": 916
+        },
+        {
+          "path": "Models/Refuel-Lights/GreenLight.ac",
+          "bytes": 912
+        },
+        {
+          "path": "Models/Refuel-Lights/RedLight.ac",
+          "bytes": 918
+        },
+        {
+          "path": "Models/Refuel-Lights/WhiteLight.ac",
+          "bytes": 906
+        },
+        {
+          "path": "Models/Services/Baggage/cargo_ramp.ac",
+          "bytes": 1102734
+        },
+        {
+          "path": "Models/Services/Catering/Catering_Loader_Truck_VolvoFM-stowed.ac",
+          "bytes": 270410
+        },
+        {
+          "path": "Models/Services/Catering/Catering_Loader_Truck_VolvoFM.ac",
+          "bytes": 192422
+        },
+        {
+          "path": "Models/Services/Catering/warning-light.ac",
+          "bytes": 707
+        },
+        {
+          "path": "Models/Services/Chokes/choke_left.ac",
+          "bytes": 3716
+        },
+        {
+          "path": "Models/Services/Chokes/choke_nose.ac",
+          "bytes": 3678
+        },
+        {
+          "path": "Models/Services/Chokes/choke_right.ac",
+          "bytes": 3740
+        },
+        {
+          "path": "Models/Services/De-Icing/volvo_deicing_truck.ac",
+          "bytes": 305046
+        },
+        {
+          "path": "Models/Services/External-Power/ext-pwr-box.ac",
+          "bytes": 98197
+        },
+        {
+          "path": "Models/Services/Fuel-Truck/Fuel_Truck_Short_VolvoFM.ac",
+          "bytes": 292804
+        },
+        {
+          "path": "Models/Services/Stairs/stairs.ac",
+          "bytes": 262508
+        },
+        {
+          "path": "Models/cockpit/cockpit.ac",
+          "bytes": 5887866
+        },
+        {
+          "path": "Models/cockpit/cockpit_seat \u2013 Kopio.ac",
+          "bytes": 801320
+        },
+        {
+          "path": "Models/cockpit/cockpit_seat.ac",
+          "bytes": 761862
+        },
+        {
+          "path": "Models/cockpit/instruments/EAD/CONFIG.ac",
+          "bytes": 9543
+        },
+        {
+          "path": "Models/cockpit/instruments/EAD/CONSEQ.ac",
+          "bytes": 810
+        },
+        {
+          "path": "Models/cockpit/instruments/EAD/EAD_1_GE.ac",
+          "bytes": 6731
+        },
+        {
+          "path": "Models/cockpit/instruments/EAD/MISC.ac",
+          "bytes": 808
+        },
+        {
+          "path": "Models/cockpit/instruments/EAD/ND.ac",
+          "bytes": 809
+        },
+        {
+          "path": "Models/cockpit/instruments/EAD/STATUS.ac",
+          "bytes": 810
+        },
+        {
+          "path": "Models/cockpit/instruments/FCP/FCP.ac",
+          "bytes": 666779
+        },
+        {
+          "path": "Models/cockpit/instruments/ND/ND_L.ac",
+          "bytes": 491
+        },
+        {
+          "path": "Models/cockpit/instruments/ND/ND_R.ac",
+          "bytes": 491
+        },
+        {
+          "path": "Models/cockpit/instruments/PFD/PFD_L.ac",
+          "bytes": 124568
+        },
+        {
+          "path": "Models/cockpit/instruments/Radio/radio.ac",
+          "bytes": 88813
+        },
+        {
+          "path": "Models/cockpit/instruments/audioselector/audioselector.ac",
+          "bytes": 108046
+        },
+        {
+          "path": "Models/cockpit/instruments/brakes/brakes.ac",
+          "bytes": 129412
+        },
+        {
+          "path": "Models/cockpit/instruments/cdu/boeing.ac",
+          "bytes": 111528
+        },
+        {
+          "path": "Models/cockpit/instruments/compass/compass.ac",
+          "bytes": 135962
+        },
+        {
+          "path": "Models/cockpit/instruments/radar/radar.ac",
+          "bytes": 87750
+        },
+        {
+          "path": "Models/cockpit/instruments/screenselector/screenselector.ac",
+          "bytes": 80629
+        },
+        {
+          "path": "Models/cockpit/instruments/stby-ai/stby-ai.ac",
+          "bytes": 263875
+        },
+        {
+          "path": "Models/cockpit/instruments/stby-alt/stbyalt.ac",
+          "bytes": 268797
+        },
+        {
+          "path": "Models/cockpit/instruments/tcas/tcas.ac",
+          "bytes": 74530
+        },
+        {
+          "path": "Models/cockpit/overhead_1.ac",
+          "bytes": 2636755
+        },
+        {
+          "path": "Models/cockpit/overhead_2.ac",
+          "bytes": 2002602
+        },
+        {
+          "path": "Models/cockpit/pedestal.ac",
+          "bytes": 1198827
+        }
+      ],
+      "designs": [
+        "Models/Liveries/MD-10ERX/Orbis2.xml",
+        "Models/Liveries/MD-10ERX/orbis2.png",
+        "Models/Liveries/MD-10F/Orbis.xml",
+        "Models/Liveries/MD-10F/Orbis2.xml",
+        "Models/Liveries/MD-10F/orbis.png",
+        "Models/Liveries/MD-10F/orbis2.png"
+      ],
+      "sourceUrl": "https://github.com/FGMEMBERS/MD-10/tree/c2aeb40f6a967f7d88b443f410023ff59d22309d",
+      "reviewStatus": "GPL_SOURCE_CONVERSION_REQUIRED",
+      "webReady": false
+    },
+    {
+      "repo": "FGMEMBERS/MD-10-Family",
+      "revision": "8697686580eebcfdde0c6be4504dd68cb91ccb52",
+      "truncated": false,
+      "licenses": [
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/FGMEMBERS/MD-10-Family/8697686580eebcfdde0c6be4504dd68cb91ccb52/LICENSE",
+          "gnu": true,
+          "version": "2"
+        }
+      ],
+      "meshes": [
+        {
+          "path": "Models/Cabin/cabin.ac",
+          "bytes": 1701545
+        },
+        {
+          "path": "Models/Cabin/cargo_area.ac",
+          "bytes": 1335127
+        },
+        {
+          "path": "Models/GE-CF6-50.ac",
+          "bytes": 147635
+        },
+        {
+          "path": "Models/KC-10-boom.ac",
+          "bytes": 79849
+        },
+        {
+          "path": "Models/KC-10-fuselage.ac",
+          "bytes": 879138
+        },
+        {
+          "path": "Models/Lights/empty.ac",
+          "bytes": 26
+        },
+        {
+          "path": "Models/Lights/greennav.ac",
+          "bytes": 12758
+        },
+        {
+          "path": "Models/Lights/landing-bare.ac",
+          "bytes": 17390
+        },
+        {
+          "path": "Models/Lights/landing.ac",
+          "bytes": 17873
+        },
+        {
+          "path": "Models/Lights/light-cone.ac",
+          "bytes": 17884
+        },
+        {
+          "path": "Models/Lights/light-flare.ac",
+          "bytes": 12282
+        },
+        {
+          "path": "Models/Lights/panel.ac",
+          "bytes": 978
+        },
+        {
+          "path": "Models/Lights/rednav.ac",
+          "bytes": 12756
+        },
+        {
+          "path": "Models/Lights/strobe.ac",
+          "bytes": 12756
+        },
+        {
+          "path": "Models/Lights/transparentlight.ac",
+          "bytes": 673
+        },
+        {
+          "path": "Models/Lights/whitelight.ac",
+          "bytes": 340
+        },
+        {
+          "path": "Models/MD-10-engine-nacelle.ac",
+          "bytes": 89981
+        },
+        {
+          "path": "Models/MD-10-fuselage.ac",
+          "bytes": 696480
+        },
+        {
+          "path": "Models/MD-10-gear.ac",
+          "bytes": 565963
+        },
+        {
+          "path": "Models/MD-10-hstab.ac",
+          "bytes": 25701
+        },
+        {
+          "path": "Models/MD-10-vstab.ac",
+          "bytes": 93500
+        },
+        {
+          "path": "Models/MD-10-wings.ac",
+          "bytes": 193042
+        },
+        {
+          "path": "Models/MD-10CF-fuselage.ac",
+          "bytes": 726223
+        },
+        {
+          "path": "Models/MD-10CF-fuselage_section.ac",
+          "bytes": 77275
+        },
+        {
+          "path": "Models/MD-10F-fuselage.ac",
+          "bytes": 726223
+        },
+        {
+          "path": "Models/MD-10F-fuselage_section.ac",
+          "bytes": 77275
+        },
+        {
+          "path": "Models/Refuel-Lights/BlueLight.ac",
+          "bytes": 916
+        },
+        {
+          "path": "Models/Refuel-Lights/GreenLight.ac",
+          "bytes": 912
+        },
+        {
+          "path": "Models/Refuel-Lights/RedLight.ac",
+          "bytes": 918
+        },
+        {
+          "path": "Models/Refuel-Lights/WhiteLight.ac",
+          "bytes": 906
+        },
+        {
+          "path": "Models/Services/Baggage/cargo_ramp.ac",
+          "bytes": 1102734
+        },
+        {
+          "path": "Models/Services/Catering/Catering_Loader_Truck_VolvoFM-stowed.ac",
+          "bytes": 270410
+        },
+        {
+          "path": "Models/Services/Catering/Catering_Loader_Truck_VolvoFM.ac",
+          "bytes": 192422
+        },
+        {
+          "path": "Models/Services/Catering/warning-light.ac",
+          "bytes": 707
+        },
+        {
+          "path": "Models/Services/Chokes/choke_left.ac",
+          "bytes": 3716
+        },
+        {
+          "path": "Models/Services/Chokes/choke_nose.ac",
+          "bytes": 3678
+        },
+        {
+          "path": "Models/Services/Chokes/choke_right.ac",
+          "bytes": 3740
+        },
+        {
+          "path": "Models/Services/De-Icing/volvo_deicing_truck.ac",
+          "bytes": 305046
+        },
+        {
+          "path": "Models/Services/External-Power/ext-pwr-box.ac",
+          "bytes": 98197
+        },
+        {
+          "path": "Models/Services/Fuel-Truck/Fuel_Truck_Short_VolvoFM.ac",
+          "bytes": 292804
+        },
+        {
+          "path": "Models/Services/Stairs/stairs.ac",
+          "bytes": 262508
+        },
+        {
+          "path": "Models/cockpit-ACF/Controls/ypL.ac",
+          "bytes": 584792
+        },
+        {
+          "path": "Models/cockpit-ACF/Controls/ypR.ac",
+          "bytes": 603124
+        },
+        {
+          "path": "Models/cockpit-ACF/Instruments/EAD/CONFIG.ac",
+          "bytes": 9486
+        },
+        {
+          "path": "Models/cockpit-ACF/Instruments/EAD/CONSEQ.ac",
+          "bytes": 802
+        },
+        {
+          "path": "Models/cockpit-ACF/Instruments/EAD/EAD_1_GE.ac",
+          "bytes": 15981
+        },
+        {
+          "path": "Models/cockpit-ACF/Instruments/EAD/MISC.ac",
+          "bytes": 800
+        },
+        {
+          "path": "Models/cockpit-ACF/Instruments/EAD/ND.ac",
+          "bytes": 801
+        },
+        {
+          "path": "Models/cockpit-ACF/Instruments/EAD/SD.ac",
+          "bytes": 6887
+        },
+        {
+          "path": "Models/cockpit-ACF/Instruments/EAD/STATUS.ac",
+          "bytes": 802
+        },
+        {
+          "path": "Models/cockpit-ACF/Instruments/EFIS/efis-ctl.ac",
+          "bytes": 211308
+        },
+        {
+          "path": "Models/cockpit-ACF/Instruments/GearHandle/gearhandle.ac",
+          "bytes": 159392
+        },
+        {
+          "path": "Models/cockpit-ACF/Instruments/KLN90B/kln90b.ac",
+          "bytes": 33134
+        },
+        {
+          "path": "Models/cockpit-ACF/Instruments/MCP/mcp.ac",
+          "bytes": 172618
+        },
+        {
+          "path": "Models/cockpit-ACF/Instruments/ND/ND_L.ac",
+          "bytes": 7366
+        },
+        {
+          "path": "Models/cockpit-ACF/Instruments/ND/ND_R.ac",
+          "bytes": 7366
+        },
+        {
+          "path": "Models/cockpit-ACF/Instruments/PFD/PFD_L.ac",
+          "bytes": 131134
+        },
+        {
+          "path": "Models/cockpit-ACF/Instruments/RadioPanel/radiopanel.ac",
+          "bytes": 97087
+        },
+        {
+          "path": "Models/cockpit-ACF/Instruments/Standby/standby.ac",
+          "bytes": 16996
+        },
+        {
+          "path": "Models/cockpit-ACF/Instruments/screenselector/screenselector.ac",
+          "bytes": 80629
+        },
+        {
+          "path": "Models/cockpit-ACF/Instruments/stby-alt/stbyalt.ac",
+          "bytes": 268797
+        },
+        {
+          "path": "Models/cockpit-ACF/MD-10-flightdeck.ac",
+          "bytes": 1165825
+        },
+        {
+          "path": "Models/cockpit-ACF/ohpanelold.ac",
+          "bytes": 4468918
+        },
+        {
+          "path": "Models/cockpit-ACF/overhead_1.ac",
+          "bytes": 2636755
+        },
+        {
+          "path": "Models/cockpit-ACF/overhead_2.ac",
+          "bytes": 2002602
+        },
+        {
+          "path": "Models/cockpit/cockpit.ac",
+          "bytes": 5887866
+        },
+        {
+          "path": "Models/cockpit/cockpit_seat \u2013 Kopio.ac",
+          "bytes": 801320
+        },
+        {
+          "path": "Models/cockpit/cockpit_seat.ac",
+          "bytes": 761862
+        },
+        {
+          "path": "Models/cockpit/instruments/EAD/CONFIG.ac",
+          "bytes": 9543
+        },
+        {
+          "path": "Models/cockpit/instruments/EAD/CONSEQ.ac",
+          "bytes": 810
+        },
+        {
+          "path": "Models/cockpit/instruments/EAD/EAD_1_GE.ac",
+          "bytes": 9120
+        },
+        {
+          "path": "Models/cockpit/instruments/EAD/MISC.ac",
+          "bytes": 808
+        },
+        {
+          "path": "Models/cockpit/instruments/EAD/ND.ac",
+          "bytes": 809
+        },
+        {
+          "path": "Models/cockpit/instruments/EAD/STATUS.ac",
+          "bytes": 810
+        },
+        {
+          "path": "Models/cockpit/instruments/FCP/FCP.ac",
+          "bytes": 666779
+        },
+        {
+          "path": "Models/cockpit/instruments/ND/ND_L.ac",
+          "bytes": 491
+        },
+        {
+          "path": "Models/cockpit/instruments/ND/ND_R.ac",
+          "bytes": 491
+        },
+        {
+          "path": "Models/cockpit/instruments/PFD/PFD_L.ac",
+          "bytes": 124274
+        },
+        {
+          "path": "Models/cockpit/instruments/Radio/radio.ac",
+          "bytes": 88813
+        },
+        {
+          "path": "Models/cockpit/instruments/audioselector/audioselector.ac",
+          "bytes": 108046
+        },
+        {
+          "path": "Models/cockpit/instruments/brakes/brakes.ac",
+          "bytes": 129412
+        },
+        {
+          "path": "Models/cockpit/instruments/cdu/boeing.ac",
+          "bytes": 111528
+        },
+        {
+          "path": "Models/cockpit/instruments/compass/compass.ac",
+          "bytes": 135962
+        },
+        {
+          "path": "Models/cockpit/instruments/radar/radar.ac",
+          "bytes": 87750
+        },
+        {
+          "path": "Models/cockpit/instruments/screenselector/screenselector.ac",
+          "bytes": 80629
+        },
+        {
+          "path": "Models/cockpit/instruments/stby-ai/stby-ai.ac",
+          "bytes": 263875
+        },
+        {
+          "path": "Models/cockpit/instruments/stby-alt/stbyalt.ac",
+          "bytes": 268797
+        },
+        {
+          "path": "Models/cockpit/instruments/tcas/tcas.ac",
+          "bytes": 74530
+        },
+        {
+          "path": "Models/cockpit/overhead_1.ac",
+          "bytes": 2636755
+        },
+        {
+          "path": "Models/cockpit/overhead_2.ac",
+          "bytes": 2002602
+        },
+        {
+          "path": "Models/cockpit/pedestal.ac",
+          "bytes": 1198827
+        }
+      ],
+      "designs": [
+        "Models/Liveries/MD-10ACF/Orbis2.xml",
+        "Models/Liveries/MD-10ACF/orbis2.png",
+        "Models/Liveries/MD-10F/Orbis.xml",
+        "Models/Liveries/MD-10F/Orbis2.xml",
+        "Models/Liveries/MD-10F/orbis.png",
+        "Models/Liveries/MD-10F/orbis2.png"
+      ],
+      "sourceUrl": "https://github.com/FGMEMBERS/MD-10-Family/tree/8697686580eebcfdde0c6be4504dd68cb91ccb52",
+      "reviewStatus": "GPL_SOURCE_CONVERSION_REQUIRED",
+      "webReady": false
+    },
+    {
+      "repo": "FGMEMBERS/dhc6",
+      "revision": "ed826b950acfe9aed737808f24ddb26a4f9a8c78",
+      "truncated": false,
+      "licenses": [],
+      "meshes": [
+        {
+          "path": "Models/Cabin/cabin.ac",
+          "bytes": 533323
+        },
+        {
+          "path": "Models/Equipment/Wiper/LHwiper.ac",
+          "bytes": 10193
+        },
+        {
+          "path": "Models/Equipment/Wiper/RHwiper.ac",
+          "bytes": 10288
+        },
+        {
+          "path": "Models/Equipment/chocks/left-chock-aft.ac",
+          "bytes": 3326
+        },
+        {
+          "path": "Models/Equipment/chocks/left-chock-fwd.ac",
+          "bytes": 3346
+        },
+        {
+          "path": "Models/Equipment/chocks/right-chock-aft.ac",
+          "bytes": 3305
+        },
+        {
+          "path": "Models/Equipment/chocks/right-chock-fwd.ac",
+          "bytes": 3319
+        },
+        {
+          "path": "Models/Equipment/engine-cover/left-engine-cover.ac",
+          "bytes": 44993
+        },
+        {
+          "path": "Models/Equipment/engine-cover/right-engine-cover.ac",
+          "bytes": 45240
+        },
+        {
+          "path": "Models/Equipment/ground-services/external-power/external-power.ac",
+          "bytes": 155016
+        },
+        {
+          "path": "Models/Equipment/ground-services/fuel-truck/fuel-truck.ac",
+          "bytes": 581006
+        },
+        {
+          "path": "Models/Equipment/pitot-cover/left-pitot-cover.ac",
+          "bytes": 97947
+        },
+        {
+          "path": "Models/Equipment/pitot-cover/right-pitot-cover.ac",
+          "bytes": 97950
+        },
+        {
+          "path": "Models/Equipment/tiedowns/left-tiedown-wheels.ac",
+          "bytes": 75990
+        },
+        {
+          "path": "Models/Equipment/tiedowns/rear-tiedown-wheels.ac",
+          "bytes": 76326
+        },
+        {
+          "path": "Models/Equipment/tiedowns/right-tiedown-wheels.ac",
+          "bytes": 75803
+        },
+        {
+          "path": "Models/Flightdeck/Circuit-breakers/center-breaker-panel.ac",
+          "bytes": 897166
+        },
+        {
+          "path": "Models/Flightdeck/Circuit-breakers/main-breaker-panel.ac",
+          "bytes": 1879487
+        },
+        {
+          "path": "Models/Flightdeck/Circuit-breakers/overhead-breaker-panel.ac",
+          "bytes": 757607
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/ELT/ArtexELT.ac",
+          "bytes": 57618
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/ai/ai.ac",
+          "bytes": 158706
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/airtemp/airtemp.ac",
+          "bytes": 102312
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/alt-set/alt-selt.ac",
+          "bytes": 77609
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/alt/alt2.ac",
+          "bytes": 153335
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/ap/AP-board.ac",
+          "bytes": 12776
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/asi/asi-gauge.ac",
+          "bytes": 101723
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/clock/m877.ac",
+          "bytes": 26848
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/compass/magcompass.ac",
+          "bytes": 86521
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/flaps/flap-gauge.ac",
+          "bytes": 1344
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/fuel/fuel-qty.ac",
+          "bytes": 46538
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/fuel/fuelflow.ac",
+          "bytes": 45321
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/gear/gear-ctl.ac",
+          "bytes": 58181
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/hi/hi.ac",
+          "bytes": 116733
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/hyd/hydpress.ac",
+          "bytes": 72415
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/ias-set/ias-set.ac",
+          "bytes": 31844
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/ki206/ki206.ac",
+          "bytes": 108831
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/ki266/ki266.ac",
+          "bytes": 110713
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/oat/oat.ac",
+          "bytes": 18131
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/oil/oilpsi.ac",
+          "bytes": 45692
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/oil/oiltemp.ac",
+          "bytes": 45470
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/prop/prop-rpm.ac",
+          "bytes": 45806
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/radar-alt/radar-alt.ac",
+          "bytes": 36851
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/radio/ctl22.ac",
+          "bytes": 41042
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/radio/ctl32.ac",
+          "bytes": 41684
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/radio/ctl62.ac",
+          "bytes": 42515
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/rmi/rmi.ac",
+          "bytes": 146712
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/tc/tc.ac",
+          "bytes": 104674
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/torque/T5.ac",
+          "bytes": 48107
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/torque/gg-rpm.ac",
+          "bytes": 46058
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/torque/torque.ac",
+          "bytes": 48066
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/transponder/gtx320a.ac",
+          "bytes": 118889
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/volts/ammeter.ac",
+          "bytes": 21268
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/volts/voltmeter.ac",
+          "bytes": 21270
+        },
+        {
+          "path": "Models/Flightdeck/Instruments/vsi/vsi.ac",
+          "bytes": 116944
+        },
+        {
+          "path": "Models/Flightdeck/No-smoking/no-smoking.ac",
+          "bytes": 2001
+        },
+        {
+          "path": "Models/Flightdeck/dhc6-lightmap-kits.blend",
+          "bytes": 5715476
+        },
+        {
+          "path": "Models/Flightdeck/flightdeck.ac",
+          "bytes": 2906593
+        },
+        {
+          "path": "Models/Lights/L-lightcone-oh.ac",
+          "bytes": 1440
+        },
+        {
+          "path": "Models/Lights/Lights.ac",
+          "bytes": 8961
+        },
+        {
+          "path": "Models/Lights/lightcone-central.ac",
+          "bytes": 4426
+        },
+        {
+          "path": "Models/Lights/lightcone-oh.ac",
+          "bytes": 1434
+        },
+        {
+          "path": "Models/Pilot/copilot.ac",
+          "bytes": 465087
+        },
+        {
+          "path": "Models/Pilot/pilot.ac",
+          "bytes": 465991
+        },
+        {
+          "path": "Models/dhc-6.ac",
+          "bytes": 1278057
+        },
+        {
+          "path": "Models/floats.ac",
+          "bytes": 304075
+        },
+        {
+          "path": "Models/shadow.ac",
+          "bytes": 389
+        },
+        {
+          "path": "Models/shadowF.ac",
+          "bytes": 390
+        },
+        {
+          "path": "Models/wheels.ac",
+          "bytes": 723907
+        }
+      ],
+      "designs": [],
+      "sourceUrl": "https://github.com/FGMEMBERS/dhc6/tree/ed826b950acfe9aed737808f24ddb26a4f9a8c78",
+      "reviewStatus": "LICENSE_REVIEW_REQUIRED",
+      "webReady": false
+    },
+    {
+      "repo": "FGMEMBERS/dc6",
+      "revision": "93b85a97efa5274cca16849c72aea5367e309ca2",
+      "truncated": false,
+      "licenses": [
+        {
+          "path": "COPYING",
+          "url": "https://raw.githubusercontent.com/FGMEMBERS/dc6/93b85a97efa5274cca16849c72aea5367e309ca2/COPYING",
+          "gnu": true,
+          "version": "2"
+        }
+      ],
+      "meshes": [
+        {
+          "path": "Models/Instruments/LHFflow.ac",
+          "bytes": 44488
+        },
+        {
+          "path": "Models/Instruments/LHman.ac",
+          "bytes": 44494
+        },
+        {
+          "path": "Models/Instruments/LHrpm.ac",
+          "bytes": 44479
+        },
+        {
+          "path": "Models/Instruments/RHFflow.ac",
+          "bytes": 44473
+        },
+        {
+          "path": "Models/Instruments/RHman.ac",
+          "bytes": 44481
+        },
+        {
+          "path": "Models/Instruments/RHrpm.ac",
+          "bytes": 44466
+        },
+        {
+          "path": "Models/Instruments/adf-radio/adf.ac",
+          "bytes": 27889
+        },
+        {
+          "path": "Models/Instruments/agl-radar/agl-radar.ac",
+          "bytes": 14454
+        },
+        {
+          "path": "Models/Instruments/alt-set/altset.ac",
+          "bytes": 24561
+        },
+        {
+          "path": "Models/Instruments/altimeter.ac",
+          "bytes": 46737
+        },
+        {
+          "path": "Models/Instruments/ap/ap.ac",
+          "bytes": 13357
+        },
+        {
+          "path": "Models/Instruments/asi/asi.ac",
+          "bytes": 25154
+        },
+        {
+          "path": "Models/Instruments/asi300gauge.ac",
+          "bytes": 40998
+        },
+        {
+          "path": "Models/Instruments/bmep.ac",
+          "bytes": 57649
+        },
+        {
+          "path": "Models/Instruments/bmep2.ac",
+          "bytes": 42629
+        },
+        {
+          "path": "Models/Instruments/clock.ac",
+          "bytes": 44276
+        },
+        {
+          "path": "Models/Instruments/comm/comm.ac",
+          "bytes": 27916
+        },
+        {
+          "path": "Models/Instruments/dir-gyro.ac",
+          "bytes": 57280
+        },
+        {
+          "path": "Models/Instruments/dme/dme.ac",
+          "bytes": 10408
+        },
+        {
+          "path": "Models/Instruments/dme/ki266.ac",
+          "bytes": 8144
+        },
+        {
+          "path": "Models/Instruments/flap.ac",
+          "bytes": 41228
+        },
+        {
+          "path": "Models/Instruments/frw/frw.ac",
+          "bytes": 285136
+        },
+        {
+          "path": "Models/Instruments/fuel45.ac",
+          "bytes": 67475
+        },
+        {
+          "path": "Models/Instruments/fuelpsi.ac",
+          "bytes": 67499
+        },
+        {
+          "path": "Models/Instruments/gyro-H.ac",
+          "bytes": 57474
+        },
+        {
+          "path": "Models/Instruments/hsi.ac",
+          "bytes": 51305
+        },
+        {
+          "path": "Models/Instruments/lights/epanel.ac",
+          "bytes": 232623
+        },
+        {
+          "path": "Models/Instruments/magcompass.ac",
+          "bytes": 21539
+        },
+        {
+          "path": "Models/Instruments/nav-radio/nav_radio.ac",
+          "bytes": 30079
+        },
+        {
+          "path": "Models/Instruments/oat.ac",
+          "bytes": 67101
+        },
+        {
+          "path": "Models/Instruments/oilpsi.ac",
+          "bytes": 67495
+        },
+        {
+          "path": "Models/Instruments/oiltemp.ac",
+          "bytes": 67499
+        },
+        {
+          "path": "Models/Instruments/pic-dev.ac",
+          "bytes": 89826
+        },
+        {
+          "path": "Models/Instruments/pic-dev/pic-dev.ac",
+          "bytes": 86225
+        },
+        {
+          "path": "Models/Instruments/rmi/rmi.ac",
+          "bytes": 22802
+        },
+        {
+          "path": "Models/Instruments/swap-nav/swap-nav.ac",
+          "bytes": 2208
+        },
+        {
+          "path": "Models/Instruments/turn.ac",
+          "bytes": 45865
+        },
+        {
+          "path": "Models/Instruments/vsi-gauge.ac",
+          "bytes": 45568
+        },
+        {
+          "path": "Models/Lights/flightdeck-light.ac",
+          "bytes": 19875
+        },
+        {
+          "path": "Models/Lights/lights.ac",
+          "bytes": 195723
+        },
+        {
+          "path": "Models/cabin.ac",
+          "bytes": 133375
+        },
+        {
+          "path": "Models/dc6-copilot.ac",
+          "bytes": 25
+        },
+        {
+          "path": "Models/dc6.ac",
+          "bytes": 1099771
+        },
+        {
+          "path": "Models/flightdeck.ac",
+          "bytes": 647131
+        },
+        {
+          "path": "Models/shadow.ac",
+          "bytes": 455
+        }
+      ],
+      "designs": [],
+      "sourceUrl": "https://github.com/FGMEMBERS/dc6/tree/93b85a97efa5274cca16849c72aea5367e309ca2",
+      "reviewStatus": "GPL_SOURCE_CONVERSION_REQUIRED",
+      "webReady": false
+    },
+    {
+      "repo": "FGMEMBERS/AS350",
+      "revision": "d52b1d8e1d30eec8a9f6a33b8c74ec7f1dcb1386",
+      "truncated": false,
+      "licenses": [
+        {
+          "path": "COPYING",
+          "url": "https://raw.githubusercontent.com/FGMEMBERS/AS350/d52b1d8e1d30eec8a9f6a33b8c74ec7f1dcb1386/COPYING",
+          "gnu": true,
+          "version": "2"
+        }
+      ],
+      "meshes": [
+        {
+          "path": "Instruments/asi/asi.ac",
+          "bytes": 738
+        },
+        {
+          "path": "Instruments/clock/clock.ac",
+          "bytes": 1326
+        },
+        {
+          "path": "Instruments/gsdi/gsdi.ac",
+          "bytes": 792
+        },
+        {
+          "path": "Instruments/tach/tach.ac",
+          "bytes": 1257
+        },
+        {
+          "path": "Instruments/torque/torque.ac",
+          "bytes": 969
+        },
+        {
+          "path": "Models/Interior/Instruments/CWS/panel.ac",
+          "bytes": 71713
+        },
+        {
+          "path": "Models/Interior/Instruments/SCU/scu.ac",
+          "bytes": 56427
+        },
+        {
+          "path": "Models/Interior/Instruments/SCU/scu2.ac",
+          "bytes": 922687
+        },
+        {
+          "path": "Models/Interior/Instruments/VEMD/FLIpage.ac",
+          "bytes": 4251
+        },
+        {
+          "path": "Models/Interior/Instruments/VEMD/enginepage.ac",
+          "bytes": 3575
+        },
+        {
+          "path": "Models/Interior/Instruments/VEMD/enginestartpage.ac",
+          "bytes": 6059
+        },
+        {
+          "path": "Models/Interior/Instruments/VEMD/flightreportpage.ac",
+          "bytes": 543
+        },
+        {
+          "path": "Models/Interior/Instruments/VEMD/initphasepage.ac",
+          "bytes": 534
+        },
+        {
+          "path": "Models/Interior/Instruments/VEMD/null.ac",
+          "bytes": 25
+        },
+        {
+          "path": "Models/Interior/Instruments/VEMD/vehiclepage.ac",
+          "bytes": 2916
+        },
+        {
+          "path": "Models/Interior/Instruments/VEMD/vemd.ac",
+          "bytes": 69400
+        },
+        {
+          "path": "Models/Interior/Instruments/asi/asi.ac",
+          "bytes": 738
+        },
+        {
+          "path": "Models/Interior/Instruments/clock/clock.ac",
+          "bytes": 1326
+        },
+        {
+          "path": "Models/Interior/Instruments/gsdi/gsdi.ac",
+          "bytes": 792
+        },
+        {
+          "path": "Models/Interior/Instruments/mfd/mfd.ac",
+          "bytes": 15581
+        },
+        {
+          "path": "Models/Interior/Instruments/switches/switch.ac",
+          "bytes": 169367
+        },
+        {
+          "path": "Models/Interior/Instruments/tach/tach.ac",
+          "bytes": 1257
+        },
+        {
+          "path": "Models/Interior/Instruments/torque/torque.ac",
+          "bytes": 969
+        },
+        {
+          "path": "Models/Lights/Flares/GreenLight-flat.ac",
+          "bytes": 714
+        },
+        {
+          "path": "Models/Lights/Flares/Light-flash.ac",
+          "bytes": 523
+        },
+        {
+          "path": "Models/Lights/Flares/RedLight-flat.ac",
+          "bytes": 707
+        },
+        {
+          "path": "Models/Lights/Flares/WhiteLight-flat.ac",
+          "bytes": 714
+        },
+        {
+          "path": "Models/Lights/LightCone/LightCone.ac",
+          "bytes": 57211
+        },
+        {
+          "path": "Models/Lights/Rembrandt/HalfSphere.ac",
+          "bytes": 3313
+        },
+        {
+          "path": "Models/Lights/Rembrandt/LandingLightCone.ac",
+          "bytes": 18947
+        },
+        {
+          "path": "Models/Lights/Rembrandt/ProbeLightCone.ac",
+          "bytes": 18754
+        },
+        {
+          "path": "Models/Lights/Rembrandt/TaxiLightCone.ac",
+          "bytes": 18729
+        },
+        {
+          "path": "Models/People/general_pilot.ac",
+          "bytes": 208689
+        },
+        {
+          "path": "Models/TailRotor/blade.ac",
+          "bytes": 7476
+        },
+        {
+          "path": "Models/TailRotor/blade1.ac",
+          "bytes": 73793
+        },
+        {
+          "path": "Models/TailRotor/tailrotor.ac",
+          "bytes": 144455
+        },
+        {
+          "path": "Models/TailRotor/tailrotor1.ac",
+          "bytes": 128282
+        },
+        {
+          "path": "Models/as350a-test.ac",
+          "bytes": 4918199
+        },
+        {
+          "path": "Models/null.ac",
+          "bytes": 836
+        },
+        {
+          "path": "Models/pilot.ac",
+          "bytes": 318328
+        }
+      ],
+      "designs": [],
+      "sourceUrl": "https://github.com/FGMEMBERS/AS350/tree/d52b1d8e1d30eec8a9f6a33b8c74ec7f1dcb1386",
+      "reviewStatus": "GPL_SOURCE_CONVERSION_REQUIRED",
+      "webReady": false
+    },
+    {
+      "repo": "FGMEMBERS/T-34",
+      "revision": "cd97bce474b3c101e8038e31f268777108549a44",
+      "truncated": false,
+      "licenses": [
+        {
+          "path": "License.txt",
+          "url": "https://raw.githubusercontent.com/FGMEMBERS/T-34/cd97bce474b3c101e8038e31f268777108549a44/License.txt",
+          "gnu": true,
+          "version": "3"
+        }
+      ],
+      "meshes": [
+        {
+          "path": "Models/T34-76R.ac",
+          "bytes": 1797085
+        },
+        {
+          "path": "Models/T34-85early.ac",
+          "bytes": 2172308
+        },
+        {
+          "path": "Models/mesh1.ac",
+          "bytes": 2403
+        },
+        {
+          "path": "Models/mesh2.ac",
+          "bytes": 2058
+        },
+        {
+          "path": "Models/nflag5p.ac",
+          "bytes": 92805
+        }
+      ],
+      "designs": [],
+      "sourceUrl": "https://github.com/FGMEMBERS/T-34/tree/cd97bce474b3c101e8038e31f268777108549a44",
+      "reviewStatus": "GPL_SOURCE_CONVERSION_REQUIRED",
+      "webReady": false
+    },
+    {
+      "repo": "FGMEMBERS/bo105",
+      "revision": "42e171a4d1c49c3ebacdc168b56ffca0f8eb2284",
+      "truncated": false,
+      "licenses": [
+        {
+          "path": "COPYING",
+          "url": "https://raw.githubusercontent.com/FGMEMBERS/bo105/42e171a4d1c49c3ebacdc168b56ffca0f8eb2284/COPYING",
+          "gnu": true,
+          "version": "2"
+        }
+      ],
+      "meshes": [
+        {
+          "path": "Instruments/asi/asi.ac",
+          "bytes": 738
+        },
+        {
+          "path": "Instruments/clock/clock.ac",
+          "bytes": 1275
+        },
+        {
+          "path": "Instruments/gsdi/gsdi.ac",
+          "bytes": 792
+        },
+        {
+          "path": "Instruments/tach/tach.ac",
+          "bytes": 1257
+        },
+        {
+          "path": "Instruments/torque/torque.ac",
+          "bytes": 969
+        },
+        {
+          "path": "Models/bo105.ac",
+          "bytes": 1367430
+        },
+        {
+          "path": "Models/hot.ac",
+          "bytes": 10676
+        },
+        {
+          "path": "Models/tracer.ac",
+          "bytes": 633
+        }
+      ],
+      "designs": [],
+      "sourceUrl": "https://github.com/FGMEMBERS/bo105/tree/42e171a4d1c49c3ebacdc168b56ffca0f8eb2284",
+      "reviewStatus": "GPL_SOURCE_CONVERSION_REQUIRED",
+      "webReady": false
+    },
+    {
+      "repo": "FGMEMBERS/Cessna337",
+      "revision": "893e5a04f90c12ba631e87f748e1a4c9bfa49d5f",
+      "truncated": false,
+      "licenses": [
+        {
+          "path": "COPYING",
+          "url": "https://raw.githubusercontent.com/FGMEMBERS/Cessna337/893e5a04f90c12ba631e87f748e1a4c9bfa49d5f/COPYING",
+          "gnu": true,
+          "version": "2"
+        }
+      ],
+      "meshes": [
+        {
+          "path": "Models/Cessna337_Skymaster.ac",
+          "bytes": 6232675
+        },
+        {
+          "path": "Models/Cessna337_seat.ac",
+          "bytes": 100713
+        },
+        {
+          "path": "Models/Instruments/ADF/KI-227.ac",
+          "bytes": 80972
+        },
+        {
+          "path": "Models/Instruments/ADF/KR87.ac",
+          "bytes": 62114
+        },
+        {
+          "path": "Models/Instruments/AI/EA-5000F6.ac",
+          "bytes": 128998
+        },
+        {
+          "path": "Models/Instruments/ASI/EA-5174.ac",
+          "bytes": 68709
+        },
+        {
+          "path": "Models/Instruments/Altimeter/EA-401A.ac",
+          "bytes": 72275
+        },
+        {
+          "path": "Models/Instruments/Amp/Amp.ac",
+          "bytes": 45527
+        },
+        {
+          "path": "Models/Instruments/AudioPanel/KMA24.ac",
+          "bytes": 53727
+        },
+        {
+          "path": "Models/Instruments/Clock/Clock.ac",
+          "bytes": 60847
+        },
+        {
+          "path": "Models/Instruments/Compass/Compass.ac",
+          "bytes": 88814
+        },
+        {
+          "path": "Models/Instruments/DME/KN62A.ac",
+          "bytes": 39938
+        },
+        {
+          "path": "Models/Instruments/EGT/AlcorDualEGT.ac",
+          "bytes": 44787
+        },
+        {
+          "path": "Models/Instruments/ELT/ArtexELT.ac",
+          "bytes": 52155
+        },
+        {
+          "path": "Models/Instruments/Fuel-CHT-Oil/CHT-Oil.ac",
+          "bytes": 9204
+        },
+        {
+          "path": "Models/Instruments/Fuel-CHT-Oil/Fuel-Oil.ac",
+          "bytes": 9202
+        },
+        {
+          "path": "Models/Instruments/FuelFlow/FuelFlow.ac",
+          "bytes": 36011
+        },
+        {
+          "path": "Models/Instruments/HI/RCA15AK.ac",
+          "bytes": 76011
+        },
+        {
+          "path": "Models/Instruments/HI/RCA15BK-1.ac",
+          "bytes": 74757
+        },
+        {
+          "path": "Models/Instruments/Hobbs/HobbsMeter.ac",
+          "bytes": 38972
+        },
+        {
+          "path": "Models/Instruments/MP/MP.ac",
+          "bytes": 35987
+        },
+        {
+          "path": "Models/Instruments/Navomatic/Navomatic400A.ac",
+          "bytes": 96775
+        },
+        {
+          "path": "Models/Instruments/RPM/RPM.ac",
+          "bytes": 37310
+        },
+        {
+          "path": "Models/Instruments/RadarAltimeter/BendixKing_KI250.ac",
+          "bytes": 90206
+        },
+        {
+          "path": "Models/Instruments/Radio/BendixKing_KX155.ac",
+          "bytes": 80948
+        },
+        {
+          "path": "Models/Instruments/Synchroscope/Synchroscope.ac",
+          "bytes": 62912
+        },
+        {
+          "path": "Models/Instruments/TC/5550-8340N5L.ac",
+          "bytes": 132275
+        },
+        {
+          "path": "Models/Instruments/Transponder/BendixKing_KT76A.ac",
+          "bytes": 92541
+        },
+        {
+          "path": "Models/Instruments/VOR/KI-206.ac",
+          "bytes": 134158
+        },
+        {
+          "path": "Models/Instruments/VSI/VSI.ac",
+          "bytes": 35803
+        },
+        {
+          "path": "Models/Instruments/Vacuum/Vacuum.ac",
+          "bytes": 75310
+        },
+        {
+          "path": "Models/Instruments/Volt/Volt.ac",
+          "bytes": 62916
+        },
+        {
+          "path": "Models/Lights/Beacon.ac",
+          "bytes": 2175
+        },
+        {
+          "path": "Models/Lights/LandingLights.ac",
+          "bytes": 2129
+        },
+        {
+          "path": "Models/Lights/NavBack.ac",
+          "bytes": 1177
+        },
+        {
+          "path": "Models/Lights/NavL.ac",
+          "bytes": 1139
+        },
+        {
+          "path": "Models/Lights/NavR.ac",
+          "bytes": 1160
+        },
+        {
+          "path": "Models/Lights/Strobe.ac",
+          "bytes": 816
+        },
+        {
+          "path": "Models/Lights/taxi.ac",
+          "bytes": 2127
+        }
+      ],
+      "designs": [],
+      "sourceUrl": "https://github.com/FGMEMBERS/Cessna337/tree/893e5a04f90c12ba631e87f748e1a4c9bfa49d5f",
+      "reviewStatus": "GPL_SOURCE_CONVERSION_REQUIRED",
+      "webReady": false
+    },
+    {
+      "repo": "FGMEMBERS/F4U",
+      "revision": "43e713e7fe7fbb519039d5db5aeff152a4fc0029",
+      "truncated": false,
+      "licenses": [],
+      "meshes": [
+        {
+          "path": "Models/Instruments/alt-us.ac",
+          "bytes": 90309
+        },
+        {
+          "path": "Models/Instruments/ammeter-us.ac",
+          "bytes": 66371
+        },
+        {
+          "path": "Models/Instruments/asi-kt-us.ac",
+          "bytes": 62614
+        },
+        {
+          "path": "Models/Instruments/asi430kt-us.ac",
+          "bytes": 70524
+        },
+        {
+          "path": "Models/Instruments/attsmall-us.ac",
+          "bytes": 78096
+        },
+        {
+          "path": "Models/Instruments/bli-us.ac",
+          "bytes": 63579
+        },
+        {
+          "path": "Models/Instruments/co2bottle.ac",
+          "bytes": 32430
+        },
+        {
+          "path": "Models/Instruments/cowl-contr.ac",
+          "bytes": 105087
+        },
+        {
+          "path": "Models/Instruments/cylinder.ac",
+          "bytes": 6746
+        },
+        {
+          "path": "Models/Instruments/cyltemp.ac",
+          "bytes": 80719
+        },
+        {
+          "path": "Models/Instruments/droptank-sw.ac",
+          "bytes": 39016
+        },
+        {
+          "path": "Models/Instruments/droptanksw.ac",
+          "bytes": 18699
+        },
+        {
+          "path": "Models/Instruments/engine.ac",
+          "bytes": 127520
+        },
+        {
+          "path": "Models/Instruments/flap-sw.ac",
+          "bytes": 39491
+        },
+        {
+          "path": "Models/Instruments/fuel-switch.ac",
+          "bytes": 25298
+        },
+        {
+          "path": "Models/Instruments/fuelf4u.ac",
+          "bytes": 70427
+        },
+        {
+          "path": "Models/Instruments/fuelpress.ac",
+          "bytes": 23523
+        },
+        {
+          "path": "Models/Instruments/gear-in.ac",
+          "bytes": 18175
+        },
+        {
+          "path": "Models/Instruments/gear-ind.ac",
+          "bytes": 18175
+        },
+        {
+          "path": "Models/Instruments/gear-sw.ac",
+          "bytes": 64417
+        },
+        {
+          "path": "Models/Instruments/guncontrol.ac",
+          "bytes": 170412
+        },
+        {
+          "path": "Models/Instruments/gyro-us.ac",
+          "bytes": 35944
+        },
+        {
+          "path": "Models/Instruments/gyrosmall-us.ac",
+          "bytes": 71893
+        },
+        {
+          "path": "Models/Instruments/hydpress.ac",
+          "bytes": 23504
+        },
+        {
+          "path": "Models/Instruments/hydpump.ac",
+          "bytes": 21609
+        },
+        {
+          "path": "Models/Instruments/ignition-us.ac",
+          "bytes": 64519
+        },
+        {
+          "path": "Models/Instruments/mk8gunsight.ac",
+          "bytes": 81024
+        },
+        {
+          "path": "Models/Instruments/mp60-us.ac",
+          "bytes": 70527
+        },
+        {
+          "path": "Models/Instruments/navyclock-us.ac",
+          "bytes": 69843
+        },
+        {
+          "path": "Models/Instruments/oilpress.ac",
+          "bytes": 23520
+        },
+        {
+          "path": "Models/Instruments/oiltemp.ac",
+          "bytes": 22564
+        },
+        {
+          "path": "Models/Instruments/press200-us.ac",
+          "bytes": 70447
+        },
+        {
+          "path": "Models/Instruments/press25-us.ac",
+          "bytes": 62528
+        },
+        {
+          "path": "Models/Instruments/recog.ac",
+          "bytes": 84425
+        },
+        {
+          "path": "Models/Instruments/remotecompass-us.ac",
+          "bytes": 60411
+        },
+        {
+          "path": "Models/Instruments/rpm45-us.ac",
+          "bytes": 70440
+        },
+        {
+          "path": "Models/Instruments/stallwarn.ac",
+          "bytes": 72647
+        },
+        {
+          "path": "Models/Instruments/temp150-us.ac",
+          "bytes": 73579
+        },
+        {
+          "path": "Models/Instruments/turn-us.ac",
+          "bytes": 68494
+        },
+        {
+          "path": "Models/Instruments/vsi6-us.ac",
+          "bytes": 69275
+        },
+        {
+          "path": "Models/f4u.ac",
+          "bytes": 1904989
+        },
+        {
+          "path": "Models/loads/1000lbs.ac",
+          "bytes": 107321
+        },
+        {
+          "path": "Models/loads/500lbs.ac",
+          "bytes": 107301
+        },
+        {
+          "path": "Models/loads/pylons.ac",
+          "bytes": 12105
+        },
+        {
+          "path": "Models/loads/rocket.ac",
+          "bytes": 49065
+        },
+        {
+          "path": "Models/loads/tank.ac",
+          "bytes": 86836
+        },
+        {
+          "path": "Models/logos.ac",
+          "bytes": 5373
+        },
+        {
+          "path": "Models/lwing.ac",
+          "bytes": 57679
+        },
+        {
+          "path": "Models/pdisk.ac",
+          "bytes": 17770
+        },
+        {
+          "path": "Models/pilot-b.ac",
+          "bytes": 388068
+        },
+        {
+          "path": "Models/rwing.ac",
+          "bytes": 57991
+        },
+        {
+          "path": "Models/transparent.ac",
+          "bytes": 7117
+        }
+      ],
+      "designs": [],
+      "sourceUrl": "https://github.com/FGMEMBERS/F4U/tree/43e713e7fe7fbb519039d5db5aeff152a4fc0029",
+      "reviewStatus": "LICENSE_REVIEW_REQUIRED",
+      "webReady": false
+    },
+    {
+      "repo": "FGMEMBERS/F-86",
+      "revision": "a4c4a6e0deee81dd10f148a634dd0da6512f40db",
+      "truncated": false,
+      "licenses": [],
+      "meshes": [
+        {
+          "path": "Models/1000lbs.ac",
+          "bytes": 107321
+        },
+        {
+          "path": "Models/500lbs.ac",
+          "bytes": 107301
+        },
+        {
+          "path": "Models/Effects/blaze.ac",
+          "bytes": 532
+        },
+        {
+          "path": "Models/Effects/crater.ac",
+          "bytes": 30910
+        },
+        {
+          "path": "Models/Human/fighterpilot50.ac",
+          "bytes": 1057861
+        },
+        {
+          "path": "Models/Human/pilot.ac",
+          "bytes": 932033
+        },
+        {
+          "path": "Models/Instruments/A4Sight/a4sight.ac",
+          "bytes": 64782
+        },
+        {
+          "path": "Models/Instruments/AI/ai.ac",
+          "bytes": 138121
+        },
+        {
+          "path": "Models/Instruments/ANARN-6/ANARN-6.ac",
+          "bytes": 167527
+        },
+        {
+          "path": "Models/Instruments/ASI/asi.ac",
+          "bytes": 6491
+        },
+        {
+          "path": "Models/Instruments/Accelerometer/accel.ac",
+          "bytes": 4336
+        },
+        {
+          "path": "Models/Instruments/Altimeter/altimeter.ac",
+          "bytes": 20681
+        },
+        {
+          "path": "Models/Instruments/BDHI/bdhi.ac",
+          "bytes": 22126
+        },
+        {
+          "path": "Models/Instruments/Clock/chronograph.ac",
+          "bytes": 14874
+        },
+        {
+          "path": "Models/Instruments/Mag-Compass/mag-compass.ac",
+          "bytes": 15379
+        },
+        {
+          "path": "Models/Instruments/VSI/vsi.ac",
+          "bytes": 3784
+        },
+        {
+          "path": "Models/Instruments/ammeter/ammeter.ac",
+          "bytes": 4219
+        },
+        {
+          "path": "Models/Instruments/cabinpress/cabinpress.ac",
+          "bytes": 10902
+        },
+        {
+          "path": "Models/Instruments/egt/egt.ac",
+          "bytes": 4187
+        },
+        {
+          "path": "Models/Instruments/ejectionseat/ejectionseat.ac",
+          "bytes": 119812
+        },
+        {
+          "path": "Models/Instruments/fuelflow/fuelflow.ac",
+          "bytes": 10700
+        },
+        {
+          "path": "Models/Instruments/fuelpress/fuelpress.ac",
+          "bytes": 10895
+        },
+        {
+          "path": "Models/Instruments/fuelq32/fuelq32.ac",
+          "bytes": 10689
+        },
+        {
+          "path": "Models/Instruments/hydpress/hydpress.ac",
+          "bytes": 10888
+        },
+        {
+          "path": "Models/Instruments/leftconsole/leftconsole.ac",
+          "bytes": 1372
+        },
+        {
+          "path": "Models/Instruments/leftpanel/leftpanel.ac",
+          "bytes": 174956
+        },
+        {
+          "path": "Models/Instruments/lights/bluelight.ac",
+          "bytes": 9848
+        },
+        {
+          "path": "Models/Instruments/lights/lights.ac",
+          "bytes": 9897
+        },
+        {
+          "path": "Models/Instruments/lights/orangelight.ac",
+          "bytes": 9890
+        },
+        {
+          "path": "Models/Instruments/lights/redlight.ac",
+          "bytes": 9909
+        },
+        {
+          "path": "Models/Instruments/loadmeter/loadmeter.ac",
+          "bytes": 4231
+        },
+        {
+          "path": "Models/Instruments/machnumber/machnumber.ac",
+          "bytes": 10693
+        },
+        {
+          "path": "Models/Instruments/oilpress/fuelpress.ac",
+          "bytes": 10888
+        },
+        {
+          "path": "Models/Instruments/oilpress/oilpress.ac",
+          "bytes": 10888
+        },
+        {
+          "path": "Models/Instruments/radiocompass/radiocompass.ac",
+          "bytes": 7506
+        },
+        {
+          "path": "Models/Instruments/rightconsole/rightconsole.ac",
+          "bytes": 8992
+        },
+        {
+          "path": "Models/Instruments/rightpanel/rightpanel.ac",
+          "bytes": 250694
+        },
+        {
+          "path": "Models/Instruments/tach120/tach120.ac",
+          "bytes": 18806
+        },
+        {
+          "path": "Models/Instruments/throttle/throttle.ac",
+          "bytes": 164421
+        },
+        {
+          "path": "Models/Instruments/vhf-control/vhf-control.ac",
+          "bytes": 86639
+        },
+        {
+          "path": "Models/cockpit.ac",
+          "bytes": 1109663
+        },
+        {
+          "path": "Models/droptank.ac",
+          "bytes": 69972
+        },
+        {
+          "path": "Models/f86f.ac",
+          "bytes": 946593
+        },
+        {
+          "path": "Models/pylon.ac",
+          "bytes": 2392
+        },
+        {
+          "path": "Models/rocket.ac",
+          "bytes": 49065
+        },
+        {
+          "path": "Models/sabre4.ac",
+          "bytes": 949300
+        },
+        {
+          "path": "Models/sabre6.ac",
+          "bytes": 946257
+        },
+        {
+          "path": "Models/sidewinder.ac",
+          "bytes": 38389
+        },
+        {
+          "path": "Models/sidewpylon.ac",
+          "bytes": 13130
+        }
+      ],
+      "designs": [],
+      "sourceUrl": "https://github.com/FGMEMBERS/F-86/tree/a4c4a6e0deee81dd10f148a634dd0da6512f40db",
+      "reviewStatus": "LICENSE_REVIEW_REQUIRED",
+      "webReady": false
+    },
+    {
+      "repo": "FGMEMBERS/P-38-Lightning",
+      "revision": "cfe15819b10c8483eb2952f546f15be0a34bf2a3",
+      "truncated": false,
+      "licenses": [
+        {
+          "path": "COPYING",
+          "url": "https://raw.githubusercontent.com/FGMEMBERS/P-38-Lightning/cfe15819b10c8483eb2952f546f15be0a34bf2a3/COPYING",
+          "gnu": true,
+          "version": "2"
+        }
+      ],
+      "meshes": [
+        {
+          "path": "Instruments/Models/Temoin-Gears.ac",
+          "bytes": 65354
+        },
+        {
+          "path": "Instruments/Models/alt-f4u7-n.ac",
+          "bytes": 9063
+        },
+        {
+          "path": "Instruments/Models/asi-f4u7.ac",
+          "bytes": 17868
+        },
+        {
+          "path": "Instruments/Models/attitude-p38.ac",
+          "bytes": 31481
+        },
+        {
+          "path": "Instruments/Models/attitudev2-p38.ac",
+          "bytes": 77824
+        },
+        {
+          "path": "Instruments/Models/attitudev3-p38.ac",
+          "bytes": 42970
+        },
+        {
+          "path": "Instruments/Models/attitudev4-p38.ac",
+          "bytes": 76385
+        },
+        {
+          "path": "Instruments/Models/attitudev5-p38.ac",
+          "bytes": 42796
+        },
+        {
+          "path": "Instruments/Models/bezel_g-p38.ac",
+          "bytes": 18476
+        },
+        {
+          "path": "Instruments/Models/bezel_n-p38.ac",
+          "bytes": 18764
+        },
+        {
+          "path": "Instruments/Models/bezel_p-p38.ac",
+          "bytes": 13596
+        },
+        {
+          "path": "Instruments/Models/bezel_s-p38.ac",
+          "bytes": 24281
+        },
+        {
+          "path": "Instruments/Models/bouton-nord.ac",
+          "bytes": 6018
+        },
+        {
+          "path": "Instruments/Models/bouton_pt-nord.ac",
+          "bytes": 6008
+        },
+        {
+          "path": "Instruments/Models/clock-f4u7.ac",
+          "bytes": 2006
+        },
+        {
+          "path": "Instruments/Models/compas-p38.ac",
+          "bytes": 12206
+        },
+        {
+          "path": "Instruments/Models/ctrl_oil_fuel-f4u7.ac",
+          "bytes": 8206
+        },
+        {
+          "path": "Instruments/Models/dummy-nord.ac",
+          "bytes": 1054
+        },
+        {
+          "path": "Instruments/Models/dummy_p.ac",
+          "bytes": 1062
+        },
+        {
+          "path": "Instruments/Models/fuel-p38.ac",
+          "bytes": 15667
+        },
+        {
+          "path": "Instruments/Models/hi-p38.ac",
+          "bytes": 14075
+        },
+        {
+          "path": "Instruments/Models/ignition-p38.ac",
+          "bytes": 7760
+        },
+        {
+          "path": "Instruments/Models/ivsi-nord.ac",
+          "bytes": 2457
+        },
+        {
+          "path": "Instruments/Models/rpm-p38.ac",
+          "bytes": 2704
+        },
+        {
+          "path": "Instruments/Models/train-flap-f4u7.ac",
+          "bytes": 53809
+        },
+        {
+          "path": "Instruments/Models/turn-nord.ac",
+          "bytes": 18810
+        },
+        {
+          "path": "Models/F-5B-nez.ac",
+          "bytes": 70130
+        },
+        {
+          "path": "Models/P-38L-nez.ac",
+          "bytes": 48020
+        },
+        {
+          "path": "Models/P38-Pilote.ac",
+          "bytes": 317484
+        },
+        {
+          "path": "Models/P38-base.ac",
+          "bytes": 1269128
+        },
+        {
+          "path": "Models/Propellers/p38-casserolle-helice.ac",
+          "bytes": 28362
+        },
+        {
+          "path": "Models/Propellers/p38-casserolle-propdisk.ac",
+          "bytes": 23387
+        },
+        {
+          "path": "Models/Propellers/p38-pale-dhelice.ac",
+          "bytes": 26898
+        },
+        {
+          "path": "Models/Propellers/p38-pale-ghelice.ac",
+          "bytes": 26897
+        },
+        {
+          "path": "Models/Propellers/p38-propdisk.ac",
+          "bytes": 15922
+        },
+        {
+          "path": "Models/p38-cockpit.ac",
+          "bytes": 232307
+        },
+        {
+          "path": "Models/p38-train-complet.ac",
+          "bytes": 442830
+        },
+        {
+          "path": "Panels/Models/vcpanel.ac",
+          "bytes": 18330
+        }
+      ],
+      "designs": [],
+      "sourceUrl": "https://github.com/FGMEMBERS/P-38-Lightning/tree/cfe15819b10c8483eb2952f546f15be0a34bf2a3",
+      "reviewStatus": "GPL_SOURCE_CONVERSION_REQUIRED",
+      "webReady": false
+    },
+    {
+      "repo": "FGMEMBERS/North-American-T28D-Trojan",
+      "revision": "2e0147565e2e93ec07611550433d74dde070433a",
+      "truncated": false,
+      "licenses": [
+        {
+          "path": "COPYING",
+          "url": "https://raw.githubusercontent.com/FGMEMBERS/North-American-T28D-Trojan/2e0147565e2e93ec07611550433d74dde070433a/COPYING",
+          "gnu": true,
+          "version": "2"
+        }
+      ],
+      "meshes": [
+        {
+          "path": "Models/Effects/guns/apibullet-tracer.ac",
+          "bytes": 1117
+        },
+        {
+          "path": "Models/Effects/guns/flack.ac",
+          "bytes": 488
+        },
+        {
+          "path": "Models/Engine/blocpiston.ac",
+          "bytes": 2031844
+        },
+        {
+          "path": "Models/Engine/r1820.ac",
+          "bytes": 2312465
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/N-9_Gunsight/N-9_Gunsight.ac",
+          "bytes": 284007
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/ai/ai.ac",
+          "bytes": 61709
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/airtemp/airtemp.ac",
+          "bytes": 64950
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/alt/alt.ac",
+          "bytes": 62582
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/ammeter/ammeter.ac",
+          "bytes": 62792
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/asi/asi.ac",
+          "bytes": 51097
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/clock/clock.ac",
+          "bytes": 208189
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/flaps/flaps.ac",
+          "bytes": 161988
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/fuelgauge/fuel.ac",
+          "bytes": 160633
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/gear/gear.ac",
+          "bytes": 608240
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/man/man.ac",
+          "bytes": 52376
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/oilpress/oilpress.ac",
+          "bytes": 163415
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/oiltemp/oiltemp.ac",
+          "bytes": 169444
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/radio-compass/radio-compass.ac",
+          "bytes": 61535
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/rpm/rpm.ac",
+          "bytes": 52322
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/rrc/rrc.ac",
+          "bytes": 59856
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/turn/turn.ac",
+          "bytes": 86814
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/voltmeter/voltmeter.ac",
+          "bytes": 162305
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/vor/vor.ac",
+          "bytes": 80387
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/vsi/vsi.ac",
+          "bytes": 68522
+        },
+        {
+          "path": "Models/Interior/Panel/Left-side/left.ac",
+          "bytes": 6727
+        },
+        {
+          "path": "Models/Interior/Panel/Right-side/right.ac",
+          "bytes": 6746
+        },
+        {
+          "path": "Models/Interior/Panel/panel.ac",
+          "bytes": 21940
+        },
+        {
+          "path": "Models/Interior/Panel/panel2.ac",
+          "bytes": 10447
+        },
+        {
+          "path": "Models/Interior/interior.ac",
+          "bytes": 130827
+        },
+        {
+          "path": "Models/Pilot/ww2_pilot_old.ac",
+          "bytes": 383815
+        },
+        {
+          "path": "Models/lights/GreenLight.ac",
+          "bytes": 1530
+        },
+        {
+          "path": "Models/lights/RedLight.ac",
+          "bytes": 1538
+        },
+        {
+          "path": "Models/lights/WhiteLight.ac",
+          "bytes": 1538
+        },
+        {
+          "path": "Models/lights/flash.ac",
+          "bytes": 449
+        },
+        {
+          "path": "Models/lights/light-cone.ac",
+          "bytes": 52000
+        },
+        {
+          "path": "Models/shadow.ac",
+          "bytes": 410
+        },
+        {
+          "path": "Models/t28d.ac",
+          "bytes": 2306938
+        }
+      ],
+      "designs": [],
+      "sourceUrl": "https://github.com/FGMEMBERS/North-American-T28D-Trojan/tree/2e0147565e2e93ec07611550433d74dde070433a",
+      "reviewStatus": "GPL_SOURCE_CONVERSION_REQUIRED",
+      "webReady": false
+    },
+    {
+      "repo": "FGMEMBERS/B-25",
+      "revision": "56d608dee3626de5c4272974e06bd1889b1da2ea",
+      "truncated": false,
+      "licenses": [
+        {
+          "path": "COPYING",
+          "url": "https://raw.githubusercontent.com/FGMEMBERS/B-25/56d608dee3626de5c4272974e06bd1889b1da2ea/COPYING",
+          "gnu": true,
+          "version": "2"
+        }
+      ],
+      "meshes": [
+        {
+          "path": "Models/Effects/RainDrops/rainglass.ac",
+          "bytes": 780832
+        },
+        {
+          "path": "Models/Engines/blocpiston.ac",
+          "bytes": 3577333
+        },
+        {
+          "path": "Models/Engines/r2600.ac",
+          "bytes": 2614705
+        },
+        {
+          "path": "Models/Interior/BombControlPanel/BombControlPanel.ac",
+          "bytes": 204530
+        },
+        {
+          "path": "Models/Interior/BombardierCompartment/BombIntervalControl/BombIntervalCtrl.ac",
+          "bytes": 14019
+        },
+        {
+          "path": "Models/Interior/BombardierCompartment/BombardierBombControl/BombardierBombCtrlPanel.ac",
+          "bytes": 259483
+        },
+        {
+          "path": "Models/Interior/BombardierCompartment/BombardierPanel/BombardierPanel.ac",
+          "bytes": 8200
+        },
+        {
+          "path": "Models/Interior/BombardierCompartment/Norden_Bombsight/Norden_Bombsight.ac",
+          "bytes": 73655
+        },
+        {
+          "path": "Models/Interior/ClipBoard/ClipBoard.ac",
+          "bytes": 35529
+        },
+        {
+          "path": "Models/Interior/Divers/divers.ac",
+          "bytes": 163517
+        },
+        {
+          "path": "Models/Interior/Guns/M2_Ammunition.ac",
+          "bytes": 188769
+        },
+        {
+          "path": "Models/Interior/Guns/M2_Browning.ac",
+          "bytes": 79792
+        },
+        {
+          "path": "Models/Interior/Guns/Mark_6_Adapter.ac",
+          "bytes": 185328
+        },
+        {
+          "path": "Models/Interior/Guns/SideGuns.ac",
+          "bytes": 147503
+        },
+        {
+          "path": "Models/Interior/Hydraulics/Hydraulics.ac",
+          "bytes": 572662
+        },
+        {
+          "path": "Models/Interior/NavigatorCompartment/NavigatorElectricalPanels.ac",
+          "bytes": 697001
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/FireDetectorSystem/FireDetectorSystem.ac",
+          "bytes": 68881
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/FuelGauge/FuelGaugeAux.ac",
+          "bytes": 56040
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/FuelGauge/FuelGaugeFront.ac",
+          "bytes": 56050
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/FuelGauge/FuelGaugeRear.ac",
+          "bytes": 56044
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/N-3B_Gunsight/Gunsight.ac",
+          "bytes": 37712
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/N-3B_Gunsight/N-3B_Gunsight.ac",
+          "bytes": 345495
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/RadioPanel/RadioPanel.ac",
+          "bytes": 317334
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/ai/ai.ac",
+          "bytes": 112429
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/air-temp/airtemp.ac",
+          "bytes": 56119
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/alt/alt.ac",
+          "bytes": 54384
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/asi/asi.ac",
+          "bytes": 50664
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/brake_press/airtemp.ac",
+          "bytes": 50843
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/brake_press/brake_press.ac",
+          "bytes": 50846
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/carb/carb.ac",
+          "bytes": 64116
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/clock/clock.ac",
+          "bytes": 55704
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/compass/compass.ac",
+          "bytes": 68006
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/cyl/cyl.ac",
+          "bytes": 63433
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/divers/CircuitBreakerYellow.ac",
+          "bytes": 6941
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/divers/NoseWheel_indicator_orange.ac",
+          "bytes": 8833
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/divers/bouton.ac",
+          "bytes": 14448
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/divers/indicator2.ac",
+          "bytes": 12800
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/divers/indicator_blue.ac",
+          "bytes": 6878
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/divers/indicator_green.ac",
+          "bytes": 8811
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/divers/indicator_orange.ac",
+          "bytes": 8835
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/divers/indicator_red.ac",
+          "bytes": 8823
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/divers/indicator_white.ac",
+          "bytes": 6876
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/divers/knob.ac",
+          "bytes": 11388
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/divers/switch.ac",
+          "bytes": 136172
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/flapsgear/flapgear.ac",
+          "bytes": 51470
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/fuelpress/fuel_pressure.ac",
+          "bytes": 61634
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/hydra_press/hydraulic.ac",
+          "bytes": 50754
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/manifold/man.ac",
+          "bytes": 86044
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/oilpress/oil_pressure.ac",
+          "bytes": 61716
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/oiltemp/oiltemp.ac",
+          "bytes": 63430
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/pdi/pdi.ac",
+          "bytes": 33129
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/radio-compass/radio-compass.ac",
+          "bytes": 58059
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/rpm/rpm.ac",
+          "bytes": 61080
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/rrc/rrc.ac",
+          "bytes": 59689
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/turn/turn.ac",
+          "bytes": 70401
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/vacuum/vac-gauge.ac",
+          "bytes": 49604
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/vor/vor.ac",
+          "bytes": 76401
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/vsi/vsi.ac",
+          "bytes": 64616
+        },
+        {
+          "path": "Models/Interior/Panel/Pedestal/console.ac",
+          "bytes": 948053
+        },
+        {
+          "path": "Models/Interior/Panel/panel.ac",
+          "bytes": 45407
+        },
+        {
+          "path": "Models/Interior/Pedals/pedal.ac",
+          "bytes": 46069
+        },
+        {
+          "path": "Models/Interior/Radio_Equipment/AN-ARC5/AN-ARC5_Dynamotor_Modulator.ac",
+          "bytes": 60282
+        },
+        {
+          "path": "Models/Interior/Radio_Equipment/AN-ARC5/AN-ARC5_RadioReceivers.ac",
+          "bytes": 346969
+        },
+        {
+          "path": "Models/Interior/Radio_Equipment/AN-ARC5/AN-ARC5_RadioTransmitters.ac",
+          "bytes": 68824
+        },
+        {
+          "path": "Models/Interior/Radio_Equipment/Interphone/Interphone_Jack_Box.ac",
+          "bytes": 24929
+        },
+        {
+          "path": "Models/Interior/Radio_Equipment/Interphone/Radio_Filter_Unit.ac",
+          "bytes": 14117
+        },
+        {
+          "path": "Models/Interior/Radio_Equipment/RadioCompassRemoteCtrl/RadioCompassRemoteCtrl.ac",
+          "bytes": 107436
+        },
+        {
+          "path": "Models/Interior/Radio_Equipment/SCR-274/SCR-274_RadioReceiver_RCU.ac",
+          "bytes": 129991
+        },
+        {
+          "path": "Models/Interior/Radio_Equipment/SCR-274/SCR-274_RadioTransmitter_RCU.ac",
+          "bytes": 111717
+        },
+        {
+          "path": "Models/Interior/Seats/seat.ac",
+          "bytes": 72693
+        },
+        {
+          "path": "Models/Interior/Yokes/yoke.ac",
+          "bytes": 297900
+        },
+        {
+          "path": "Models/Interior/interior.ac",
+          "bytes": 1525227
+        },
+        {
+          "path": "Models/Interior/table/table.ac",
+          "bytes": 2335
+        },
+        {
+          "path": "Models/Lights/BlueLight.ac",
+          "bytes": 1537
+        },
+        {
+          "path": "Models/Lights/GreenLight.ac",
+          "bytes": 1549
+        },
+        {
+          "path": "Models/Lights/RedLight.ac",
+          "bytes": 1549
+        },
+        {
+          "path": "Models/Lights/WhiteLight.ac",
+          "bytes": 1549
+        },
+        {
+          "path": "Models/Lights/light-cone.ac",
+          "bytes": 52000
+        },
+        {
+          "path": "Models/Pilot/ww2_pilot_old.ac",
+          "bytes": 369177
+        },
+        {
+          "path": "Models/b25.ac",
+          "bytes": 3063094
+        },
+        {
+          "path": "Models/b25j_ExtraModels/NozeArt.ac",
+          "bytes": 12478
+        },
+        {
+          "path": "Models/b25j_ExtraModels/b25j_AddonsSuperRabbit.ac",
+          "bytes": 156822
+        },
+        {
+          "path": "Models/bomb.ac",
+          "bytes": 177023
+        },
+        {
+          "path": "Models/shadow.ac",
+          "bytes": 426
+        }
+      ],
+      "designs": [],
+      "sourceUrl": "https://github.com/FGMEMBERS/B-25/tree/56d608dee3626de5c4272974e06bd1889b1da2ea",
+      "reviewStatus": "GPL_SOURCE_CONVERSION_REQUIRED",
+      "webReady": false
+    },
+    {
+      "repo": "FGMEMBERS/p51d",
+      "revision": "cb3bcd6ef41182f6b1bae91395f38d0dadd974e5",
+      "truncated": false,
+      "licenses": [],
+      "meshes": [
+        {
+          "path": "Models/Cockpit/BombSalvo/bomb-salvo.ac",
+          "bytes": 186258
+        },
+        {
+          "path": "Models/Cockpit/ElectricPanel/electrical-panel.ac",
+          "bytes": 308813
+        },
+        {
+          "path": "Models/Cockpit/EngineSwitchPanel/engine-switch-panel.ac",
+          "bytes": 117198
+        },
+        {
+          "path": "Models/Cockpit/FlapsLever/flaps-control.ac",
+          "bytes": 1560527
+        },
+        {
+          "path": "Models/Cockpit/FloresentLightLeft/flor-light-left.ac",
+          "bytes": 146886
+        },
+        {
+          "path": "Models/Cockpit/FloresentLightRight/flor-light-rt.ac",
+          "bytes": 142481
+        },
+        {
+          "path": "Models/Cockpit/FuelTankSelector/fuel-tank-selector.ac",
+          "bytes": 84883
+        },
+        {
+          "path": "Models/Cockpit/GunSwitch/gun-switch.ac",
+          "bytes": 13596
+        },
+        {
+          "path": "Models/Cockpit/HornButton/horn-button.ac",
+          "bytes": 23464
+        },
+        {
+          "path": "Models/Cockpit/HydraualicHandleAndPressureGauge/hydraulic.ac",
+          "bytes": 45968
+        },
+        {
+          "path": "Models/Cockpit/IgnitionSwitch/p51d-jw-ignition.ac",
+          "bytes": 34001
+        },
+        {
+          "path": "Models/Cockpit/LeftSwitchPanel/left-switch-box.ac",
+          "bytes": 130402
+        },
+        {
+          "path": "Models/Cockpit/OxHose/Ox-hose.ac",
+          "bytes": 1290666
+        },
+        {
+          "path": "Models/Cockpit/P-51D-cockpit.ac",
+          "bytes": 1236471
+        },
+        {
+          "path": "Models/Cockpit/ParkingBrake/park-brake.ac",
+          "bytes": 12678
+        },
+        {
+          "path": "Models/Cockpit/RocketControls/weapons-controls.ac",
+          "bytes": 80056
+        },
+        {
+          "path": "Models/Cockpit/SCR-695/SCR-695.ac",
+          "bytes": 178750
+        },
+        {
+          "path": "Models/Cockpit/SeatAndArmor/seat-vintage.ac",
+          "bytes": 581784
+        },
+        {
+          "path": "Models/Cockpit/StickLock/sticklock.ac",
+          "bytes": 137119
+        },
+        {
+          "path": "Models/Cockpit/Throttle/throttle.ac",
+          "bytes": 458891
+        },
+        {
+          "path": "Models/Cockpit/Trims/aileronTrimKnob.ac",
+          "bytes": 399518
+        },
+        {
+          "path": "Models/Cockpit/Trims/elevatorTrimWheel.ac",
+          "bytes": 647592
+        },
+        {
+          "path": "Models/Cockpit/Trims/rudderTrimKnob.ac",
+          "bytes": 168812
+        },
+        {
+          "path": "Models/Cockpit/canopy.ac",
+          "bytes": 2062583
+        },
+        {
+          "path": "Models/Cockpit/canopyCrank/canopyCrank.ac",
+          "bytes": 579995
+        },
+        {
+          "path": "Models/Cockpit/canopyEmergencyRelease/emergencyReleaseHandleBracket.ac",
+          "bytes": 158325
+        },
+        {
+          "path": "Models/Cockpit/engine-limitations-placard.ac",
+          "bytes": 1394
+        },
+        {
+          "path": "Models/Effects/guns/50BMGCase.ac",
+          "bytes": 61039
+        },
+        {
+          "path": "Models/Effects/guns/apibullet-tracer.ac",
+          "bytes": 633
+        },
+        {
+          "path": "Models/Effects/guns/puff.ac",
+          "bytes": 383
+        },
+        {
+          "path": "Models/Instruments/ASI/p51d-jw-asi.ac",
+          "bytes": 24274
+        },
+        {
+          "path": "Models/Instruments/Altimeter/p51d-jw-alt.ac",
+          "bytes": 35746
+        },
+        {
+          "path": "Models/Instruments/Attitude/p51d-jw-attitude.ac",
+          "bytes": 46522
+        },
+        {
+          "path": "Models/Instruments/BankAndTurn/p51d-jw-turn.ac",
+          "bytes": 29517
+        },
+        {
+          "path": "Models/Instruments/CarbAndCoolingTemp/p51d-jw-temp.ac",
+          "bytes": 25743
+        },
+        {
+          "path": "Models/Instruments/Clock/p51d-jw-clock.ac",
+          "bytes": 30257
+        },
+        {
+          "path": "Models/Instruments/Compass/p51d-jw-compass.ac",
+          "bytes": 27867
+        },
+        {
+          "path": "Models/Instruments/EngineCluster/p51d-jw-engine.ac",
+          "bytes": 27089
+        },
+        {
+          "path": "Models/Instruments/GMeter/p51d-jw-acc.ac",
+          "bytes": 26738
+        },
+        {
+          "path": "Models/Instruments/GearWarning/p51d-jw-gearwarn.ac",
+          "bytes": 16274
+        },
+        {
+          "path": "Models/Instruments/MagCompass/p51d-jw-magcompass.ac",
+          "bytes": 27624
+        },
+        {
+          "path": "Models/Instruments/ManifoldPressure/p51d-jw-man.ac",
+          "bytes": 24269
+        },
+        {
+          "path": "Models/Instruments/OxBlinker/blinker.ac",
+          "bytes": 30671
+        },
+        {
+          "path": "Models/Instruments/OxPressure/ox-pressure.ac",
+          "bytes": 28986
+        },
+        {
+          "path": "Models/Instruments/RemoteCompass/p51d-jw-remote.ac",
+          "bytes": 31386
+        },
+        {
+          "path": "Models/Instruments/Tachometer/p51d-jw-tach.ac",
+          "bytes": 24269
+        },
+        {
+          "path": "Models/Instruments/VSI/p51d-jw-vsi.ac",
+          "bytes": 24267
+        },
+        {
+          "path": "Models/Instruments/Vacuum/p51d-jw-vac.ac",
+          "bytes": 25741
+        },
+        {
+          "path": "Models/P-51D-25NA.ac",
+          "bytes": 11855265
+        },
+        {
+          "path": "Models/Pilot/pilot.ac",
+          "bytes": 328586
+        },
+        {
+          "path": "Models/Pilot/pilotWWII.ac",
+          "bytes": 567296
+        },
+        {
+          "path": "Models/brake-placard.ac",
+          "bytes": 1384
+        },
+        {
+          "path": "Models/drop-tank.ac",
+          "bytes": 83682
+        },
+        {
+          "path": "Models/frontRocketMount.ac",
+          "bytes": 143155
+        },
+        {
+          "path": "Models/leftBombRack.ac",
+          "bytes": 1205463
+        },
+        {
+          "path": "Models/prop.ac",
+          "bytes": 359599
+        },
+        {
+          "path": "Models/propDisk.ac",
+          "bytes": 123501
+        },
+        {
+          "path": "Models/rearRocketMount.ac",
+          "bytes": 122
+        },
+        {
+          "path": "Models/rightBombRack.ac",
+          "bytes": 1206884
+        },
+        {
+          "path": "Models/scew-head-philips.ac",
+          "bytes": 11460
+        },
+        {
+          "path": "Models/switch.ac",
+          "bytes": 10755
+        },
+        {
+          "path": "Models/wingTank75.ac",
+          "bytes": 438842
+        },
+        {
+          "path": "Resources/WIP/50BMGCase.blend",
+          "bytes": 554888
+        },
+        {
+          "path": "Resources/WIP/BMG.blend",
+          "bytes": 527672
+        },
+        {
+          "path": "Resources/WIP/P-51D-25NA.ac",
+          "bytes": 984324
+        },
+        {
+          "path": "Resources/WIP/P-51D-UVmap.blend",
+          "bytes": 9663288
+        },
+        {
+          "path": "Resources/WIP/P-51D-cockpit.blend",
+          "bytes": 3396484
+        },
+        {
+          "path": "Resources/WIP/P-51D-export-raw.obj",
+          "bytes": 17506874
+        },
+        {
+          "path": "Resources/WIP/P-51D-gear-doors.ac",
+          "bytes": 1683
+        },
+        {
+          "path": "Resources/WIP/P-51D-textured copy.blend",
+          "bytes": 11630028
+        },
+        {
+          "path": "Resources/WIP/P-51D-wing_loft-tip.blend",
+          "bytes": 2671652
+        },
+        {
+          "path": "Resources/WIP/P-51D-working copy.blend",
+          "bytes": 8591412
+        },
+        {
+          "path": "Resources/WIP/SCR-522A.blend",
+          "bytes": 494840
+        },
+        {
+          "path": "Resources/WIP/bombRack.blend",
+          "bytes": 1305032
+        },
+        {
+          "path": "Resources/WIP/canopy-6-FITTINGS.blend",
+          "bytes": 2343284
+        },
+        {
+          "path": "Resources/WIP/canopy-6.blend",
+          "bytes": 1527636
+        },
+        {
+          "path": "Resources/WIP/canopy.ac",
+          "bytes": 2066610
+        },
+        {
+          "path": "Resources/WIP/canopyCrank.blend",
+          "bytes": 1032644
+        },
+        {
+          "path": "Resources/WIP/canopyTruck.blend",
+          "bytes": 652192
+        },
+        {
+          "path": "Resources/WIP/cowl.blend",
+          "bytes": 878664
+        },
+        {
+          "path": "Resources/WIP/cowl2.blend",
+          "bytes": 1406924
+        },
+        {
+          "path": "Resources/WIP/doghouse.blend",
+          "bytes": 7739148
+        },
+        {
+          "path": "Resources/WIP/elevator.blend",
+          "bytes": 536688
+        },
+        {
+          "path": "Resources/WIP/elevatorTrimWheel.blend",
+          "bytes": 1049836
+        },
+        {
+          "path": "Resources/WIP/emergency release cable cover.blend",
+          "bytes": 499480
+        },
+        {
+          "path": "Resources/WIP/emergencyReleaseHandleBracket.blend",
+          "bytes": 686012
+        },
+        {
+          "path": "Resources/WIP/emergencyReleaseLever.blend",
+          "bytes": 524828
+        },
+        {
+          "path": "Resources/WIP/exhaustCover.blend",
+          "bytes": 511676
+        },
+        {
+          "path": "Resources/WIP/fronRocketMount.ac",
+          "bytes": 122
+        },
+        {
+          "path": "Resources/WIP/fronRocketMount.blend",
+          "bytes": 641552
+        },
+        {
+          "path": "Resources/WIP/frontCowl.blend",
+          "bytes": 568996
+        },
+        {
+          "path": "Resources/WIP/fugelage.blend",
+          "bytes": 1365620
+        },
+        {
+          "path": "Resources/WIP/fuselage.blend",
+          "bytes": 1193664
+        },
+        {
+          "path": "Resources/WIP/fuselage2.blend",
+          "bytes": 1824488
+        },
+        {
+          "path": "Resources/WIP/gearDoorLinkForward.blend",
+          "bytes": 515896
+        },
+        {
+          "path": "Resources/WIP/gearDoorLinks.blend",
+          "bytes": 579096
+        },
+        {
+          "path": "Resources/WIP/glass.blend",
+          "bytes": 496816
+        },
+        {
+          "path": "Resources/WIP/horizStab.blend",
+          "bytes": 569584
+        },
+        {
+          "path": "Resources/WIP/horizStabElvevator.blend",
+          "bytes": 694872
+        },
+        {
+          "path": "Resources/WIP/instrumentShroud.blend",
+          "bytes": 690652
+        },
+        {
+          "path": "Resources/WIP/landingGearLeg.blend",
+          "bytes": 1636968
+        },
+        {
+          "path": "Resources/WIP/landingLight.blend",
+          "bytes": 583428
+        },
+        {
+          "path": "Resources/WIP/leftBombRack.ac",
+          "bytes": 1205460
+        },
+        {
+          "path": "Resources/WIP/leftBombRack.blend",
+          "bytes": 1573532
+        },
+        {
+          "path": "Resources/WIP/lowerLongeronLeft.blend",
+          "bytes": 506112
+        },
+        {
+          "path": "Resources/WIP/mainGearRetractHydraulicsStrutLeft.blend",
+          "bytes": 565648
+        },
+        {
+          "path": "Resources/WIP/mainWheel.blend",
+          "bytes": 663712
+        },
+        {
+          "path": "Resources/WIP/panel.blend",
+          "bytes": 515220
+        },
+        {
+          "path": "Resources/WIP/parts.blend",
+          "bytes": 5588356
+        },
+        {
+          "path": "Resources/WIP/pilotWWII.blend",
+          "bytes": 1001792
+        },
+        {
+          "path": "Resources/WIP/pitotTube.blend",
+          "bytes": 531224
+        },
+        {
+          "path": "Resources/WIP/posed.blend",
+          "bytes": 9849708
+        },
+        {
+          "path": "Resources/WIP/prop.blend",
+          "bytes": 809300
+        },
+        {
+          "path": "Resources/WIP/propDisk.blend",
+          "bytes": 590348
+        },
+        {
+          "path": "Resources/WIP/rearRockrtMount.blend",
+          "bytes": 573236
+        },
+        {
+          "path": "Resources/WIP/rib61_5Left.blend",
+          "bytes": 549532
+        },
+        {
+          "path": "Resources/WIP/ribSta38_5Left.blend",
+          "bytes": 511664
+        },
+        {
+          "path": "Resources/WIP/ribSta50.blend",
+          "bytes": 520832
+        },
+        {
+          "path": "Resources/WIP/rightBombRack.blend",
+          "bytes": 1573532
+        },
+        {
+          "path": "Resources/WIP/scope.blend",
+          "bytes": 7438628
+        },
+        {
+          "path": "Resources/WIP/spinner.blend",
+          "bytes": 535816
+        },
+        {
+          "path": "Resources/WIP/tailWheelAssmy.blend",
+          "bytes": 791348
+        },
+        {
+          "path": "Resources/WIP/throttle.blend",
+          "bytes": 1299704
+        },
+        {
+          "path": "Resources/WIP/throttle2.blend",
+          "bytes": 1002544
+        },
+        {
+          "path": "Resources/WIP/trimKnob.blend",
+          "bytes": 553936
+        },
+        {
+          "path": "Resources/WIP/upperLongeronLeft.blend",
+          "bytes": 506176
+        },
+        {
+          "path": "Resources/WIP/vetStabRudder.blend",
+          "bytes": 690976
+        },
+        {
+          "path": "Resources/WIP/windshieldLowPoly.blend",
+          "bytes": 514928
+        },
+        {
+          "path": "Resources/WIP/wingFillet.blend",
+          "bytes": 578676
+        },
+        {
+          "path": "Resources/WIP/wingTank75.blend",
+          "bytes": 893772
+        },
+        {
+          "path": "Stores/HVAR/HVAR.ac",
+          "bytes": 627215
+        },
+        {
+          "path": "Stores/HVAR/HVAR.blend",
+          "bytes": 1046748
+        },
+        {
+          "path": "Stores/HVAR/fire-impact.ac",
+          "bytes": 23247
+        },
+        {
+          "path": "Stores/HVAR/rocket.ac",
+          "bytes": 2988
+        },
+        {
+          "path": "Stores/M57/m57.ac",
+          "bytes": 17949
+        },
+        {
+          "path": "Stores/M64/m64.ac",
+          "bytes": 17913
+        },
+        {
+          "path": "Stores/bomb/fire-impact.ac",
+          "bytes": 23247
+        },
+        {
+          "path": "Stores/guns/flack.ac",
+          "bytes": 372
+        },
+        {
+          "path": "Stores/guns/null.ac",
+          "bytes": 25
+        },
+        {
+          "path": "Stores/guns/puff.ac",
+          "bytes": 1447
+        },
+        {
+          "path": "Stores/guns/splash.ac",
+          "bytes": 1859
+        },
+        {
+          "path": "Stores/guns/tracer.ac",
+          "bytes": 647
+        }
+      ],
+      "designs": [],
+      "sourceUrl": "https://github.com/FGMEMBERS/p51d/tree/cb3bcd6ef41182f6b1bae91395f38d0dadd974e5",
+      "reviewStatus": "LICENSE_REVIEW_REQUIRED",
+      "webReady": false
+    },
+    {
+      "repo": "FGMEMBERS/PC-6",
+      "revision": "e4b5776dde5b041171fb5a5ab641e92edc81ec7f",
+      "truncated": false,
+      "licenses": [],
+      "meshes": [
+        {
+          "path": "Models/Humans/para.ac",
+          "bytes": 222290
+        },
+        {
+          "path": "Models/Humans/pilot.ac",
+          "bytes": 254347
+        },
+        {
+          "path": "Models/Instruments/KLN90B/kln90b.ac",
+          "bytes": 27012
+        },
+        {
+          "path": "Models/Instruments/KT76A/KT76A.ac",
+          "bytes": 113153
+        },
+        {
+          "path": "Models/Instruments/ai/ai-gauge.ac",
+          "bytes": 80352
+        },
+        {
+          "path": "Models/Instruments/alt2/alt2.ac",
+          "bytes": 38364
+        },
+        {
+          "path": "Models/Instruments/alt2/alt2_orig.ac",
+          "bytes": 46818
+        },
+        {
+          "path": "Models/Instruments/alt_para/alt_para.ac",
+          "bytes": 34916
+        },
+        {
+          "path": "Models/Instruments/annunciator/annunciator.ac",
+          "bytes": 23084
+        },
+        {
+          "path": "Models/Instruments/annunciator/caution_warning.ac",
+          "bytes": 2395
+        },
+        {
+          "path": "Models/Instruments/annunciator/stall_warning.ac",
+          "bytes": 2391
+        },
+        {
+          "path": "Models/Instruments/annunciator/warning_warning.ac",
+          "bytes": 2359
+        },
+        {
+          "path": "Models/Instruments/asi/asi-gauge.ac",
+          "bytes": 42492
+        },
+        {
+          "path": "Models/Instruments/elt/elt.ac",
+          "bytes": 56612
+        },
+        {
+          "path": "Models/Instruments/fuel-qty/fuel-qty.ac",
+          "bytes": 37630
+        },
+        {
+          "path": "Models/Instruments/fuel-used/fuel-used.ac",
+          "bytes": 40470
+        },
+        {
+          "path": "Models/Instruments/fuelflow/fuelflow.ac",
+          "bytes": 32621
+        },
+        {
+          "path": "Models/Instruments/hdg/hdg.ac",
+          "bytes": 34670
+        },
+        {
+          "path": "Models/Instruments/itt/itt.ac",
+          "bytes": 35650
+        },
+        {
+          "path": "Models/Instruments/ka134/ka134.ac",
+          "bytes": 13048
+        },
+        {
+          "path": "Models/Instruments/ky196/ky196.ac",
+          "bytes": 19967
+        },
+        {
+          "path": "Models/Instruments/left_cb_panel/left_cb_panel.ac",
+          "bytes": 389544
+        },
+        {
+          "path": "Models/Instruments/left_electric_panel/left_electric_panel.ac",
+          "bytes": 195395
+        },
+        {
+          "path": "Models/Instruments/mag-compass/mag-compass.ac",
+          "bytes": 9252
+        },
+        {
+          "path": "Models/Instruments/oil/oil.ac",
+          "bytes": 37606
+        },
+        {
+          "path": "Models/Instruments/pedals/pedals.ac",
+          "bytes": 37860
+        },
+        {
+          "path": "Models/Instruments/prop-rpm/prop-rpm.ac",
+          "bytes": 31633
+        },
+        {
+          "path": "Models/Instruments/prop_percent_rpm/prop_percent_rpm.ac",
+          "bytes": 32011
+        },
+        {
+          "path": "Models/Instruments/right_cb_panel/right_cb_panel.ac",
+          "bytes": 113198
+        },
+        {
+          "path": "Models/Instruments/right_electric_panel/right_electric_panel.ac",
+          "bytes": 63181
+        },
+        {
+          "path": "Models/Instruments/thermometer/OAT.ac",
+          "bytes": 9094
+        },
+        {
+          "path": "Models/Instruments/torque/torque.ac",
+          "bytes": 36018
+        },
+        {
+          "path": "Models/Instruments/trim/trim.ac",
+          "bytes": 17171
+        },
+        {
+          "path": "Models/Instruments/turn-gauge/turn-gauge.ac",
+          "bytes": 47555
+        },
+        {
+          "path": "Models/Instruments/turn/turn.ac",
+          "bytes": 51426
+        },
+        {
+          "path": "Models/Instruments/voltmeter/voltmeter.ac",
+          "bytes": 37628
+        },
+        {
+          "path": "Models/Instruments/vsi/vsi-gauge.ac",
+          "bytes": 41016
+        },
+        {
+          "path": "Models/Lights/GreenLight.ac",
+          "bytes": 633
+        },
+        {
+          "path": "Models/Lights/RedLight.ac",
+          "bytes": 633
+        },
+        {
+          "path": "Models/Lights/WhiteLight.ac",
+          "bytes": 633
+        },
+        {
+          "path": "Models/Lights/light-cone.ac",
+          "bytes": 47684
+        },
+        {
+          "path": "Models/pdisk.ac",
+          "bytes": 17930
+        },
+        {
+          "path": "Models/porter.ac",
+          "bytes": 1976514
+        }
+      ],
+      "designs": [],
+      "sourceUrl": "https://github.com/FGMEMBERS/PC-6/tree/e4b5776dde5b041171fb5a5ab641e92edc81ec7f",
+      "reviewStatus": "LICENSE_REVIEW_REQUIRED",
+      "webReady": false
+    },
+    {
+      "repo": "FGMEMBERS/Stearman",
+      "revision": "db57b5b2c33eac5463c1b0ace6804ea1c265e306",
+      "truncated": false,
+      "licenses": [
+        {
+          "path": "COPYING",
+          "url": "https://raw.githubusercontent.com/FGMEMBERS/Stearman/db57b5b2c33eac5463c1b0ace6804ea1c265e306/COPYING",
+          "gnu": true,
+          "version": "2"
+        }
+      ],
+      "meshes": [
+        {
+          "path": "Models/Engine/blocpiston.ac",
+          "bytes": 697246
+        },
+        {
+          "path": "Models/Engine/r670.ac",
+          "bytes": 1909846
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/alt/alt.ac",
+          "bytes": 74032
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/asi/asi.ac",
+          "bytes": 35272
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/compass/compass.ac",
+          "bytes": 32130
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/magneto/magneto.ac",
+          "bytes": 115786
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/man/man.ac",
+          "bytes": 47071
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/oil-fuel-temp/oil-fuel-temp.ac",
+          "bytes": 43123
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/rpm/rpm.ac",
+          "bytes": 31750
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/turn/turn.ac",
+          "bytes": 54777
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/vsi/vsi.ac",
+          "bytes": 42227
+        },
+        {
+          "path": "Models/Interior/Panel/panel.ac",
+          "bytes": 41349
+        },
+        {
+          "path": "Models/Interior/interior.ac",
+          "bytes": 1146330
+        },
+        {
+          "path": "Models/Pilot/general_pilot.ac",
+          "bytes": 341361
+        },
+        {
+          "path": "Models/lights/GreenLight.ac",
+          "bytes": 960
+        },
+        {
+          "path": "Models/lights/RedLight.ac",
+          "bytes": 966
+        },
+        {
+          "path": "Models/lights/WhiteLight.ac",
+          "bytes": 954
+        },
+        {
+          "path": "Models/lights/light-cone.ac",
+          "bytes": 70258
+        },
+        {
+          "path": "Models/shadow.ac",
+          "bytes": 441
+        },
+        {
+          "path": "Models/stearman.ac",
+          "bytes": 4433188
+        }
+      ],
+      "designs": [],
+      "sourceUrl": "https://github.com/FGMEMBERS/Stearman/tree/db57b5b2c33eac5463c1b0ace6804ea1c265e306",
+      "reviewStatus": "GPL_SOURCE_CONVERSION_REQUIRED",
+      "webReady": false
+    },
+    {
+      "repo": "FGMEMBERS/North-American-T6-Texan",
+      "revision": "886ed8f9c313adadf0ea5bf229a8c9f265521f5e",
+      "truncated": false,
+      "licenses": [
+        {
+          "path": "COPYING",
+          "url": "https://raw.githubusercontent.com/FGMEMBERS/North-American-T6-Texan/886ed8f9c313adadf0ea5bf229a8c9f265521f5e/COPYING",
+          "gnu": true,
+          "version": "2"
+        }
+      ],
+      "meshes": [
+        {
+          "path": "Models/Engine/blocpiston.ac",
+          "bytes": 2031852
+        },
+        {
+          "path": "Models/Engine/r1340.ac",
+          "bytes": 2312469
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/ai/ai.ac",
+          "bytes": 53960
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/alt/alt.ac",
+          "bytes": 66693
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/ammeter/ammeter.ac",
+          "bytes": 63700
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/asi/asi.ac",
+          "bytes": 57446
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/carb/carb.ac",
+          "bytes": 63490
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/compass/compass.ac",
+          "bytes": 26516
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/fuel/fuel.ac",
+          "bytes": 34122
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/manifold/man.ac",
+          "bytes": 81897
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/note/note.ac",
+          "bytes": 5616
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/psi/psi.ac",
+          "bytes": 96774
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/rpm/rpm.ac",
+          "bytes": 55118
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/switchs/magnetos.ac",
+          "bytes": 40120
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/switchs/starter.ac",
+          "bytes": 31847
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/turn/turn.ac",
+          "bytes": 93198
+        },
+        {
+          "path": "Models/Interior/Panel/Instruments/vsi/vsi.ac",
+          "bytes": 72820
+        },
+        {
+          "path": "Models/Interior/Panel/panel.ac",
+          "bytes": 28619
+        },
+        {
+          "path": "Models/Interior/Panel/panel2.ac",
+          "bytes": 10349
+        },
+        {
+          "path": "Models/Interior/Panel/subpanel/subpanel.ac",
+          "bytes": 1399
+        },
+        {
+          "path": "Models/Interior/Panel/subpanel/subpanel2.ac",
+          "bytes": 1400
+        },
+        {
+          "path": "Models/Interior/interior.ac",
+          "bytes": 239719
+        },
+        {
+          "path": "Models/Pilot/ww2_pilot_old.ac",
+          "bytes": 511566
+        },
+        {
+          "path": "Models/lights/GreenLight.ac",
+          "bytes": 1530
+        },
+        {
+          "path": "Models/lights/RedLight.ac",
+          "bytes": 1538
+        },
+        {
+          "path": "Models/lights/WhiteLight.ac",
+          "bytes": 1538
+        },
+        {
+          "path": "Models/lights/flash.ac",
+          "bytes": 449
+        },
+        {
+          "path": "Models/lights/light-cone.ac",
+          "bytes": 52000
+        },
+        {
+          "path": "Models/shadow.ac",
+          "bytes": 388
+        },
+        {
+          "path": "Models/t6.ac",
+          "bytes": 2024624
+        }
+      ],
+      "designs": [],
+      "sourceUrl": "https://github.com/FGMEMBERS/North-American-T6-Texan/tree/886ed8f9c313adadf0ea5bf229a8c9f265521f5e",
+      "reviewStatus": "GPL_SOURCE_CONVERSION_REQUIRED",
+      "webReady": false
+    },
+    {
+      "repo": "FGMEMBERS/F8F-VooDooBear",
+      "revision": "fbef3bb342832e3f5579af6bbb5fe2719c81fee1",
+      "truncated": false,
+      "licenses": [],
+      "meshes": [
+        {
+          "path": "F8F_VooDooBearSAVE.ac",
+          "bytes": 1080398
+        },
+        {
+          "path": "Models/Effects/blaze.ac",
+          "bytes": 7097
+        },
+        {
+          "path": "Models/F8F_VooDooBear.ac",
+          "bytes": 1086247
+        },
+        {
+          "path": "Models/Instruments/P-39D-acc.ac",
+          "bytes": 24233
+        },
+        {
+          "path": "Models/Instruments/P-39D-alt.ac",
+          "bytes": 30676
+        },
+        {
+          "path": "Models/Instruments/P-39D-asi.ac",
+          "bytes": 22451
+        },
+        {
+          "path": "Models/Instruments/P-39D-attitude.ac",
+          "bytes": 49205
+        },
+        {
+          "path": "Models/Instruments/P-39D-clock.ac",
+          "bytes": 27411
+        },
+        {
+          "path": "Models/Instruments/P-39D-compass.ac",
+          "bytes": 24665
+        },
+        {
+          "path": "Models/Instruments/P-39D-engine.ac",
+          "bytes": 23943
+        },
+        {
+          "path": "Models/Instruments/P-39D-gunsight.ac",
+          "bytes": 90729
+        },
+        {
+          "path": "Models/Instruments/P-39D-ignition.ac",
+          "bytes": 27043
+        },
+        {
+          "path": "Models/Instruments/P-39D-magcompass.ac",
+          "bytes": 18409
+        },
+        {
+          "path": "Models/Instruments/P-39D-man.ac",
+          "bytes": 22438
+        },
+        {
+          "path": "Models/Instruments/P-39D-remote.ac",
+          "bytes": 26565
+        },
+        {
+          "path": "Models/Instruments/P-39D-tach.ac",
+          "bytes": 22425
+        },
+        {
+          "path": "Models/Instruments/P-39D-temp.ac",
+          "bytes": 22507
+        },
+        {
+          "path": "Models/Instruments/P-39D-turn.ac",
+          "bytes": 28118
+        },
+        {
+          "path": "Models/Instruments/P-39D-vac.ac",
+          "bytes": 25707
+        },
+        {
+          "path": "Models/Instruments/P-39D-vsi.ac",
+          "bytes": 22509
+        },
+        {
+          "path": "Models/InstrumentsOLD/afn2.ac",
+          "bytes": 162379
+        },
+        {
+          "path": "Models/InstrumentsOLD/alt-ger.ac",
+          "bytes": 151811
+        },
+        {
+          "path": "Models/InstrumentsOLD/asi-ger.ac",
+          "bytes": 143524
+        },
+        {
+          "path": "Models/InstrumentsOLD/asi750-ger.ac",
+          "bytes": 147010
+        },
+        {
+          "path": "Models/InstrumentsOLD/att-ger.ac",
+          "bytes": 188302
+        },
+        {
+          "path": "Models/InstrumentsOLD/breaker.ac",
+          "bytes": 78383
+        },
+        {
+          "path": "Models/InstrumentsOLD/clock.ac",
+          "bytes": 139839
+        },
+        {
+          "path": "Models/InstrumentsOLD/dimmer.ac",
+          "bytes": 160976
+        },
+        {
+          "path": "Models/InstrumentsOLD/engine-ger.ac",
+          "bytes": 151414
+        },
+        {
+          "path": "Models/InstrumentsOLD/fuelfw.ac",
+          "bytes": 144097
+        },
+        {
+          "path": "Models/InstrumentsOLD/fuelsw-fw.ac",
+          "bytes": 21362
+        },
+        {
+          "path": "Models/InstrumentsOLD/fw190a8_j.ac",
+          "bytes": 137594
+        },
+        {
+          "path": "Models/InstrumentsOLD/gear-ger.ac",
+          "bytes": 169475
+        },
+        {
+          "path": "Models/InstrumentsOLD/gearsw-fw.ac",
+          "bytes": 114217
+        },
+        {
+          "path": "Models/InstrumentsOLD/ignition-ger.ac",
+          "bytes": 13427
+        },
+        {
+          "path": "Models/InstrumentsOLD/indlight.ac",
+          "bytes": 65485
+        },
+        {
+          "path": "Models/InstrumentsOLD/man18-ger.ac",
+          "bytes": 142502
+        },
+        {
+          "path": "Models/InstrumentsOLD/o2guard.ac",
+          "bytes": 139404
+        },
+        {
+          "path": "Models/InstrumentsOLD/o2pressure.ac",
+          "bytes": 146273
+        },
+        {
+          "path": "Models/InstrumentsOLD/pitchclock.ac",
+          "bytes": 139819
+        },
+        {
+          "path": "Models/InstrumentsOLD/primer-ger.ac",
+          "bytes": 22598
+        },
+        {
+          "path": "Models/InstrumentsOLD/remote-ger.ac",
+          "bytes": 154550
+        },
+        {
+          "path": "Models/InstrumentsOLD/shutoff.ac",
+          "bytes": 77553
+        },
+        {
+          "path": "Models/InstrumentsOLD/starter-ger.ac",
+          "bytes": 19626
+        },
+        {
+          "path": "Models/InstrumentsOLD/tach35-ger.ac",
+          "bytes": 146585
+        },
+        {
+          "path": "Models/InstrumentsOLD/tanksw.ac",
+          "bytes": 168816
+        },
+        {
+          "path": "Models/InstrumentsOLD/temp130.ac",
+          "bytes": 144060
+        },
+        {
+          "path": "Models/InstrumentsOLD/throttle-fw.ac",
+          "bytes": 34482
+        },
+        {
+          "path": "Models/InstrumentsOLD/trimind.ac",
+          "bytes": 144154
+        },
+        {
+          "path": "Models/InstrumentsOLD/vario30-ger.ac",
+          "bytes": 142823
+        },
+        {
+          "path": "Models/PortAileron.ac",
+          "bytes": 9720
+        },
+        {
+          "path": "Models/PortFlap.ac",
+          "bytes": 14560
+        },
+        {
+          "path": "Models/PropSpinner.ac",
+          "bytes": 28476
+        },
+        {
+          "path": "Models/StarboardAileron.ac",
+          "bytes": 9824
+        },
+        {
+          "path": "Models/StarboardFlap.ac",
+          "bytes": 14491
+        },
+        {
+          "path": "Models/pdisk.ac",
+          "bytes": 13844
+        }
+      ],
+      "designs": [],
+      "sourceUrl": "https://github.com/FGMEMBERS/F8F-VooDooBear/tree/fbef3bb342832e3f5579af6bbb5fe2719c81fee1",
+      "reviewStatus": "LICENSE_REVIEW_REQUIRED",
+      "webReady": false
+    },
+    {
+      "repo": "cobe571/EXTRA-EA300",
+      "revision": "78a586ea9d71ed26dfc49d62aebaf873de89433f",
+      "truncated": false,
+      "licenses": [
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/cobe571/EXTRA-EA300/78a586ea9d71ed26dfc49d62aebaf873de89433f/LICENSE",
+          "gnu": true,
+          "version": "2"
+        },
+        {
+          "path": "License.txt",
+          "url": "https://raw.githubusercontent.com/cobe571/EXTRA-EA300/78a586ea9d71ed26dfc49d62aebaf873de89433f/License.txt",
+          "gnu": true,
+          "version": "2"
+        }
+      ],
+      "meshes": [
+        {
+          "path": "Models/EXTRA-EA300.ac",
+          "bytes": 6226705
+        },
+        {
+          "path": "Models/Effects/Vortex/vortex.ac",
+          "bytes": 339
+        },
+        {
+          "path": "Models/Interior/Ai/ai.ac",
+          "bytes": 90005
+        },
+        {
+          "path": "Models/Interior/Alt/alt.ac",
+          "bytes": 125981
+        },
+        {
+          "path": "Models/Interior/Asi/asi.ac",
+          "bytes": 58490
+        },
+        {
+          "path": "Models/Interior/Gmeter/GMeter.ac",
+          "bytes": 82135
+        },
+        {
+          "path": "Models/Interior/Hdg/hdg.ac",
+          "bytes": 62999
+        },
+        {
+          "path": "Models/Interior/Man/man.ac",
+          "bytes": 43117
+        },
+        {
+          "path": "Models/Interior/Oil/oil.ac",
+          "bytes": 55801
+        },
+        {
+          "path": "Models/Interior/Pedals/pedals.ac",
+          "bytes": 6105
+        },
+        {
+          "path": "Models/Interior/Pilot/FG-Acro-Pilot.ac",
+          "bytes": 1042175
+        },
+        {
+          "path": "Models/Interior/Pilot/FG-Pilot.ac",
+          "bytes": 1306692
+        },
+        {
+          "path": "Models/Interior/Seat/seat.ac",
+          "bytes": 17061
+        },
+        {
+          "path": "Models/Interior/Turn/turn.ac",
+          "bytes": 176014
+        },
+        {
+          "path": "Models/Interior/Vsi/vsi.ac",
+          "bytes": 41654
+        },
+        {
+          "path": "Models/Interior/Yoke/yoke.ac",
+          "bytes": 189183
+        },
+        {
+          "path": "Models/Interior/interior.ac",
+          "bytes": 1197021
+        },
+        {
+          "path": "Models/Lights/GreenLight.ac",
+          "bytes": 1530
+        },
+        {
+          "path": "Models/Lights/RedLight.ac",
+          "bytes": 1538
+        },
+        {
+          "path": "Models/Lights/WhiteLight.ac",
+          "bytes": 1538
+        },
+        {
+          "path": "Models/Lights/light-cone.ac",
+          "bytes": 52000
+        },
+        {
+          "path": "Models/shadow.ac",
+          "bytes": 459
+        }
+      ],
+      "designs": [],
+      "sourceUrl": "https://github.com/cobe571/EXTRA-EA300/tree/78a586ea9d71ed26dfc49d62aebaf873de89433f",
+      "reviewStatus": "GPL_SOURCE_CONVERSION_REQUIRED",
+      "webReady": false
+    }
+  ]
+}

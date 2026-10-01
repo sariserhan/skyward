@@ -1,6 +1,6 @@
 # Special-aircraft visual coverage
 
-Reviewed catalog mapping for 120 current featured aircraft. 63 have exact-type community geometry, 23 use an explicitly related family model, and 34 require an approximate fallback or more precise type identification. A model match does not certify every geometric detail.
+Reviewed catalog mapping for 120 current featured aircraft. 64 have exact-type community geometry, 23 use an explicitly related family model, and 33 require an approximate fallback or more precise type identification. A model match does not certify every geometric detail.
 
 The registration index fills missing feed types at ingestion/selection, preserves provider types and timestamps, and rejects conflicting types for registration-based paint selection. It does not infer aircraft appearance from team membership. Existing compatible operator textures can be selected by registration when the callsign does not identify an operator.
 
@@ -91,7 +91,7 @@ Regenerate with `node web/scripts/prepare-special-visuals.mjs` (also part of bui
 | JA607A | Boeing 767-300ER | type | [Source](https://www.flightradar24.com/blog/flight-tracking-news/just-for-fun/pokemon-liveries/) |
 | JA894A | Boeing 787-9 | type | [Source](https://www.flightradar24.com/blog/flight-tracking-news/just-for-fun/pokemon-liveries/) |
 | JA784A | Boeing 777-300ER | family | [Source](https://www.flightradar24.com/blog/flight-tracking-news/just-for-fun/pokemon-liveries/) |
-| B-18916 | Airbus A350 | fallback | [Source](https://www.flightradar24.com/blog/flight-tracking-news/just-for-fun/pokemon-liveries/) |
+| B-18916 | Airbus A350-900 | type | [Source](https://www.flightradar24.com/blog/flight-tracking-news/just-for-fun/pokemon-liveries/) |
 | B-18101 | Airbus A321neo | family | [Source](https://www.flightradar24.com/blog/flight-tracking-news/just-for-fun/pokemon-liveries/) |
 | PK-GMU | Boeing 737-800 | type | [Source](https://www.flightradar24.com/blog/flight-tracking-news/just-for-fun/pokemon-liveries/) |
 | 9V-OJJ | Boeing 787-9 | type | [Source](https://www.flightradar24.com/blog/flight-tracking-news/just-for-fun/pokemon-liveries/) |
@@ -134,3 +134,5 @@ Regenerate with `node web/scripts/prepare-special-visuals.mjs` (also part of bui
 | VH-XZJ | Boeing 737-800 | type | [Source](https://www.qantas.com/en-au/onboard/fleet/flying-art) |
 
 Validation: 597 server/unit tests passed, one skipped; production build passed. Headless Chromium verified the special-aircraft link with the provider type deliberately omitted, selection of the A330-300 asset, appearance-reference visibility, reload, mobile announcement layout and stale removal. The Browser plugin was unavailable, so the existing Playwright harness ran on a temporary local server (1440×1000 and 390×844). Evidence is saved outside the repository at `/tmp/skyward-browser-76f2_jbk`. Exact texture appearance was not certified by this interaction test. No deployment performed.
+
+See the [complete model and livery source audit](special-aircraft-asset-search.md) for candidate downloads, compatibility limits and unresolved assets across all 120 registrations.
