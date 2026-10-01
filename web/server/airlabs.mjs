@@ -1,3 +1,5 @@
+import airportCatalog from '../data/airport-catalog.json' with {type:'json'};
+const airportByCode=new Map(Object.entries(airportCatalog).flatMap(([id,a])=>[[id,a],[a.icao,a]]));
 // AirLabs v9 flight details. Never used by the position-refresh loop.
 const text = v => typeof v === 'string' && v.trim() ? v.trim().slice(0, 100) : null;
 const stamp = v => typeof v === 'number' && Number.isFinite(v) && v > 0 && v < 4102444800 ? v * 1000 : null;
@@ -22,6 +24,8 @@ export function normalizeFlight(body, expected, now = Date.now()) {
   if (expected.hex && (!match || (!expected.date && !current))) return {status: match ? 'STALE_OR_UNCONFIRMED' : 'IDENTITY_MISMATCH', flight: null};
   const endpoint = prefix => ({
     airport: text(r[`${prefix}_iata`]) ?? text(r[`${prefix}_icao`]),
+    name: airportByCode.get(text(r[`${prefix}_iata`])??text(r[`${prefix}_icao`]))?.name??null,
+    city: airportByCode.get(text(r[`${prefix}_iata`])??text(r[`${prefix}_icao`]))?.city??null,
     terminal: text(r[`${prefix}_terminal`]), gate: text(r[`${prefix}_gate`]),
     scheduledAt: stamp(r[`${prefix}_time_ts`]), estimatedAt: stamp(r[`${prefix}_estimated_ts`]), actualAt: stamp(r[`${prefix}_actual_ts`]),
   });
@@ -55,10 +59,15 @@ export function airlabsPreview(mode) {
   return {provider: 'AirLabs integration preview', mode: 'demo', ...result, passengers: {status: 'UNAVAILABLE', names: null, onboardCount: null}, message: 'Synthetic example DEMO101. Not data for your selected aircraft. No AirLabs request was made.'};
 }
 
+export function scheduleAirportCode(airport){
+ const a=airportCatalog[airport];
+ if(a){if(/^[A-Z]{3}$/.test(a.iata||''))return {code:a.iata,kind:'iata'};if(/^[A-Z0-9]{4}$/.test(a.icao||''))return {code:a.icao,kind:'icao'};return null;}
+ return /^[A-Z]{3,4}$/.test(airport||'')?{code:airport,kind:airport.length===3?'iata':'icao'}:null;
+}
 export async function fetchAirLabsSchedules({apiKey,airport,direction='departures',fetchImpl=fetch,now=Date.now()}){
- if(!/^[A-Z]{3,4}$/.test(airport)||!['departures','arrivals'].includes(direction)||!apiKey)throw Error('Invalid schedule request.');
- const url=new URL('https://airlabs.co/api/v9/schedules');url.searchParams.set(`${direction==='departures'?'dep':'arr'}_${airport.length===3?'iata':'icao'}`,airport);url.searchParams.set('limit','50');url.searchParams.set('api_key',apiKey);
+ const lookup=scheduleAirportCode(airport);if(!lookup||!['departures','arrivals'].includes(direction)||!apiKey)throw Error('Invalid schedule request.');
+ const url=new URL('https://airlabs.co/api/v9/schedules');url.searchParams.set(`${direction==='departures'?'dep':'arr'}_${lookup.kind}`,lookup.code);url.searchParams.set('limit','50');url.searchParams.set('api_key',apiKey);
  let body;try{const r=await fetchImpl(url,{signal:AbortSignal.timeout(8000),redirect:'error'});if(!r.ok)throw Error();body=await r.json();if(body.error||!Array.isArray(body.response))throw Error();}catch{throw Error('Schedule lookup unavailable. No automatic retry was made.');}
- const flights=body.response.slice(0,50).flatMap(r=>{const code=text(r.flight_icao);if(!code||!/^[A-Z]{3}[A-Z0-9]{1,7}$/.test(code))return [];const side=direction==='departures'?'dep':'arr';if(r[`${side}_${airport.length===3?'iata':'icao'}`]!==airport)return [];return [normalizeFlight({response:r},{callsign:code},now).flight].filter(Boolean);});
+ const flights=body.response.slice(0,50).flatMap(r=>{const code=text(r.flight_icao);if(!code||!/^[A-Z]{3}[A-Z0-9]{1,7}$/.test(code))return [];const side=direction==='departures'?'dep':'arr';if(r[`${side}_${lookup.kind}`]!==lookup.code)return [];return [normalizeFlight({response:r},{callsign:code},now).flight].filter(Boolean);});
  return {mode:'live',fetchedAt:now,airport,direction,flights,partial:true,message:'Up to 50 received schedules. Coverage varies; this is not a complete airport timetable.'};
 }

@@ -1,5 +1,5 @@
 import {airlabsPermissions,airlabsUsageAllowed} from './airlabs-permissions.mjs';
-import {fetchAirLabsFlight,fetchAirLabsSchedules} from './airlabs.mjs';
+import {fetchAirLabsFlight,fetchAirLabsSchedules,scheduleAirportCode} from './airlabs.mjs';
 // A real subscription check is deliberately separate from development/test entitlement.
 export function createPremiumLive({env,paid,reserve,fetchImpl=fetch,now=Date.now,permissions=airlabsPermissions}){
  const enabled=env.SKYWARD_AIRLABS_MODE==='live'&&env.SKYWARD_BILLING_MODE==='live'&&!!env.AIRLABS_API_KEY&&airlabsUsageAllowed(permissions);
@@ -11,5 +11,5 @@ export function createPremiumLive({env,paid,reserve,fetchImpl=fetch,now=Date.now
   if(pending.has(key))return {...await pending.get(key),cached:true};
   const task=(async()=>{await reserve(u);const result=await load();if(cache.size>=200)cache.delete(cache.keys().next().value);cache.set(key,result);return {...result,cached:false};})();pending.set(key,task);try{return await task;}finally{pending.delete(key);}
  }
- return {enabled,flight:(u,j)=>request(u,`flight:${j.callsign}:${j.hex}:${j.date}:${j.from||''}:${j.to||''}`,()=>fetchAirLabsFlight({apiKey:env.AIRLABS_API_KEY,callsign:j.callsign,hex:j.hex||undefined,date:j.date,from:j.from,to:j.to,fetchImpl,now:now()})),schedules:(u,airport,direction)=>request(u,`board:${airport}:${direction}`,()=>fetchAirLabsSchedules({apiKey:env.AIRLABS_API_KEY,airport,direction,fetchImpl,now:now()}))};
+ return {enabled,flight:(u,j)=>request(u,`flight:${j.callsign}:${j.hex}:${j.date}:${j.from||''}:${j.to||''}`,()=>fetchAirLabsFlight({apiKey:env.AIRLABS_API_KEY,callsign:j.callsign,hex:j.hex||undefined,date:j.date,from:j.from,to:j.to,fetchImpl,now:now()})),schedules:async(u,airport,direction)=>{if(!scheduleAirportCode(airport))throw Object.assign(Error('Schedule data is unavailable for this airport identifier.'),{status:503});return request(u,`board:${airport}:${direction}`,()=>fetchAirLabsSchedules({apiKey:env.AIRLABS_API_KEY,airport,direction,fetchImpl,now:now()}));}};
 }

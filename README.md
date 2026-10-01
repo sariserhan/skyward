@@ -645,3 +645,13 @@ After catalog/title changes, regenerate checked-in cards using `python web/scrip
 Flight-view camera controls include **Share view**, restoring the selected viewpoint at the latest available position, and a branded PNG export with credits. A shared link is not a replay or an onboard video.
 
 After deployment, run `npm --prefix web run check:public -- https://skyvvard.com`. It checks all published profile sitemap entries and a bounded sample of page metadata, internal discovery links and image files without calling aviation APIs. The GitHub **Public discovery checks** workflow can run manually and after a successful GitHub deployment marked `production`; Cloudflare must publish that deployment status for the automatic trigger. Local release checks include desktop/mobile onboarding and discovery interactions.
+
+### Airport arrivals and departures boards
+
+Every catalog airport has `/airports/{CODE}/board/` (for example `/airports/IAD/board/`), linked from its airport reference page, globe inspector, and saved-airport schedule control. The standalone board supports airport-local dates and times, departures/arrivals, flight links, terminal/gate fields, search, and full screen. It loads without the globe engine.
+
+Schedules use the existing authenticated `/api/premium/schedules` service and its shared five-minute cache, request coalescing, and paid-request budgets. A visitor explicitly loads or refreshes a direction; there is no paid background polling. Unavailable gates are shown as “Not supplied”, and failed refreshes retain the prior direction's rows and timestamp. The provider currently supplies up to 50 rows per direction; the board does not claim a complete timetable.
+
+Live rows require the existing AirLabs configuration, verified account-specific permissions in `web/data/airlabs-permissions.json`, and a verified paid subscription. The current permissions file remains unresolved: these pages therefore show an honest unavailable state until the service is configured. All airports have pages, but provider coverage is not guaranteed. Operational boards use `noindex,follow` because their schedule data requires authenticated access; the existing public airport reference pages remain in the sitemap.
+
+Validate with `node --test web/server/airport-board.test.mjs` and `npm --prefix web run test:airport-board` (existing Node Playwright required).

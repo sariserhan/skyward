@@ -129,3 +129,8 @@ isolated fixture catalog to verify published flight HTML with JavaScript enabled
 and disabled, desktop/mobile layout, directory links, canonical metadata,
 sitemap inclusion, and shared camera fragments. Reference pages must make zero
 aviation API requests. Fixture data stays in a temporary directory.
+
+`npm run test:airport-board` uses the same Node Playwright setup to check
+airport-local dates, arrivals/departures, gates, filtering, stale rows on errors,
+responses arriving after a tab switch, keyboard navigation, full screen, mobile
+layout, and unavailable/unsigned-in states. Schedule requests are fixture-only.
