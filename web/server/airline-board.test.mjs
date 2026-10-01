@@ -9,7 +9,7 @@ import {verifiedAirLabs} from './fixtures/airlabs-permissions.mjs';
 const origin='https://skyvvard.com',env={SKYWARD_PUBLIC_ORIGIN:origin},page=path=>publicPage(new URL(path,origin),env);
 test('airline directory and canonical airline boards serve for every recognized operator',async()=>{
  const directory=page('/airlines/');assert.equal(directory.status,200);assert.match(directory.body,/Turkish Airlines/);
- for(const code of Object.keys(airlineNames)){assert.ok(directory.body.includes(`/airlines/${code}/`));const p=page(`/airlines/${code}/`);assert.equal(p.status,200);assert.ok(p.body.includes(`data-airline="${code}"`));assert.match(p.body,/noindex,follow/);assert.doesNotMatch(p.body,/special-flights.js/);}
+ for(const code of Object.keys(airlineNames)){assert.ok(directory.body.includes(`/airlines/${code}/`));const p=page(`/airlines/${code}/`);assert.equal(p.status,200);assert.ok(p.body.includes(`data-airline="${code}"`));assert.doesNotMatch(p.body,/noindex/);assert.doesNotMatch(p.body,/special-flights.js/);}
  assert.equal(page('/airlines/thy').location,'/airlines/THY/');assert.equal(page('/airlines/ZZZ/').status,404);assert.match(page('/sitemap.xml').body,/<loc>https:\/\/skyvvard.com\/airlines\/<\/loc>/);
  assert.match(page('/airlines/THY/').body,/Ticket prefix: <strong>TK/);
  for(const method of ['GET','HEAD']){const r=await handle(new Request(origin+'/airlines/THY/',{method}),env);assert.equal(r.status,200);if(method==='HEAD')assert.equal(await r.text(),'');}

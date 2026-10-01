@@ -11,8 +11,8 @@ test('all catalog airports have canonical board pages with useful links and unav
  for(const id of Object.keys(catalog)){const p=page(`/airports/${id}/board/`);assert.equal(p.status,200,id);assert.ok(p.body.includes(`data-airport="${id}"`));assert.match(p.body,/airport-board.js/);assert.doesNotMatch(p.body,/special-flights.js|type="module".*main-/);}
  assert.equal(page('/airports/iad/board').location,'/airports/IAD/board/');assert.equal(page('/airports/NOTREAL/board/').status,404);
  assert.match(page('/airports/IAD/board/').body,/America\/New_York/);assert.match(page('/airports/IAD/').body,/\/airports\/IAD\/board\//);
- // Authenticated operational data is not published as an empty SEO landing page.
- assert.match(page('/airports/IAD/board/').body,/noindex,follow/);assert.doesNotMatch(page('/sitemap.xml').body,/\/board\//);
+ // Public board pages are indexable; live schedule access is still authenticated.
+ assert.doesNotMatch(page('/airports/IAD/board/').body,/noindex/);assert.match(page('/sitemap.xml').body,/\/board\//);
 });
 test('edge boards serve without loading the globe or calling the flight provider',async()=>{
  for(const method of ['GET','HEAD']){const r=await handle(new Request(env.SKYWARD_PUBLIC_ORIGIN+'/airports/IAD/board/',{method}),env);assert.equal(r.status,200);assert.equal(r.headers.get('content-type'),'text/html; charset=utf-8');const html=await r.text();if(method==='HEAD')assert.equal(html,'');else assert.match(html,/Airport flight board/);}
