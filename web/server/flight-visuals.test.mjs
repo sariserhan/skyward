@@ -13,7 +13,7 @@ test('camera fits the usable desktop and mobile space and takes the short headin
  const desk=flightFraming(1200,900,{left:24,right:378,top:115,bottom:750},74,1.15,Math.PI/3);
  assert.ok(desk.cx>378+74&&desk.cx<1116);assert.ok(desk.range>150);
  const mobile=flightFraming(390,780,{left:10,right:380,top:460,bottom:760},74,1.15,Math.PI/3);
- assert.ok(mobile.cy>100&&mobile.cy<460);assert.ok(mobile.range>74);
+ assert.equal(mobile.cx,195);assert.ok(mobile.cy>100&&mobile.cy<460);assert.ok(mobile.range>74);
  assert.equal(angleStep(359,1,.5),360);
 });
 test('illustrative gear extends before landing and retracts gradually after takeoff',()=>{
@@ -46,4 +46,18 @@ test('tower retains bounded detailed traffic at approach distances even on low q
  assert.deepEqual(nearbyModelIds(rows,modelBudget('low',true),true),['0','1','2']);
  assert.deepEqual(nearbyModelIds(rows,modelBudget('high')),[]);
  assert.equal(modelOpacity(6000,false,true),1);assert.equal(modelOpacity(20000,false,true),0);
+});
+
+test('wheel zoom respects direction, input units and close-up limits',async()=>{
+ const {flightWheelDistance,flightZoomLimits}=await import('../src/lib/flightVisuals.ts');
+ assert.ok(flightWheelDistance(1,-100)<1);assert.ok(flightWheelDistance(1,100)>1);
+ assert.equal(flightWheelDistance(1,5,1),flightWheelDistance(1,80));
+ assert.equal(flightWheelDistance(1,.1,2,800),flightWheelDistance(1,80));
+ assert.equal(flightWheelDistance(flightZoomLimits.min,-1000),flightZoomLimits.min);
+ assert.equal(flightWheelDistance(flightZoomLimits.max,1000),flightZoomLimits.max);
+ assert.equal(flightWheelDistance(1,NaN),1.15);
+ const {sanitizeFlightPreferences}=await import('../src/lib/flightPreferences.ts');
+ const saved=sanitizeFlightPreferences({distance:flightZoomLimits.min,savedDistance:flightZoomLimits.min});
+ assert.equal(saved.distance,flightZoomLimits.min);assert.equal(saved.savedDistance,flightZoomLimits.min);
+ const {validBackupValue}=await import('../src/lib/localBackup.ts');assert.ok(validBackupValue('skyward.flight-view.v1',JSON.stringify(saved)));
 });

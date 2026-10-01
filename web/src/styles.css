@@ -506,3 +506,7 @@ body>.cesium-credit-lightbox-overlay .cesium-credit-lightbox-close{min-width:36p
 .recent-aircraft{padding:10px 0;border-bottom:1px solid var(--line)}.recent-aircraft h3{font-size:12px;color:var(--mint);margin:0 0 6px}.recent-aircraft>p{font-size:11px;line-height:1.5;margin-bottom:6px}.recent-aircraft .airport-main{width:100%;text-align:left;padding:10px 8px;border-radius:5px}.recent-aircraft .airport-main:hover,.recent-aircraft .airport-main:focus-visible{background:#23424b}.recent-aircraft small{font-size:10px;line-height:1.5}
 
 .flight-search-help{font-size:11px;line-height:1.5;color:var(--muted);margin:0 0 10px}
+
+/* Avoid a stale sticky-header compositing surface over the mobile WebGL view.
+   The sheet handle and panel controls already provide the persistent controls. */
+.phone-layout .flight-experience header{position:static}

@@ -40,7 +40,7 @@ import type {Aircraft,AirportGeometry,TrailPoint,GeometryFile,FlightRoute} from 
 import {aircraftNames,airline} from '../lib/aircraft';
 import {nearestCity,type City} from '../lib/cities';
 import {profileNames,fullLivery,fleetUri,fallbackFleetUri,sourcedModel,fleetProfile,fleetPaint,runwayFrame} from '../lib/flightPresentation';
-import {angleStep,flightFraming,illustrativeGear} from '../lib/flightVisuals';
+import {angleStep,flightFraming,flightWheelDistance,flightZoomLimits,illustrativeGear} from '../lib/flightVisuals';
 import {ageSeconds} from '../lib/aircraft';
 const profileLengths:Record<string,number>={b772:64,b788:57,b78x:68,a35k:74,e190:36,crj:36,pc12:14,a380:73,b747:71,b777:74,b787:63,a330:64,a350:67,b767:55,b757:47,bizjet:22,light:9,turboprop:23};
 type View='route'|'chase'|'side'|'orbit'|'area'|'front'|'cockpit'|'cabin'|'bird'|'free'|'wing'|'tail'|'director';
@@ -70,7 +70,12 @@ export function FlightExperience(p:Props){
   const returnPose={destination:C.Cartesian3.clone(v.camera.positionWC),orientation:{direction:C.Cartesian3.clone(v.camera.directionWC),up:C.Cartesian3.clone(v.camera.upWC)}};const entryNavigation=p.navigationKey;
   v.camera.cancelFlight();v.trackedEntity=undefined;last.current=0;const originalNear=v.camera.frustum.near,controller=v.scene.screenSpaceCameraController,originalCollision=controller.enableCollisionDetection;let retainedSurface=0,retainedFloor=25;
   const groundSurface=(lon:number,lat:number)=>{const sample=v.scene.globe.getHeight(C.Cartographic.fromDegrees(lon,lat));if(typeof sample==='number'&&Number.isFinite(sample)&&sample>=-430&&sample<=8849)retainedSurface=sample;return retainedSurface;};
-  const release=()=>{if(state.current.view==='cockpit'||state.current.view==='cabin')return;previousView='free';setView('free');};v.canvas.addEventListener('pointerdown',release);v.canvas.addEventListener('wheel',release);v.canvas.addEventListener('keydown',release);
+  const release=()=>{if(state.current.view==='cockpit'||state.current.view==='cabin')return;previousView='free';setView('free');};v.canvas.addEventListener('pointerdown',release);v.canvas.addEventListener('wheel',zoom,{capture:true,passive:false});v.canvas.addEventListener('keydown',release);
+  function zoom(event:WheelEvent){
+   if(!['side','chase','orbit','bird','tail','director'].includes(state.current.view)){release();return;}
+   event.preventDefault();event.stopImmediatePropagation();
+   setDistance(current=>flightWheelDistance(current,event.deltaY,event.deltaMode,v.canvas.clientHeight));
+  }
   const hidden=()=>{if(document.hidden||state.current.p.suspended)setPlaying(false);last.current=0;};document.addEventListener('visibilitychange',hidden);
   let shown:Cesium.Entity|undefined,drawn='',cameraAngle=original?.heading??0,cameraRange=0,layoutDirty=true,box:{left:number;top:number;right:number;bottom:number}|null=null;
   const layout=()=>{const canvas=v.canvas.getBoundingClientRect(),panel=panelRef.current?.getBoundingClientRect();box=panel?{left:panel.left-canvas.left,top:panel.top-canvas.top,right:panel.right-canvas.left,bottom:panel.bottom-canvas.top}:null;layoutDirty=true;};
@@ -160,7 +165,7 @@ export function FlightExperience(p:Props){
    cameraMoving=!!position&&s.view!=='free'&&s.view!=='route'&&s.view!=='cockpit'?camera(position!,heading,s.view==='director'?directedView(fix&&'landingPhase' in fix&&fix.landingPhase?fix.landingPhase:fix?.ground?'taxi':undefined):s.view,dt):false;if(['front','cabin','wing','tail'].includes(s.view)&&rough.strength>.001){v.camera.lookUp(rough.pitch*Math.PI/180*.5);v.camera.twistRight(rough.roll*Math.PI/180*.5);}v.scene.requestRender();
   };
   frame.current=requestAnimationFrame(tick);
-  return()=>{cancelAnimationFrame(frame.current);resize.disconnect();observedPanel?.removeEventListener('panelpositionchange',layout);v.canvas.removeEventListener('pointerdown',release);v.canvas.removeEventListener('wheel',release);v.canvas.removeEventListener('keydown',release);document.removeEventListener('visibilitychange',hidden);if(!v.isDestroyed()){controller.enableCollisionDetection=originalCollision;v.camera.frustum.near=originalNear;if(shown)v.entities.remove(shown);const a=state.current.p.aircraft?.hex===original?.hex?state.current.p.aircraft:original,e=a&&v.entities.getById(`aircraft-${a.hex}`);if(e&&a){e.show=true;gear(e,a,a.ground?1:0,0,false);}v.camera.lookAtTransform(C.Matrix4.IDENTITY);if(!state.current.open&&state.current.p.mode==='3D'&&!state.current.p.replay&&state.current.p.navigationKey===entryNavigation){v.camera.cancelFlight();v.camera.setView(returnPose);}v.scene.requestRender();}};
+  return()=>{cancelAnimationFrame(frame.current);resize.disconnect();observedPanel?.removeEventListener('panelpositionchange',layout);v.canvas.removeEventListener('pointerdown',release);v.canvas.removeEventListener('wheel',zoom,true);v.canvas.removeEventListener('keydown',release);document.removeEventListener('visibilitychange',hidden);if(!v.isDestroyed()){controller.enableCollisionDetection=originalCollision;v.camera.frustum.near=originalNear;if(shown)v.entities.remove(shown);const a=state.current.p.aircraft?.hex===original?.hex?state.current.p.aircraft:original,e=a&&v.entities.getById(`aircraft-${a.hex}`);if(e&&a){e.show=true;gear(e,a,a.ground?1:0,0,false);}v.camera.lookAtTransform(C.Matrix4.IDENTITY);if(!state.current.open&&state.current.p.mode==='3D'&&!state.current.p.replay&&state.current.p.navigationKey===entryNavigation){v.camera.cancelFlight();v.camera.setView(returnPose);}v.scene.requestRender();}};
  },[p.viewer,open,p.mode,p.replay]);
 
  if(!eligible||p.mode!=='3D'||p.replay)return null;
@@ -181,7 +186,7 @@ export function FlightExperience(p:Props){
  {!demo&&presentation?.arrivalAnimation&&<button className="quiet-button" onClick={()=>sharedLiveMotion.stopArrival(a.hex)}>Return to live tracking</button>}
  {!demo&&<p className="flight-motion-status" role="status">{p.aircraft?.positionWarning?`Position quality: ${p.aircraft.positionWarning} · suspect fix excluded. ${liveMotionStatus(a,p.trail,Date.now(),p.reducedMotion,p.route,p.arrivalGeometry,presentation)}`:liveMotionStatus(a,p.trail,Date.now(),p.reducedMotion,p.route,p.arrivalGeometry,presentation)}{!p.modelReady&&view!=='area'&&view!=='route'&&<small>3D model not ready · aircraft marker retained</small>}</p>}
  {p.modelStage!=='primary'&&!demo&&<div className="model-recovery" role="status"><p>{p.modelStage==='fallback'?'Lightweight model · detailed model unavailable or slow':'Aircraft marker · 3D models unavailable or slow'}</p><button onClick={p.retryModel}>Retry detailed model</button></div>}
- {view!=='front'&&view!=='cabin'&&<label className="flight-distance">Camera distance<input aria-label="Flight camera distance" type="range" min="0.8" max="2.4" step="0.05" value={distance} onChange={e=>{setDistance(Number(e.target.value));if(view==='free')setView('side');}}/></label>}
+ {view!=='front'&&view!=='cabin'&&<label className="flight-distance">Camera distance<input aria-label="Flight camera distance" type="range" min={flightZoomLimits.min} max={flightZoomLimits.max} step="0.05" value={distance} onChange={e=>{setDistance(Number(e.target.value));if(view==='free')setView('side');}}/></label>}
  </section><div className="flight-details" hidden={compact}><h3 className="flight-group-title">Flight details</h3>
  <p className="flight-mobile-hint">Scroll for camera controls and location map ↓</p>
  <p>{demo?`${airport?.id} · runway ${runways[runway]?.id} · 45-second illustration`:endpoints?`${endpoints[0].iata||endpoints[0].icao} → ${endpoints[1].iata||endpoints[1].icao} · route`:'Origin / destination not verified'}</p>

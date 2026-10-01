@@ -22,3 +22,16 @@ test('decorative bridges require mapped apron and terminal proximity and avoid r
  const airport={lat:0,lon:0,gates:[{label:'A1',position:[.0013,0]}],surfaces:[{kind:'terminal',points:ring},{kind:'apron',points:[[-.002,-.002],[.003,-.002],[.003,.002],[-.002,.002]]}],runways:[]};
  assert.equal(airportStandDetails(airport).length,1);airport.runways=[{a:[.0011,-.01],b:[.0011,.01],width:45}];assert.equal(airportStandDetails(airport).length,0);airport.runways=[];airport.surfaces.pop();assert.equal(airportStandDetails(airport).length,0);
 });
+
+test('logo illumination stays on explicitly authored tail decals and preserves texture coordinates',()=>{
+ const texture={index:2,texCoord:1};
+ const tail={name:'Operator logo identification',alphaMode:'MASK',alphaCutoff:.08,pbrMetallicRoughness:{baseColorTexture:texture}};
+ const unknown={name:'Airline atlas',pbrMetallicRoughness:{baseColorTexture:{index:3}}};
+ const extended={...tail,extensions:{KHR_materials_unlit:{}}};
+ const model={materials:[tail,unknown,extended]};
+ assert.equal(refineAircraftMaterials(model),1);
+ assert.deepEqual(tail.emissiveTexture,texture);assert.deepEqual(tail.emissiveFactor,[.24,.24,.24]);
+ assert.equal(tail.alphaMode,'MASK');assert.equal(tail.alphaCutoff,.08);
+ assert.equal(unknown.emissiveTexture,undefined);assert.equal(extended.emissiveTexture,undefined);
+ assert.equal(refineAircraftMaterials(model),0);
+});

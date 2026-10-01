@@ -1,0 +1,49 @@
+name: Aircraft visual regression
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'web/src/components/FlightExperience.tsx'
+      - 'web/src/lib/flight*.ts'
+      - 'web/src/lib/aircraftMaterials.ts'
+      - 'web/src/lib/nightMap.ts'
+      - 'web/src/lib/solarLighting.ts'
+      - 'web/src/styles.css'
+      - 'web/public/models/**'
+      - 'web/tests/browser/aircraft-visual.mjs'
+      - '.github/workflows/aircraft-visual.yml'
+permissions:
+  contents: read
+concurrency:
+  group: aircraft-visual-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  aircraft:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+        working-directory: web
+      - name: Install isolated browser tooling
+        run: |
+          npm install --prefix "$RUNNER_TEMP/skyward-playwright" --no-package-lock playwright@1.62.1
+          "$RUNNER_TEMP/skyward-playwright/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Unit and rendered aircraft checks
+        working-directory: web
+        run: |
+          node --test server/flight-visuals.test.mjs server/flight-enhancements.test.mjs server/visual-realism.test.mjs server/solar-lighting.test.mjs
+          SKYWARD_QA_PLAYWRIGHT="$RUNNER_TEMP/skyward-playwright/node_modules/playwright" npm run test:aircraft-visual
+        env:
+          SKYWARD_QA_ARTIFACTS: /tmp/skyward-aircraft-visual
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: aircraft-visual
+          path: /tmp/skyward-aircraft-visual
+          retention-days: 7

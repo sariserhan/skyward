@@ -3,6 +3,14 @@ type Material={name?:string;extensions?:unknown;pbrMetallicRoughness?:{roughness
 export function refineAircraftMaterials(model:{materials?:Material[]}){
  let changed=0;
  for(const m of model.materials??[]){
+  // Only authored tail identification decals qualify; unknown livery atlases,
+  // windows and fuselage logos must not acquire invented illumination.
+  const texture=m.pbrMetallicRoughness?.baseColorTexture;
+  if(m.name==='Operator logo identification'&&!m.extensions&&texture&&typeof texture==='object'){
+   if(JSON.stringify(m.emissiveFactor)!=='[0.24,0.24,0.24]'||JSON.stringify(m.emissiveTexture)!==JSON.stringify(texture)){
+    m.emissiveFactor=[.24,.24,.24];m.emissiveTexture={...texture};changed++;
+   }
+  }
   const p=m.pbrMetallicRoughness;if(!p||p.metallicRoughnessTexture||m.extensions)continue;
   const name=(m.name??'').toLowerCase();let profile:[number,number]|undefined;
   if(/(?:^|[_ .-])(rubber|tyre|tire)(?:$|[_ .-]|\d)/.test(name))profile=[.92,0];

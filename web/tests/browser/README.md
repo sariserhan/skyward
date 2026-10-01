@@ -99,3 +99,22 @@ and `python3 tests/browser/traffic-requests.py` from `web/` with Playwright
 installed. These use mocked feeds to verify that fresh results survive repeated
 visibility events without extra requests, expired routes refresh, and airport
 refreshes respect `Retry-After` even when a rate-limit response is plain text.
+
+## Aircraft close-up regression
+
+`npm run test:aircraft-visual` builds the app and runs a deterministic Node
+Playwright suite with an isolated server and fixture traffic. It uses an existing
+`playwright` package; if your QA tooling is installed outside this project, set
+`SKYWARD_QA_PLAYWRIGHT` to that package directory. It does not install tooling or
+contact live aircraft providers. `SKYWARD_QA_ARTIFACTS` selects the output directory
+(default: a new directory under the system temporary directory).
+
+The matrix covers a dark British Airways 737 livery, a United 787 tail-logo decal,
+a Delta CRJ T-tail, and a Cessna 172 fixture using the small-aircraft fallback model. Both sides are captured at the closest
+camera setting in daylight, dusk and night. Assertions cover attached wheel zoom,
+model-selection refresh after a shader rebuild, visible content and rendering
+errors, mobile orientation changes, horizontal overflow, and opaque black bands
+in the mobile canvas. Screenshots and `results.json` are retained for review.
+These are Chromium software-renderer checks, not physical-device certification.
+The `Aircraft visual regression` workflow runs for relevant pull requests and can
+also be started manually; browser tooling is installed separately from app dependencies.
