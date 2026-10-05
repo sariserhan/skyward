@@ -12,7 +12,7 @@ test('all catalog airports have canonical board pages with useful links and unav
  assert.equal(page('/airports/iad/board').location,'/airports/IAD/board/');assert.equal(page('/airports/NOTREAL/board/').status,404);
  assert.match(page('/airports/IAD/board/').body,/America\/New_York/);assert.match(page('/airports/IAD/').body,/\/airports\/IAD\/board\//);
  // Public board pages are indexable; live schedule access is still authenticated.
- assert.doesNotMatch(page('/airports/IAD/board/').body,/noindex/);assert.match(page('/sitemap.xml').body,/\/board\//);
+ assert.doesNotMatch(page('/airports/IAD/board/').body,/noindex/);assert.doesNotMatch(page('/sitemap.xml').body,/\/board\//);
 });
 test('edge boards serve without loading the globe or calling the flight provider',async()=>{
  for(const method of ['GET','HEAD']){const r=await handle(new Request(env.SKYWARD_PUBLIC_ORIGIN+'/airports/IAD/board/',{method}),env);assert.equal(r.status,200);assert.equal(r.headers.get('content-type'),'text/html; charset=utf-8');const html=await r.text();if(method==='HEAD')assert.equal(html,'');else assert.match(html,/Airport flight board/);}

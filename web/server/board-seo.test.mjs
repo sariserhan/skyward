@@ -6,13 +6,14 @@ import {publicPage} from './public-pages.mjs';
 import worker from '../cloudflare/router.mjs';
 const origin='https://skyvvard.com',env={SKYWARD_PUBLIC_ORIGIN:origin};
 const page=path=>publicPage(new URL(path,origin),env);
-test('every airline and airport board has one sitemap entry, canonical metadata and accurate breadcrumbs',()=>{
+test('airline boards are in the sitemap; airport boards stay indexable but are left out of it; all have canonical metadata and accurate breadcrumbs',()=>{
  const sitemap=page('/sitemap.xml').body;
  const urls=[...sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map(m=>m[1]);
  assert.equal(new Set(urls).size,urls.length,'sitemap has no duplicate URLs');
  const paths=[...Object.keys(catalog).map(id=>`/airports/${id}/board/`),...Object.keys(airlineNames).map(code=>`/airlines/${code}/`)];
  for(const path of paths){
-  const canonical=origin+path,p=page(path);assert.equal(p.status,200,path);assert.ok(urls.includes(canonical),path);
+  const canonical=origin+path,p=page(path);assert.equal(p.status,200,path);// Airport boards hold no crawlable schedule data; the airport page is the sitemap entry and links to its board.
+  assert.equal(urls.includes(canonical),path.startsWith('/airlines/'),path);if(path.startsWith('/airports/'))assert.ok(urls.includes(canonical.replace('board/','')),path);
   assert.doesNotMatch(p.body,/noindex/);assert.ok(p.body.includes(`<link rel="canonical" href="${canonical}">`),path);
   for(const tag of ['<title>','name="description"','property="og:title"','property="og:description"','name="twitter:card"'])assert.ok(p.body.includes(tag),path+' '+tag);
   const schema=JSON.parse(p.body.match(/<script type="application\/ld\+json">(.*?)<\/script>/s)[1]);
